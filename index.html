@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yazeed Alotaibi · PM Tools &amp; Resources</title>
+  <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #f6f4ee;
+      --ink:     #1a1a1a;
+      --muted:   #6b6860;
+      --faint:   #e8e4d9;
+      --accent:  #2b49c9;
+      --accent-light: #edf0fb;
+      --card-bg: #ffffff;
+      --chalk:   #1e1e1e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ─── Top bar ─────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--faint);
+    }
+    .topbar-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .topbar-nav a {
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .topbar-nav a:hover { color: var(--ink); }
+    .topbar-nav .li-btn {
+      padding: 0.375rem 0.875rem;
+      border: 1px solid var(--faint);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background 0.15s;
+      background: var(--card-bg);
+    }
+    .topbar-nav .li-btn:hover { background: var(--faint); }
+
+    /* ─── Hero ────────────────────────────────────────────── */
+    .hero {
+      max-width: 860px;
+      margin: 5rem auto 4rem;
+      padding: 0 2rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.7;
+    }
+    .creds {
+      display: inline-flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .cred-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 0.3rem 0.7rem;
+      background: var(--chalk);
+      color: #f0ede4;
+      border-radius: 4px;
+    }
+
+    /* ─── Tools section ───────────────────────────────────── */
+    .tools-section {
+      max-width: 860px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+    }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-top: 1px solid var(--faint);
+      padding-top: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ─── Tool card ───────────────────────────────────────── */
+    .tool-card {
+      background: var(--card-bg);
+      border: 1px solid var(--faint);
+      border-radius: 10px;
+      padding: 1.5rem 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .tool-card:hover:not(.soon) {
+      border-color: #c8c3b6;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    }
+    .tool-card.soon {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .card-domain {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+    .card-domain.coming {
+      color: var(--muted);
+      background: var(--faint);
+    }
+    .card-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .card-stats {
+      display: flex;
+      gap: 1rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--faint);
+    }
+    .stat {
+      text-align: left;
+    }
+    .stat-num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+    .card-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+    .card-arrow svg { transition: transform 0.15s; }
+    .tool-card:hover .card-arrow svg { transform: translateX(3px); }
+
+    /* ─── Footer ──────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--faint);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .footer-name {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-name a {
+      color: var(--ink);
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid var(--faint);
+    }
+    .footer-name a:hover { border-color: var(--ink); }
+    .footer-right {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ─── Mobile ──────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .topbar { padding: 1rem 1.25rem; }
+      .hero, .tools-section { padding: 0 1.25rem; }
+      .hero { margin: 3.5rem auto 3rem; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .footer { padding: 1.5rem 1.25rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <a href="/" class="topbar-logo">by: Yazeed Alotaibi</a>
+    <nav class="topbar-nav">
+      <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener" class="li-btn">LinkedIn ↗</a>
+      <a href="mailto:yaz.otb.sa@gmail.com" class="li-btn">Email</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-eyebrow">Project Management · Tools &amp; Resources</p>
+    <h1>Built by a PM,<br><em>for PMs.</em></h1>
+    <p class="hero-sub">
+      Practical tools, calculators, dashboards, and AI resources for project managers
+      who need the right answer fast.
+    </p>
+  </section>
+
+  <!-- Tools -->
+  <section class="tools-section">
+    <p class="section-label">Tools</p>
+    <div class="tools-grid">
+
+      <!-- PM Calculation Desk — LIVE -->
+      <a class="tool-card" href="pm-calculation-desk.html">
+        <span class="card-domain">Calculators</span>
+        <h2 class="card-title">The Project Manager's Calculation Desk</h2>
+        <p class="card-desc">
+          Every PM formula you'll ever need — EVM, PERT, risk, quality, procurement, agile, and more.
+          Each one explained and color-coded so you know what the result actually means.
+        </p>
+        <div class="card-stats">
+          <div class="stat">
+            <div class="stat-num">14</div>
+            <div class="stat-label">Domains</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">33</div>
+            <div class="stat-label">Calculators</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">99</div>
+            <div class="stat-label">Metrics</div>
+          </div>
+        </div>
+        <span class="card-arrow">
+          Open tool
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- Placeholder: Dashboard -->
+      <div class="tool-card soon">
+        <span class="card-domain coming">Dashboards</span>
+        <h2 class="card-title">Project Status Dashboard</h2>
+        <p class="card-desc">
+          Visual dashboard templates for tracking project health, milestones, budget, and risk in one view.
+        </p>
+        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
+      </div>
+
+      <!-- Placeholder: AI tool -->
+      <div class="tool-card soon">
+        <span class="card-domain coming">AI Tools</span>
+        <h2 class="card-title">AI Scope Statement Generator</h2>
+        <p class="card-desc">
+          Describe your project in plain language and get a structured, PMI-aligned scope statement draft.
+        </p>
+        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
+      </div>
+
+      <!-- Placeholder: Estimation -->
+      <div class="tool-card soon">
+        <span class="card-domain coming">Estimation</span>
+        <h2 class="card-title">WBS Estimation Toolkit</h2>
+        <p class="card-desc">
+          Build a work breakdown structure, apply three-point estimates, and roll up confidence intervals automatically.
+        </p>
+        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-name">
+      Made by <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
+    </p>
+    <p class="footer-right">&copy; 2026 yazeed.blog</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,2255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Project Manager's Calculation Desk</title>
+  <meta name="description" content="Interactive project management calculators — earned value, PERT estimation, float, EMV, NPV, procurement and agile forecasting — with every formula and parameter explained.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <style>
+/* PM Calculation Desk — editorial light theme.
+   Direction: warm paper, ink typography (Fraunces display / Inter UI),
+   dark chalk-strip formulas, semantic tones reserved for interpretation. */
+
+:root {
+  --paper: #f6f4ee;
+  --card: #fffefa;
+  --ink: #1c1b17;
+  --ink-soft: #6b675c;
+  --ink-faint: #948f81;
+  --line: #e4dfd2;
+  --line-strong: #cfc8b6;
+  --chalk: #23221d;
+  --chalk-text: #f0ead9;
+
+  --accent: #2b49c9;
+  --accent-soft: #eceffc;
+  --good: #1c7a4d;
+  --good-soft: #e8f4ec;
+  --warn: #9a6c07;
+  --warn-soft: #faf3e0;
+  --bad: #bb3a3a;
+  --bad-soft: #f9ecec;
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  --space-section: clamp(3.5rem, 2.5rem + 3vw, 6rem);
+  --radius: 14px;
+  --dur: 180ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+}
+
+/* ------------------------------------------------------------ sidebar */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.75rem 1.25rem;
+  border-right: 1px solid var(--line);
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 10px;
+  background: var(--chalk);
+  color: var(--chalk-text);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.brand strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.brand span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.search input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.search input::placeholder { color: var(--ink-faint); }
+
+.search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+#cat-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#cat-nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+
+#cat-nav a .nav-num {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+}
+
+#cat-nav a:hover { background: var(--card); color: var(--ink); }
+
+#cat-nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#cat-nav a.active {
+  border-left-color: var(--accent);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+#cat-nav a.dimmed { opacity: 0.35; }
+
+.sidebar footer {
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------- main */
+main {
+  padding: 0 clamp(1.25rem, 4vw, 4rem) 5rem;
+  max-width: 1060px;
+}
+
+.hero {
+  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(2rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.kicker {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.4rem);
+  font-weight: 560;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  max-width: 16ch;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero .lede {
+  margin: 1.4rem 0 0;
+  max-width: 58ch;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  color: var(--ink-soft);
+}
+
+#hero-stats {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  background: var(--card);
+}
+
+/* ---------------------------------------------------------- category */
+.category { padding-top: var(--space-section); }
+
+.cat-head {
+  display: flex;
+  gap: 1.25rem;
+  align-items: baseline;
+  margin-bottom: 1.75rem;
+}
+
+.cat-num {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--line-strong);
+  line-height: 1;
+}
+
+.cat-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.2rem);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+
+.cat-blurb {
+  margin: 0.45rem 0 0;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+/* --------------------------------------------------------------- card */
+.calc-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  margin-bottom: 1.5rem;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+
+.calc-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 10px 30px -18px rgba(28, 27, 23, 0.25);
+}
+
+.calc-card:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px -18px rgba(43, 73, 201, 0.35);
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+}
+
+.card-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.about {
+  margin: 0.8rem 0 1.1rem;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  max-width: 72ch;
+}
+
+.formula {
+  background: var(--chalk);
+  border-radius: 10px;
+  padding: 0.9rem 1.15rem;
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+}
+
+.formula code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.9;
+  color: var(--chalk-text);
+  white-space: pre;
+}
+
+/* ------------------------------------------------------ inputs/outputs */
+.io {
+  display: grid;
+  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.io h4 {
+  margin: 0 0 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+}
+
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.5rem 0.15rem;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--line-strong);
+  border-radius: 0;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.field input::placeholder { color: var(--ink-faint); font-size: 0.85rem; }
+
+.field input:hover { border-bottom-color: var(--ink-soft); }
+
+.field input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.field-meaning {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.result-group {
+  margin: 1.2rem 0 0.7rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.result-group:first-child { margin-top: 0; }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.7rem;
+}
+
+.result {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.r-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-soft);
+}
+
+.r-value {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.r-meaning {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.r-verdict {
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding-top: 0.35rem;
+  margin-top: 0.15rem;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.result.good { border-left-color: var(--good); background: var(--good-soft); }
+.result.good .r-verdict { color: var(--good); }
+
+.result.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.result.warn .r-verdict { color: var(--warn); }
+
+.result.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+.result.bad .r-verdict { color: var(--bad); }
+
+.result.info { border-left-color: var(--accent); }
+.result.info .r-verdict { color: var(--accent); }
+
+.result.has-value .r-value { color: var(--ink); }
+
+/* --------------------------------------------------------------- foot */
+.page-foot {
+  margin-top: var(--space-section);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  max-width: 70ch;
+}
+
+.credit {
+  display: block;
+  margin: 0.9rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.credit a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.credit a:hover { border-bottom-color: var(--accent); }
+
+.credit a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------- responsive */
+@media (max-width: 920px) {
+  /* minmax(0,…) so pre-formatted formula lines can't widen the page */
+  body { grid-template-columns: minmax(0, 1fr); }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #cat-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  #cat-nav a {
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+  }
+
+  #cat-nav a.active { border-color: var(--accent); }
+
+  .sidebar footer { display: none; }
+
+  .io { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">Σ</span>
+      <div>
+        <strong>Calculation Desk</strong>
+        <span>for project managers</span>
+      </div>
+    </div>
+
+    <label class="search">
+      <span class="sr-only" hidden>Search calculators</span>
+      <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" aria-label="Search calculators">
+    </label>
+
+    <nav id="cat-nav" aria-label="Calculation categories"></nav>
+
+    <footer>
+      Formulas follow PMBOK / PMP-exam conventions. Enter any consistent
+      currency and time units — the math doesn't care which.
+      <p class="credit">Made by
+        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
+      </p>
+    </footer>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <p class="kicker">Every formula · explained</p>
+      <h1>The Project Manager's <em>Calculation Desk</em></h1>
+      <p class="lede">
+        One page for the numbers behind project decisions. Each calculator
+        defines what it measures and why it exists, explains every parameter
+        you type in, and tells you how to read the result — not just what it is.
+      </p>
+      <p id="hero-stats"></p>
+    </header>
+
+    <div id="calc-sections"></div>
+
+    <footer class="page-foot">
+      Built as a study and working reference. Values compute locally in your
+      browser — nothing is sent anywhere. Interpretations are rules of thumb;
+      real decisions deserve context the formulas can't see.
+      <span class="credit">Made by
+        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
+      </span>
+    </footer>
+  </main>
+
+  <script>
+/* PM Calculation Desk — calculator definitions.
+   Each calculator carries its own teaching material: `about` (what it is and
+   why it exists), `formula` lines, per-input `meaning`, and per-output
+   `meaning` plus an `interpret` function that tells the reader how to act on
+   the number. Values arrive in `v` keyed by input key; text inputs arrive as
+   raw strings. Compute functions return a number, a display string, or null
+   when the inputs are insufficient. */
+
+var PM_DATA = (function () {
+  'use strict';
+
+  function ok() {
+    for (var i = 0; i < arguments.length; i++) {
+      if (!Number.isFinite(arguments[i])) return false;
+    }
+    return true;
+  }
+
+  function f2(n) {
+    if (!Number.isFinite(n)) return '—';
+    return Number(n.toFixed(2)).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function parseFlows(s) {
+    if (typeof s !== 'string' || !s.trim()) return null;
+    var parts = s.split(/[,;\s]+/).filter(Boolean).map(Number);
+    if (!parts.length) return null;
+    for (var i = 0; i < parts.length; i++) {
+      if (!Number.isFinite(parts[i])) return null;
+    }
+    return parts;
+  }
+
+  function npvOf(rate, inv, flows) {
+    var v = -inv;
+    for (var t = 0; t < flows.length; t++) {
+      v += flows[t] / Math.pow(1 + rate, t + 1);
+    }
+    return v;
+  }
+
+  function irrOf(inv, flows) {
+    var lo = -0.99, hi = 10;
+    var flo = npvOf(lo, inv, flows);
+    var fhi = npvOf(hi, inv, flows);
+    if (!Number.isFinite(flo) || !Number.isFinite(fhi) || flo * fhi > 0) return null;
+    for (var i = 0; i < 200; i++) {
+      var mid = (lo + hi) / 2;
+      var fm = npvOf(mid, inv, flows);
+      if (flo * fm <= 0) { hi = mid; } else { lo = mid; flo = fm; }
+    }
+    return ((lo + hi) / 2) * 100;
+  }
+
+  var good = function (t) { return { tone: 'good', text: t }; };
+  var warn = function (t) { return { tone: 'warn', text: t }; };
+  var bad = function (t) { return { tone: 'bad', text: t }; };
+  var info = function (t) { return { tone: 'info', text: t }; };
+
+  var categories = [
+
+    /* ------------------------------------------------------------ EVM */
+    {
+      id: 'evm',
+      name: 'Earned Value Management',
+      blurb: 'One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.',
+      cards: [
+        {
+          id: 'earned-value',
+          name: 'Earned value core & forecasting',
+          tagline: 'CV · SV · CPI · SPI · EAC · ETC · VAC · TCPI',
+          about: 'Enter the four base measures below and every earned-value metric updates live. The performance metrics describe project health today; the forecasting metrics project that health forward to completion. All monetary figures share whatever currency you enter.',
+          formula: [
+            'CV  = EV − AC        SV  = EV − PV',
+            'CPI = EV ÷ AC        SPI = EV ÷ PV',
+            'EAC = BAC ÷ CPI      ETC = EAC − AC',
+            'VAC = BAC − EAC',
+            'TCPI = (BAC − EV) ÷ (BAC − AC)'
+          ],
+          inputs: [
+            { key: 'bac', label: 'BAC — Budget at Completion', meaning: 'The total approved budget for all project work. The baseline everything else is measured against.', placeholder: 'e.g. 100000' },
+            { key: 'pv', label: 'PV — Planned Value', meaning: 'The budgeted cost of the work that was scheduled to be done by now (also called BCWS).', placeholder: 'e.g. 50000' },
+            { key: 'ev', label: 'EV — Earned Value', meaning: 'The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).', placeholder: 'e.g. 45000' },
+            { key: 'ac', label: 'AC — Actual Cost', meaning: 'What the completed work really cost, regardless of what was budgeted (also called ACWP).', placeholder: 'e.g. 60000' }
+          ],
+          outputs: [
+            {
+              group: 'Performance today',
+              key: 'cv', label: 'Cost Variance (CV)', format: 'money',
+              meaning: 'Budget health in currency: value earned minus money spent.',
+              compute: function (v) { return ok(v.ev, v.ac) ? v.ev - v.ac : null; },
+              interpret: function (x) { return x > 0 ? good('Under budget so far.') : x < 0 ? bad('Over budget by this amount.') : info('Exactly on budget.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'sv', label: 'Schedule Variance (SV)', format: 'money',
+              meaning: 'Schedule health expressed in currency: work done minus work planned.',
+              compute: function (v) { return ok(v.ev, v.pv) ? v.ev - v.pv : null; },
+              interpret: function (x) { return x > 0 ? good('Ahead of schedule.') : x < 0 ? bad('Behind schedule.') : info('Exactly on schedule.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'cpi', label: 'Cost Performance Index (CPI)', format: 'ratio',
+              meaning: 'Cost efficiency: value earned per unit of money spent.',
+              compute: function (v) { return ok(v.ev, v.ac) && v.ac !== 0 ? v.ev / v.ac : null; },
+              interpret: function (x) { return x > 1 ? good('Each 1.00 spent earns ' + f2(x) + ' of value.') : x < 1 ? bad('Each 1.00 spent earns only ' + f2(x) + ' of value.') : info('Spending exactly as planned.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'spi', label: 'Schedule Performance Index (SPI)', format: 'ratio',
+              meaning: 'Schedule efficiency: rate of progress versus the plan.',
+              compute: function (v) { return ok(v.ev, v.pv) && v.pv !== 0 ? v.ev / v.pv : null; },
+              interpret: function (x) { return x > 1 ? good('Progressing faster than planned.') : x < 1 ? bad('Progressing at ' + f2(x * 100) + '% of the planned rate.') : info('Exactly on pace.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'csi', label: 'Cost–Schedule Index (CSI)', format: 'ratio',
+              meaning: 'CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.',
+              compute: function (v) { return ok(v.ev, v.pv, v.ac) && v.ac !== 0 && v.pv !== 0 ? (v.ev / v.ac) * (v.ev / v.pv) : null; },
+              interpret: function (x) { return x >= 1 ? good('Healthy overall.') : x >= 0.9 ? warn('Slipping — watch closely.') : bad('Recovery is statistically unlikely without intervention.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'pctComplete', label: '% Complete', format: 'pct',
+              meaning: 'Share of the total scope actually finished: EV ÷ BAC.',
+              compute: function (v) { return ok(v.ev, v.bac) && v.bac !== 0 ? (v.ev / v.bac) * 100 : null; },
+              interpret: function (x, v) { return ok(v.ac, v.bac) && v.bac !== 0 && (v.ac / v.bac) * 100 > x ? warn('You have spent a larger share of budget than of scope.') : info('Compare with % Spent to gauge burn.'); }
+            },
+            {
+              group: 'Performance today',
+              key: 'pctSpent', label: '% Spent', format: 'pct',
+              meaning: 'Share of the total budget already consumed: AC ÷ BAC.',
+              compute: function (v) { return ok(v.ac, v.bac) && v.bac !== 0 ? (v.ac / v.bac) * 100 : null; },
+              interpret: function () { return info('Read alongside % Complete.'); }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'eacTypical', label: 'EAC — typical variance', format: 'money',
+              meaning: 'BAC ÷ CPI. Forecast final cost assuming today’s cost efficiency continues — the default assumption.',
+              compute: function (v) { return ok(v.bac, v.ev, v.ac) && v.ev !== 0 ? v.bac / (v.ev / v.ac) : null; },
+              interpret: function (x, v) { return ok(v.bac) ? (x <= v.bac ? good('Forecast at or under budget.') : bad('Forecast overrun of ' + f2(x - v.bac) + '.')) : null; }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'eacAtypical', label: 'EAC — atypical variance', format: 'money',
+              meaning: 'AC + (BAC − EV). Use when the variance was a one-off and the remaining work will go to plan.',
+              compute: function (v) { return ok(v.bac, v.ev, v.ac) ? v.ac + (v.bac - v.ev) : null; },
+              interpret: function (x, v) { return ok(v.bac) ? (x <= v.bac ? good('Forecast at or under budget.') : bad('Forecast overrun of ' + f2(x - v.bac) + '.')) : null; }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'eacBoth', label: 'EAC — cost & schedule', format: 'money',
+              meaning: 'AC + (BAC − EV) ÷ (CPI × SPI). Use when schedule pressure is also driving cost (e.g. a hard deadline).',
+              compute: function (v) {
+                if (!ok(v.bac, v.pv, v.ev, v.ac) || v.ac === 0 || v.pv === 0 || v.ev === 0) return null;
+                return v.ac + (v.bac - v.ev) / ((v.ev / v.ac) * (v.ev / v.pv));
+              },
+              interpret: function (x, v) { return ok(v.bac) ? (x <= v.bac ? good('Forecast at or under budget.') : bad('Forecast overrun of ' + f2(x - v.bac) + '.')) : null; }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'etc', label: 'ETC — Estimate to Complete', format: 'money',
+              meaning: 'EAC − AC (using the typical-variance EAC). Money still needed to finish the remaining work.',
+              compute: function (v) { return ok(v.bac, v.ev, v.ac) && v.ev !== 0 ? v.bac / (v.ev / v.ac) - v.ac : null; },
+              interpret: function () { return info('The funding request for the remainder of the project.'); }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'vac', label: 'VAC — Variance at Completion', format: 'money',
+              meaning: 'BAC − EAC. The over- or under-run expected on the day the project finishes.',
+              compute: function (v) { return ok(v.bac, v.ev, v.ac) && v.ev !== 0 ? v.bac - v.bac / (v.ev / v.ac) : null; },
+              interpret: function (x) { return x >= 0 ? good('Expected to finish under or on budget.') : bad('Expected to finish over budget by this amount.'); }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'tcpiBac', label: 'TCPI — to hit BAC', format: 'ratio',
+              meaning: '(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.',
+              compute: function (v) { return ok(v.bac, v.ev, v.ac) && (v.bac - v.ac) !== 0 ? (v.bac - v.ev) / (v.bac - v.ac) : null; },
+              interpret: function (x) { return x <= 1 ? good('Achievable — no extra efficiency needed.') : x <= 1.1 ? warn('A stretch: remaining work must run ' + f2((x - 1) * 100) + '% more efficiently.') : bad('Likely unrealistic — consider re-baselining to an EAC.'); }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'tcpiEac', label: 'TCPI — to hit EAC', format: 'ratio',
+              meaning: '(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit the new forecast instead of the original budget.',
+              compute: function (v) {
+                if (!ok(v.bac, v.ev, v.ac) || v.ev === 0) return null;
+                var eac = v.bac / (v.ev / v.ac);
+                return (eac - v.ac) !== 0 ? (v.bac - v.ev) / (eac - v.ac) : null;
+              },
+              interpret: function (x) { return x <= 1 ? good('The revised target is achievable at current efficiency.') : warn('Even the revised target demands improvement.'); }
+            }
+          ]
+        },
+        {
+          id: 'time-forecast',
+          name: 'Time forecasting (SPI-based)',
+          tagline: 'Planned duration ÷ SPI',
+          about: 'Cost gets EAC; schedule gets this. Dividing the planned duration by the schedule performance index projects when the project will actually finish if the current pace continues. It is an approximation — SPI drifts back toward 1.0 late in a project as planned value tops out, so trust it early and mid-project and re-check often.',
+          formula: ['Forecast duration = Planned duration ÷ SPI', 'SPI = EV ÷ PV'],
+          inputs: [
+            { key: 'plannedDur', label: 'Planned duration', meaning: 'The baseline total duration, in any time unit — the forecast comes back in the same unit.', placeholder: 'e.g. 12' },
+            { key: 'ev', label: 'EV — Earned Value', meaning: 'Budgeted cost of the work actually completed to date.', placeholder: 'e.g. 45000' },
+            { key: 'pv', label: 'PV — Planned Value', meaning: 'Budgeted cost of the work scheduled to be done by now.', placeholder: 'e.g. 50000' }
+          ],
+          outputs: [
+            {
+              key: 'spi', label: 'SPI', format: 'ratio',
+              meaning: 'Pace versus plan — the engine of the forecast.',
+              compute: function (v) { return ok(v.ev, v.pv) && v.pv !== 0 ? v.ev / v.pv : null; },
+              interpret: function (x) { return x >= 1 ? good('At or ahead of the planned pace.') : bad('Running at ' + f2(x * 100) + '% of the planned pace.'); }
+            },
+            {
+              key: 'forecastDur', label: 'Forecast duration', format: 'num',
+              meaning: 'Expected total duration if the current pace holds.',
+              compute: function (v) { return ok(v.plannedDur, v.ev, v.pv) && v.ev !== 0 ? v.plannedDur / (v.ev / v.pv) : null; },
+              interpret: function () { return info('Same unit as the planned duration you entered.'); }
+            },
+            {
+              key: 'delay', label: 'Projected slip', format: 'num',
+              meaning: 'Forecast minus plan — the schedule overrun taking shape.',
+              compute: function (v) { return ok(v.plannedDur, v.ev, v.pv) && v.ev !== 0 ? v.plannedDur / (v.ev / v.pv) - v.plannedDur : null; },
+              interpret: function (x) { return x > 0 ? bad('Trending ' + f2(x) + ' time unit(s) late — compress the schedule or move the date.') : good('Trending on time or early.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* -------------------------------------------------- Budget & Burn */
+    {
+      id: 'burn',
+      name: 'Budget & Burn Rate',
+      blurb: 'The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.',
+      cards: [
+        {
+          id: 'burn-rate',
+          name: 'Burn rate & runway',
+          tagline: 'Spend pace · runway · budget used',
+          about: 'Divide what you have spent by how long you have been spending it and you get the burn rate — the project’s cash velocity. Runway converts the remaining budget into time at that pace. Use any period unit (months, sprints); the runway comes back in the same unit.',
+          formula: [
+            'Burn rate = Spent ÷ Periods elapsed',
+            'Runway = (Budget − Spent) ÷ Burn rate'
+          ],
+          inputs: [
+            { key: 'budget', label: 'Total budget', meaning: 'Approved funds for the whole project.', placeholder: 'e.g. 120000' },
+            { key: 'spent', label: 'Spent to date', meaning: 'Actual cost so far — same as AC in earned value.', placeholder: 'e.g. 45000' },
+            { key: 'elapsed', label: 'Periods elapsed', meaning: 'How many months / sprints of spending produced that cost.', placeholder: 'e.g. 3' },
+            { key: 'planLeft', label: 'Planned periods remaining (optional)', meaning: 'How much longer the plan says the work will take — to test whether the money outlives the work.', placeholder: 'e.g. 6' }
+          ],
+          outputs: [
+            {
+              key: 'burnRate', label: 'Burn rate', format: 'money',
+              meaning: 'Average spend per period — the pace at which the budget is being consumed.',
+              compute: function (v) { return ok(v.spent, v.elapsed) && v.elapsed > 0 ? v.spent / v.elapsed : null; },
+              interpret: function () { return info('A trend, not a verdict — compare across periods to spot acceleration.'); }
+            },
+            {
+              key: 'remaining', label: 'Budget remaining', format: 'money',
+              meaning: 'Funds left before the budget is exhausted.',
+              compute: function (v) { return ok(v.budget, v.spent) ? v.budget - v.spent : null; },
+              interpret: function (x) { return x < 0 ? bad('Budget already exhausted.') : info('The fuel left in the tank.'); }
+            },
+            {
+              key: 'runway', label: 'Runway (periods)', format: 'num',
+              meaning: 'How many more periods the remaining budget lasts at the current burn rate.',
+              compute: function (v) { return ok(v.budget, v.spent, v.elapsed) && v.elapsed > 0 && v.spent > 0 ? (v.budget - v.spent) / (v.spent / v.elapsed) : null; },
+              interpret: function (x, v) {
+                if (ok(v.planLeft)) {
+                  return x >= v.planLeft ? good('Money outlasts the plan — ' + f2(x - v.planLeft) + ' period(s) of buffer.') : bad('Money runs out ' + f2(v.planLeft - x) + ' period(s) before the work does.');
+                }
+                return info('Enter planned periods remaining to compare against the plan.');
+              }
+            },
+            {
+              key: 'pctUsed', label: '% of budget used', format: 'pct',
+              meaning: 'Share of total funds already consumed.',
+              compute: function (v) { return ok(v.budget, v.spent) && v.budget !== 0 ? (v.spent / v.budget) * 100 : null; },
+              interpret: function (x) { return x > 100 ? bad('Over budget.') : warn('Meaningful only next to % of work complete — see Earned Value.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ----------------------------------------------------- Estimation */
+    {
+      id: 'estimation',
+      name: 'Estimation',
+      blurb: 'Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.',
+      cards: [
+        {
+          id: 'three-point',
+          name: 'Three-point estimate (PERT)',
+          tagline: 'Triangular · Beta · σ · confidence ranges',
+          about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike.',
+          formula: [
+            'Triangular = (O + M + P) ÷ 3',
+            'PERT (beta) = (O + 4M + P) ÷ 6',
+            'σ = (P − O) ÷ 6        Variance = σ²'
+          ],
+          inputs: [
+            { key: 'o', label: 'O — Optimistic', meaning: 'Best-case estimate: everything goes right. Roughly the 1-in-100 lucky outcome.', placeholder: 'e.g. 4' },
+            { key: 'm', label: 'M — Most Likely', meaning: 'The realistic estimate you would give under normal conditions.', placeholder: 'e.g. 6' },
+            { key: 'p', label: 'P — Pessimistic', meaning: 'Worst-case estimate: known risks materialise. Roughly the 1-in-100 unlucky outcome.', placeholder: 'e.g. 12' }
+          ],
+          outputs: [
+            {
+              key: 'tri', label: 'Triangular average', format: 'num',
+              meaning: 'Simple mean of the three points — use when you have no reason to trust M more.',
+              compute: function (v) { return ok(v.o, v.m, v.p) ? (v.o + v.m + v.p) / 3 : null; },
+              interpret: function () { return info('All three scenarios weighted equally.'); }
+            },
+            {
+              key: 'pert', label: 'PERT (beta) estimate', format: 'num',
+              meaning: 'Weighted mean, 4× on Most Likely — the standard exam and planning answer.',
+              compute: function (v) { return ok(v.o, v.m, v.p) ? (v.o + 4 * v.m + v.p) / 6 : null; },
+              interpret: function () { return info('The expected value to plan around.'); }
+            },
+            {
+              key: 'sd', label: 'Standard deviation (σ)', format: 'num',
+              meaning: 'How spread out the outcome could be. A wide O–P gap means low confidence.',
+              compute: function (v) { return ok(v.o, v.p) ? (v.p - v.o) / 6 : null; },
+              interpret: function (x, v) { return ok(v.m) && v.m !== 0 && Math.abs(x / v.m) > 0.25 ? warn('High uncertainty relative to the estimate — refine the inputs.') : info('Uncertainty of a single activity.'); }
+            },
+            {
+              key: 'variance', label: 'Variance (σ²)', format: 'num',
+              meaning: 'σ squared. Variances (not σ) are what you add up along a path to get path-level uncertainty.',
+              compute: function (v) { return ok(v.o, v.p) ? Math.pow((v.p - v.o) / 6, 2) : null; },
+              interpret: function () { return info('Path σ = √(sum of activity variances).'); }
+            },
+            {
+              key: 'r68', label: '68% confidence (±1σ)', format: 'text',
+              meaning: 'Roughly two times in three, the real result lands inside this range.',
+              compute: function (v) {
+                if (!ok(v.o, v.m, v.p)) return null;
+                var mean = (v.o + 4 * v.m + v.p) / 6, sd = (v.p - v.o) / 6;
+                return f2(mean - sd) + ' – ' + f2(mean + sd);
+              },
+              interpret: function () { return info('PERT ± 1σ.'); }
+            },
+            {
+              key: 'r95', label: '95% confidence (±2σ)', format: 'text',
+              meaning: 'The range usually quoted when someone asks for a commitment.',
+              compute: function (v) {
+                if (!ok(v.o, v.m, v.p)) return null;
+                var mean = (v.o + 4 * v.m + v.p) / 6, sd = (v.p - v.o) / 6;
+                return f2(mean - 2 * sd) + ' – ' + f2(mean + 2 * sd);
+              },
+              interpret: function () { return info('PERT ± 2σ.'); }
+            },
+            {
+              key: 'r997', label: '99.7% confidence (±3σ)', format: 'text',
+              meaning: 'Near-certainty bounds — use for hard external deadlines.',
+              compute: function (v) {
+                if (!ok(v.o, v.m, v.p)) return null;
+                var mean = (v.o + 4 * v.m + v.p) / 6, sd = (v.p - v.o) / 6;
+                return f2(mean - 3 * sd) + ' – ' + f2(mean + 3 * sd);
+              },
+              interpret: function () { return info('PERT ± 3σ.'); }
+            }
+          ]
+        },
+        {
+          id: 'path-sigma',
+          name: 'Path uncertainty roll-up',
+          tagline: 'σ(path) = √(Σ σ²)',
+          about: 'Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk.',
+          formula: ['σ(path) = √(σ₁² + σ₂² + … + σₙ²)'],
+          inputs: [
+            { key: 'sigmas', label: 'Activity σ values (comma-separated)', meaning: 'The standard deviation of each activity on the path, from the three-point calculator above.', placeholder: 'e.g. 1.33, 0.5, 2', type: 'text' }
+          ],
+          outputs: [
+            {
+              key: 'pathSigma', label: 'Path σ', format: 'num',
+              meaning: 'The combined uncertainty of the whole chain — use it for path-level confidence ranges.',
+              compute: function (v) {
+                var s = parseFlows(v.sigmas);
+                if (!s) return null;
+                var sum = 0;
+                for (var i = 0; i < s.length; i++) sum += s[i] * s[i];
+                return Math.sqrt(sum);
+              },
+              interpret: function () { return info('Path estimate ± this σ gives the 68% range; ± 2σ gives 95%.'); }
+            },
+            {
+              key: 'naiveSum', label: 'Naive sum of σ’s', format: 'num',
+              meaning: 'What you would get by simply adding the uncertainties — shown for contrast.',
+              compute: function (v) {
+                var s = parseFlows(v.sigmas);
+                if (!s) return null;
+                var sum = 0;
+                for (var i = 0; i < s.length; i++) sum += s[i];
+                return sum;
+              },
+              interpret: function (x, v) {
+                var s = parseFlows(v.sigmas);
+                if (!s || s.length < 2) return info('Add more activities to see the diversification effect.');
+                var sq = 0;
+                for (var i = 0; i < s.length; i++) sq += s[i] * s[i];
+                return warn('Overstates risk by ' + f2(x - Math.sqrt(sq)) + ' — pad the path, not every task.');
+              }
+            }
+          ]
+        },
+        {
+          id: 'learning-curve',
+          name: 'Learning curve',
+          tagline: 'T(n) = T₁ × n^(log rate ÷ log 2)',
+          about: 'Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.',
+          formula: ['Time for unit n = T₁ × n^(log(rate) ÷ log 2)'],
+          inputs: [
+            { key: 't1', label: 'T₁ — first unit time (or cost)', meaning: 'How long the first repetition took — the anchor of the curve.', placeholder: 'e.g. 100' },
+            { key: 'rate', label: 'Learning rate (%)', meaning: 'Per-doubling retention: 80 means each doubling takes 80% of the previous. Typical: 70–90%; 100 = no learning.', placeholder: 'e.g. 80' },
+            { key: 'n', label: 'Unit number (n)', meaning: 'Which repetition you want the estimate for.', placeholder: 'e.g. 4' }
+          ],
+          outputs: [
+            {
+              key: 'tn', label: 'Time for unit n', format: 'num',
+              meaning: 'Predicted effort for that repetition.',
+              compute: function (v) { return ok(v.t1, v.rate, v.n) && v.t1 > 0 && v.rate > 0 && v.rate <= 100 && v.n >= 1 ? v.t1 * Math.pow(v.n, Math.log(v.rate / 100) / Math.log(2)) : null; },
+              interpret: function () { return info('Assumes the same team and no long breaks — learning decays when work pauses.'); }
+            },
+            {
+              key: 'improvement', label: 'Improvement vs unit 1', format: 'pct',
+              meaning: 'How much faster unit n is than the first attempt.',
+              compute: function (v) { return ok(v.t1, v.rate, v.n) && v.t1 > 0 && v.rate > 0 && v.rate <= 100 && v.n >= 1 ? (1 - Math.pow(v.n, Math.log(v.rate / 100) / Math.log(2))) * 100 : null; },
+              interpret: function () { return warn('Estimating every repetition at T₁ quietly pads the plan.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ------------------------------------------------------- Schedule */
+    {
+      id: 'schedule',
+      name: 'Schedule & Critical Path',
+      blurb: 'The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.',
+      cards: [
+        {
+          id: 'float',
+          name: 'Float (slack)',
+          tagline: 'Total float · free float · critical path test',
+          about: 'Total float is how long an activity can slip without delaying the project finish. Free float is how long it can slip without delaying its immediate successor. Zero total float means the activity is on the critical path. Enter the dates from your forward/backward pass — either day numbers or durations, as long as they are consistent (this calculator uses the continuous convention where EF = ES + duration).',
+          formula: [
+            'Total Float = LS − ES = LF − EF',
+            'Free Float = ES(successor) − EF'
+          ],
+          inputs: [
+            { key: 'es', label: 'ES — Early Start', meaning: 'The soonest the activity can start, from the forward pass.', placeholder: 'e.g. 5' },
+            { key: 'ef', label: 'EF — Early Finish', meaning: 'The soonest it can finish: ES + duration.', placeholder: 'e.g. 9' },
+            { key: 'ls', label: 'LS — Late Start', meaning: 'The latest it can start without delaying the project, from the backward pass.', placeholder: 'e.g. 8' },
+            { key: 'lf', label: 'LF — Late Finish', meaning: 'The latest it can finish without delaying the project.', placeholder: 'e.g. 12' },
+            { key: 'succEs', label: 'Successor ES (optional)', meaning: 'Early start of the next activity — only needed for free float.', placeholder: 'e.g. 11' }
+          ],
+          outputs: [
+            {
+              key: 'tf', label: 'Total float', format: 'num',
+              meaning: 'Slip allowance before the project end date moves: LS − ES.',
+              compute: function (v) { return ok(v.ls, v.es) ? v.ls - v.es : ok(v.lf, v.ef) ? v.lf - v.ef : null; },
+              interpret: function (x) { return x === 0 ? bad('Zero float: this activity is on the critical path — any slip delays the project.') : x < 0 ? bad('Negative float: the schedule is already behind its target.') : good('Can slip ' + f2(x) + ' time unit(s) without moving the finish date.'); }
+            },
+            {
+              key: 'tfCheck', label: 'Cross-check (LF − EF)', format: 'num',
+              meaning: 'Should equal LS − ES; a mismatch means a pass was computed inconsistently.',
+              compute: function (v) { return ok(v.lf, v.ef) ? v.lf - v.ef : null; },
+              interpret: function (x, v) { return ok(v.ls, v.es) && (v.ls - v.es) !== x ? warn('Does not match LS − ES — re-check the forward/backward pass.') : info('Consistent with LS − ES.'); }
+            },
+            {
+              key: 'ff', label: 'Free float', format: 'num',
+              meaning: 'Slip allowance before the next activity is disturbed: successor ES − EF.',
+              compute: function (v) { return ok(v.succEs, v.ef) ? v.succEs - v.ef : null; },
+              interpret: function (x) { return x > 0 ? good('Can slip without touching the successor.') : x === 0 ? warn('Any slip pushes the successor immediately.') : bad('Already overlapping the successor.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ---------------------------------------- Schedule Compression */
+    {
+      id: 'compression',
+      name: 'Schedule Compression',
+      blurb: 'When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.',
+      cards: [
+        {
+          id: 'crash',
+          name: 'Crash cost slope',
+          tagline: '(Crash cost − Normal cost) ÷ time saved',
+          about: 'Most activities can be sped up — more people, overtime, premium suppliers — but only so far and at a price. The cost slope is the price of each time unit saved. To compress rationally: crash only critical-path activities, cheapest slope first, and stop when the slope costs more than the deadline is worth. Run this once per candidate activity and compare.',
+          formula: ['Cost slope = (Crash cost − Normal cost) ÷ (Normal duration − Crash duration)'],
+          inputs: [
+            { key: 'normalCost', label: 'Normal cost', meaning: 'Cost of the activity at its normal, efficient pace.', placeholder: 'e.g. 10000' },
+            { key: 'crashCost', label: 'Crash cost', meaning: 'Cost at the fastest possible pace — overtime, extra staff, expediting fees included.', placeholder: 'e.g. 16000' },
+            { key: 'normalDur', label: 'Normal duration', meaning: 'Duration at the normal pace (any time unit).', placeholder: 'e.g. 10' },
+            { key: 'crashDur', label: 'Crash duration', meaning: 'The shortest duration physically achievable — beyond it, money buys nothing.', placeholder: 'e.g. 8' }
+          ],
+          outputs: [
+            {
+              key: 'slope', label: 'Cost slope', format: 'money',
+              meaning: 'Extra cost per time unit saved on this activity.',
+              compute: function (v) { return ok(v.normalCost, v.crashCost, v.normalDur, v.crashDur) && (v.normalDur - v.crashDur) > 0 ? (v.crashCost - v.normalCost) / (v.normalDur - v.crashDur) : null; },
+              interpret: function (x) { return x < 0 ? good('Cheaper and faster — do it regardless of the deadline.') : info('Compare slopes across critical activities; crash the cheapest first.'); }
+            },
+            {
+              key: 'maxSaving', label: 'Maximum time saved', format: 'num',
+              meaning: 'The most this activity can be shortened: normal minus crash duration.',
+              compute: function (v) { return ok(v.normalDur, v.crashDur) ? v.normalDur - v.crashDur : null; },
+              interpret: function (x) { return x <= 0 ? bad('No compression available on this activity.') : warn('Crashing helps only while this activity stays on the critical path — re-check after each step.'); }
+            },
+            {
+              key: 'premium', label: 'Full crash premium', format: 'money',
+              meaning: 'Total extra cost of buying all the available time.',
+              compute: function (v) { return ok(v.normalCost, v.crashCost) ? v.crashCost - v.normalCost : null; },
+              interpret: function () { return info('Weigh against the cost of being late: penalties, lost revenue, standing armies.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ---------------------------------------------- Resources & Team */
+    {
+      id: 'resources',
+      name: 'Resources & Team',
+      blurb: 'Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.',
+      cards: [
+        {
+          id: 'fte',
+          name: 'Full-time equivalents (FTE)',
+          tagline: 'Effort ÷ capacity',
+          about: 'FTE converts a pile of estimated effort into how many full-time people the work actually needs within a given window. One FTE is one person fully allocated. Use productive hours per period, not contract hours — meetings, support and admin eat 15–30% before project work starts.',
+          formula: ['FTE = Effort hours ÷ (Productive hours per period × Periods)'],
+          inputs: [
+            { key: 'effort', label: 'Total effort (hours)', meaning: 'Estimated person-hours of work to deliver in the window.', placeholder: 'e.g. 2080' },
+            { key: 'hoursPer', label: 'Productive hours / person / period', meaning: 'Hours one person can really spend on this work each period — e.g. 130 of a 160-hour month after overhead.', placeholder: 'e.g. 130' },
+            { key: 'periods', label: 'Periods in the window', meaning: 'How many periods (months, sprints) the work is spread across.', placeholder: 'e.g. 4' }
+          ],
+          outputs: [
+            {
+              key: 'fte', label: 'FTE required', format: 'num',
+              meaning: 'Full-time people the work demands over the window.',
+              compute: function (v) { return ok(v.effort, v.hoursPer, v.periods) && v.hoursPer > 0 && v.periods > 0 ? v.effort / (v.hoursPer * v.periods) : null; },
+              interpret: function () { return info('The fraction is where over-allocation hides — someone absorbs it.'); }
+            },
+            {
+              key: 'headcount', label: 'Headcount (rounded up)', format: 'int',
+              meaning: 'Whole people to staff if nobody can split across projects cleanly.',
+              compute: function (v) { return ok(v.effort, v.hoursPer, v.periods) && v.hoursPer > 0 && v.periods > 0 ? Math.ceil(v.effort / (v.hoursPer * v.periods)) : null; },
+              interpret: function () { return info('Rounding down means overtime; rounding up means slack — choose deliberately.'); }
+            }
+          ]
+        },
+        {
+          id: 'utilization',
+          name: 'Utilization',
+          tagline: 'Allocated ÷ available',
+          about: 'The share of a person’s available time already committed. Sustained utilization near 100% removes all slack: queues form, small surprises cascade, and cycle times explode (the queueing math behind this lives in Lean & Flow). Plan people like you plan servers — with headroom.',
+          formula: ['Utilization % = Allocated hours ÷ Available hours × 100'],
+          inputs: [
+            { key: 'allocated', label: 'Allocated hours', meaning: 'Hours of committed work in the period across all assignments.', placeholder: 'e.g. 150' },
+            { key: 'available', label: 'Available hours', meaning: 'Hours the person actually has in the period.', placeholder: 'e.g. 160' }
+          ],
+          outputs: [
+            {
+              key: 'util', label: 'Utilization', format: 'pct',
+              meaning: 'Commitment level for the period.',
+              compute: function (v) { return ok(v.allocated, v.available) && v.available > 0 ? (v.allocated / v.available) * 100 : null; },
+              interpret: function (x) { return x > 100 ? bad('Over-allocated: something will slip, or quality will pay for it.') : x >= 85 ? warn('Little room for the unplanned — delays amplify above ~85%.') : good('Healthy margin for the unplanned.'); }
+            },
+            {
+              key: 'slack', label: 'Uncommitted hours', format: 'num',
+              meaning: 'Hours left for the work nobody predicted.',
+              compute: function (v) { return ok(v.allocated, v.available) ? v.available - v.allocated : null; },
+              interpret: function (x) { return x < 0 ? bad('Negative slack is unpaid overtime in disguise.') : info('Slack is capacity insurance, not waste.'); }
+            }
+          ]
+        },
+        {
+          id: 'labor-cost',
+          name: 'Loaded labor cost',
+          tagline: 'Rate × (1 + overhead)',
+          about: 'A person’s cost to the project is never just their pay rate. The loaded (burdened) rate adds employer overhead — benefits, payroll taxes, equipment, facilities, licences — typically 25–50% on top. Budgets built on bare rates systematically understate cost and get discovered at the worst possible time.',
+          formula: ['Loaded cost = Hours × Rate × (1 + Overhead %)'],
+          inputs: [
+            { key: 'hours', label: 'Effort (hours)', meaning: 'Person-hours of work being costed.', placeholder: 'e.g. 400' },
+            { key: 'rate', label: 'Base rate (per hour)', meaning: 'The bare pay or contract rate before burden.', placeholder: 'e.g. 60' },
+            { key: 'overhead', label: 'Overhead / burden (%)', meaning: 'Employer add-ons as a percentage of the base rate — ask finance; 25–50% is typical for employees.', placeholder: 'e.g. 35' }
+          ],
+          outputs: [
+            {
+              key: 'base', label: 'Base cost', format: 'money',
+              meaning: 'Hours × bare rate — the number that looks deceptively affordable.',
+              compute: function (v) { return ok(v.hours, v.rate) ? v.hours * v.rate : null; },
+              interpret: function () { return info('What the budget shows when overhead is forgotten.'); }
+            },
+            {
+              key: 'loaded', label: 'Loaded cost', format: 'money',
+              meaning: 'The true cost to the organisation, burden included.',
+              compute: function (v) { return ok(v.hours, v.rate, v.overhead) ? v.hours * v.rate * (1 + v.overhead / 100) : null; },
+              interpret: function (x, v) { return ok(v.hours, v.rate) ? warn('The bare-rate budget understates this by ' + f2(x - v.hours * v.rate) + '.') : null; }
+            },
+            {
+              key: 'loadedRate', label: 'Loaded hourly rate', format: 'money',
+              meaning: 'The per-hour figure to use in every estimate.',
+              compute: function (v) { return ok(v.rate, v.overhead) ? v.rate * (1 + v.overhead / 100) : null; },
+              interpret: function () { return info('Use this, not the bare rate, when costing effort.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* -------------------------------------------------- Communication */
+    {
+      id: 'comms',
+      name: 'Communication',
+      blurb: 'Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.',
+      cards: [
+        {
+          id: 'channels',
+          name: 'Communication channels',
+          tagline: 'n(n−1) ÷ 2',
+          about: 'Every pair of people on a project is a potential communication path that can carry — or garble — information. This count is used to justify communication plans, meeting structures and why large stakeholder groups need formal channels. Count everyone who communicates about the project, including yourself and the sponsor.',
+          formula: ['Channels = n × (n − 1) ÷ 2'],
+          inputs: [
+            { key: 'n', label: 'n — People now', meaning: 'Current number of people communicating on the project (team + stakeholders + you).', placeholder: 'e.g. 10' },
+            { key: 'n2', label: 'People after change (optional)', meaning: 'Headcount after adding or removing members — to see how many channels the change creates.', placeholder: 'e.g. 15' }
+          ],
+          outputs: [
+            {
+              key: 'ch', label: 'Channels now', format: 'int',
+              meaning: 'One-to-one paths that currently exist.',
+              compute: function (v) { return ok(v.n) && v.n >= 0 ? v.n * (v.n - 1) / 2 : null; },
+              interpret: function (x) { return x > 100 ? warn('Too many to manage informally — a structured communication plan is essential.') : info('Each path is a place information can distort.'); }
+            },
+            {
+              key: 'ch2', label: 'Channels after change', format: 'int',
+              meaning: 'Paths at the new headcount.',
+              compute: function (v) { return ok(v.n2) && v.n2 >= 0 ? v.n2 * (v.n2 - 1) / 2 : null; },
+              interpret: function () { return info('Compare against today.'); }
+            },
+            {
+              key: 'delta', label: 'Channels added', format: 'int',
+              meaning: 'New paths the headcount change creates — the hidden coordination cost.',
+              compute: function (v) { return ok(v.n, v.n2) ? v.n2 * (v.n2 - 1) / 2 - v.n * (v.n - 1) / 2 : null; },
+              interpret: function (x, v) { return x > 0 ? warn('Adding ' + f2(v.n2 - v.n) + ' people creates ' + f2(x) + ' new channels — onboarding and sync overhead grows.') : x < 0 ? good('Fewer channels: coordination gets simpler.') : info('No change.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ----------------------------------------------------------- Risk */
+    {
+      id: 'risk',
+      name: 'Risk',
+      blurb: 'Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.',
+      cards: [
+        {
+          id: 'emv',
+          name: 'Expected Monetary Value (EMV)',
+          tagline: 'Probability × impact',
+          about: 'EMV is the probability-weighted value of an uncertain event — what the risk is “worth” on average if you could run the project many times. Enter threats with a negative impact and opportunities with a positive one. Summing the EMV of every identified risk gives the contingency reserve; EMV is also the math behind decision-tree analysis.',
+          formula: ['EMV = Probability × Impact'],
+          inputs: [
+            { key: 'p', label: 'Probability (%)', meaning: 'Likelihood the risk event actually occurs, from qualitative analysis or data. 0–100.', placeholder: 'e.g. 30' },
+            { key: 'impact', label: 'Impact', meaning: 'Full monetary consequence if it occurs. Negative for threats (costs), positive for opportunities (gains).', placeholder: 'e.g. -50000' }
+          ],
+          outputs: [
+            {
+              key: 'emv', label: 'Expected Monetary Value', format: 'money',
+              meaning: 'The amount to carry in the contingency reserve for this single risk.',
+              compute: function (v) { return ok(v.p, v.impact) ? (v.p / 100) * v.impact : null; },
+              interpret: function (x) { return x < 0 ? bad('A threat: reserve ' + f2(-x) + ' against it, or spend up to that amount on a response that removes it.') : x > 0 ? good('An opportunity worth pursuing if capturing it costs less than ' + f2(x) + '.') : info('No monetary exposure.'); }
+            },
+            {
+              key: 'residual', label: 'Impact if it happens', format: 'money',
+              meaning: 'Reminder: EMV is an average — if the event fires you feel the full impact, not the EMV.',
+              compute: function (v) { return ok(v.impact) ? v.impact : null; },
+              interpret: function () { return info('Reserves cover portfolios of risks, not single worst cases.'); }
+            }
+          ]
+        },
+        {
+          id: 'risk-score',
+          name: 'Qualitative risk score',
+          tagline: 'Probability × impact, on a 1–5 scale',
+          about: 'Before risks are worth quantifying in money, they are ranked qualitatively: rate probability and impact on an agreed 1–5 scale and multiply. The product places each risk in the probability–impact matrix and decides how much attention it gets. The scales are ordinal — a 4 is not “twice” a 2 — so use the score to rank, not to budget.',
+          formula: ['Risk score = Probability (1–5) × Impact (1–5)'],
+          inputs: [
+            { key: 'p', label: 'Probability rating (1–5)', meaning: '1 = rare, 3 = possible, 5 = almost certain — per your organisation’s definitions.', placeholder: 'e.g. 4' },
+            { key: 'i', label: 'Impact rating (1–5)', meaning: '1 = negligible, 3 = moderate, 5 = severe effect on objectives.', placeholder: 'e.g. 3' }
+          ],
+          outputs: [
+            {
+              key: 'score', label: 'Risk score', format: 'int',
+              meaning: 'Position in the 25-cell probability–impact matrix.',
+              compute: function (v) { return ok(v.p, v.i) ? v.p * v.i : null; },
+              interpret: function (x) { return x >= 15 ? bad('High: plan a response now and assign an owner.') : x >= 8 ? warn('Moderate: watchlist with a named owner and trigger conditions.') : good('Low: accept and monitor at routine reviews.'); }
+            }
+          ]
+        },
+        {
+          id: 'contingency',
+          name: 'Contingency reserve roll-up',
+          tagline: 'Σ EMV across the risk register',
+          about: 'Sum the expected monetary value of every identified risk and you get the contingency reserve — the funded buffer for known-unknowns, owned by the project manager. Enter matching lists: one probability and one impact per risk, threats negative, opportunities positive. (Unknown-unknowns are covered separately by management reserve, which sits outside the baseline.)',
+          formula: ['Contingency reserve = − Σ (Probabilityᵢ × Impactᵢ)'],
+          inputs: [
+            { key: 'probs', label: 'Probabilities % (comma-separated)', meaning: 'Likelihood of each risk, in register order — e.g. 30, 10, 50.', placeholder: 'e.g. 30, 10, 50', type: 'text' },
+            { key: 'impacts', label: 'Impacts (same order)', meaning: 'Monetary consequence of each risk: threats negative, opportunities positive.', placeholder: 'e.g. -50000, -20000, 10000', type: 'text' }
+          ],
+          outputs: [
+            {
+              key: 'netEmv', label: 'Net EMV of the register', format: 'money',
+              meaning: 'Probability-weighted sum of all risks — usually negative when threats dominate.',
+              compute: function (v) {
+                var p = parseFlows(v.probs), im = parseFlows(v.impacts);
+                if (!p || !im || p.length !== im.length) return null;
+                var sum = 0;
+                for (var i = 0; i < p.length; i++) sum += (p[i] / 100) * im[i];
+                return sum;
+              },
+              interpret: function (x, v) {
+                var p = parseFlows(v.probs), im = parseFlows(v.impacts);
+                if (p && im && p.length !== im.length) return bad('Probability and impact lists must be the same length.');
+                return x < 0 ? info('The register expects a net loss of ' + f2(-x) + ' — fund it.') : good('Opportunities outweigh threats on paper — verify the optimism.');
+              }
+            },
+            {
+              key: 'reserve', label: 'Suggested contingency reserve', format: 'money',
+              meaning: 'The buffer to add to the cost baseline (zero if net EMV is positive).',
+              compute: function (v) {
+                var p = parseFlows(v.probs), im = parseFlows(v.impacts);
+                if (!p || !im || p.length !== im.length) return null;
+                var sum = 0;
+                for (var i = 0; i < p.length; i++) sum += (p[i] / 100) * im[i];
+                return Math.max(0, -sum);
+              },
+              interpret: function () { return info('An average across many futures — single big risks may need explicit response plans instead.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ----------------------------------------------- Decision Analysis */
+    {
+      id: 'decision',
+      name: 'Decision Analysis',
+      blurb: 'Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.',
+      cards: [
+        {
+          id: 'decision-tree',
+          name: 'Decision tree — compare two options',
+          tagline: 'EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)',
+          about: 'Each option is a branch: pay its cost, then chance decides between a success payoff and a failure payoff. The branch with the higher expected monetary value wins — on average. Classic uses: build vs buy, prototype vs commit, upgrade vs replace. Remember EMV is a long-run average; for one-shot, bet-the-company decisions, weigh the worst case too.',
+          formula: [
+            'EMV(option) = − Cost',
+            '             + P(success) × Payoff(success)',
+            '             + (1 − P) × Payoff(failure)'
+          ],
+          inputs: [
+            { key: 'costA', label: 'Option A — cost', meaning: 'Upfront cost of choosing branch A.', placeholder: 'e.g. 40000' },
+            { key: 'pA', label: 'Option A — P(success) %', meaning: 'Probability branch A succeeds.', placeholder: 'e.g. 60' },
+            { key: 'winA', label: 'Option A — payoff if success', meaning: 'Value delivered when A succeeds.', placeholder: 'e.g. 100000' },
+            { key: 'loseA', label: 'Option A — payoff if failure', meaning: 'Value (often 0, sometimes negative) when A fails.', placeholder: 'e.g. 0' },
+            { key: 'costB', label: 'Option B — cost', meaning: 'Upfront cost of choosing branch B.', placeholder: 'e.g. 10000' },
+            { key: 'pB', label: 'Option B — P(success) %', meaning: 'Probability branch B succeeds.', placeholder: 'e.g. 30' },
+            { key: 'winB', label: 'Option B — payoff if success', meaning: 'Value delivered when B succeeds.', placeholder: 'e.g. 60000' },
+            { key: 'loseB', label: 'Option B — payoff if failure', meaning: 'Value when B fails.', placeholder: 'e.g. 0' }
+          ],
+          outputs: [
+            {
+              key: 'emvA', label: 'EMV — Option A', format: 'money',
+              meaning: 'Expected value of branch A after its cost.',
+              compute: function (v) { return ok(v.costA, v.pA, v.winA, v.loseA) ? -v.costA + (v.pA / 100) * v.winA + (1 - v.pA / 100) * v.loseA : null; },
+              interpret: function (x) { return x < 0 ? warn('Negative expectation — A only makes sense for non-monetary reasons.') : info('The long-run average outcome of choosing A.'); }
+            },
+            {
+              key: 'emvB', label: 'EMV — Option B', format: 'money',
+              meaning: 'Expected value of branch B after its cost.',
+              compute: function (v) { return ok(v.costB, v.pB, v.winB, v.loseB) ? -v.costB + (v.pB / 100) * v.winB + (1 - v.pB / 100) * v.loseB : null; },
+              interpret: function (x) { return x < 0 ? warn('Negative expectation — B only makes sense for non-monetary reasons.') : info('The long-run average outcome of choosing B.'); }
+            },
+            {
+              key: 'verdict', label: 'Better option', format: 'text',
+              meaning: 'The branch with the higher expected value, and by how much.',
+              compute: function (v) {
+                if (!ok(v.costA, v.pA, v.winA, v.loseA, v.costB, v.pB, v.winB, v.loseB)) return null;
+                var a = -v.costA + (v.pA / 100) * v.winA + (1 - v.pA / 100) * v.loseA;
+                var b = -v.costB + (v.pB / 100) * v.winB + (1 - v.pB / 100) * v.loseB;
+                if (a === b) return 'Tie — decide on risk appetite';
+                return (a > b ? 'Option A' : 'Option B') + ' by ' + f2(Math.abs(a - b));
+              },
+              interpret: function () { return info('The margin is the expected cost of choosing the weaker branch.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ----------------------------------------------------- Quality */
+    {
+      id: 'quality',
+      name: 'Quality & Six Sigma',
+      blurb: 'Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?',
+      cards: [
+        {
+          id: 'dpmo',
+          name: 'DPMO & sigma level',
+          tagline: 'Defects per million opportunities',
+          about: 'DPMO normalizes defect counts by how many chances there were to fail, so processes of different complexity can be compared fairly. The sigma level restates DPMO on the Six Sigma scale (with the conventional 1.5σ shift): 3σ ≈ 66,800 defects per million, 4σ ≈ 6,210, 6σ ≈ 3.4.',
+          formula: [
+            'DPMO = Defects × 1,000,000 ÷ (Units × Opportunities per unit)',
+            'Sigma level ≈ 0.8406 + √(29.37 − 2.221 × ln DPMO)'
+          ],
+          inputs: [
+            { key: 'defects', label: 'Defects found', meaning: 'Total defects observed in the sample.', placeholder: 'e.g. 25' },
+            { key: 'units', label: 'Units inspected', meaning: 'How many items, transactions or deliverables were checked.', placeholder: 'e.g. 1000' },
+            { key: 'opps', label: 'Opportunities per unit', meaning: 'Distinct ways each unit could be defective — fields on a form, joints on an assembly.', placeholder: 'e.g. 4' }
+          ],
+          outputs: [
+            {
+              key: 'dpmo', label: 'DPMO', format: 'int',
+              meaning: 'Defects expected per million opportunities at this rate.',
+              compute: function (v) { return ok(v.defects, v.units, v.opps) && v.units > 0 && v.opps > 0 ? (v.defects * 1000000) / (v.units * v.opps) : null; },
+              interpret: function (x) { return x <= 233 ? good('≈ 5σ or better — world class.') : x <= 6210 ? info('≈ 4σ territory — around industry average.') : x <= 66807 ? warn('≈ 3σ — significant rework cost.') : bad('Below 3σ — the process needs redesign, not inspection.'); }
+            },
+            {
+              key: 'yield', label: 'Process yield', format: 'pct',
+              meaning: 'Share of opportunities that pass defect-free.',
+              compute: function (v) { return ok(v.defects, v.units, v.opps) && v.units > 0 && v.opps > 0 ? (1 - v.defects / (v.units * v.opps)) * 100 : null; },
+              interpret: function () { return info('99% yield still means 10,000 defects per million.'); }
+            },
+            {
+              key: 'sigma', label: 'Sigma level', format: 'ratio',
+              meaning: 'The process capability on the Six Sigma scale, 1.5σ shift included.',
+              compute: function (v) {
+                if (!ok(v.defects, v.units, v.opps) || v.units <= 0 || v.opps <= 0) return null;
+                var dpmo = (v.defects * 1000000) / (v.units * v.opps);
+                if (dpmo === 0) return '≥ 6 (no observed defects)';
+                var inner = 29.37 - 2.221 * Math.log(dpmo);
+                return inner >= 0 ? 0.8406 + Math.sqrt(inner) : null;
+              },
+              interpret: function (x) { return typeof x === 'number' && x >= 6 ? good('Six Sigma performance.') : info('Approximation — accurate between roughly 1.5σ and 6σ.'); }
+            }
+          ]
+        },
+        {
+          id: 'control',
+          name: 'Control limits (±3σ)',
+          tagline: 'UCL · LCL · warning zone',
+          about: 'A control chart flags when a process leaves its normal noise band. The limits sit three standard deviations either side of the historical mean: a point outside them — or seven consecutive points on one side of the mean (the rule of seven) — signals the process is out of control and needs investigation, not tampering.',
+          formula: ['UCL = Mean + 3σ        LCL = Mean − 3σ'],
+          inputs: [
+            { key: 'mean', label: 'Process mean', meaning: 'The long-run average of the measurement, from historical data.', placeholder: 'e.g. 50' },
+            { key: 'sigma', label: 'Process σ', meaning: 'Standard deviation of the measurement under normal conditions.', placeholder: 'e.g. 2' }
+          ],
+          outputs: [
+            {
+              key: 'ucl', label: 'Upper control limit', format: 'num',
+              meaning: 'Mean + 3σ — the ceiling of normal variation.',
+              compute: function (v) { return ok(v.mean, v.sigma) ? v.mean + 3 * v.sigma : null; },
+              interpret: function () { return info('Points above this are signals, not noise.'); }
+            },
+            {
+              key: 'lcl', label: 'Lower control limit', format: 'num',
+              meaning: 'Mean − 3σ — the floor of normal variation.',
+              compute: function (v) { return ok(v.mean, v.sigma) ? v.mean - 3 * v.sigma : null; },
+              interpret: function () { return info('“Too good” readings below the band deserve investigation too.'); }
+            },
+            {
+              key: 'warnZone', label: 'Warning zone (±2σ)', format: 'text',
+              meaning: 'Inner band where points are legal but worth watching.',
+              compute: function (v) { return ok(v.mean, v.sigma) ? f2(v.mean - 2 * v.sigma) + ' – ' + f2(v.mean + 2 * v.sigma) : null; },
+              interpret: function () { return info('Roughly 95% of in-control points should land inside this.'); }
+            }
+          ]
+        },
+        {
+          id: 'cpk',
+          name: 'Process capability (Cp / Cpk)',
+          tagline: 'Can the process meet the spec?',
+          about: 'Control limits describe what the process does; specification limits describe what the customer needs. Capability indices compare the two. Cp asks whether the spec window is wide enough for the process spread (ignoring centering); Cpk penalises a process that drifts off-centre. The common acceptance bar is Cpk ≥ 1.33.',
+          formula: [
+            'Cp  = (USL − LSL) ÷ 6σ',
+            'Cpk = min(USL − Mean, Mean − LSL) ÷ 3σ'
+          ],
+          inputs: [
+            { key: 'usl', label: 'USL — upper spec limit', meaning: 'The highest value the customer or requirement accepts.', placeholder: 'e.g. 10' },
+            { key: 'lsl', label: 'LSL — lower spec limit', meaning: 'The lowest acceptable value.', placeholder: 'e.g. 4' },
+            { key: 'mean', label: 'Process mean', meaning: 'Where the process actually centres, from measurement data.', placeholder: 'e.g. 6' },
+            { key: 'sigma', label: 'Process σ', meaning: 'Standard deviation of the process output.', placeholder: 'e.g. 0.5' }
+          ],
+          outputs: [
+            {
+              key: 'cp', label: 'Cp — potential capability', format: 'ratio',
+              meaning: 'Spec width versus process spread, assuming perfect centering.',
+              compute: function (v) { return ok(v.usl, v.lsl, v.sigma) && v.sigma > 0 ? (v.usl - v.lsl) / (6 * v.sigma) : null; },
+              interpret: function (x) { return x >= 1.33 ? good('The spec window is comfortably wider than the spread.') : x >= 1 ? warn('Barely fits — any drift produces defects.') : bad('The process spread is wider than the spec — defects are guaranteed.'); }
+            },
+            {
+              key: 'cpk', label: 'Cpk — actual capability', format: 'ratio',
+              meaning: 'Capability including how far off-centre the process runs.',
+              compute: function (v) { return ok(v.usl, v.lsl, v.mean, v.sigma) && v.sigma > 0 ? Math.min(v.usl - v.mean, v.mean - v.lsl) / (3 * v.sigma) : null; },
+              interpret: function (x, v) {
+                if (x >= 1.33) return good('Capable — meets the common ≥ 1.33 bar.');
+                if (ok(v.usl, v.lsl, v.sigma) && v.sigma > 0 && (v.usl - v.lsl) / (6 * v.sigma) >= 1.33) return warn('Cp is fine but Cpk is not: the process is off-centre — re-centre before re-engineering.');
+                return x >= 1 ? warn('Marginal — improvement needed.') : bad('Not capable of meeting the specification.');
+              }
+            }
+          ]
+        },
+        {
+          id: 'coq',
+          name: 'Cost of Quality (CoQ)',
+          tagline: 'Conformance vs failure spend',
+          about: 'Everything quality costs, split into money spent on purpose and money lost to failure. Conformance costs are investments: prevention (training, standards, design reviews) and appraisal (testing, inspections, audits). Non-conformance costs are the bill for defects: internal failures (rework, scrap) and external ones (warranty, support, reputation). Mature organisations deliberately shift spend from the failure side to the prevention side.',
+          formula: [
+            'Conformance = Prevention + Appraisal',
+            'Non-conformance = Internal failures + External failures',
+            'CoQ = Conformance + Non-conformance'
+          ],
+          inputs: [
+            { key: 'prevention', label: 'Prevention costs', meaning: 'Spent stopping defects from happening: training, standards, quality planning.', placeholder: 'e.g. 20000' },
+            { key: 'appraisal', label: 'Appraisal costs', meaning: 'Spent finding defects early: testing, inspection, audits.', placeholder: 'e.g. 30000' },
+            { key: 'internal', label: 'Internal failure costs', meaning: 'Defects caught before the customer: rework, scrap, retesting.', placeholder: 'e.g. 40000' },
+            { key: 'external', label: 'External failure costs', meaning: 'Defects that reached the customer: warranty, incident response, lost business.', placeholder: 'e.g. 25000' }
+          ],
+          outputs: [
+            {
+              key: 'conformance', label: 'Cost of conformance', format: 'money',
+              meaning: 'The deliberate investment in quality.',
+              compute: function (v) { return ok(v.prevention, v.appraisal) ? v.prevention + v.appraisal : null; },
+              interpret: function () { return info('Money spent on purpose, before defects exist.'); }
+            },
+            {
+              key: 'nonconformance', label: 'Cost of non-conformance', format: 'money',
+              meaning: 'The price of failure, internal and external.',
+              compute: function (v) { return ok(v.internal, v.external) ? v.internal + v.external : null; },
+              interpret: function () { return info('Usually understated — reputation and morale rarely get counted.'); }
+            },
+            {
+              key: 'total', label: 'Total cost of quality', format: 'money',
+              meaning: 'Everything quality costs, both sides combined.',
+              compute: function (v) { return ok(v.prevention, v.appraisal, v.internal, v.external) ? v.prevention + v.appraisal + v.internal + v.external : null; },
+              interpret: function () { return info('Often 15–25% of project cost when measured honestly.'); }
+            },
+            {
+              key: 'failShare', label: 'Failure share of CoQ', format: 'pct',
+              meaning: 'What portion of quality spend is failure rather than investment.',
+              compute: function (v) {
+                if (!ok(v.prevention, v.appraisal, v.internal, v.external)) return null;
+                var total = v.prevention + v.appraisal + v.internal + v.external;
+                return total > 0 ? ((v.internal + v.external) / total) * 100 : null;
+              },
+              interpret: function (x) { return x > 50 ? bad('Paying for failure more than prevention — shift spend upstream.') : x > 30 ? warn('Failure costs are significant — review where defects originate.') : good('Spend is weighted toward prevention, where it returns most.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ------------------------------------------------------ Financial */
+    {
+      id: 'financial',
+      name: 'Project Selection & Finance',
+      blurb: 'The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.',
+      cards: [
+        {
+          id: 'roi',
+          name: 'Return on Investment (ROI)',
+          tagline: '(Benefit − Cost) ÷ Cost',
+          about: 'The simplest project-selection measure: how much you get back per unit invested, ignoring timing. Good for quick comparisons; misleading for long projects because it ignores when the money arrives — use NPV for that.',
+          formula: ['ROI % = (Benefit − Cost) ÷ Cost × 100'],
+          inputs: [
+            { key: 'cost', label: 'Total cost', meaning: 'Everything invested in the project: build, licences, labour, run costs over the horizon you are measuring.', placeholder: 'e.g. 200000' },
+            { key: 'benefit', label: 'Total benefit', meaning: 'Total value returned over the same horizon: revenue, savings, avoided costs.', placeholder: 'e.g. 260000' }
+          ],
+          outputs: [
+            {
+              key: 'roi', label: 'ROI', format: 'pct',
+              meaning: 'Percentage return over the whole horizon (not per year).',
+              compute: function (v) { return ok(v.cost, v.benefit) && v.cost !== 0 ? ((v.benefit - v.cost) / v.cost) * 100 : null; },
+              interpret: function (x) { return x > 0 ? good('Positive return — compare against alternatives before committing.') : x < 0 ? bad('Destroys value as scoped.') : info('Break-even.'); }
+            },
+            {
+              key: 'net', label: 'Net benefit', format: 'money',
+              meaning: 'Absolute value created: benefit minus cost.',
+              compute: function (v) { return ok(v.cost, v.benefit) ? v.benefit - v.cost : null; },
+              interpret: function () { return info('A small % on a huge base can beat a big % on a tiny one.'); }
+            }
+          ]
+        },
+        {
+          id: 'npv',
+          name: 'NPV · IRR · Payback',
+          tagline: 'Discounted cash-flow appraisal',
+          about: 'The rigorous way to value a project: every future cash flow is discounted back to today because money later is worth less than money now. NPV is the value created in today’s money; IRR is the discount rate at which the project merely breaks even; payback tells you how long capital is at risk. When choosing between projects, pick the higher NPV.',
+          formula: [
+            'NPV = −Investment + Σ  CFₜ ÷ (1 + r)ᵗ',
+            'IRR: the r where NPV = 0',
+            'Payback: periods until cumulative cash flow ≥ 0'
+          ],
+          inputs: [
+            { key: 'rate', label: 'Discount rate (%)', meaning: 'Cost of capital or required return per period — the hurdle the project must beat.', placeholder: 'e.g. 10' },
+            { key: 'inv', label: 'Initial investment', meaning: 'Cash out at period 0, entered as a positive number.', placeholder: 'e.g. 1000' },
+            { key: 'flows', label: 'Cash flows (comma-separated)', meaning: 'Net cash in (or out, negative) for each following period, in order: period 1, 2, 3…', placeholder: 'e.g. 500, 500, 500', type: 'text' }
+          ],
+          outputs: [
+            {
+              key: 'npv', label: 'Net Present Value', format: 'money',
+              meaning: 'Value created in today’s money after paying back capital and the required return.',
+              compute: function (v) {
+                var flows = parseFlows(v.flows);
+                return ok(v.rate, v.inv) && flows ? npvOf(v.rate / 100, v.inv, flows) : null;
+              },
+              interpret: function (x) { return x > 0 ? good('Accept: creates value beyond the required return.') : x < 0 ? bad('Reject: fails to earn the discount rate.') : info('Exactly earns the required return.'); }
+            },
+            {
+              key: 'irr', label: 'Internal Rate of Return', format: 'pct',
+              meaning: 'The project’s intrinsic return per period. Compare it to the discount rate.',
+              compute: function (v) {
+                var flows = parseFlows(v.flows);
+                return ok(v.inv) && flows ? irrOf(v.inv, flows) : null;
+              },
+              interpret: function (x, v) { return ok(v.rate) ? (x > v.rate ? good('Beats the ' + f2(v.rate) + '% hurdle rate.') : bad('Below the hurdle rate.')) : info('Compare with your cost of capital.'); }
+            },
+            {
+              key: 'bcr', label: 'Benefit–Cost Ratio', format: 'ratio',
+              meaning: 'Present value of inflows per unit invested. Above 1 means benefits outweigh costs.',
+              compute: function (v) {
+                var flows = parseFlows(v.flows);
+                if (!ok(v.rate, v.inv) || !flows || v.inv === 0) return null;
+                return (npvOf(v.rate / 100, v.inv, flows) + v.inv) / v.inv;
+              },
+              interpret: function (x) { return x > 1 ? good('Each 1.00 invested returns ' + f2(x) + ' in present value.') : bad('Returns less than it costs.'); }
+            },
+            {
+              key: 'payback', label: 'Payback period', format: 'text',
+              meaning: 'Periods until the undiscounted cash recovers the investment — a measure of capital risk, not profitability.',
+              compute: function (v) {
+                var flows = parseFlows(v.flows);
+                if (!ok(v.inv) || !flows) return null;
+                var cum = -v.inv;
+                if (cum >= 0) return '0 periods';
+                for (var i = 0; i < flows.length; i++) {
+                  if (cum + flows[i] >= 0 && flows[i] > 0) {
+                    return f2(i + (-cum) / flows[i]) + ' periods';
+                  }
+                  cum += flows[i];
+                }
+                return 'Not recovered in ' + flows.length + ' periods';
+              },
+              interpret: function () { return warn('Ignores everything after recovery and the time value of money — never use alone.'); }
+            }
+          ]
+        },
+        {
+          id: 'tvm',
+          name: 'Present & Future Value',
+          tagline: 'FV = PV(1 + r)ⁿ',
+          about: 'The time-value-of-money primitive behind NPV. Future value answers “what will this be worth after n periods of compounding?”; present value answers the reverse: “what is a promised future amount worth today?”. Both outputs are computed from the single amount you enter.',
+          formula: ['FV = Amount × (1 + r)ⁿ', 'PV = Amount ÷ (1 + r)ⁿ'],
+          inputs: [
+            { key: 'amount', label: 'Amount', meaning: 'The sum of money to move through time.', placeholder: 'e.g. 10000' },
+            { key: 'rate', label: 'Rate per period (%)', meaning: 'Interest or discount rate for each compounding period.', placeholder: 'e.g. 8' },
+            { key: 'n', label: 'Periods (n)', meaning: 'Number of compounding periods — years if the rate is annual.', placeholder: 'e.g. 5' }
+          ],
+          outputs: [
+            {
+              key: 'fv', label: 'Future value', format: 'money',
+              meaning: 'What the amount grows to if invested today at the given rate.',
+              compute: function (v) { return ok(v.amount, v.rate, v.n) ? v.amount * Math.pow(1 + v.rate / 100, v.n) : null; },
+              interpret: function () { return info('Treats the amount as invested today.'); }
+            },
+            {
+              key: 'pv', label: 'Present value', format: 'money',
+              meaning: 'What a payment of that amount, received n periods from now, is worth today.',
+              compute: function (v) { return ok(v.amount, v.rate, v.n) ? v.amount / Math.pow(1 + v.rate / 100, v.n) : null; },
+              interpret: function () { return info('Treats the amount as received in the future.'); }
+            },
+            {
+              key: 'doubling', label: 'Doubling time (Rule of 72)', format: 'num',
+              meaning: '72 ÷ rate: the mental-math shortcut for how many periods money takes to double.',
+              compute: function (v) { return ok(v.rate) && v.rate > 0 ? 72 / v.rate : null; },
+              interpret: function () { return info('Approximation — accurate within ~2% for rates between 4% and 15%.'); }
+            }
+          ]
+        },
+        {
+          id: 'breakeven',
+          name: 'Break-even point',
+          tagline: 'Fixed costs ÷ contribution margin',
+          about: 'How many units (or billable hours, or subscriptions) you must sell before the venture stops losing money. The denominator — price minus variable cost — is the contribution margin: what each unit contributes toward covering fixed costs.',
+          formula: ['Break-even units = Fixed costs ÷ (Price − Variable cost per unit)'],
+          inputs: [
+            { key: 'fixed', label: 'Fixed costs', meaning: 'Costs that exist regardless of volume: rent, salaries, licences, the project build itself.', placeholder: 'e.g. 50000' },
+            { key: 'price', label: 'Price per unit', meaning: 'Revenue received for each unit sold.', placeholder: 'e.g. 25' },
+            { key: 'varCost', label: 'Variable cost per unit', meaning: 'Cost incurred for each additional unit: materials, transaction fees, support.', placeholder: 'e.g. 15' }
+          ],
+          outputs: [
+            {
+              key: 'units', label: 'Break-even units', format: 'num',
+              meaning: 'Volume at which total revenue equals total cost.',
+              compute: function (v) { return ok(v.fixed, v.price, v.varCost) && (v.price - v.varCost) > 0 ? v.fixed / (v.price - v.varCost) : null; },
+              interpret: function () { return info('Every unit beyond this is profit; every unit short is loss.'); }
+            },
+            {
+              key: 'revenue', label: 'Break-even revenue', format: 'money',
+              meaning: 'The revenue level at that volume.',
+              compute: function (v) { return ok(v.fixed, v.price, v.varCost) && (v.price - v.varCost) > 0 ? (v.fixed / (v.price - v.varCost)) * v.price : null; },
+              interpret: function () { return info('Sanity-check against realistic market size.'); }
+            },
+            {
+              key: 'margin', label: 'Contribution margin / unit', format: 'money',
+              meaning: 'Price − variable cost: what each sale contributes to fixed costs.',
+              compute: function (v) { return ok(v.price, v.varCost) ? v.price - v.varCost : null; },
+              interpret: function (x) { return x <= 0 ? bad('Non-positive margin: no volume can ever break even.') : info('Higher margin means fewer units to break even.'); }
+            }
+          ]
+        },
+        {
+          id: 'depreciation',
+          name: 'Straight-line depreciation',
+          tagline: '(Cost − Salvage) ÷ Useful life',
+          about: 'Spreads an asset’s cost evenly across its useful life — the depreciation method assumed in PMP exam questions and the simplest for business cases that must account for capital assets.',
+          formula: ['Annual depreciation = (Cost − Salvage value) ÷ Useful life'],
+          inputs: [
+            { key: 'cost', label: 'Purchase cost', meaning: 'What the asset costs to acquire and put into service.', placeholder: 'e.g. 120000' },
+            { key: 'salvage', label: 'Salvage value', meaning: 'Expected resale or scrap value at the end of its useful life.', placeholder: 'e.g. 20000' },
+            { key: 'life', label: 'Useful life (years)', meaning: 'How many years the asset will be productive.', placeholder: 'e.g. 5' }
+          ],
+          outputs: [
+            {
+              key: 'annual', label: 'Depreciation per year', format: 'money',
+              meaning: 'The expense recognised each year of the asset’s life.',
+              compute: function (v) { return ok(v.cost, v.salvage, v.life) && v.life > 0 ? (v.cost - v.salvage) / v.life : null; },
+              interpret: function () { return info('Same amount every year — that is the “straight line”.'); }
+            },
+            {
+              key: 'ratePct', label: 'Depreciation rate', format: 'pct',
+              meaning: 'Share of the depreciable base expensed each year: 1 ÷ life.',
+              compute: function (v) { return ok(v.life) && v.life > 0 ? 100 / v.life : null; },
+              interpret: function () { return info('Applied to (cost − salvage).'); }
+            }
+          ]
+        },
+        {
+          id: 'scoring',
+          name: 'Weighted scoring model',
+          tagline: 'Σ (weight × score)',
+          about: 'The standard way to compare options against several criteria at once: weight each criterion by importance, score the option against each, and sum weight × score. Run it once per option and compare the totals. Its real value is political — the weights force stakeholders to argue about priorities before the decision, not after it.',
+          formula: ['Weighted score = Σ (weightᵢ × scoreᵢ) ÷ Σ weightᵢ'],
+          inputs: [
+            { key: 'weights', label: 'Criteria weights (comma-separated)', meaning: 'Importance of each criterion, any scale — e.g. strategic fit 5, cost 3, risk 2.', placeholder: 'e.g. 5, 3, 2', type: 'text' },
+            { key: 'scores', label: 'Option scores (same order)', meaning: 'How this option rates on each criterion, on your scoring scale (say 1–10), in the same order as the weights.', placeholder: 'e.g. 8, 6, 9', type: 'text' }
+          ],
+          outputs: [
+            {
+              key: 'weighted', label: 'Weighted score', format: 'num',
+              meaning: 'The option’s weighted average on your scoring scale — directly comparable across options.',
+              compute: function (v) {
+                var w = parseFlows(v.weights), s = parseFlows(v.scores);
+                if (!w || !s || w.length !== s.length) return null;
+                var sw = 0, total = 0;
+                for (var i = 0; i < w.length; i++) { sw += w[i]; total += w[i] * s[i]; }
+                return sw > 0 ? total / sw : null;
+              },
+              interpret: function () { return info('Meaningless alone — compare against the other options’ totals.'); }
+            },
+            {
+              key: 'raw', label: 'Raw weighted total', format: 'num',
+              meaning: 'The unnormalized Σ weight × score, as many textbooks present it.',
+              compute: function (v) {
+                var w = parseFlows(v.weights), s = parseFlows(v.scores);
+                if (!w || !s || w.length !== s.length) return null;
+                var total = 0;
+                for (var i = 0; i < w.length; i++) total += w[i] * s[i];
+                return total;
+              },
+              interpret: function (x, v) {
+                var w = parseFlows(v.weights), s = parseFlows(v.scores);
+                return w && s && w.length !== s.length ? bad('Weights and scores must have the same number of entries.') : info('Same ranking as the weighted average, different scale.');
+              }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ---------------------------------------------------- Procurement */
+    {
+      id: 'procurement',
+      name: 'Procurement & Contracts',
+      blurb: 'The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.',
+      cards: [
+        {
+          id: 'pta',
+          name: 'Point of Total Assumption (PTA)',
+          tagline: 'Where the seller starts paying for overruns',
+          about: 'In a Fixed-Price-Incentive-Fee contract, cost overruns are shared according to the buyer/seller ratio only up to the ceiling price. The PTA is the actual-cost level at which the buyer’s share of the overrun has consumed the room up to the ceiling; beyond it, every additional dollar of cost comes out of the seller’s fee. Sellers manage hard to stay below it.',
+          formula: ['PTA = (Ceiling price − Target price) ÷ Buyer share + Target cost'],
+          inputs: [
+            { key: 'ceiling', label: 'Ceiling price', meaning: 'The maximum the buyer will ever pay, regardless of cost.', placeholder: 'e.g. 180000' },
+            { key: 'targetPrice', label: 'Target price', meaning: 'Target cost + target fee: what both parties expect the buyer to pay.', placeholder: 'e.g. 165000' },
+            { key: 'targetCost', label: 'Target cost', meaning: 'The cost both parties negotiated as the expected outcome.', placeholder: 'e.g. 150000' },
+            { key: 'buyerShare', label: 'Buyer share (%)', meaning: 'Buyer’s portion of the share ratio. An “80/20 split” means the buyer covers 80% of overruns — enter 80.', placeholder: 'e.g. 80' }
+          ],
+          outputs: [
+            {
+              key: 'pta', label: 'Point of Total Assumption', format: 'money',
+              meaning: 'The actual cost at which the seller assumes all further overrun.',
+              compute: function (v) { return ok(v.ceiling, v.targetPrice, v.targetCost, v.buyerShare) && v.buyerShare > 0 ? (v.ceiling - v.targetPrice) / (v.buyerShare / 100) + v.targetCost : null; },
+              interpret: function () { return warn('Above this cost, each extra dollar reduces the seller’s fee dollar-for-dollar.'); }
+            },
+            {
+              key: 'headroom', label: 'Overrun absorbed before PTA', format: 'money',
+              meaning: 'How much the cost can overrun target before the PTA is reached.',
+              compute: function (v) { return ok(v.ceiling, v.targetPrice, v.targetCost, v.buyerShare) && v.buyerShare > 0 ? (v.ceiling - v.targetPrice) / (v.buyerShare / 100) : null; },
+              interpret: function () { return info('Shared per the ratio inside this band.'); }
+            }
+          ]
+        },
+        {
+          id: 'fpif',
+          name: 'FPIF final fee & price',
+          tagline: 'Settling an incentive contract',
+          about: 'When the work is done, the incentive formula converts the cost outcome into the seller’s final fee: the seller keeps its share of any saving and gives up its share of any overrun. If a ceiling price is set, the buyer never pays more than it.',
+          formula: [
+            'Final fee = Target fee + (Target cost − Actual cost) × Seller share',
+            'Final price = min(Actual cost + Final fee, Ceiling price)'
+          ],
+          inputs: [
+            { key: 'targetCost', label: 'Target cost', meaning: 'Negotiated expected cost of the work.', placeholder: 'e.g. 150000' },
+            { key: 'targetFee', label: 'Target fee', meaning: 'Profit the seller earns if actual cost exactly equals target cost.', placeholder: 'e.g. 15000' },
+            { key: 'actualCost', label: 'Actual cost', meaning: 'What the work really cost the seller.', placeholder: 'e.g. 140000' },
+            { key: 'sellerShare', label: 'Seller share (%)', meaning: 'Seller’s portion of the ratio. In an 80/20 split, enter 20.', placeholder: 'e.g. 20' },
+            { key: 'ceiling', label: 'Ceiling price (optional)', meaning: 'Contract maximum — caps what the buyer pays.', placeholder: 'e.g. 180000' }
+          ],
+          outputs: [
+            {
+              key: 'finalFee', label: 'Final fee', format: 'money',
+              meaning: 'Seller’s profit after applying the incentive share.',
+              compute: function (v) { return ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare) ? v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100) : null; },
+              interpret: function (x, v) { return ok(v.targetFee) ? (x > v.targetFee ? good('Seller beat target cost and earns an incentive bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.')) : null; }
+            },
+            {
+              key: 'finalPrice', label: 'Final price (buyer pays)', format: 'money',
+              meaning: 'Actual cost plus final fee, capped at the ceiling if one is set.',
+              compute: function (v) {
+                if (!ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare)) return null;
+                var price = v.actualCost + v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100);
+                return ok(v.ceiling) ? Math.min(price, v.ceiling) : price;
+              },
+              interpret: function (x, v) { return ok(v.ceiling) && x >= v.ceiling ? warn('Ceiling reached — the seller absorbs everything above it.') : info('Within the shared-risk band.'); }
+            }
+          ]
+        },
+        {
+          id: 'cpif',
+          name: 'CPIF final fee & price',
+          tagline: 'Cost-plus with a bounded incentive',
+          about: 'In a Cost-Plus-Incentive-Fee contract the buyer reimburses all allowable costs, but the seller’s fee moves with performance: it grows when the seller beats the target cost and shrinks on overruns, always clamped between a negotiated minimum and maximum fee. Unlike FPIF there is no ceiling price — cost risk stays mostly with the buyer, which is why CPIF suits work too uncertain to fix-price.',
+          formula: [
+            'Fee = Target fee + (Target cost − Actual cost) × Seller share',
+            'Final fee = clamp(Fee, Min fee, Max fee)',
+            'Final price = Actual cost + Final fee'
+          ],
+          inputs: [
+            { key: 'targetCost', label: 'Target cost', meaning: 'Negotiated expected cost of the work.', placeholder: 'e.g. 100000' },
+            { key: 'targetFee', label: 'Target fee', meaning: 'Fee the seller earns if cost lands exactly on target.', placeholder: 'e.g. 10000' },
+            { key: 'actualCost', label: 'Actual cost', meaning: 'What the work really cost — fully reimbursed by the buyer.', placeholder: 'e.g. 90000' },
+            { key: 'sellerShare', label: 'Seller share (%)', meaning: 'Seller’s portion of the share ratio. In an 80/20 split, enter 20.', placeholder: 'e.g. 20' },
+            { key: 'minFee', label: 'Minimum fee (optional)', meaning: 'Fee floor — the least the seller can earn however badly cost overruns.', placeholder: 'e.g. 4000' },
+            { key: 'maxFee', label: 'Maximum fee (optional)', meaning: 'Fee ceiling — the most the seller can earn however well it performs.', placeholder: 'e.g. 15000' }
+          ],
+          outputs: [
+            {
+              key: 'fee', label: 'Final fee', format: 'money',
+              meaning: 'Incentive-adjusted fee, clamped to the min/max band if provided.',
+              compute: function (v) {
+                if (!ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare)) return null;
+                var fee = v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100);
+                if (ok(v.maxFee)) fee = Math.min(fee, v.maxFee);
+                if (ok(v.minFee)) fee = Math.max(fee, v.minFee);
+                return fee;
+              },
+              interpret: function (x, v) {
+                if (ok(v.maxFee) && x >= v.maxFee) return warn('Capped at the maximum fee — further savings earn the seller nothing.');
+                if (ok(v.minFee) && x <= v.minFee) return warn('Floored at the minimum fee — further overruns cost the seller nothing.');
+                return ok(v.targetFee) ? (x > v.targetFee ? good('Seller beat the target cost and earns a bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.')) : null;
+              }
+            },
+            {
+              key: 'price', label: 'Final price (buyer pays)', format: 'money',
+              meaning: 'Reimbursed actual cost plus the final fee — no ceiling in CPIF.',
+              compute: function (v) {
+                if (!ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare)) return null;
+                var fee = v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100);
+                if (ok(v.maxFee)) fee = Math.min(fee, v.maxFee);
+                if (ok(v.minFee)) fee = Math.max(fee, v.minFee);
+                return v.actualCost + fee;
+              },
+              interpret: function () { return info('Once the fee hits its floor, every extra cost dollar passes straight to the buyer.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ---------------------------------------------------------- Agile */
+    {
+      id: 'agile',
+      name: 'Agile Forecasting',
+      blurb: 'Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.',
+      cards: [
+        {
+          id: 'velocity',
+          name: 'Velocity & release forecast',
+          tagline: 'Backlog ÷ velocity',
+          about: 'Velocity is the average number of story points a team completes per sprint, measured from finished sprints only (yesterday’s weather). Dividing the remaining backlog by velocity gives the most honest forecast available: how many sprints of work remain at the current, demonstrated pace.',
+          formula: [
+            'Velocity = Points completed ÷ Sprints completed',
+            'Sprints remaining = ⌈ Remaining backlog ÷ Velocity ⌉'
+          ],
+          inputs: [
+            { key: 'points', label: 'Points completed', meaning: 'Total story points fully done (meeting the Definition of Done) across the measured sprints.', placeholder: 'e.g. 120' },
+            { key: 'sprints', label: 'Sprints completed', meaning: 'Number of finished sprints those points came from — use at least 3 for a stable average.', placeholder: 'e.g. 4' },
+            { key: 'backlog', label: 'Remaining backlog (points)', meaning: 'Estimated points left in the release or project scope.', placeholder: 'e.g. 200' },
+            { key: 'weeks', label: 'Sprint length (weeks, optional)', meaning: 'Length of one sprint — converts the forecast into calendar time.', placeholder: 'e.g. 2' }
+          ],
+          outputs: [
+            {
+              key: 'velocity', label: 'Velocity', format: 'num',
+              meaning: 'Demonstrated delivery rate in points per sprint.',
+              compute: function (v) { return ok(v.points, v.sprints) && v.sprints > 0 ? v.points / v.sprints : null; },
+              interpret: function (x, v) { return ok(v.sprints) && v.sprints < 3 ? warn('Based on fewer than 3 sprints — treat as a rough signal.') : info('Use the team’s own history only.'); }
+            },
+            {
+              key: 'sprintsLeft', label: 'Sprints remaining', format: 'int',
+              meaning: 'Whole sprints needed to clear the backlog at current velocity.',
+              compute: function (v) { return ok(v.points, v.sprints, v.backlog) && v.points > 0 && v.sprints > 0 ? Math.ceil(v.backlog / (v.points / v.sprints)) : null; },
+              interpret: function () { return info('Rounded up — partial sprints still occupy the calendar.'); }
+            },
+            {
+              key: 'weeksLeft', label: 'Calendar time remaining', format: 'text',
+              meaning: 'Sprints remaining × sprint length.',
+              compute: function (v) {
+                if (!ok(v.points, v.sprints, v.backlog, v.weeks) || v.points <= 0 || v.sprints <= 0) return null;
+                var w = Math.ceil(v.backlog / (v.points / v.sprints)) * v.weeks;
+                return f2(w) + ' weeks (≈ ' + f2(w / 4.33) + ' months)';
+              },
+              interpret: function () { return warn('Assumes stable scope and team — re-forecast every sprint.'); }
+            }
+          ]
+        },
+        {
+          id: 'capacity',
+          name: 'Sprint capacity',
+          tagline: 'People × days × hours × focus',
+          about: 'Capacity planning in hours, for sprint-level task commitment. Start from raw availability, then apply a focus factor — the share of the day genuinely available for sprint work after ceremonies, support duty, e-mail and context switching. Teams that skip the focus factor systematically over-commit. Use capacity for task hours; use velocity (above) for story points — they answer different questions.',
+          formula: ['Capacity = Members × Days × Hours per day × Focus factor'],
+          inputs: [
+            { key: 'members', label: 'Team members', meaning: 'People doing sprint work — count partial allocations as fractions (0.5 for half-time).', placeholder: 'e.g. 5' },
+            { key: 'days', label: 'Working days in sprint', meaning: 'Sprint length minus holidays and planned leave.', placeholder: 'e.g. 9' },
+            { key: 'hoursPerDay', label: 'Hours per day', meaning: 'Nominal working hours per person per day.', placeholder: 'e.g. 8' },
+            { key: 'focus', label: 'Focus factor (%)', meaning: 'Share of the day truly available for sprint work — 60–70% is realistic for most teams.', placeholder: 'e.g. 65' }
+          ],
+          outputs: [
+            {
+              key: 'raw', label: 'Raw hours', format: 'num',
+              meaning: 'Theoretical availability before reality intervenes.',
+              compute: function (v) { return ok(v.members, v.days, v.hoursPerDay) ? v.members * v.days * v.hoursPerDay : null; },
+              interpret: function () { return warn('Committing to this number is how sprints fail.'); }
+            },
+            {
+              key: 'capacity', label: 'Plannable capacity (hours)', format: 'num',
+              meaning: 'What the team can actually commit to after the focus factor.',
+              compute: function (v) { return ok(v.members, v.days, v.hoursPerDay, v.focus) ? v.members * v.days * v.hoursPerDay * (v.focus / 100) : null; },
+              interpret: function () { return info('Compare against the task-hour sum of the proposed sprint backlog.'); }
+            }
+          ]
+        },
+        {
+          id: 'say-do',
+          name: 'Say/do ratio',
+          tagline: 'Delivered ÷ committed',
+          about: 'The simplest measure of forecast reliability: of what the team committed to at sprint planning, how much was actually delivered? Track it over several sprints. A team that consistently delivers what it says — even if it says less — is worth more to planning than a fast team nobody can predict.',
+          formula: ['Say/do % = Points delivered ÷ Points committed × 100'],
+          inputs: [
+            { key: 'committed', label: 'Points committed', meaning: 'Story points the team signed up for at sprint planning.', placeholder: 'e.g. 34' },
+            { key: 'delivered', label: 'Points delivered', meaning: 'Points fully done (per the Definition of Done) by sprint end.', placeholder: 'e.g. 29' }
+          ],
+          outputs: [
+            {
+              key: 'ratio', label: 'Say/do ratio', format: 'pct',
+              meaning: 'Forecast reliability for this sprint.',
+              compute: function (v) { return ok(v.committed, v.delivered) && v.committed > 0 ? (v.delivered / v.committed) * 100 : null; },
+              interpret: function (x) { return x >= 85 && x <= 110 ? good('Reliable — stakeholders can plan on this team’s word.') : x < 85 ? warn('Chronic over-commitment: plan less, deliver it, rebuild trust.') : info('Consistently beating commitments — the forecasts may be sandbagged.'); }
+            },
+            {
+              key: 'gap', label: 'Commitment gap (points)', format: 'num',
+              meaning: 'Delivered minus committed — negative means work rolled over.',
+              compute: function (v) { return ok(v.committed, v.delivered) ? v.delivered - v.committed : null; },
+              interpret: function (x) { return x < 0 ? info('Rolled-over work distorts the next sprint’s plan — re-estimate it.') : info('Zero gap is the goal, not a big positive one.'); }
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ---------------------------------------------------- Lean & Flow */
+    {
+      id: 'flow',
+      name: 'Lean & Flow',
+      blurb: 'Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.',
+      cards: [
+        {
+          id: 'littles-law',
+          name: 'Little’s Law & flow efficiency',
+          tagline: 'Cycle time = WIP ÷ throughput',
+          about: 'Given any two of work-in-progress, throughput and cycle time, Little’s Law fixes the third. It is the mathematical case for WIP limits: with throughput unchanged, every extra item you start adds directly to how long everything takes. Flow efficiency then reveals how much of that cycle time is actual work versus waiting in queues.',
+          formula: [
+            'Cycle time = WIP ÷ Throughput',
+            'Flow efficiency % = Active work time ÷ Cycle time × 100'
+          ],
+          inputs: [
+            { key: 'wip', label: 'WIP — work in progress', meaning: 'Items currently started and unfinished on the board.', placeholder: 'e.g. 12' },
+            { key: 'throughput', label: 'Throughput (items / period)', meaning: 'Items finished per period — pick days or weeks and stay consistent.', placeholder: 'e.g. 3' },
+            { key: 'workTime', label: 'Active work per item (optional)', meaning: 'Hands-on time an item actually receives, in the same period units — for flow efficiency.', placeholder: 'e.g. 0.5' }
+          ],
+          outputs: [
+            {
+              key: 'cycleTime', label: 'Average cycle time', format: 'num',
+              meaning: 'How long a newly started item takes to finish, in your chosen periods.',
+              compute: function (v) { return ok(v.wip, v.throughput) && v.throughput > 0 ? v.wip / v.throughput : null; },
+              interpret: function () { return info('Halve WIP and cycle time halves — without anyone working faster.'); }
+            },
+            {
+              key: 'flowEff', label: 'Flow efficiency', format: 'pct',
+              meaning: 'Share of the cycle time that is real work rather than waiting.',
+              compute: function (v) { return ok(v.wip, v.throughput, v.workTime) && v.throughput > 0 && v.wip > 0 ? (v.workTime / (v.wip / v.throughput)) * 100 : null; },
+              interpret: function (x) { return x >= 40 ? good('Exceptional — most knowledge work sits at 5–15%.') : x >= 15 ? info('Typical to good for knowledge work.') : warn('Items spend most of their life waiting — attack queues, not people.'); }
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  return { categories: categories };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
+
+  </script>
+  <script>
+/* PM Calculation Desk — rendering and live computation.
+   Reads PM_DATA (data.js), builds the sidebar nav and one card per
+   calculator, and recomputes a card's outputs on every keystroke. */
+
+(function () {
+  'use strict';
+
+  var DATA = window.PM_DATA;
+  var sectionsEl = document.getElementById('calc-sections');
+  var navEl = document.getElementById('cat-nav');
+  var searchEl = document.getElementById('search');
+  var statsEl = document.getElementById('hero-stats');
+
+  /* ------------------------------------------------------- formatting */
+  function formatValue(val, format) {
+    if (val === null || val === undefined || (typeof val === 'number' && !Number.isFinite(val))) return '—';
+    if (typeof val === 'string') return val;
+    switch (format) {
+      case 'money':
+        return val.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      case 'pct':
+        return Number(val.toFixed(1)).toLocaleString('en-US') + '%';
+      case 'ratio':
+        return val.toFixed(2);
+      case 'int':
+        return Math.round(val).toLocaleString('en-US');
+      default:
+        return Number(val.toFixed(2)).toLocaleString('en-US');
+    }
+  }
+
+  /* --------------------------------------------------------- building */
+  function inputField(inp) {
+    var type = inp.type === 'text' ? 'text' : 'number';
+    return '' +
+      '<div class="field">' +
+        '<label for="f-' + inp.cardId + '-' + inp.key + '">' + inp.label + '</label>' +
+        '<input id="f-' + inp.cardId + '-' + inp.key + '" type="' + type + '"' +
+          (type === 'number' ? ' step="any" inputmode="decimal"' : '') +
+          ' data-key="' + inp.key + '" data-type="' + (inp.type || 'number') + '"' +
+          ' placeholder="' + (inp.placeholder || '') + '" autocomplete="off">' +
+        '<p class="field-meaning">' + inp.meaning + '</p>' +
+      '</div>';
+  }
+
+  function resultChip(out) {
+    return '' +
+      '<div class="result" data-out="' + out.key + '">' +
+        '<span class="r-label">' + out.label + '</span>' +
+        '<span class="r-value">—</span>' +
+        '<span class="r-meaning">' + out.meaning + '</span>' +
+        '<span class="r-verdict" hidden></span>' +
+      '</div>';
+  }
+
+  function buildCard(card) {
+    card.inputs.forEach(function (inp) { inp.cardId = card.id; });
+
+    var groups = [];
+    card.outputs.forEach(function (out) {
+      var name = out.group || '';
+      var g = groups.length && groups[groups.length - 1].name === name
+        ? groups[groups.length - 1] : null;
+      if (!g) { g = { name: name, outs: [] }; groups.push(g); }
+      g.outs.push(out);
+    });
+
+    var resultsHtml = groups.map(function (g) {
+      return (g.name ? '<h4 class="result-group">' + g.name + '</h4>' : '') +
+        '<div class="results-grid">' + g.outs.map(resultChip).join('') + '</div>';
+    }).join('');
+
+    var searchText = (card.name + ' ' + card.tagline + ' ' + card.about + ' ' +
+      card.outputs.map(function (o) { return o.label; }).join(' ')).toLowerCase();
+
+    var el = document.createElement('article');
+    el.className = 'calc-card';
+    el.id = 'calc-' + card.id;
+    el.dataset.search = searchText;
+    el.innerHTML =
+      '<header class="card-head">' +
+        '<h3>' + card.name + '</h3>' +
+        '<p class="tagline">' + card.tagline + '</p>' +
+      '</header>' +
+      '<p class="about">' + card.about + '</p>' +
+      '<div class="formula" role="img" aria-label="Formula">' +
+        card.formula.map(function (l) { return '<code>' + l + '</code>'; }).join('') +
+      '</div>' +
+      '<div class="io">' +
+        '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
+        '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
+      '</div>';
+
+    el.addEventListener('input', function () { computeCard(card, el); });
+    return el;
+  }
+
+  /* ------------------------------------------------------- computing */
+  function readValues(card, el) {
+    var v = {};
+    card.inputs.forEach(function (inp) {
+      var node = el.querySelector('input[data-key="' + inp.key + '"]');
+      v[inp.key] = inp.type === 'text' ? node.value : parseFloat(node.value);
+    });
+    return v;
+  }
+
+  function computeCard(card, el) {
+    var v = readValues(card, el);
+    card.outputs.forEach(function (out) {
+      var chip = el.querySelector('.result[data-out="' + out.key + '"]');
+      var valueEl = chip.querySelector('.r-value');
+      var verdictEl = chip.querySelector('.r-verdict');
+      var val = null;
+      try { val = out.compute(v); } catch (e) { val = null; }
+
+      valueEl.textContent = formatValue(val, out.format);
+      chip.classList.remove('good', 'warn', 'bad', 'info');
+      chip.classList.toggle('has-value', val !== null && val !== undefined);
+
+      var verdict = (val !== null && val !== undefined && out.interpret)
+        ? out.interpret(val, v) : null;
+      if (verdict) {
+        chip.classList.add(verdict.tone);
+        verdictEl.textContent = verdict.text;
+        verdictEl.hidden = false;
+      } else {
+        verdictEl.textContent = '';
+        verdictEl.hidden = true;
+      }
+    });
+  }
+
+  /* --------------------------------------------------------- sections */
+  var totalCards = 0, totalOutputs = 0;
+
+  DATA.categories.forEach(function (cat, i) {
+    var section = document.createElement('section');
+    section.className = 'category';
+    section.id = 'cat-' + cat.id;
+    section.setAttribute('aria-labelledby', 'cat-h-' + cat.id);
+    section.innerHTML =
+      '<header class="cat-head">' +
+        '<span class="cat-num">' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<div><h2 id="cat-h-' + cat.id + '">' + cat.name + '</h2>' +
+        '<p class="cat-blurb">' + cat.blurb + '</p></div>' +
+      '</header>';
+
+    cat.cards.forEach(function (card) {
+      section.appendChild(buildCard(card));
+      totalCards += 1;
+      totalOutputs += card.outputs.length;
+    });
+    sectionsEl.appendChild(section);
+
+    var link = document.createElement('a');
+    link.href = '#cat-' + cat.id;
+    link.dataset.cat = cat.id;
+    link.innerHTML = '<span class="nav-num">' + String(i + 1).padStart(2, '0') + '</span>' + cat.name;
+    navEl.appendChild(link);
+  });
+
+  if (statsEl) {
+    statsEl.textContent = DATA.categories.length + ' domains · ' +
+      totalCards + ' calculators · ' + totalOutputs + ' metrics, each one explained';
+  }
+
+  /* ----------------------------------------------------------- search */
+  if (searchEl) {
+    searchEl.addEventListener('input', function () {
+      var q = searchEl.value.trim().toLowerCase();
+      DATA.categories.forEach(function (cat) {
+        var section = document.getElementById('cat-' + cat.id);
+        var visible = 0;
+        cat.cards.forEach(function (card) {
+          var el = document.getElementById('calc-' + card.id);
+          var show = !q || el.dataset.search.indexOf(q) !== -1;
+          el.hidden = !show;
+          if (show) visible += 1;
+        });
+        section.hidden = visible === 0;
+        var link = navEl.querySelector('a[data-cat="' + cat.id + '"]');
+        if (link) link.classList.toggle('dimmed', visible === 0);
+      });
+    });
+  }
+
+  /* -------------------------------------------------------- scrollspy */
+  if ('IntersectionObserver' in window) {
+    var links = {};
+    navEl.querySelectorAll('a[data-cat]').forEach(function (a) { links[a.dataset.cat] = a; });
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var id = entry.target.id.replace('cat-', '');
+        Object.keys(links).forEach(function (k) {
+          links[k].classList.toggle('active', k === id);
+        });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.category').forEach(function (s) { observer.observe(s); });
+  }
+})();
+
+  </script>
+</body>
+</html>
