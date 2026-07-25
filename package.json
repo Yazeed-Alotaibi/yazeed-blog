@@ -1,0 +1,12 @@
+{
+  "name": "yazeed-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static site: PM tools and resources at yazeed.blog",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
