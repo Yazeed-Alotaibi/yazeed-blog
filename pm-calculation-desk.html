@@ -358,13 +358,33 @@ main {
 
 .viz[hidden] { display: none; }
 
-.viz figcaption {
+.viz figcaption { margin-bottom: 1.1rem; }
+
+.viz-title {
+  display: block;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink-faint);
-  margin-bottom: 0.85rem;
+}
+
+/* The reading guide. Every figure carries one, and it is deliberately prose
+   rather than more marks on the chart: it is what lets the picture stay
+   simple. Plain text also wraps, selects and reads aloud, which annotation
+   inside the SVG does not. */
+.viz-note {
+  display: block;
+  margin-top: 0.5rem;
+  max-width: 68ch;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.viz-note b {
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .viz svg {
@@ -2274,6 +2294,9 @@ var PM_DATA = (function () {
   /* -------------------------------------------------- 1 · earned value */
   VIZ['earned-value'] = {
     caption: 'Budget, plan and spend side by side',
+    note: 'Three bars: what you <b>planned</b> to have spent by now, what the finished work is ' +
+      '<b>worth</b>, and what you <b>actually</b> spent. The vertical line is the full budget. ' +
+      'EV shorter than PV means behind schedule; AC longer than EV means over budget.',
     aria: function (v) {
       return 'Horizontal bars comparing planned value ' + f2(v.pv) + ', earned value ' +
         f2(v.ev) + ' and actual cost ' + f2(v.ac) + ' against a budget at completion of ' +
@@ -2281,7 +2304,7 @@ var PM_DATA = (function () {
     },
     draw: function (v, r, W) {
       if (!ok(v.bac, v.pv, v.ev, v.ac)) return null;
-      var L = 44, R = 74, T = 30, bh = 24, gap = 22;
+      var L = 44, R = 74, T = 30, bh = 22, gap = 30;
       var rows = [
         { k: 'PV', label: 'Planned value', val: v.pv },
         { k: 'EV', label: 'Earned value', val: v.ev },
@@ -2293,7 +2316,7 @@ var PM_DATA = (function () {
       var bottom = T + rows.length * (bh + gap) - gap + 4;
       var s = '';
 
-      ticks(0, hi * 1.04, W < 460 ? 3 : 5).forEach(function (t) {
+      ticks(0, hi * 1.04, W < 460 ? 2 : 4).forEach(function (t) {
         s += line(x(t), T - 8, x(t), bottom, 'v-grid');
         s += text(x(t), bottom + 16, fk(t), 'v-t-sm v-t-mid');
       });
@@ -2318,6 +2341,10 @@ var PM_DATA = (function () {
   /* ------------------------------------------------ 2 · three-point PERT */
   VIZ['three-point'] = {
     caption: 'The estimate’s distribution and confidence bands',
+    note: 'The curve is where the real duration is likely to land — the taller it is, the more ' +
+      'likely. The three shaded bands hold <b>68%</b>, <b>95%</b> and <b>99.7%</b> of that ' +
+      'likelihood. Note the PERT line sits to the right of the peak: a long pessimistic tail ' +
+      'pulls the expected value away from your best guess.',
     aria: function (v, r) {
       return 'A PERT probability curve from an optimistic ' + f2(v.o) + ' to a pessimistic ' +
         f2(v.p) + ', peaking at the most likely ' + f2(v.m) + ', with the expected value at ' +
@@ -2373,9 +2400,10 @@ var PM_DATA = (function () {
       var pxx = x(r.pert);
       s += line(pxx, T - 12, pxx, base, 'v-ref');
       s += text(pxx, T - 17, 'PERT ' + f2(r.pert), 'v-t-val v-t-mid');
+      /* The band percentages live in the reading note now, so the chart only
+         states the one number the note cannot: this estimate's own sigma. */
       s += '<g>' + tip('68% of outcomes fall within ±1σ (' + f2(r.sd) + ')') +
-        text(W - R, base + 33, '±1σ ' + f2(r.sd) + '  ·  68 / 95 / 99.7% bands', 'v-t-sm v-t-end') +
-        '</g>';
+        text(W - R, base + 33, '±1σ = ' + f2(r.sd), 'v-t-sm v-t-end') + '</g>';
       return { h: H, s: s };
     }
   };
@@ -2383,6 +2411,10 @@ var PM_DATA = (function () {
   /* ------------------------------------------------------------ 3 · float */
   VIZ['float'] = {
     caption: 'The activity’s early and late windows',
+    note: 'The top bar is the earliest the activity can run; the bottom bar is the latest it can ' +
+      'run without delaying the project. How far the bottom bar can slide right — the shaded ' +
+      'band — is your <b>float</b>. When the two bars sit directly above each other there is no ' +
+      'slack at all, and the activity is on the critical path.',
     aria: function (v, r) {
       return 'A timeline showing the activity scheduled early from ' + f2(v.es) + ' to ' +
         f2(v.ef) + ' and late from ' + f2(v.ls) + ' to ' + f2(v.lf) +
@@ -2443,6 +2475,9 @@ var PM_DATA = (function () {
   /* -------------------------------------------------------- 4 · break-even */
   VIZ['breakeven'] = {
     caption: 'Where revenue overtakes total cost',
+    note: 'Revenue climbs from zero; total cost starts partway up, because the fixed cost is ' +
+      'owed before you sell anything. Left of the crossing the cost line is on top and you are ' +
+      'losing money; right of it you are making money. The crossing is <b>break-even</b>.',
     aria: function (v, r) {
       return 'Two lines crossing at the break-even point of ' + f2(r.units) +
         ' units and ' + f2(r.revenue) + ' revenue; total cost starts at the fixed cost of ' +
@@ -2499,6 +2534,10 @@ var PM_DATA = (function () {
   /* ---------------------------------------------------------------- 5 · NPV */
   VIZ['npv'] = {
     caption: 'Discounted cash flows and the running total',
+    note: 'The grey bar is the money you put in. The blue bars are what comes back each period, ' +
+      'already discounted — equal payments shrink the further out they land, because money later ' +
+      'is worth less than money now. The line is the running total: where it crosses zero you ' +
+      'have paid the investment back, and where it ends is <b>NPV</b>.',
     aria: function (v, r) {
       return 'Bars showing each period’s discounted cash flow after an initial investment of ' +
         f2(v.inv) + ', with a running cumulative line reaching a net present value of ' +
@@ -2565,6 +2604,10 @@ var PM_DATA = (function () {
   /* ------------------------------------------------------ 6 · control chart */
   VIZ['control'] = {
     caption: 'The control band, drawn to scale',
+    note: 'How far a measurement can drift before it means something. Inside the blue band is ' +
+      'ordinary noise — leave it alone. In the amber band, keep watching. Past the red lines the ' +
+      'process has genuinely changed, and so has the right response: <b>investigate the cause, ' +
+      'do not adjust the machine</b>. Reacting to noise makes a process worse, not better.',
     aria: function (v, r) {
       return 'A control chart band centred on a mean of ' + f2(v.mean) +
         ', with warning limits at plus and minus two sigma and control limits at ' +
@@ -2572,7 +2615,7 @@ var PM_DATA = (function () {
     },
     draw: function (v, r, W) {
       if (!ok(v.mean, v.sigma) || !(v.sigma > 0)) return null;
-      var L = 62, R = 84, T = 26, H = 246, base = H - 40;
+      var L = 62, R = 84, T = 26, H = 224, base = H - 28;
       var lo = v.mean - 4 * v.sigma, hi = v.mean + 4 * v.sigma;
       var y = sc(lo, hi, base, T);
       var s = '', wPlot = W - R - L;
@@ -2601,14 +2644,12 @@ var PM_DATA = (function () {
         s += text(L - 8, yy + 4, fk(row[1]), 'v-t-sm v-t-end');
       });
 
-      /* Zone names sit inside their own band. */
+      /* Zone names sit inside their own band, top half only — the band is
+         symmetric, so labelling the mirror image again is just more ink. The
+         reading note carries what to do about each zone. */
       s += text(L + 10, y((hi + v.mean + 3 * v.sigma) / 2) + 4, 'Out of control', 'v-t');
       s += text(L + 10, y(v.mean + 2.5 * v.sigma) + 4, 'Warning', 'v-t');
-      s += text(L + 10, y(v.mean + v.sigma) + 4, 'Expected — about 95% of points', 'v-t');
-      s += text(L + 10, y((lo + v.mean - 3 * v.sigma) / 2) + 4, 'Out of control', 'v-t');
-      s += text(L, base + 26,
-        'A point outside ±3σ, or seven in a row on one side of the mean, is a signal — investigate rather than adjust.',
-        'v-t-sm');
+      s += text(L + 10, y(v.mean + v.sigma) + 4, 'Expected variation', 'v-t');
       return { h: H, s: s };
     }
   };
@@ -2616,6 +2657,10 @@ var PM_DATA = (function () {
   /* --------------------------------------------------- 7 · process capability */
   VIZ['cpk'] = {
     caption: 'The process spread against the spec limits',
+    note: 'The curve is your process — where its output actually falls. The red lines are the ' +
+      'limits it has to stay inside. <b>Cp</b> asks only whether the curve is narrow enough to ' +
+      'fit; <b>Cpk</b> also asks whether it is centred. A process can be plenty narrow and still ' +
+      'fail, simply by sitting too close to one limit.',
     aria: function (v, r) {
       return 'A normal curve for a process centred at ' + f2(v.mean) + ' with sigma ' +
         f2(v.sigma) + ', drawn against a lower spec limit of ' + f2(v.lsl) +
@@ -2657,11 +2702,13 @@ var PM_DATA = (function () {
       s += line(x(v.mean), T - 2, x(v.mean), base, 'v-ref');
       s += text(x(v.mean), base + 18, 'μ ' + f2(v.mean), 'v-t-sm v-t-mid');
 
+      /* The live verdict — the one thing the reading note cannot say, because
+         it depends on the numbers currently typed in. */
       var centred = Number.isFinite(r.cp) && Number.isFinite(r.cpk) &&
         Math.abs(r.cp - r.cpk) < 0.01;
       s += text(L, base + 36, centred
         ? 'Centred — Cpk matches Cp at ' + f2(r.cpk)
-        : 'Off centre — Cpk ' + f2(r.cpk) + ' trails Cp ' + f2(r.cp), 'v-t-sm');
+        : 'Off centre — Cpk ' + f2(r.cpk) + ' trails Cp ' + f2(r.cp), 'v-t-val');
       return { h: H, s: s };
     }
   };
@@ -2669,6 +2716,10 @@ var PM_DATA = (function () {
   /* --------------------------------------------------------- 8 · decision tree */
   VIZ['decision-tree'] = {
     caption: 'The two branches and what each is worth',
+    note: 'The diamond is the decision. Each branch is an option, splitting into its best and ' +
+      'worst case with the odds of each. <b>EMV</b> weighs those outcomes by their probability ' +
+      'and subtracts what the option costs. The blue branch is the one the maths favours — worth ' +
+      'more on average, which is not the same as safer.',
     aria: function (v, r) {
       return 'A decision tree comparing option A at an expected value of ' + f2(r.emvA) +
         ' against option B at ' + f2(r.emvB) + '. ' + (r.verdict || '');
@@ -2728,6 +2779,10 @@ var PM_DATA = (function () {
   /* -------------------------------------------------------- 9 · learning curve */
   VIZ['learning-curve'] = {
     caption: 'Time per unit as output doubles',
+    note: 'Each dot is a <b>doubling</b> of output — unit 1, 2, 4, 8. Every doubling multiplies ' +
+      'the time per unit by the learning rate, which is why the curve drops steeply at first and ' +
+      'then flattens. Most of the saving arrives early: the gain from unit 1 to 2 is the same ' +
+      'proportion as from 50 to 100, but far cheaper to reach.',
     aria: function (v, r) {
       return 'A decay curve showing unit time falling from ' + f2(v.t1) + ' at unit one to ' +
         f2(r.tn) + ' at unit ' + f2(v.n) + ' under a ' + f2(v.rate) + '% learning curve.';
@@ -2769,8 +2824,6 @@ var PM_DATA = (function () {
          the curve it sits on. */
       s += text(Math.min(x(v.n) + 10, W - R), y(r.tn) - 12, 'unit ' + f2(v.n) + ' · ' + f2(r.tn),
         x(v.n) > W - R - 90 ? 'v-t-val v-t-end' : 'v-t-val');
-      s += text(L, T - 14, f2(v.rate) + '% curve — each doubling cuts unit time to ' +
-        f2(v.rate) + '%', 'v-t-sm');
       s += text(W - R, base + 32, 'Unit number', 'v-t-sm v-t-end');
       return { h: H, s: s };
     }
@@ -2779,6 +2832,10 @@ var PM_DATA = (function () {
   /* ----------------------------------------------------------- 10 · flow */
   VIZ['littles-law'] = {
     caption: 'Cycle time against work in progress',
+    note: 'The line is straight, and that is the whole point: at a fixed throughput, cycle time ' +
+      'rises in step with work in progress. <b>Halve the work in progress and you halve the ' +
+      'wait</b> — without anyone working faster. The bar underneath shows how much of that time ' +
+      'is real work rather than sitting in a queue.',
     aria: function (v, r) {
       return 'A line showing cycle time rising with work in progress at a throughput of ' +
         f2(v.throughput) + ', with the current point at ' + f2(v.wip) + ' items and ' +
@@ -2803,9 +2860,12 @@ var PM_DATA = (function () {
       s += line(L, base, W - R, base, 'v-axis');
       s += '<g>' + tip('WIP ' + f2(v.wip) + ' → cycle time ' + f2(r.cycleTime)) +
         '<circle cx="' + px(x(v.wip)) + '" cy="' + px(y(r.cycleTime)) + '" r="5.5" class="v-dot"/></g>';
-      s += text(Math.min(x(v.wip) + 10, W - R - 4), y(r.cycleTime) - 9,
-        'cycle ' + f2(r.cycleTime), 'v-t-val');
-      s += text(L, T - 12, 'Halve WIP, halve cycle time', 'v-t-sm');
+      /* Above and to the LEFT. The line rises to the right, so a label set to
+         the right of the marker is climbed into and struck through — the more
+         so as the card narrows and the line steepens on screen. To the left
+         the line is always below the label. */
+      s += text(Math.max(x(v.wip) - 12, L + 4), y(r.cycleTime) - 10,
+        'cycle ' + f2(r.cycleTime), 'v-t-val v-t-end');
       /* Its own row — on the tick baseline it overprinted the last tick. */
       s += text(W - R, base + 33, 'WIP', 'v-t-sm v-t-end');
 
@@ -2925,8 +2985,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
       '</div>' +
-      (viz ? '<figure class="viz" hidden><figcaption>' + viz.caption + '</figcaption>' +
-             '<div class="viz-slot"></div></figure>' : '');
+      (viz ? '<figure class="viz" hidden><figcaption>' +
+               '<span class="viz-title">' + viz.caption + '</span>' +
+               '<span class="viz-note">' + viz.note + '</span>' +
+             '</figcaption><div class="viz-slot"></div></figure>' : '');
 
     el.addEventListener('input', function () { computeCard(card, el); });
 

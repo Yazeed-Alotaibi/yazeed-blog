@@ -50,12 +50,33 @@ test('every figure attaches to a calculator that exists', function () {
   });
 });
 
-test('every figure declares a caption, an aria description and a draw', function () {
+test('every figure declares a caption, a reading note, an aria description and a draw', function () {
   IDS.forEach(function (id) {
     var f = VIZ[id];
     assert.ok(f.caption, id + ' has no caption');
+    assert.ok(f.note, id + ' has no reading note');
     assert.strictEqual(typeof f.aria, 'function', id + ' has no aria function');
     assert.strictEqual(typeof f.draw, 'function', id + ' has no draw function');
+  });
+});
+
+test('reading notes actually explain how to read the figure', function () {
+  /* The notes are what let the charts stay uncluttered, so they carry a real
+     share of the teaching and are worth holding to a standard. */
+  IDS.forEach(function (id) {
+    var note = VIZ[id].note;
+    assert.ok(note.length > 120,
+      id + ' note is too short to explain anything (' + note.length + ' chars)');
+    assert.ok(note.length < 600, id + ' note has grown into an essay (' + note.length + ' chars)');
+    assert.ok(/<b>.+<\/b>/.test(note),
+      id + ' note highlights nothing — mark the term the reader should take away');
+    /* Notes are injected as HTML, so only the intended emphasis tag is allowed. */
+    var tags = (note.match(/<\/?([a-z]+)[^>]*>/g) || []).map(function (t) {
+      return t.replace(/[<>/]/g, '');
+    });
+    tags.forEach(function (t) {
+      assert.strictEqual(t, 'b', id + ' note contains an unexpected <' + t + '> tag');
+    });
   });
 });
 
