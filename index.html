@@ -7,356 +7,738 @@
   <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* yazeed.blog — whiteprint / blueprint.
+   Direction: the reprographic drawing. Light mode is a diazo whiteprint —
+   dark lines on pale stock. Dark mode is the cyanotype it was printed from —
+   pale lines on prussian. Structure comes from drafting conventions: title
+   blocks, sheet numbers, hairline rules, tabular figures. The one signature
+   element is the status rail, which plots a verdict on a three-position
+   track so meaning never depends on color alone. */
 
-    :root {
-      --paper:   #f6f4ee;
-      --ink:     #1a1a1a;
-      --muted:   #6b6860;
-      --faint:   #e8e4d9;
-      --accent:  #2b49c9;
-      --accent-light: #edf0fb;
-      --card-bg: #ffffff;
-      --chalk:   #1e1e1e;
-    }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+:root {
+  color-scheme: light;
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100vh;
-      font-size: 16px;
-      line-height: 1.6;
-    }
+  --ground:      #e7ecef;
+  --sheet:       #fbfcfd;
+  --sheet-sunk:  #f1f4f6;
+  --ink:         #0d2233;
+  --ink-2:       #4a5c69;
+  --ink-3:       #55636e;
+  --rule:        #ccd6dd;
+  --rule-2:      #a9b8c2;
 
-    /* ─── Top bar ─────────────────────────────────────────── */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--faint);
-    }
-    .topbar-logo {
-      font-family: 'Fraunces', serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--ink);
-      text-decoration: none;
-      letter-spacing: -0.01em;
-    }
-    .topbar-nav {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-    .topbar-nav a {
-      font-size: 0.875rem;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .topbar-nav a:hover { color: var(--ink); }
-    .topbar-nav .li-btn {
-      padding: 0.375rem 0.875rem;
-      border: 1px solid var(--faint);
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--ink);
-      text-decoration: none;
-      transition: background 0.15s;
-      background: var(--card-bg);
-    }
-    .topbar-nav .li-btn:hover { background: var(--faint); }
+  --accent:      #0b5f96;
+  --accent-soft: #dce9f2;
+  --good:        #0f6b46;
+  --warn:        #8a5a06;
+  --bad:         #a8322f;
 
-    /* ─── Hero ────────────────────────────────────────────── */
-    .hero {
-      max-width: 860px;
-      margin: 5rem auto 4rem;
-      padding: 0 2rem;
-    }
-    .hero-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-    .hero h1 {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      font-weight: 600;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      margin-bottom: 0.75rem;
-    }
-    .hero h1 em {
-      font-style: italic;
-      color: var(--accent);
-    }
-    .hero-sub {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 540px;
-      line-height: 1.7;
-    }
-    .creds {
-      display: inline-flex;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-    }
-    .cred-pill {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 0.3rem 0.7rem;
-      background: var(--chalk);
-      color: #f0ede4;
-      border-radius: 4px;
-    }
+  --strip:       #0d2233;
+  --strip-ink:   #d5e6f2;
+  --strip-grid:  rgba(150, 200, 235, 0.15);
 
-    /* ─── Tools section ───────────────────────────────────── */
-    .tools-section {
-      max-width: 860px;
-      margin: 0 auto 6rem;
-      padding: 0 2rem;
-    }
-    .section-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-top: 1px solid var(--faint);
-      padding-top: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.25rem;
-    }
+  --shadow: 0 12px 28px -22px rgba(13, 34, 51, 0.55);
 
-    /* ─── Tool card ───────────────────────────────────────── */
-    .tool-card {
-      background: var(--card-bg);
-      border: 1px solid var(--faint);
-      border-radius: 10px;
-      padding: 1.5rem 1.5rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      color: inherit;
-    }
-    .tool-card:hover:not(.soon) {
-      border-color: #c8c3b6;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-    }
-    .tool-card.soon {
-      opacity: 0.55;
-      cursor: default;
-    }
-    .card-domain {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-light);
-      display: inline-block;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
-    }
-    .card-domain.coming {
-      color: var(--muted);
-      background: var(--faint);
-    }
-    .card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.25rem;
-      font-weight: 500;
-      line-height: 1.25;
-      letter-spacing: -0.01em;
-    }
-    .card-desc {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .card-stats {
-      display: flex;
-      gap: 1rem;
-      margin-top: auto;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--faint);
-    }
-    .stat {
-      text-align: left;
-    }
-    .stat-num {
-      font-family: 'Fraunces', serif;
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--ink);
-    }
-    .stat-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-    }
-    .card-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--accent);
-      margin-top: 0.25rem;
-    }
-    .card-arrow svg { transition: transform 0.15s; }
-    .tool-card:hover .card-arrow svg { transform: translateX(3px); }
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
-    /* ─── Footer ──────────────────────────────────────────── */
-    .footer {
-      border-top: 1px solid var(--faint);
-      padding: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .footer-name {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .footer-name a {
-      color: var(--ink);
-      font-weight: 500;
-      text-decoration: none;
-      border-bottom: 1px solid var(--faint);
-    }
-    .footer-name a:hover { border-color: var(--ink); }
-    .footer-right {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
 
-    /* ─── Mobile ──────────────────────────────────────────── */
-    @media (max-width: 640px) {
-      .topbar { padding: 1rem 1.25rem; }
-      .hero, .tools-section { padding: 0 1.25rem; }
-      .hero { margin: 3.5rem auto 3rem; }
-      .tools-grid { grid-template-columns: 1fr; }
-      .footer { padding: 1.5rem 1.25rem; flex-direction: column; align-items: flex-start; }
-    }
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --ground:      #0b2333;
+    --sheet:       #102c3e;
+    --sheet-sunk:  #0c2536;
+    --ink:         #e6eef3;
+    --ink-2:       #a8bcc8;
+    --ink-3:       #8ba3b1;
+    --rule:        #1d4055;
+    --rule-2:      #2c5670;
+
+    --accent:      #6cb8e8;
+    --accent-soft: #14344a;
+    --good:        #5cc79a;
+    --warn:        #e0b45c;
+    --bad:         #f0908a;
+
+    --strip:       #071a26;
+    --strip-ink:   #cfe3f0;
+    --strip-grid:  rgba(108, 184, 232, 0.13);
+
+    --shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.8);
+  }
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--body);
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+/* Drafting labels — the small caps meta that annotates a sheet. */
+.label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ─── Title bar ──────────────────────────────────────────────────── */
+.topbar {
+  border-bottom: 1px solid var(--rule);
+  background: var(--sheet);
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.85rem;
+}
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+.mark-glyph {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--rule-2);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--sheet-sunk);
+}
+.mark-name {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 108;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.mark-role {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.topbar-nav { display: flex; gap: 0.5rem; }
+.topbar-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--rule-2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--sheet);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.topbar-nav a:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
+
+:where(a, button, input):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+}
+.hero-eyebrow { margin-bottom: 1.25rem; }
+.hero h1 {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 112;
+  font-size: clamp(2.3rem, 1.2rem + 4.4vw, 4rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.hero h1 span { color: var(--accent); }
+.hero-lede {
+  margin-top: 1.35rem;
+  max-width: 46ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.12rem);
+  color: var(--ink-2);
+}
+.creds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.75rem;
+  list-style: none;
+}
+.cred-pill {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--rule-2);
+  color: var(--ink-2);
+}
+
+/* ─── Instrument: the live earned-value readout ──────────────────── */
+.instrument {
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+}
+.instrument-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.instrument-head strong {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 100;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.strip {
+  padding: 0.85rem 1rem;
+  background-color: var(--strip);
+  background-image:
+    linear-gradient(var(--strip-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  overflow-x: auto;
+}
+.strip code {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: var(--strip-ink);
+  white-space: pre;
+}
+
+.instrument-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.ifield label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 0.3rem;
+}
+.ifield input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.4rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule-2);
+  border-radius: 0;
+  transition: border-color var(--dur) var(--ease);
+}
+.ifield input:hover { border-color: var(--ink-3); }
+.ifield input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+.instrument-out {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.readout {
+  padding: 0.9rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.readout + .readout { border-left: 1px solid var(--rule); }
+.r-name {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.r-value {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.r-note {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* The signature: a three-position RAG track. The filled tick carries the
+   verdict positionally, so the reading survives without color. */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  height: 4px;
+}
+.rail i { background: var(--rule); }
+.tone-bad  .rail i:nth-child(1) { background: var(--bad); }
+.tone-warn .rail i:nth-child(2) { background: var(--warn); }
+.tone-good .rail i:nth-child(3) { background: var(--good); }
+.tone-bad  .r-value { color: var(--bad); }
+.tone-warn .r-value { color: var(--warn); }
+.tone-good .r-value { color: var(--good); }
+
+.instrument-foot {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+  font-size: 0.74rem;
+  color: var(--ink-3);
+}
+.instrument-foot a { color: var(--accent); font-weight: 500; }
+
+/* ─── Tools ──────────────────────────────────────────────────────── */
+.tools { padding-bottom: clamp(3.5rem, 7vw, 6rem); }
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule-2);
+  margin-bottom: 1.75rem;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+              transform var(--dur) var(--ease);
+}
+.tool-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.tool-card.soon {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--rule-2);
+}
+
+.card-index {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.card-domain { color: var(--accent); }
+.tool-card.soon .card-domain { color: var(--ink-3); }
+
+.card-title {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 104;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.card-desc {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.card-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--rule);
+}
+.stat-num {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+.tool-card.soon .card-action { color: var(--ink-3); }
+.card-action svg { transition: transform var(--dur) var(--ease); }
+.tool-card:hover .card-action svg { transform: translateX(4px); }
+
+/* ─── Title block footer ─────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--rule-2);
+  background: var(--sheet);
+}
+.footer-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.tb-cell {
+  padding: 1.1rem var(--gutter);
+  border-right: 1px solid var(--rule);
+}
+.tb-cell:last-child { border-right: none; }
+.tb-cell p {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+.tb-cell a { color: var(--accent); font-weight: 500; text-decoration: none; }
+.tb-cell a:hover { text-decoration: underline; }
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 460px) {
+  .instrument-fields { grid-template-columns: minmax(0, 1fr); }
+  .instrument-out { grid-template-columns: minmax(0, 1fr); }
+  .readout + .readout { border-left: none; border-top: 1px solid var(--rule); }
+  .topbar-inner { flex-wrap: wrap; }
+  .tb-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
   </style>
 </head>
 <body>
 
-  <!-- Top bar -->
   <header class="topbar">
-    <a href="/" class="topbar-logo">by: Yazeed Alotaibi</a>
-    <nav class="topbar-nav">
-      <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener" class="li-btn">LinkedIn ↗</a>
-      <a href="mailto:yaz.otb.sa@gmail.com" class="li-btn">Email</a>
-    </nav>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <p class="hero-eyebrow">Project Management · Tools &amp; Resources</p>
-    <h1>Built by a PM,<br><em>for PMs.</em></h1>
-    <p class="hero-sub">
-      Practical tools, calculators, dashboards, and AI resources for project managers
-      who need the right answer fast.
-    </p>
-  </section>
-
-  <!-- Tools -->
-  <section class="tools-section">
-    <p class="section-label">Tools</p>
-    <div class="tools-grid">
-
-      <!-- PM Calculation Desk — LIVE -->
-      <a class="tool-card" href="pm-calculation-desk.html">
-        <span class="card-domain">Calculators</span>
-        <h2 class="card-title">The Project Manager's Calculation Desk</h2>
-        <p class="card-desc">
-          Every PM formula you'll ever need — EVM, PERT, risk, quality, procurement, agile, and more.
-          Each one explained and color-coded so you know what the result actually means.
-        </p>
-        <div class="card-stats">
-          <div class="stat">
-            <div class="stat-num">14</div>
-            <div class="stat-label">Domains</div>
-          </div>
-          <div class="stat">
-            <div class="stat-num">33</div>
-            <div class="stat-label">Calculators</div>
-          </div>
-          <div class="stat">
-            <div class="stat-num">99</div>
-            <div class="stat-label">Metrics</div>
-          </div>
-        </div>
-        <span class="card-arrow">
-          Open tool
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+    <div class="wrap topbar-inner">
+      <a href="/" class="mark">
+        <span class="mark-glyph" aria-hidden="true">YA</span>
+        <span>
+          <span class="mark-name">Yazeed Alotaibi</span>
+          <span class="mark-role">Project management</span>
         </span>
       </a>
-
-      <!-- Placeholder: Dashboard -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">Dashboards</span>
-        <h2 class="card-title">Project Status Dashboard</h2>
-        <p class="card-desc">
-          Visual dashboard templates for tracking project health, milestones, budget, and risk in one view.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
-      </div>
-
-      <!-- Placeholder: AI tool -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">AI Tools</span>
-        <h2 class="card-title">AI Scope Statement Generator</h2>
-        <p class="card-desc">
-          Describe your project in plain language and get a structured, PMI-aligned scope statement draft.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
-      </div>
-
-      <!-- Placeholder: Estimation -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">Estimation</span>
-        <h2 class="card-title">WBS Estimation Toolkit</h2>
-        <p class="card-desc">
-          Build a work breakdown structure, apply three-point estimates, and roll up confidence intervals automatically.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
-      </div>
-
+      <nav class="topbar-nav" aria-label="Contact">
+        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:yaz.otb.sa@gmail.com">Email</a>
+      </nav>
     </div>
-  </section>
+  </header>
 
-  <!-- Footer -->
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <p class="label hero-eyebrow">Tools &amp; resources for project managers</p>
+          <h1>Know what the <span>number</span> means.</h1>
+          <p class="hero-lede">
+            Every project decision has arithmetic under it — earned value, float,
+            expected monetary value, procurement, agile forecasting. These tools run
+            the arithmetic, then tell you how to read the answer.
+          </p>
+          <ul class="creds">
+            <li class="cred-pill">PMI-RMP</li>
+            <li class="cred-pill">PRINCE2</li>
+          </ul>
+        </div>
+
+        <!-- The hero is the product in miniature: a real calculator, running. -->
+        <figure class="instrument" id="evm">
+          <figcaption class="instrument-head">
+            <strong>Earned value, live</strong>
+            <span class="label">Try it</span>
+          </figcaption>
+
+          <div class="strip">
+            <code>CPI = EV ÷ AC</code>
+            <code>SPI = EV ÷ PV</code>
+          </div>
+
+          <div class="instrument-fields">
+            <div class="ifield">
+              <label for="ev">EV earned</label>
+              <input id="ev" type="number" step="any" inputmode="decimal" value="108000" autocomplete="off">
+            </div>
+            <div class="ifield">
+              <label for="ac">AC spent</label>
+              <input id="ac" type="number" step="any" inputmode="decimal" value="96000" autocomplete="off">
+            </div>
+            <div class="ifield">
+              <label for="pv">PV planned</label>
+              <input id="pv" type="number" step="any" inputmode="decimal" value="120000" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="instrument-out" aria-live="polite">
+            <div class="readout" id="out-cpi">
+              <span class="r-name">CPI · cost</span>
+              <span class="r-value">—</span>
+              <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="r-note">Enter a value above.</span>
+            </div>
+            <div class="readout" id="out-spi">
+              <span class="r-name">SPI · schedule</span>
+              <span class="r-value">—</span>
+              <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="r-note">Enter a value above.</span>
+            </div>
+          </div>
+
+          <p class="instrument-foot">
+            Two of 99 metrics on the
+            <a href="pm-calculation-desk.html">Calculation Desk</a>.
+          </p>
+        </figure>
+      </section>
+
+      <section class="tools">
+        <div class="section-head">
+          <h2 class="label">Tools</h2>
+          <span class="label">1 available · 3 in progress</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <a class="tool-card" href="pm-calculation-desk.html">
+            <div class="card-index">
+              <span class="label card-domain">Calculators</span>
+              <span class="label">01</span>
+            </div>
+            <h3 class="card-title">The Project Manager's Calculation Desk</h3>
+            <p class="card-desc">
+              Every PM formula you'll ever need — EVM, PERT, risk, quality, procurement,
+              agile, and more. Each one explained and colour-coded so you know what the
+              result actually means.
+            </p>
+            <div class="card-stats">
+              <div class="stat">
+                <div class="stat-num">14</div>
+                <div class="stat-label">Domains</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">33</div>
+                <div class="stat-label">Calculators</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">99</div>
+                <div class="stat-label">Metrics</div>
+              </div>
+            </div>
+            <span class="card-action">
+              Open the desk
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </a>
+
+          <div class="tool-card soon">
+            <div class="card-index">
+              <span class="label card-domain">Dashboards</span>
+              <span class="label">02</span>
+            </div>
+            <h3 class="card-title">Project Status Dashboard</h3>
+            <p class="card-desc">
+              Visual dashboard templates for tracking project health, milestones, budget,
+              and risk in one view.
+            </p>
+            <span class="card-action">Coming soon</span>
+          </div>
+
+          <div class="tool-card soon">
+            <div class="card-index">
+              <span class="label card-domain">AI tools</span>
+              <span class="label">03</span>
+            </div>
+            <h3 class="card-title">AI Scope Statement Generator</h3>
+            <p class="card-desc">
+              Describe your project in plain language and get a structured, PMI-aligned
+              scope statement draft.
+            </p>
+            <span class="card-action">Coming soon</span>
+          </div>
+
+          <div class="tool-card soon">
+            <div class="card-index">
+              <span class="label card-domain">Estimation</span>
+              <span class="label">04</span>
+            </div>
+            <h3 class="card-title">WBS Estimation Toolkit</h3>
+            <p class="card-desc">
+              Build a work breakdown structure, apply three-point estimates, and roll up
+              confidence intervals automatically.
+            </p>
+            <span class="card-action">Coming soon</span>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
   <footer class="footer">
-    <p class="footer-name">
-      Made by <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
-    </p>
-    <p class="footer-right">&copy; 2026 yazeed.blog</p>
+    <div class="footer-inner">
+      <div class="tb-cell">
+        <span class="label">Made by</span>
+        <p><a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a></p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Conventions</span>
+        <p>PMBOK / PMP-exam formulas</p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Your data</span>
+        <p>Computed in your browser. Nothing is sent anywhere.</p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Sheet</span>
+        <p>yazeed.blog &middot; 2026</p>
+      </div>
+    </div>
   </footer>
+
+  <script>
+/* Hero instrument. The same two indices the Calculation Desk opens with,
+   wired live so the homepage demonstrates the product rather than
+   describing it. */
+(function () {
+  'use strict';
+
+  var fields = {
+    ev: document.getElementById('ev'),
+    ac: document.getElementById('ac'),
+    pv: document.getElementById('pv')
+  };
+  var figure = document.getElementById('evm');
+  if (!figure || !fields.ev) return;
+
+  function read(el) {
+    var n = parseFloat(el.value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function pct(n) { return Math.round(Math.abs(n) * 100); }
+
+  function cpiVerdict(cpi) {
+    if (cpi >= 1.05) return { tone: 'good', text: 'Under budget. Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
+    if (cpi >= 1) return { tone: 'good', text: 'On budget. Spending is tracking the work delivered.' };
+    if (cpi >= 0.95) return { tone: 'warn', text: 'Slightly over budget. Watch the trend before it compounds.' };
+    return { tone: 'bad', text: 'Over budget by ' + pct(1 / cpi - 1) + '%. Costs are outrunning the work delivered.' };
+  }
+
+  function spiVerdict(spi) {
+    if (spi >= 1.05) return { tone: 'good', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
+    if (spi >= 1) return { tone: 'good', text: 'On schedule. Work is landing when it was planned to.' };
+    if (spi >= 0.95) return { tone: 'warn', text: 'Slipping. ' + pct(spi) + '% of the scheduled work is done.' };
+    return { tone: 'bad', text: 'Behind plan. Only ' + pct(spi) + '% of the scheduled work is done.' };
+  }
+
+  function paint(id, value, verdict) {
+    var el = document.getElementById(id);
+    el.classList.remove('tone-good', 'tone-warn', 'tone-bad');
+    if (value === null) {
+      el.querySelector('.r-value').textContent = '—';
+      el.querySelector('.r-note').textContent = 'Enter a value above.';
+      return;
+    }
+    el.classList.add('tone-' + verdict.tone);
+    el.querySelector('.r-value').textContent = value.toFixed(2);
+    el.querySelector('.r-note').textContent = verdict.text;
+  }
+
+  function update() {
+    var ev = read(fields.ev), ac = read(fields.ac), pv = read(fields.pv);
+
+    var cpi = (ev !== null && ac) ? ev / ac : null;
+    var spi = (ev !== null && pv) ? ev / pv : null;
+
+    paint('out-cpi', cpi, cpi === null ? null : cpiVerdict(cpi));
+    paint('out-spi', spi, spi === null ? null : spiVerdict(spi));
+  }
+
+  Object.keys(fields).forEach(function (k) {
+    fields[k].addEventListener('input', update);
+  });
+  update();
+})();
+  </script>
 
 </body>
 </html>

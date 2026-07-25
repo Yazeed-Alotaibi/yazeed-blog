@@ -7,41 +7,81 @@
   <meta name="description" content="Interactive project management calculators — earned value, PERT estimation, float, EMV, NPV, procurement and agile forecasting — with every formula and parameter explained.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-/* PM Calculation Desk — editorial light theme.
-   Direction: warm paper, ink typography (Fraunces display / Inter UI),
-   dark chalk-strip formulas, semantic tones reserved for interpretation. */
+/* PM Calculation Desk — whiteprint / blueprint.
+   Direction: the reprographic drawing. Light mode is a diazo whiteprint —
+   dark lines on pale stock. Dark mode is the cyanotype it was printed from —
+   pale lines on prussian. Formulas sit on a gridded strip, as if drawn on the
+   sheet. Every result carries a status rail: a three-position RAG track whose
+   filled tick states the verdict positionally, so the reading survives
+   without color. */
 
 :root {
-  --paper: #f6f4ee;
-  --card: #fffefa;
-  --ink: #1c1b17;
-  --ink-soft: #6b675c;
-  --ink-faint: #948f81;
-  --line: #e4dfd2;
-  --line-strong: #cfc8b6;
-  --chalk: #23221d;
-  --chalk-text: #f0ead9;
+  color-scheme: light;
 
-  --accent: #2b49c9;
-  --accent-soft: #eceffc;
-  --good: #1c7a4d;
-  --good-soft: #e8f4ec;
-  --warn: #9a6c07;
-  --warn-soft: #faf3e0;
-  --bad: #bb3a3a;
-  --bad-soft: #f9ecec;
+  --ground:      #e7ecef;
+  --sheet:       #fbfcfd;
+  --sheet-sunk:  #f1f4f6;
+  --ink:         #0d2233;
+  --ink-2:       #4a5c69;
+  --ink-3:       #55636e;
+  --rule:        #ccd6dd;
+  --rule-2:      #a9b8c2;
 
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  --accent:      #0b5f96;
+  --accent-soft: #dce9f2;
+  --good:        #0f6b46;
+  --good-soft:   #e2eeea;
+  --warn:        #8a5a06;
+  --warn-soft:   #f3ece0;
+  --bad:         #a8322f;
+  --bad-soft:    #f4e3e2;
 
-  --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
-  --space-section: clamp(3.5rem, 2.5rem + 3vw, 6rem);
-  --radius: 14px;
+  --strip:       #0d2233;
+  --strip-ink:   #d5e6f2;
+  --strip-grid:  rgba(150, 200, 235, 0.15);
+
+  --shadow: 0 14px 32px -26px rgba(13, 34, 51, 0.6);
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
+  --space-section: clamp(3.5rem, 2.5rem + 3vw, 5.5rem);
   --dur: 180ms;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --ground:      #0b2333;
+    --sheet:       #102c3e;
+    --sheet-sunk:  #0c2536;
+    --ink:         #e6eef3;
+    --ink-2:       #a8bcc8;
+    --ink-3:       #8ba3b1;
+    --rule:        #1d4055;
+    --rule-2:      #2c5670;
+
+    --accent:      #6cb8e8;
+    --accent-soft: #14344a;
+    --good:        #5cc79a;
+    --good-soft:   #10322a;
+    --warn:        #e0b45c;
+    --warn-soft:   #322816;
+    --bad:         #f0908a;
+    --bad-soft:    #3a1d1e;
+
+    --strip:       #071a26;
+    --strip-ink:   #cfe3f0;
+    --strip-grid:  rgba(108, 184, 232, 0.13);
+
+    --shadow: 0 14px 32px -26px rgba(0, 0, 0, 0.85);
+  }
 }
 
 * { box-sizing: border-box; }
@@ -50,13 +90,30 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--ground);
   color: var(--ink);
-  font-family: var(--font-ui);
+  font-family: var(--body);
   font-size: var(--text-base);
   line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 272px minmax(0, 1fr);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:where(a, button, input):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ------------------------------------------------------------ sidebar */
@@ -65,170 +122,198 @@ body {
   top: 0;
   height: 100vh;
   overflow-y: auto;
-  padding: 1.75rem 1.25rem;
-  border-right: 1px solid var(--line);
-  background: var(--paper);
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--rule-2);
+  background: var(--sheet);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
 }
 
+/* Title block — the bordered identification panel on a drawing sheet. */
 .brand {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--rule);
 }
 
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 10px;
-  background: var(--chalk);
-  color: var(--chalk-text);
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 1px solid var(--rule-2);
+  background: var(--sheet-sunk);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .brand strong {
   display: block;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 106;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
 }
 
-.brand span {
+/* Scoped to the inner span: a bare `.brand span` also matches .brand-mark and
+   silently overrides its display and size. */
+.brand div span {
   display: block;
-  font-size: 0.72rem;
-  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--ink-3);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
 }
 
 .search input {
   width: 100%;
-  padding: 0.55rem 0.75rem;
-  font: inherit;
+  min-height: 44px;
+  padding: 0.5rem 0.7rem;
+  font-family: var(--body);
   font-size: 0.85rem;
   color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--line-strong);
-  border-radius: 9px;
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule-2);
+  border-radius: 0;
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
-.search input::placeholder { color: var(--ink-faint); }
+.search input::placeholder { color: var(--ink-3); }
 
 .search input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.search-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.search-hint kbd {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--rule-2);
+  color: var(--ink-2);
 }
 
 #cat-nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 #cat-nav a {
   display: flex;
   align-items: baseline;
-  gap: 0.6rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  border-left: 3px solid transparent;
-  color: var(--ink-soft);
-  font-size: 0.86rem;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border-left: 2px solid transparent;
+  color: var(--ink-2);
+  font-size: 0.85rem;
   text-decoration: none;
   transition: color var(--dur) var(--ease), background var(--dur) var(--ease),
               border-color var(--dur) var(--ease);
 }
 
 #cat-nav a .nav-num {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
-#cat-nav a:hover { background: var(--card); color: var(--ink); }
-
-#cat-nav a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+#cat-nav a:hover { background: var(--sheet-sunk); color: var(--ink); }
 
 #cat-nav a.active {
   border-left-color: var(--accent);
-  background: var(--card);
+  background: var(--sheet-sunk);
   color: var(--ink);
   font-weight: 600;
 }
 
-#cat-nav a.dimmed { opacity: 0.35; }
+#cat-nav a.active .nav-num { color: var(--accent); }
+
+#cat-nav a.dimmed { opacity: 0.3; }
 
 .sidebar footer {
   margin-top: auto;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--rule);
   font-size: 0.72rem;
-  color: var(--ink-faint);
+  color: var(--ink-3);
   line-height: 1.5;
 }
 
 /* --------------------------------------------------------------- main */
 main {
   padding: 0 clamp(1.25rem, 4vw, 4rem) 5rem;
-  max-width: 1060px;
+  max-width: 1080px;
 }
 
 .hero {
-  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(2rem, 4vw, 3rem);
-  border-bottom: 1px solid var(--line-strong);
+  padding: clamp(3rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 2.75rem);
+  border-bottom: 1px solid var(--rule-2);
 }
 
 .kicker {
-  margin: 0 0 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  margin: 0 0 1.1rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.16em;
   color: var(--accent);
 }
 
 .hero h1 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.4rem);
-  font-weight: 560;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
-  max-width: 16ch;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 112;
+  font-size: clamp(2.2rem, 1.3rem + 4vw, 4rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  max-width: 18ch;
+  text-wrap: balance;
 }
 
 .hero h1 em {
-  font-style: italic;
+  font-style: normal;
   color: var(--accent);
 }
 
 .hero .lede {
-  margin: 1.4rem 0 0;
+  margin: 1.35rem 0 0;
   max-width: 58ch;
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
-  color: var(--ink-soft);
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+  color: var(--ink-2);
 }
 
 #hero-stats {
   display: inline-block;
   margin-top: 1.5rem;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  color: var(--ink-soft);
-  background: var(--card);
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
 }
 
 /* ---------------------------------------------------------- category */
@@ -236,120 +321,136 @@ main {
 
 .cat-head {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.1rem;
   align-items: baseline;
-  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 1.5rem;
 }
 
 .cat-num {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 1.5rem + 2vw, 3.2rem);
-  font-weight: 300;
-  font-style: italic;
-  color: var(--line-strong);
-  line-height: 1;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .cat-head h2 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.2rem);
-  font-weight: 560;
-  letter-spacing: -0.01em;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 106;
+  font-size: clamp(1.4rem, 1.15rem + 1.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .cat-blurb {
-  margin: 0.45rem 0 0;
+  margin: 0.4rem 0 0;
   max-width: 62ch;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
+  color: var(--ink-2);
+  font-size: 0.9rem;
 }
 
 /* --------------------------------------------------------------- card */
 .calc-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: clamp(1.25rem, 2.5vw, 2rem);
-  margin-bottom: 1.5rem;
-  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
-              border-color var(--dur) var(--ease);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  padding: clamp(1.15rem, 2.5vw, 1.85rem);
+  margin-bottom: 1.25rem;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
 .calc-card:hover {
-  border-color: var(--line-strong);
-  box-shadow: 0 10px 30px -18px rgba(28, 27, 23, 0.25);
+  border-color: var(--rule-2);
+  box-shadow: var(--shadow);
 }
 
 .calc-card:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 10px 30px -18px rgba(43, 73, 201, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .card-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem 1rem;
+  gap: 0.35rem 0.85rem;
+}
+
+.card-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
 .card-head h3 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 102;
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .tagline {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
   color: var(--accent);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .about {
-  margin: 0.8rem 0 1.1rem;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-  max-width: 72ch;
+  margin: 0.75rem 0 1rem;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  max-width: 74ch;
 }
 
+/* The formula sits on gridded stock, like a figure drawn on the sheet. */
 .formula {
-  background: var(--chalk);
-  border-radius: 10px;
-  padding: 0.9rem 1.15rem;
-  margin-bottom: 1.4rem;
+  padding: 0.85rem 1.05rem;
+  margin-bottom: 1.3rem;
+  background-color: var(--strip);
+  background-image:
+    linear-gradient(var(--strip-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
   overflow-x: auto;
 }
 
 .formula code {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  line-height: 1.9;
-  color: var(--chalk-text);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.95;
+  color: var(--strip-ink);
   white-space: pre;
 }
 
 /* ------------------------------------------------------ inputs/outputs */
 .io {
   display: grid;
-  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  grid-template-columns: minmax(230px, 290px) minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2.25rem);
 }
 
 .io h4 {
   margin: 0 0 0.9rem;
-  font-size: 0.7rem;
-  font-weight: 700;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 
-.field { margin-bottom: 1rem; }
+.field { margin-bottom: 0.9rem; }
 
 .field label {
   display: block;
@@ -360,141 +461,175 @@ main {
 
 .field input {
   width: 100%;
-  padding: 0.5rem 0.15rem;
-  font: inherit;
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
+  min-height: 44px;
+  padding: 0.45rem 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--line-strong);
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule-2);
   border-radius: 0;
-  transition: border-color var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
-.field input::placeholder { color: var(--ink-faint); font-size: 0.85rem; }
+.field input::placeholder { color: var(--ink-3); font-size: 0.82rem; }
 
-.field input:hover { border-bottom-color: var(--ink-soft); }
+.field input:hover { border-color: var(--ink-3); }
 
 .field input:focus {
   outline: none;
-  border-bottom-color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .field-meaning {
   margin: 0.35rem 0 0;
   font-size: 0.75rem;
   line-height: 1.45;
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
 .result-group {
-  margin: 1.2rem 0 0.7rem;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.95rem;
+  margin: 1.15rem 0 0.65rem;
+  font-family: var(--mono);
+  font-size: 0.66rem;
   font-weight: 500;
-  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--ink-3);
 }
 
 .result-group:first-child { margin-top: 0; }
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 0.65rem;
 }
 
 .result {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--line-strong);
-  border-radius: 10px;
-  padding: 0.7rem 0.85rem;
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule);
+  padding: 0.7rem 0.8rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
   transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
 .r-label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ink-soft);
+  letter-spacing: 0.11em;
+  color: var(--ink-3);
 }
 
 .r-value {
-  font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
 }
+
+/* The status rail: three positions, bad → watch → good. The filled tick
+   states the verdict by position, so it reads without color too. */
+.r-rail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  height: 3px;
+  margin: 0.1rem 0 0.05rem;
+}
+
+.r-rail i { background: var(--rule); }
 
 .r-meaning {
   font-size: 0.72rem;
   line-height: 1.45;
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
 .r-verdict {
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   font-weight: 600;
   line-height: 1.4;
   padding-top: 0.35rem;
-  margin-top: 0.15rem;
-  border-top: 1px dashed var(--line-strong);
+  border-top: 1px solid var(--rule);
 }
 
-.result.good { border-left-color: var(--good); background: var(--good-soft); }
+.result.good { border-color: var(--good); background: var(--good-soft); }
 .result.good .r-verdict { color: var(--good); }
+.result.good .r-rail i:nth-child(3) { background: var(--good); }
 
-.result.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.result.warn { border-color: var(--warn); background: var(--warn-soft); }
 .result.warn .r-verdict { color: var(--warn); }
+.result.warn .r-rail i:nth-child(2) { background: var(--warn); }
 
-.result.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+.result.bad { border-color: var(--bad); background: var(--bad-soft); }
 .result.bad .r-verdict { color: var(--bad); }
+.result.bad .r-rail i:nth-child(1) { background: var(--bad); }
 
-.result.info { border-left-color: var(--accent); }
+/* Informational readings sit outside the good/bad axis, so the rail stays
+   unmarked — filling it would imply a verdict the number doesn't carry. */
+.result.info { border-color: var(--accent); background: var(--accent-soft); }
 .result.info .r-verdict { color: var(--accent); }
 
 .result.has-value .r-value { color: var(--ink); }
 
+/* --------------------------------------------------------- no results */
+.no-results {
+  margin-top: var(--space-section);
+  padding: 2rem 1.5rem;
+  border: 1px dashed var(--rule-2);
+  text-align: center;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+.no-results strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 104;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
 /* --------------------------------------------------------------- foot */
 .page-foot {
   margin-top: var(--space-section);
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule-2);
   font-size: 0.78rem;
-  color: var(--ink-faint);
+  color: var(--ink-3);
   max-width: 70ch;
 }
 
 .credit {
   display: block;
-  margin: 0.9rem 0 0;
+  margin: 0.85rem 0 0;
   padding-top: 0.7rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--rule);
   font-size: 0.78rem;
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
 .credit a {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color var(--dur) var(--ease);
 }
 
 .credit a:hover { border-bottom-color: var(--accent); }
-
-.credit a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /* --------------------------------------------------------- responsive */
 @media (max-width: 920px) {
@@ -505,31 +640,42 @@ main {
     position: static;
     height: auto;
     border-right: none;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--rule-2);
   }
 
+  /* One scrolling row rather than a wrapped block: 14 stacked pills pushed
+     the whole page below the fold on a phone. */
   #cat-nav {
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.4rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.3rem;
+    scrollbar-width: thin;
   }
 
   #cat-nav a {
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    padding: 0.35rem 0.8rem;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--rule-2);
+    border-left-width: 2px;
+    white-space: nowrap;
   }
 
   #cat-nav a.active { border-color: var(--accent); }
 
+  .search-hint,
   .sidebar footer { display: none; }
 
-  .io { grid-template-columns: 1fr; }
+  .io { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  * { transition-duration: 0.01ms !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
   </style>
@@ -545,10 +691,11 @@ main {
       </div>
     </div>
 
-    <label class="search">
-      <span class="sr-only" hidden>Search calculators</span>
-      <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" aria-label="Search calculators">
-    </label>
+    <div class="search">
+      <label class="sr-only" for="search">Search calculators</label>
+      <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" autocomplete="off">
+      <span class="search-hint">Press <kbd>/</kbd> to search</span>
+    </div>
 
     <nav id="cat-nav" aria-label="Calculation categories"></nav>
 
@@ -574,6 +721,11 @@ main {
     </header>
 
     <div id="calc-sections"></div>
+
+    <p class="no-results" id="no-results" hidden>
+      <strong>Nothing matches that.</strong>
+      Try a metric (CPI, EAC), a technique (PERT, float), or a domain (risk, quality).
+    </p>
 
     <footer class="page-foot">
       Built as a study and working reference. Values compute locally in your
@@ -2092,16 +2244,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
   }
 
   function resultChip(out) {
+    /* The rail is decorative for assistive tech: .r-verdict already states
+       the reading in words. It exists so the verdict is legible by position
+       as well as by colour. */
     return '' +
       '<div class="result" data-out="' + out.key + '">' +
         '<span class="r-label">' + out.label + '</span>' +
         '<span class="r-value">—</span>' +
+        '<span class="r-rail" aria-hidden="true"><i></i><i></i><i></i></span>' +
         '<span class="r-meaning">' + out.meaning + '</span>' +
         '<span class="r-verdict" hidden></span>' +
       '</div>';
   }
 
-  function buildCard(card) {
+  function buildCard(card, index, categoryName) {
     card.inputs.forEach(function (inp) { inp.cardId = card.id; });
 
     var groups = [];
@@ -2118,7 +2274,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         '<div class="results-grid">' + g.outs.map(resultChip).join('') + '</div>';
     }).join('');
 
-    var searchText = (card.name + ' ' + card.tagline + ' ' + card.about + ' ' +
+    /* Searching the domain name too, so "risk" or "quality" finds the whole
+       family rather than only the cards that happen to say the word. */
+    var searchText = (categoryName + ' ' + card.name + ' ' + card.tagline + ' ' +
+      card.about + ' ' + card.formula.join(' ') + ' ' +
       card.outputs.map(function (o) { return o.label; }).join(' ')).toLowerCase();
 
     var el = document.createElement('article');
@@ -2127,11 +2286,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
     el.dataset.search = searchText;
     el.innerHTML =
       '<header class="card-head">' +
+        '<span class="card-num">' + index + '</span>' +
         '<h3>' + card.name + '</h3>' +
         '<p class="tagline">' + card.tagline + '</p>' +
       '</header>' +
       '<p class="about">' + card.about + '</p>' +
-      '<div class="formula" role="img" aria-label="Formula">' +
+      '<div class="formula">' +
         card.formula.map(function (l) { return '<code>' + l + '</code>'; }).join('') +
       '</div>' +
       '<div class="io">' +
@@ -2194,8 +2354,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         '<p class="cat-blurb">' + cat.blurb + '</p></div>' +
       '</header>';
 
-    cat.cards.forEach(function (card) {
-      section.appendChild(buildCard(card));
+    cat.cards.forEach(function (card, j) {
+      /* Sheet-style index: domain, then card within it — 04.2 is the second
+         calculator of the fourth domain, so a card can be cited out loud. */
+      var index = String(i + 1).padStart(2, '0') + '.' + (j + 1);
+      section.appendChild(buildCard(card, index, cat.name));
       totalCards += 1;
       totalOutputs += card.outputs.length;
     });
@@ -2215,8 +2378,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   /* ----------------------------------------------------------- search */
   if (searchEl) {
+    var emptyEl = document.getElementById('no-results');
+    var baseStats = statsEl ? statsEl.textContent : '';
+
     searchEl.addEventListener('input', function () {
       var q = searchEl.value.trim().toLowerCase();
+      var matched = 0;
+
       DATA.categories.forEach(function (cat) {
         var section = document.getElementById('cat-' + cat.id);
         var visible = 0;
@@ -2227,9 +2395,32 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
           if (show) visible += 1;
         });
         section.hidden = visible === 0;
+        matched += visible;
         var link = navEl.querySelector('a[data-cat="' + cat.id + '"]');
         if (link) link.classList.toggle('dimmed', visible === 0);
       });
+
+      /* Without this the page just empties out and looks broken. */
+      if (emptyEl) emptyEl.hidden = !(q && matched === 0);
+
+      if (statsEl) {
+        statsEl.textContent = q
+          ? matched + (matched === 1 ? ' calculator matches “' : ' calculators match “') + searchEl.value.trim() + '”'
+          : baseStats;
+      }
+    });
+
+    /* "/" jumps to search from anywhere; Escape clears and returns the page. */
+    document.addEventListener('keydown', function (e) {
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (e.key === '/' && tag !== 'input' && tag !== 'textarea') {
+        e.preventDefault();
+        searchEl.focus();
+        searchEl.select();
+      } else if (e.key === 'Escape' && e.target === searchEl && searchEl.value) {
+        searchEl.value = '';
+        searchEl.dispatchEvent(new Event('input'));
+      }
     });
   }
 
