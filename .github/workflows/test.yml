@@ -1,0 +1,27 @@
+name: tests
+
+# The site is uploaded to Hostinger by hand, so this workflow does not deploy
+# anything — it is the gate that runs before an upload, checking that the 99
+# calculator formulas still produce the right numbers and that the homepage's
+# advertised counts still match the data.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No dependencies to install: the suite runs on the Node standard
+      # library alone (node:test, node:assert, node:vm).
+      - name: Run formula and structure tests
+        run: npm test
