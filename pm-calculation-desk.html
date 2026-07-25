@@ -33,6 +33,15 @@
   --bad: #bb3a3a;
   --bad-soft: #f9ecec;
 
+  /* Ordinal ramp for figures: the accent hue (OKLCH h 267.4) stepped light to
+     dark at a constant ΔL of 0.07. Validated against the --card surface —
+     monotone lightness, visible step gaps, lightest step 2.32:1. */
+  --viz-1: #88a7fa;
+  --viz-2: #698ef9;
+  --viz-3: #4c73f6;
+  --viz-4: #3a5dde;
+  --viz-5: #2946c6;
+
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
   --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
@@ -331,6 +340,102 @@ main {
   line-height: 1.9;
   color: var(--chalk-text);
   white-space: pre;
+}
+
+/* ------------------------------------------------------------- figures
+   One hue — the page accent, stepped into an ordinal ramp — plus the three
+   reserved status tones, used only where a colour genuinely means good or
+   bad. A second series hue was considered and rejected: every warm candidate
+   measured under OKLab ΔE 15 against --warn or --bad, i.e. close enough to
+   impersonate a verdict, and the alternatives that did clear it were violets
+   found nowhere else on the site. Identity in the multi-series figures is
+   carried by the legend and direct labels instead of by hue. */
+.viz {
+  margin: 1.5rem 0 0;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.viz[hidden] { display: none; }
+
+.viz figcaption {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  margin-bottom: 0.85rem;
+}
+
+.viz svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* chrome — recessive, hairline, never dashed */
+.v-grid { stroke: var(--line); stroke-width: 1; }
+.v-axis { stroke: var(--line-strong); stroke-width: 1; }
+.v-ref  { stroke: var(--ink-faint); stroke-width: 1.5; }
+
+/* marks — anything carrying data clears 3:1 on the --card surface. The ramp's
+   pale steps are for washes and meter tracks only, never for a data mark. */
+.v-fill   { fill: var(--accent); }               /* 7.18:1 */
+.v-fill-3 { fill: var(--viz-3); }                /* 3.75:1 */
+.v-wash   { fill: var(--accent); opacity: 0.10; }
+.v-line   { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+/* --viz-3 not --viz-2: a 2px line needs 3:1, and step 2 measures 2.70. */
+.v-line-2 { fill: none; stroke: var(--viz-3); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.v-dot    { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+
+/* De-emphasis: --ink-faint at 3.20:1, not --line-strong at 1.65 — these carry
+   real values (the investment bar, the losing branch), so they are marks, not
+   chrome, and have to clear the mark floor. */
+.v-mute   { fill: var(--ink-faint); }
+.v-mute-l { fill: none; stroke: var(--ink-faint); stroke-width: 2; stroke-linejoin: round; }
+.v-mute-d { fill: var(--ink-faint); stroke: var(--card); stroke-width: 2; }
+/* A running total is a primary series, so it gets a full-strength ink. */
+.v-cum    { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.v-cum-d  { fill: var(--ink-soft); stroke: var(--card); stroke-width: 2; }
+
+/* status — reserved; always paired with a label, never colour alone */
+.v-good   { fill: var(--good); }
+.v-warn   { fill: var(--warn); }
+.v-bad    { fill: var(--bad); }
+.v-good-s { stroke: var(--good); }
+.v-warn-s { stroke: var(--warn); }
+.v-bad-s  { stroke: var(--bad); }
+.v-good-w { fill: var(--good); opacity: 0.13; }
+.v-bad-w  { fill: var(--bad);  opacity: 0.13; }
+.v-warn-w { fill: var(--warn); opacity: 0.13; }
+
+/* text — always an ink token, never the mark colour */
+.v-t {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  fill: var(--ink-soft);
+}
+/* --ink-soft, not --ink-faint: these carry sentences and axis values, and
+   --ink-faint measures 3.20:1 — under the 4.5:1 floor for small text. */
+.v-t-sm { font-size: 10px; fill: var(--ink-soft); }
+.v-t-val {
+  font-size: 11.5px;
+  font-weight: 650;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.v-t-key {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  fill: var(--ink-soft);
+}
+.v-t-mid { text-anchor: middle; }
+.v-t-end { text-anchor: end; }
+
+@media (max-width: 560px) {
+  .viz { margin-top: 1.25rem; }
 }
 
 /* ------------------------------------------------------ inputs/outputs */
@@ -2039,7 +2144,687 @@ var PM_DATA = (function () {
     }
   ];
 
-  return { categories: categories };
+  /* =====================================================================
+     Figures.
+
+     Every draw() is a pure function of (inputs, results, width) returning
+     SVG markup, so the visuals are unit-testable exactly like the compute
+     functions — no DOM involved. The renderer supplies the width in CSS
+     pixels and uses it as the viewBox width, so one unit is one pixel and
+     label type never scales away on a narrow screen.
+
+     Encoding rules held throughout: one hue (the accent ramp) for magnitude;
+     the reserved status tones only where a colour genuinely means good or
+     bad; identity from legends and direct labels, never hue alone; hairline
+     solid chrome. Every number drawn here is also printed in the results
+     grid above, so nothing is reachable only by looking at the picture.
+     ===================================================================== */
+
+  function px(n) { return Math.round(n * 100) / 100; }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function sc(d0, d1, r0, r1) {
+    return function (x) {
+      if (d1 === d0) return r0;
+      return r0 + ((x - d0) * (r1 - r0)) / (d1 - d0);
+    };
+  }
+
+  function trim0(n) { return String(Math.round(n * 10) / 10); }
+
+  /* Compact axis label: 1.2k, 3.4M — axis ticks must not wrap. */
+  function fk(n) {
+    if (!Number.isFinite(n)) return '';
+    var a = Math.abs(n);
+    if (a >= 1e9) return trim0(n / 1e9) + 'B';
+    if (a >= 1e6) return trim0(n / 1e6) + 'M';
+    if (a >= 1e4) return trim0(n / 1e3) + 'k';
+    if (a >= 1) return String(Math.round(n * 10) / 10);
+    return String(Math.round(n * 100) / 100);
+  }
+
+  /* Round tick values — 0 / 500 / 1,000, never 0 / 437 / 874. */
+  function ticks(lo, hi, count) {
+    if (!(hi > lo)) return [lo];
+    var raw = (hi - lo) / (count || 4);
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var norm = raw / mag;
+    var s = (norm >= 7.5 ? 10 : norm >= 3.5 ? 5 : norm >= 1.5 ? 2 : 1) * mag;
+    var out = [];
+    for (var t = Math.ceil(lo / s) * s; t <= hi + s * 1e-6; t += s) {
+      out.push(Math.abs(t) < s * 1e-6 ? 0 : Math.round(t * 1e6) / 1e6);
+    }
+    return out;
+  }
+
+  /* Bars carry a 4px rounded data-end and stay square at the baseline. */
+  function hbar(x0, y, w, h, r) {
+    if (!(w > 0.5)) return '';
+    r = Math.min(r === undefined ? 4 : r, w, h / 2);
+    var x1 = x0 + w;
+    return 'M' + px(x0) + ' ' + px(y) +
+      'H' + px(x1 - r) + 'A' + px(r) + ' ' + px(r) + ' 0 0 1 ' + px(x1) + ' ' + px(y + r) +
+      'V' + px(y + h - r) + 'A' + px(r) + ' ' + px(r) + ' 0 0 1 ' + px(x1 - r) + ' ' + px(y + h) +
+      'H' + px(x0) + 'Z';
+  }
+
+  /* Vertical bar from a baseline; dy > 0 grows up, dy < 0 grows down. */
+  function vbar(x, yBase, w, dy, r) {
+    if (!(Math.abs(dy) > 0.5)) return '';
+    r = Math.min(r === undefined ? 4 : r, w / 2, Math.abs(dy));
+    var up = dy > 0, yTip = yBase - dy, x1 = x + w;
+    if (up) {
+      return 'M' + px(x) + ' ' + px(yBase) + 'V' + px(yTip + r) +
+        'A' + px(r) + ' ' + px(r) + ' 0 0 1 ' + px(x + r) + ' ' + px(yTip) +
+        'H' + px(x1 - r) + 'A' + px(r) + ' ' + px(r) + ' 0 0 1 ' + px(x1) + ' ' + px(yTip + r) +
+        'V' + px(yBase) + 'Z';
+    }
+    return 'M' + px(x) + ' ' + px(yBase) + 'V' + px(yTip - r) +
+      'A' + px(r) + ' ' + px(r) + ' 0 0 0 ' + px(x + r) + ' ' + px(yTip) +
+      'H' + px(x1 - r) + 'A' + px(r) + ' ' + px(r) + ' 0 0 0 ' + px(x1) + ' ' + px(yTip - r) +
+      'V' + px(yBase) + 'Z';
+  }
+
+  function poly(pts) {
+    var d = '';
+    for (var i = 0; i < pts.length; i++) {
+      d += (i ? 'L' : 'M') + px(pts[i][0]) + ' ' + px(pts[i][1]);
+    }
+    return d;
+  }
+
+  function line(x1, y1, x2, y2, cls) {
+    return '<line x1="' + px(x1) + '" y1="' + px(y1) + '" x2="' + px(x2) + '" y2="' + px(y2) +
+      '" class="' + cls + '"/>';
+  }
+
+  function text(x, y, s, cls) {
+    return '<text x="' + px(x) + '" y="' + px(y) + '" class="' + (cls || 'v-t') + '">' +
+      esc(s) + '</text>';
+  }
+
+  function tip(s) { return '<title>' + esc(s) + '</title>'; }
+
+  /* Legend — always present once a figure carries two or more series. */
+  function legend(x, y, items) {
+    var out = '', cx = x;
+    items.forEach(function (it) {
+      out += it.kind === 'line'
+        ? '<line x1="' + px(cx) + '" y1="' + px(y) + '" x2="' + px(cx + 14) + '" y2="' + px(y) +
+          '" class="' + it.cls + '" stroke-width="2.5"/>'
+        : '<rect x="' + px(cx) + '" y="' + px(y - 5) + '" width="11" height="11" rx="2.5" class="' +
+          it.cls + '"/>';
+      var w = it.kind === 'line' ? 20 : 17;
+      out += text(cx + w, y + 4, it.label, 'v-t');
+      cx += w + it.label.length * 5.9 + 18;
+    });
+    return out;
+  }
+
+  /* Normal density, unnormalised — shape is all these figures need. */
+  function gauss(x, mu, s) { return Math.exp(-0.5 * Math.pow((x - mu) / s, 2)); }
+
+  var VIZ = {};
+
+  /* -------------------------------------------------- 1 · earned value */
+  VIZ['earned-value'] = {
+    caption: 'Budget, plan and spend side by side',
+    aria: function (v) {
+      return 'Horizontal bars comparing planned value ' + f2(v.pv) + ', earned value ' +
+        f2(v.ev) + ' and actual cost ' + f2(v.ac) + ' against a budget at completion of ' +
+        f2(v.bac) + '.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.bac, v.pv, v.ev, v.ac)) return null;
+      var L = 44, R = 74, T = 30, bh = 24, gap = 22;
+      var rows = [
+        { k: 'PV', label: 'Planned value', val: v.pv },
+        { k: 'EV', label: 'Earned value', val: v.ev },
+        { k: 'AC', label: 'Actual cost', val: v.ac }
+      ];
+      var H = T + rows.length * (bh + gap) + 34;
+      var hi = Math.max(v.bac, v.pv, v.ev, v.ac, 0) || 1;
+      var x = sc(0, hi * 1.04, L, W - R);
+      var bottom = T + rows.length * (bh + gap) - gap + 4;
+      var s = '';
+
+      ticks(0, hi * 1.04, W < 460 ? 3 : 5).forEach(function (t) {
+        s += line(x(t), T - 8, x(t), bottom, 'v-grid');
+        s += text(x(t), bottom + 16, fk(t), 'v-t-sm v-t-mid');
+      });
+
+      rows.forEach(function (row, i) {
+        var y = T + i * (bh + gap);
+        s += '<g>' + tip(row.label + ': ' + f2(row.val)) +
+          '<path d="' + hbar(L, y, Math.max(0, x(row.val) - L), bh) + '" class="v-fill"/></g>';
+        s += text(L - 8, y + bh / 2 + 4, row.k, 'v-t-key v-t-end');
+        s += text(x(row.val) + 8, y + bh / 2 + 4, f2(row.val), 'v-t-val');
+      });
+
+      /* BAC is a threshold, not a gridline — heavier, labelled, full height. */
+      var bx = x(v.bac);
+      s += line(bx, T - 14, bx, bottom, 'v-ref');
+      s += text(bx, T - 19, 'BAC ' + f2(v.bac), 'v-t-sm v-t-mid');
+      s += line(L, T - 8, L, bottom, 'v-axis');
+      return { h: H, s: s };
+    }
+  };
+
+  /* ------------------------------------------------ 2 · three-point PERT */
+  VIZ['three-point'] = {
+    caption: 'The estimate’s distribution and confidence bands',
+    aria: function (v, r) {
+      return 'A PERT probability curve from an optimistic ' + f2(v.o) + ' to a pessimistic ' +
+        f2(v.p) + ', peaking at the most likely ' + f2(v.m) + ', with the expected value at ' +
+        f2(r.pert) + ' and one, two and three sigma bands shaded.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.o, v.m, v.p) || !(v.p > v.o) || v.m < v.o || v.m > v.p) return null;
+      if (!Number.isFinite(r.pert) || !Number.isFinite(r.sd)) return null;
+      var L = 20, R = 20, T = 34, H = 236, base = H - 46;
+      var lo = Math.min(v.o, r.pert - 3.4 * r.sd), hi = Math.max(v.p, r.pert + 3.4 * r.sd);
+      var x = sc(lo, hi, L, W - R);
+      var a = 1 + 4 * (v.m - v.o) / (v.p - v.o), b = 1 + 4 * (v.p - v.m) / (v.p - v.o);
+      var s = '', i, t, d, peak = 0, pts = [], N = 140;
+
+      for (i = 0; i <= N; i++) {
+        t = i / N;
+        d = Math.pow(t, a - 1) * Math.pow(1 - t, b - 1);
+        if (!Number.isFinite(d)) d = 0;
+        if (d > peak) peak = d;
+        pts.push([v.o + t * (v.p - v.o), d]);
+      }
+      if (!(peak > 0)) return null;
+      var y = sc(0, peak * 1.12, base, T);
+
+      var curve = pts.map(function (p) { return [x(p[0]), y(p[1])]; });
+      var area = poly(curve) + 'L' + px(x(v.p)) + ' ' + px(base) + 'L' + px(x(v.o)) + ' ' +
+        px(base) + 'Z';
+
+      /* Nested sigma bands, clipped to the area under the curve. Drawn as bare
+         rectangles they would keep their full height out past O and P, shading
+         a region where the distribution has no mass at all — the clip is what
+         makes the band mean "this share of the distribution". */
+      s += '<defs><clipPath id="pert-clip"><path d="' + area + '"/></clipPath></defs>';
+      s += '<g clip-path="url(#pert-clip)">';
+      [{ k: 3, fill: 'var(--viz-1)' }, { k: 2, fill: 'var(--viz-2)' },
+       { k: 1, fill: 'var(--viz-3)' }].forEach(function (bd) {
+        var x0 = Math.max(L, x(r.pert - bd.k * r.sd)), x1 = Math.min(W - R, x(r.pert + bd.k * r.sd));
+        if (x1 > x0) {
+          s += '<rect x="' + px(x0) + '" y="' + px(T - 6) + '" width="' + px(x1 - x0) +
+            '" height="' + px(base - T + 6) + '" fill="' + bd.fill + '" opacity="0.55"/>';
+        }
+      });
+      s += '</g>';
+      s += '<path d="' + poly(curve) + '" class="v-line"/>';
+      s += line(L, base, W - R, base, 'v-axis');
+
+      [{ at: v.o, lab: 'O ' + f2(v.o) }, { at: v.m, lab: 'M ' + f2(v.m) },
+       { at: v.p, lab: 'P ' + f2(v.p) }].forEach(function (mk) {
+        s += line(x(mk.at), base, x(mk.at), base + 6, 'v-axis');
+        s += text(x(mk.at), base + 19, mk.lab, 'v-t-sm v-t-mid');
+      });
+
+      var pxx = x(r.pert);
+      s += line(pxx, T - 12, pxx, base, 'v-ref');
+      s += text(pxx, T - 17, 'PERT ' + f2(r.pert), 'v-t-val v-t-mid');
+      s += '<g>' + tip('68% of outcomes fall within ±1σ (' + f2(r.sd) + ')') +
+        text(W - R, base + 33, '±1σ ' + f2(r.sd) + '  ·  68 / 95 / 99.7% bands', 'v-t-sm v-t-end') +
+        '</g>';
+      return { h: H, s: s };
+    }
+  };
+
+  /* ------------------------------------------------------------ 3 · float */
+  VIZ['float'] = {
+    caption: 'The activity’s early and late windows',
+    aria: function (v, r) {
+      return 'A timeline showing the activity scheduled early from ' + f2(v.es) + ' to ' +
+        f2(v.ef) + ' and late from ' + f2(v.ls) + ' to ' + f2(v.lf) +
+        ', with a total float of ' + f2(r.tf) + '.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.es, v.ef, v.ls, v.lf)) return null;
+      var L = 52, R = 30, T = 40, bh = 24, H = 210;
+      var lo = Math.min(v.es, v.ls);
+      var hi = Math.max(v.ef, v.lf, ok(v.succEs) ? v.succEs : -Infinity);
+      if (!(hi > lo)) hi = lo + 1;
+      var pad = (hi - lo) * 0.08;
+      var x = sc(lo - pad, hi + pad, L, W - R);
+      var s = '', yE = T, yL = T + bh + 26;
+
+      ticks(lo, hi, W < 460 ? 3 : 5).forEach(function (t) {
+        s += line(x(t), T - 10, x(t), yL + bh + 8, 'v-grid');
+        s += text(x(t), yL + bh + 24, fk(t), 'v-t-sm v-t-mid');
+      });
+
+      /* Float drawn first, as the ground the two windows slide across. It is a
+         quantity, not a verdict — slack is usually a good thing — so it wears
+         the palest ramp step rather than the reserved warning tone. The
+         judgement lives in the caption instead. */
+      if (Number.isFinite(r.tf) && r.tf > 0) {
+        s += '<rect x="' + px(x(v.ef)) + '" y="' + px(yE - 6) + '" width="' +
+          px(Math.max(0, x(v.lf) - x(v.ef))) + '" height="' + px(yL + bh - yE + 12) +
+          '" fill="var(--viz-1)" opacity="0.30" rx="4"/>';
+      }
+
+      s += '<g>' + tip('Early window: ' + f2(v.es) + ' to ' + f2(v.ef)) +
+        '<path d="' + hbar(x(v.es), yE, Math.max(0, x(v.ef) - x(v.es)), bh) + '" class="v-fill"/></g>';
+      s += text(L - 8, yE + bh / 2 + 4, 'EARLY', 'v-t-key v-t-end');
+
+      s += '<g>' + tip('Late window: ' + f2(v.ls) + ' to ' + f2(v.lf)) +
+        '<path d="' + hbar(x(v.ls), yL, Math.max(0, x(v.lf) - x(v.ls)), bh) + '" class="v-fill-3"/></g>';
+      s += text(L - 8, yL + bh / 2 + 4, 'LATE', 'v-t-key v-t-end');
+
+      s += text(x(v.es) + 4, yE - 9, 'ES ' + f2(v.es), 'v-t-sm');
+      s += text(x(v.ef) - 4, yE - 9, 'EF ' + f2(v.ef), 'v-t-sm v-t-end');
+      s += text(x(v.ls) + 4, yL + bh + 15, 'LS ' + f2(v.ls), 'v-t-sm');
+      s += text(x(v.lf) - 4, yL + bh + 15, 'LF ' + f2(v.lf), 'v-t-sm v-t-end');
+
+      if (Number.isFinite(r.tf)) {
+        s += text((x(v.ef) + x(v.lf)) / 2, T - 17,
+          r.tf === 0 ? 'No float — critical' : 'Total float ' + f2(r.tf), 'v-t-val v-t-mid');
+      }
+      /* The successor marker gets its own row below the tick labels — sharing
+         their baseline overprinted it on whichever tick landed nearest. */
+      if (ok(v.succEs)) {
+        s += line(x(v.succEs), T - 10, x(v.succEs), yL + bh + 8, 'v-ref');
+        s += text(x(v.succEs), yL + bh + 38, 'successor ES ' + f2(v.succEs), 'v-t-sm v-t-mid');
+      }
+      return { h: H, s: s };
+    }
+  };
+
+  /* -------------------------------------------------------- 4 · break-even */
+  VIZ['breakeven'] = {
+    caption: 'Where revenue overtakes total cost',
+    aria: function (v, r) {
+      return 'Two lines crossing at the break-even point of ' + f2(r.units) +
+        ' units and ' + f2(r.revenue) + ' revenue; total cost starts at the fixed cost of ' +
+        f2(v.fixed) + '.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.fixed, v.price, v.varCost)) return null;
+      if (!Number.isFinite(r.units) || !(r.units > 0)) return null;
+      var L = 54, R = 26, T = 40, H = 262, base = H - 52;
+      var uMax = r.units * 1.85;
+      var yMax = Math.max(v.price * uMax, v.fixed + v.varCost * uMax) * 1.06 || 1;
+      var x = sc(0, uMax, L, W - R), y = sc(0, yMax, base, T);
+      var s = '';
+
+      ticks(0, yMax, 4).forEach(function (t) {
+        s += line(L, y(t), W - R, y(t), 'v-grid');
+        s += text(L - 8, y(t) + 4, fk(t), 'v-t-sm v-t-end');
+      });
+      ticks(0, uMax, W < 460 ? 3 : 5).forEach(function (t) {
+        s += text(x(t), base + 18, fk(t), 'v-t-sm v-t-mid');
+      });
+
+      var xb = x(r.units), yb = y(r.revenue);
+      /* Loss below the crossing, profit above — here the colour genuinely
+         means good or bad, so the status tones are the right channel. */
+      s += '<path d="' + poly([[L, y(v.fixed)], [xb, yb], [L, y(0)]]) + 'Z" class="v-bad-w"/>';
+      s += '<path d="' + poly([[xb, yb], [x(uMax), y(v.price * uMax)],
+        [x(uMax), y(v.fixed + v.varCost * uMax)]]) + 'Z" class="v-good-w"/>';
+
+      s += '<path d="' + poly([[L, y(0)], [x(uMax), y(v.price * uMax)]]) + '" class="v-line"/>';
+      s += '<path d="' + poly([[L, y(v.fixed)], [x(uMax), y(v.fixed + v.varCost * uMax)]]) +
+        '" class="v-line-2"/>';
+      s += line(L, base, W - R, base, 'v-axis');
+      s += line(L, T - 10, L, base, 'v-axis');
+
+      s += '<g>' + tip('Break-even: ' + f2(r.units) + ' units, ' + f2(r.revenue) + ' revenue') +
+        '<circle cx="' + px(xb) + '" cy="' + px(yb) + '" r="5" class="v-dot"/></g>';
+
+      /* The crossing is annotated on the footnote row rather than beside the
+         dot. Both lines pass through that point at a slope, so a horizontal
+         label of any useful length crosses one of them — above, below, or
+         either side — and it gets worse as the card narrows. The dot marks
+         the spot; the row states it. */
+      s += text(L, base + 33, 'Break-even ' + f2(r.units) + ' units · ' + f2(r.revenue), 'v-t-val');
+      s += text(W - R, base + 33, 'Units', 'v-t-sm v-t-end');
+      s += legend(L, T - 20, [
+        { kind: 'line', cls: 'v-line', label: 'Revenue' },
+        { kind: 'line', cls: 'v-line-2', label: 'Total cost' }
+      ]);
+      return { h: H, s: s };
+    }
+  };
+
+  /* ---------------------------------------------------------------- 5 · NPV */
+  VIZ['npv'] = {
+    caption: 'Discounted cash flows and the running total',
+    aria: function (v, r) {
+      return 'Bars showing each period’s discounted cash flow after an initial investment of ' +
+        f2(v.inv) + ', with a running cumulative line reaching a net present value of ' +
+        f2(r.npv) + '.';
+    },
+    draw: function (v, r, W) {
+      var flows = parseFlows(v.flows);
+      if (!flows || !ok(v.rate, v.inv) || !Number.isFinite(r.npv)) return null;
+      var L = 54, R = 26, T = 34, H = 254, base = H - 54;
+      var disc = flows.map(function (f, t) { return f / Math.pow(1 + v.rate / 100, t + 1); });
+      var cum = [-v.inv], acc = -v.inv;
+      disc.forEach(function (d) { acc += d; cum.push(acc); });
+      var all = disc.concat(cum);
+      var hi = Math.max.apply(null, all.concat([0])), lo = Math.min.apply(null, all.concat([0]));
+      if (!Number.isFinite(hi) || !Number.isFinite(lo)) return null;
+      var padv = (hi - lo) * 0.14 || 1;
+      var y = sc(lo - padv, hi + padv, base, T);
+      var n = disc.length + 1;
+      var bandW = (W - R - L) / n, bw = Math.min(24, bandW * 0.5);
+      var s = '', zero = y(0);
+
+      ticks(lo - padv, hi + padv, 4).forEach(function (t) {
+        s += line(L, y(t), W - R, y(t), 'v-grid');
+        s += text(L - 8, y(t) + 4, fk(t), 'v-t-sm v-t-end');
+      });
+
+      var cx = function (i) { return L + bandW * (i + 0.5); };
+
+      /* Period 0 is the investment: it sits below the baseline, so position
+         already carries the sign and no second hue is needed. */
+      s += '<g>' + tip('Period 0 — investment: ' + f2(-v.inv)) +
+        '<path d="' + vbar(cx(0) - bw / 2, zero, bw, zero - y(-v.inv)) + '" class="v-mute"/></g>';
+      s += text(cx(0), base + 18, '0', 'v-t-sm v-t-mid');
+
+      disc.forEach(function (d, i) {
+        s += '<g>' + tip('Period ' + (i + 1) + ' — discounted: ' + f2(d)) +
+          '<path d="' + vbar(cx(i + 1) - bw / 2, zero, bw, zero - y(d)) + '" class="v-fill"/></g>';
+        if (n <= 9) s += text(cx(i + 1), base + 18, String(i + 1), 'v-t-sm v-t-mid');
+      });
+
+      s += line(L, zero, W - R, zero, 'v-axis');
+
+      /* The running total is a series in its own right, so it takes a full
+         ink rather than a pale de-emphasis grey. */
+      var cpts = cum.map(function (c, i) { return [cx(i), y(c)]; });
+      s += '<path d="' + poly(cpts) + '" class="v-cum"/>';
+      cpts.forEach(function (p, i) {
+        s += '<g>' + tip('Cumulative after period ' + i + ': ' + f2(cum[i])) +
+          '<circle cx="' + px(p[0]) + '" cy="' + px(p[1]) + '" r="3.5" class="v-cum-d"/></g>';
+      });
+
+      var last = cpts[cpts.length - 1];
+      s += text(last[0] - 10, last[1] + (r.npv >= 0 ? -14 : 20), 'NPV ' + f2(r.npv),
+        'v-t-val v-t-end');
+      s += text(W - R, base + 34, 'Period', 'v-t-sm v-t-end');
+      s += legend(L, T - 14, [
+        { kind: 'swatch', cls: 'v-fill', label: 'Discounted flow' },
+        { kind: 'line', cls: 'v-cum', label: 'Cumulative' }
+      ]);
+      return { h: H, s: s };
+    }
+  };
+
+  /* ------------------------------------------------------ 6 · control chart */
+  VIZ['control'] = {
+    caption: 'The control band, drawn to scale',
+    aria: function (v, r) {
+      return 'A control chart band centred on a mean of ' + f2(v.mean) +
+        ', with warning limits at plus and minus two sigma and control limits at ' +
+        f2(r.lcl) + ' and ' + f2(r.ucl) + '.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.mean, v.sigma) || !(v.sigma > 0)) return null;
+      var L = 62, R = 84, T = 26, H = 246, base = H - 40;
+      var lo = v.mean - 4 * v.sigma, hi = v.mean + 4 * v.sigma;
+      var y = sc(lo, hi, base, T);
+      var s = '', wPlot = W - R - L;
+
+      /* Three zones, stepped far enough apart to actually read as ordered —
+         a first pass used 0.20 and 0.16 of two adjacent ramp steps, which were
+         indistinguishable. Each zone is named where it sits, so the reader
+         never has to match a colour to a key. */
+      function zone(top, bot, fill, op) {
+        return '<rect x="' + px(L) + '" y="' + px(y(top)) + '" width="' + px(wPlot) +
+          '" height="' + px(y(bot) - y(top)) + '" fill="' + fill + '" opacity="' + op + '"/>';
+      }
+      s += zone(hi, v.mean + 3 * v.sigma, 'var(--bad)', 0.10);
+      s += zone(v.mean - 3 * v.sigma, lo, 'var(--bad)', 0.10);
+      s += zone(v.mean + 3 * v.sigma, v.mean + 2 * v.sigma, 'var(--warn)', 0.14);
+      s += zone(v.mean - 2 * v.sigma, v.mean - 3 * v.sigma, 'var(--warn)', 0.14);
+      s += zone(v.mean + 2 * v.sigma, v.mean - 2 * v.sigma, 'var(--viz-2)', 0.22);
+
+      [['UCL  +3σ', r.ucl, 'v-bad-s', 1.5], ['+2σ', v.mean + 2 * v.sigma, 'v-warn-s', 1.5],
+       ['Mean', v.mean, 'v-axis', 2], ['−2σ', v.mean - 2 * v.sigma, 'v-warn-s', 1.5],
+       ['LCL  −3σ', r.lcl, 'v-bad-s', 1.5]].forEach(function (row) {
+        var yy = y(row[1]);
+        s += '<line x1="' + px(L) + '" y1="' + px(yy) + '" x2="' + px(W - R) + '" y2="' + px(yy) +
+          '" class="' + row[2] + '" stroke-width="' + row[3] + '"/>';
+        s += text(W - R + 8, yy + 4, row[0], row[0] === 'Mean' ? 'v-t-val' : 'v-t');
+        s += text(L - 8, yy + 4, fk(row[1]), 'v-t-sm v-t-end');
+      });
+
+      /* Zone names sit inside their own band. */
+      s += text(L + 10, y((hi + v.mean + 3 * v.sigma) / 2) + 4, 'Out of control', 'v-t');
+      s += text(L + 10, y(v.mean + 2.5 * v.sigma) + 4, 'Warning', 'v-t');
+      s += text(L + 10, y(v.mean + v.sigma) + 4, 'Expected — about 95% of points', 'v-t');
+      s += text(L + 10, y((lo + v.mean - 3 * v.sigma) / 2) + 4, 'Out of control', 'v-t');
+      s += text(L, base + 26,
+        'A point outside ±3σ, or seven in a row on one side of the mean, is a signal — investigate rather than adjust.',
+        'v-t-sm');
+      return { h: H, s: s };
+    }
+  };
+
+  /* --------------------------------------------------- 7 · process capability */
+  VIZ['cpk'] = {
+    caption: 'The process spread against the spec limits',
+    aria: function (v, r) {
+      return 'A normal curve for a process centred at ' + f2(v.mean) + ' with sigma ' +
+        f2(v.sigma) + ', drawn against a lower spec limit of ' + f2(v.lsl) +
+        ' and an upper spec limit of ' + f2(v.usl) + '. Cp ' + f2(r.cp) + ', Cpk ' + f2(r.cpk) + '.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.usl, v.lsl, v.mean, v.sigma) || !(v.sigma > 0) || !(v.usl > v.lsl)) return null;
+      var L = 24, R = 24, T = 44, H = 244, base = H - 46;
+      var lo = Math.min(v.lsl, v.mean - 4 * v.sigma) - v.sigma * 0.4;
+      var hi = Math.max(v.usl, v.mean + 4 * v.sigma) + v.sigma * 0.4;
+      var x = sc(lo, hi, L, W - R), y = sc(0, 1.14, base, T);
+      var s = '', i, pts = [], N = 160, xv;
+
+      for (i = 0; i <= N; i++) {
+        xv = lo + (i / N) * (hi - lo);
+        pts.push([x(xv), y(gauss(xv, v.mean, v.sigma))]);
+      }
+
+      /* Out-of-spec tails: the colour here means "defective", so status. */
+      function tail(fromX, toX) {
+        var seg = pts.filter(function (p) { return p[0] >= fromX - 0.01 && p[0] <= toX + 0.01; });
+        if (seg.length < 2) return '';
+        return '<path d="' + poly(seg) + 'L' + px(seg[seg.length - 1][0]) + ' ' + px(base) +
+          'L' + px(seg[0][0]) + ' ' + px(base) + 'Z" class="v-bad-w"/>';
+      }
+      s += tail(L, x(v.lsl)) + tail(x(v.usl), W - R);
+
+      s += '<path d="' + poly(pts) + 'L' + px(W - R) + ' ' + px(base) + 'L' + px(L) + ' ' +
+        px(base) + 'Z" class="v-wash"/>';
+      s += '<path d="' + poly(pts) + '" class="v-line"/>';
+      s += line(L, base, W - R, base, 'v-axis');
+
+      [[v.lsl, 'LSL'], [v.usl, 'USL']].forEach(function (sp) {
+        s += '<line x1="' + px(x(sp[0])) + '" y1="' + px(T - 16) + '" x2="' + px(x(sp[0])) +
+          '" y2="' + px(base) + '" class="v-bad-s" stroke-width="1.5"/>';
+        s += text(x(sp[0]), T - 21, sp[1] + ' ' + f2(sp[0]), 'v-t-val v-t-mid');
+      });
+
+      s += line(x(v.mean), T - 2, x(v.mean), base, 'v-ref');
+      s += text(x(v.mean), base + 18, 'μ ' + f2(v.mean), 'v-t-sm v-t-mid');
+
+      var centred = Number.isFinite(r.cp) && Number.isFinite(r.cpk) &&
+        Math.abs(r.cp - r.cpk) < 0.01;
+      s += text(L, base + 36, centred
+        ? 'Centred — Cpk matches Cp at ' + f2(r.cpk)
+        : 'Off centre — Cpk ' + f2(r.cpk) + ' trails Cp ' + f2(r.cp), 'v-t-sm');
+      return { h: H, s: s };
+    }
+  };
+
+  /* --------------------------------------------------------- 8 · decision tree */
+  VIZ['decision-tree'] = {
+    caption: 'The two branches and what each is worth',
+    aria: function (v, r) {
+      return 'A decision tree comparing option A at an expected value of ' + f2(r.emvA) +
+        ' against option B at ' + f2(r.emvB) + '. ' + (r.verdict || '');
+    },
+    draw: function (v, r, W) {
+      if (!Number.isFinite(r.emvA) || !Number.isFinite(r.emvB)) return null;
+      var H = 300, L = 28, R = 24;
+      var xRoot = L + 8, xNode = L + Math.max(104, (W - L - R) * 0.30);
+      var xLeaf = W - R - Math.max(104, (W - L - R) * 0.22);
+      var yA = 82, yB = 216, yRoot = (yA + yB) / 2, spread = 44;
+      var s = '', aWins = r.emvA >= r.emvB;
+
+      function branch(y, key, emv, p, win, lose, best) {
+        var cls = best ? 'v-line' : 'v-mute-l';
+        var t = '<path d="M' + px(xRoot + 7) + ' ' + px(yRoot) + 'C' + px(xNode - 34) + ' ' +
+          px(yRoot) + ' ' + px(xRoot + 34) + ' ' + px(y) + ' ' + px(xNode - 7) + ' ' + px(y) +
+          '" class="' + cls + '"/>';
+
+        [[win, p, y - spread, 'Best case'], [lose, ok(p) ? 100 - p : NaN, y + spread, 'Worst case']]
+          .forEach(function (leaf) {
+            if (!ok(leaf[0])) return;
+            t += '<path d="M' + px(xNode + 7) + ' ' + px(y) + 'C' + px(xLeaf - 34) + ' ' + px(y) +
+              ' ' + px(xNode + 34) + ' ' + px(leaf[2]) + ' ' + px(xLeaf) + ' ' + px(leaf[2]) +
+              '" class="' + cls + '"/>';
+            t += '<g>' + tip(leaf[3] + ': ' + f2(leaf[0]) + ' at ' + f2(leaf[1]) + '% likelihood') +
+              '<circle cx="' + px(xLeaf) + '" cy="' + px(leaf[2]) + '" r="4.5" class="' +
+              (best ? 'v-dot' : 'v-mute-d') + '"/></g>';
+            t += text(xLeaf + 11, leaf[2] + 4, f2(leaf[1]) + '%  ·  ' + f2(leaf[0]), 'v-t-sm');
+          });
+
+        t += '<circle cx="' + px(xNode) + '" cy="' + px(y) + '" r="7" class="' +
+          (best ? 'v-dot' : 'v-mute-d') + '"/>';
+
+        /* Both the incoming branch and the two outgoing ones run horizontally
+           through the node, so the label stacks well above it — set on the
+           node's own baseline it was struck through by the lines. Kept to two
+           short lines on purpose: a wider label (this carried the cost too)
+           reaches far enough right that the rising branch cuts through it once
+           the card narrows. The cost is an input, and stays in Parameters. */
+        t += text(xNode, y - 36, 'OPTION ' + key, 'v-t-key v-t-mid');
+        t += text(xNode, y - 20, 'EMV ' + f2(emv), best ? 'v-t-val v-t-mid' : 'v-t v-t-mid');
+        return t;
+      }
+
+      s += branch(yA, 'A', r.emvA, v.pA, v.winA, v.loseA, aWins);
+      s += branch(yB, 'B', r.emvB, v.pB, v.winB, v.loseB, !aWins);
+      s += '<rect x="' + px(xRoot - 7) + '" y="' + px(yRoot - 7) + '" width="14" height="14" ' +
+        'transform="rotate(45 ' + px(xRoot) + ' ' + px(yRoot) + ')" class="v-fill"/>';
+      /* Above the diamond: both branches leave the root horizontally, so a
+         label beside it is crossed by them. */
+      s += text(xRoot, yRoot - 18, 'Decide', 'v-t-sm v-t-mid');
+      if (r.verdict) s += text(L, H - 10, String(r.verdict), 'v-t-val');
+      return { h: H, s: s };
+    }
+  };
+
+  /* -------------------------------------------------------- 9 · learning curve */
+  VIZ['learning-curve'] = {
+    caption: 'Time per unit as output doubles',
+    aria: function (v, r) {
+      return 'A decay curve showing unit time falling from ' + f2(v.t1) + ' at unit one to ' +
+        f2(r.tn) + ' at unit ' + f2(v.n) + ' under a ' + f2(v.rate) + '% learning curve.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.t1, v.rate, v.n) || !(v.n >= 1) || !(v.rate > 0) || !(v.t1 > 0)) return null;
+      if (!Number.isFinite(r.tn)) return null;
+      var L = 52, R = 58, T = 32, H = 224, base = H - 44;
+      var nMax = Math.max(v.n * 1.15, 2);
+      var b = Math.log(v.rate / 100) / Math.LN2;
+      var x = sc(1, nMax, L, W - R), y = sc(0, v.t1 * 1.1, base, T);
+      var s = '', i, pts = [], N = 120, u;
+
+      for (i = 0; i <= N; i++) {
+        u = 1 + (i / N) * (nMax - 1);
+        pts.push([x(u), y(v.t1 * Math.pow(u, b))]);
+      }
+
+      ticks(0, v.t1 * 1.1, 4).forEach(function (t) {
+        s += line(L, y(t), W - R, y(t), 'v-grid');
+        s += text(L - 8, y(t) + 4, fk(t), 'v-t-sm v-t-end');
+      });
+
+      s += '<path d="' + poly(pts) + 'L' + px(x(nMax)) + ' ' + px(base) + 'L' + px(L) + ' ' +
+        px(base) + 'Z" class="v-wash"/>';
+      s += '<path d="' + poly(pts) + '" class="v-line"/>';
+      s += line(L, base, W - R, base, 'v-axis');
+
+      /* Doubling points — the curve's whole idea. */
+      for (u = 1; u <= nMax; u *= 2) {
+        s += '<g>' + tip('Unit ' + u + ': ' + f2(v.t1 * Math.pow(u, b))) +
+          '<circle cx="' + px(x(u)) + '" cy="' + px(y(v.t1 * Math.pow(u, b))) +
+          '" r="3.5" class="v-dot"/></g>';
+        s += text(x(u), base + 18, String(u), 'v-t-sm v-t-mid');
+      }
+
+      s += '<circle cx="' + px(x(v.n)) + '" cy="' + px(y(r.tn)) + '" r="5.5" class="v-dot"/>';
+      /* Above the marker — on its own baseline the label was struck through by
+         the curve it sits on. */
+      s += text(Math.min(x(v.n) + 10, W - R), y(r.tn) - 12, 'unit ' + f2(v.n) + ' · ' + f2(r.tn),
+        x(v.n) > W - R - 90 ? 'v-t-val v-t-end' : 'v-t-val');
+      s += text(L, T - 14, f2(v.rate) + '% curve — each doubling cuts unit time to ' +
+        f2(v.rate) + '%', 'v-t-sm');
+      s += text(W - R, base + 32, 'Unit number', 'v-t-sm v-t-end');
+      return { h: H, s: s };
+    }
+  };
+
+  /* ----------------------------------------------------------- 10 · flow */
+  VIZ['littles-law'] = {
+    caption: 'Cycle time against work in progress',
+    aria: function (v, r) {
+      return 'A line showing cycle time rising with work in progress at a throughput of ' +
+        f2(v.throughput) + ', with the current point at ' + f2(v.wip) + ' items and ' +
+        f2(r.cycleTime) + ' cycle time, plus a flow-efficiency meter at ' + f2(r.flowEff) + '%.';
+    },
+    draw: function (v, r, W) {
+      if (!ok(v.wip, v.throughput) || !(v.throughput > 0) || !Number.isFinite(r.cycleTime)) return null;
+      var L = 52, R = 26, T = 30, H = 242, base = H - 92;
+      var wMax = Math.max(v.wip * 1.6, 2), tMax = (wMax / v.throughput) * 1.08;
+      var x = sc(0, wMax, L, W - R), y = sc(0, tMax, base, T);
+      var s = '';
+
+      ticks(0, tMax, 3).forEach(function (t) {
+        s += line(L, y(t), W - R, y(t), 'v-grid');
+        s += text(L - 8, y(t) + 4, fk(t), 'v-t-sm v-t-end');
+      });
+      ticks(0, wMax, W < 460 ? 3 : 5).forEach(function (t) {
+        s += text(x(t), base + 17, fk(t), 'v-t-sm v-t-mid');
+      });
+
+      s += '<path d="' + poly([[x(0), y(0)], [x(wMax), y(wMax / v.throughput)]]) + '" class="v-line"/>';
+      s += line(L, base, W - R, base, 'v-axis');
+      s += '<g>' + tip('WIP ' + f2(v.wip) + ' → cycle time ' + f2(r.cycleTime)) +
+        '<circle cx="' + px(x(v.wip)) + '" cy="' + px(y(r.cycleTime)) + '" r="5.5" class="v-dot"/></g>';
+      s += text(Math.min(x(v.wip) + 10, W - R - 4), y(r.cycleTime) - 9,
+        'cycle ' + f2(r.cycleTime), 'v-t-val');
+      s += text(L, T - 12, 'Halve WIP, halve cycle time', 'v-t-sm');
+      /* Its own row — on the tick baseline it overprinted the last tick. */
+      s += text(W - R, base + 33, 'WIP', 'v-t-sm v-t-end');
+
+      /* Flow-efficiency meter: fill carries severity, track is the palest
+         step of the same ramp. */
+      if (Number.isFinite(r.flowEff)) {
+        var my = H - 34, mw = W - R - L, pct = Math.max(0, Math.min(100, r.flowEff));
+        var tone = pct >= 40 ? 'v-good' : pct >= 15 ? 'v-warn' : 'v-bad';
+        var word = pct >= 40 ? 'strong' : pct >= 15 ? 'typical' : 'mostly waiting';
+        s += '<rect x="' + px(L) + '" y="' + px(my) + '" width="' + px(mw) +
+          '" height="10" rx="5" fill="var(--viz-1)" opacity="0.4"/>';
+        s += '<path d="' + hbar(L, my, mw * pct / 100, 10, 5) + '" class="' + tone + '"/>';
+        s += text(L, my - 8, 'Flow efficiency ' + f2(pct) + '% — ' + word, 'v-t-val');
+      }
+      return { h: H, s: s };
+    }
+  };
+
+  return { categories: categories, viz: VIZ };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
@@ -2125,6 +2910,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
     el.className = 'calc-card';
     el.id = 'calc-' + card.id;
     el.dataset.search = searchText;
+    var viz = DATA.viz && DATA.viz[card.id];
+
     el.innerHTML =
       '<header class="card-head">' +
         '<h3>' + card.name + '</h3>' +
@@ -2137,10 +2924,56 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
       '<div class="io">' +
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
-      '</div>';
+      '</div>' +
+      (viz ? '<figure class="viz" hidden><figcaption>' + viz.caption + '</figcaption>' +
+             '<div class="viz-slot"></div></figure>' : '');
 
     el.addEventListener('input', function () { computeCard(card, el); });
+
+    /* The figure's viewBox width tracks its rendered pixel width, so one unit
+       is one pixel and 11px label type stays 11px at any card width instead of
+       scaling away on a phone. That means a redraw on resize, not just on
+       input. */
+    if (viz && typeof ResizeObserver === 'function') {
+      var pending = false;
+      var ro = new ResizeObserver(function () {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(function () { pending = false; computeCard(card, el); });
+      });
+      ro.observe(el.querySelector('.viz'));
+    }
     return el;
+  }
+
+  /* ----------------------------------------------------------- figures */
+  function drawViz(card, el, v, results) {
+    var viz = DATA.viz && DATA.viz[card.id];
+    if (!viz) return;
+    var fig = el.querySelector('.viz');
+    var slot = fig && fig.querySelector('.viz-slot');
+    if (!slot) return;
+
+    var w = Math.round(slot.clientWidth);
+    if (!(w > 0)) w = 640;                       /* first paint, or display:none */
+    w = Math.max(300, w);
+
+    var out = null;
+    try { out = viz.draw(v, results, w); } catch (e) { out = null; }
+
+    if (!out) {                                   /* not enough input yet */
+      fig.hidden = true;
+      slot.innerHTML = '';
+      return;
+    }
+
+    var label = '';
+    try { label = viz.aria(v, results) || ''; } catch (e) { label = viz.caption; }
+
+    fig.hidden = false;
+    slot.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + out.h + '" width="' + w + '" height="' +
+      out.h + '" role="img" aria-label="' + String(label).replace(/"/g, '&quot;') + '">' +
+      out.s + '</svg>';
   }
 
   /* ------------------------------------------------------- computing */
@@ -2155,12 +2988,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   function computeCard(card, el) {
     var v = readValues(card, el);
+    var results = {};
     card.outputs.forEach(function (out) {
       var chip = el.querySelector('.result[data-out="' + out.key + '"]');
       var valueEl = chip.querySelector('.r-value');
       var verdictEl = chip.querySelector('.r-verdict');
       var val = null;
       try { val = out.compute(v); } catch (e) { val = null; }
+      results[out.key] = val;
 
       valueEl.textContent = formatValue(val, out.format);
       chip.classList.remove('good', 'warn', 'bad', 'info');
@@ -2177,6 +3012,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         verdictEl.hidden = true;
       }
     });
+
+    drawViz(card, el, v, results);
   }
 
   /* --------------------------------------------------------- sections */
