@@ -5,358 +5,480 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yazeed Alotaibi · PM Tools &amp; Resources</title>
   <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2.">
+  <link rel="canonical" href="https://yazeed.blog/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yazeed.blog/">
+  <meta property="og:title" content="Yazeed Alotaibi · PM Tools &amp; Resources">
+  <meta property="og:description" content="Calculators and references for working project managers — every formula explained, every result interpreted.">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23151c2e'/%3E%3Cpath d='M16 7l9 9-9 9-9-9z' fill='none' stroke='%238fa3f5' stroke-width='2'/%3E%3C/svg%3E">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('yz-theme'); } catch (e) {}
+      if (t === 'dark' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Yazeed Alotaibi",
+    "jobTitle": "Project Manager",
+    "url": "https://yazeed.blog/",
+    "email": "mailto:yaz.otb.sa@gmail.com",
+    "sameAs": ["https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2"]
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --paper:   #f6f4ee;
-      --ink:     #1a1a1a;
-      --muted:   #6b6860;
-      --faint:   #e8e4d9;
-      --accent:  #2b49c9;
-      --accent-light: #edf0fb;
-      --card-bg: #ffffff;
-      --chalk:   #1e1e1e;
+      --vellum:       #f6f7f9;
+      --sheet:        #ffffff;
+      --ink:          #171a1f;
+      --muted:        #5b6472;
+      --hairline:     #e2e5ea;
+      --rule:         #c7ccd4;
+      --accent:       #2b49c9;
+      --accent-ink:   #2b49c9;
+      --accent-soft:  #e9edfb;
+      --print-bg:     #151c2e;
+      --print-text:   #b7c6f0;
+      --grid-line:    rgba(43, 73, 201, 0.07);
+      --shadow:       0 2px 10px rgba(23, 26, 31, 0.05);
+      --focus-ring:   0 0 0 2px var(--vellum), 0 0 0 4px var(--accent);
+    }
+    [data-theme="dark"] {
+      --vellum:       #0f1216;
+      --sheet:        #161b22;
+      --ink:          #e7eaef;
+      --muted:        #9aa4b2;
+      --hairline:     #272e39;
+      --rule:         #3a4350;
+      --accent:       #8fa3f5;
+      --accent-ink:   #a5b6f7;
+      --accent-soft:  #1d2536;
+      --print-bg:     #131a2b;
+      --print-text:   #b7c6f0;
+      --grid-line:    rgba(143, 163, 245, 0.08);
+      --shadow:       0 2px 10px rgba(0, 0, 0, 0.35);
+      --focus-ring:   0 0 0 2px var(--vellum), 0 0 0 4px var(--accent);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--paper);
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--vellum);
       color: var(--ink);
-      min-height: 100vh;
+      min-height: 100dvh;
       font-size: 16px;
       line-height: 1.6;
-    }
-
-    /* ─── Top bar ─────────────────────────────────────────── */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--faint);
-    }
-    .topbar-logo {
-      font-family: 'Fraunces', serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--ink);
-      text-decoration: none;
-      letter-spacing: -0.01em;
-    }
-    .topbar-nav {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-    .topbar-nav a {
-      font-size: 0.875rem;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .topbar-nav a:hover { color: var(--ink); }
-    .topbar-nav .li-btn {
-      padding: 0.375rem 0.875rem;
-      border: 1px solid var(--faint);
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--ink);
-      text-decoration: none;
-      transition: background 0.15s;
-      background: var(--card-bg);
-    }
-    .topbar-nav .li-btn:hover { background: var(--faint); }
-
-    /* ─── Hero ────────────────────────────────────────────── */
-    .hero {
-      max-width: 860px;
-      margin: 5rem auto 4rem;
-      padding: 0 2rem;
-    }
-    .hero-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-    .hero h1 {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      font-weight: 600;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      margin-bottom: 0.75rem;
-    }
-    .hero h1 em {
-      font-style: italic;
-      color: var(--accent);
-    }
-    .hero-sub {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 540px;
-      line-height: 1.7;
-    }
-    .creds {
-      display: inline-flex;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-    }
-    .cred-pill {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 0.3rem 0.7rem;
-      background: var(--chalk);
-      color: #f0ede4;
-      border-radius: 4px;
-    }
-
-    /* ─── Tools section ───────────────────────────────────── */
-    .tools-section {
-      max-width: 860px;
-      margin: 0 auto 6rem;
-      padding: 0 2rem;
-    }
-    .section-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-top: 1px solid var(--faint);
-      padding-top: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.25rem;
-    }
-
-    /* ─── Tool card ───────────────────────────────────────── */
-    .tool-card {
-      background: var(--card-bg);
-      border: 1px solid var(--faint);
-      border-radius: 10px;
-      padding: 1.5rem 1.5rem 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+    }
+
+    a { color: inherit; }
+    :focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
+
+    .mono {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    .wrap { width: min(1120px, 100% - 3rem); margin-inline: auto; }
+
+    /* ── Top bar ─────────────────────────────────────────── */
+    .topbar { border-bottom: 1px solid var(--hairline); }
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; padding: 0.875rem 0;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 0.625rem;
+      text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      letter-spacing: -0.01em; padding: 0.5rem 0;
+    }
+    .brand-mark { width: 22px; height: 22px; flex: none; color: var(--accent); }
+    .topbar-nav { display: flex; align-items: center; gap: 0.5rem; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      min-height: 44px; padding: 0.5rem 0.875rem;
+      border: 1px solid var(--hairline); border-radius: 6px;
+      background: var(--sheet); color: var(--ink);
+      font-size: 0.82rem; font-weight: 500; text-decoration: none;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .pill:hover { border-color: var(--rule); background: var(--accent-soft); }
+    .pill svg { width: 14px; height: 14px; color: var(--muted); }
+    .theme-toggle { color: var(--muted); }
+    .theme-toggle .icon-sun { display: none; }
+    [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .hero { padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2.5rem, 5vw, 4rem); }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr;
+      gap: 2.5rem; align-items: center;
+    }
+    .kicker {
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--accent-ink); margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.3rem, 5vw, 3.6rem);
+      font-weight: 600; line-height: 1.08; letter-spacing: -0.03em;
+      margin-bottom: 1rem; max-width: 14ch;
+    }
+    .hero-sub {
+      font-size: 1.02rem; color: var(--muted);
+      max-width: 52ch; line-height: 1.7; margin-bottom: 1.5rem;
+    }
+    .creds { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .cred {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+      padding: 0.3rem 0.65rem; border: 1px solid var(--rule);
+      border-radius: 4px; color: var(--muted);
+    }
+
+    /* Hero figure: earned-value S-curve on grid paper */
+    .hero-fig {
+      background: var(--sheet); border: 1px solid var(--hairline);
+      border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;
+    }
+    .hero-fig svg { display: block; width: 100%; height: auto; }
+    .fig-caption {
+      display: flex; justify-content: space-between; gap: 1rem;
+      padding: 0.6rem 0.875rem; border-top: 1px solid var(--hairline);
+      font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Dimension-line section headers ──────────────────── */
+    .dim {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+    .dim-tick { width: 1px; height: 9px; background: var(--rule); flex: none; }
+    .dim-line { height: 1px; background: var(--rule); flex: 1; }
+    .dim-label {
+      flex: none; font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    }
+
+    /* ── Featured sheet ──────────────────────────────────── */
+    .tools { padding-bottom: clamp(3rem, 7vw, 5rem); }
+    .featured {
+      display: block; text-decoration: none;
+      background: var(--sheet); border: 1px solid var(--hairline);
+      border-radius: 8px; box-shadow: var(--shadow);
+      padding: clamp(1.5rem, 3vw, 2.25rem);
       transition: border-color 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      color: inherit;
     }
-    .tool-card:hover:not(.soon) {
-      border-color: #c8c3b6;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    .featured:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(43, 73, 201, 0.12); }
+    .featured-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; margin-bottom: 0.875rem;
     }
-    .tool-card.soon {
-      opacity: 0.55;
-      cursor: default;
+    .sheet-no { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; }
+    .tag {
+      font-size: 0.66rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent-ink);
+      background: var(--accent-soft); padding: 0.25rem 0.6rem; border-radius: 4px;
     }
-    .card-domain {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-light);
-      display: inline-block;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
+    .featured h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.9rem); font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.625rem;
     }
-    .card-domain.coming {
-      color: var(--muted);
-      background: var(--faint);
+    .featured p {
+      font-size: 0.94rem; color: var(--muted); line-height: 1.65;
+      max-width: 62ch; margin-bottom: 1.5rem;
     }
-    .card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.25rem;
-      font-weight: 500;
-      line-height: 1.25;
-      letter-spacing: -0.01em;
+    .featured-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      border-top: 1px solid var(--hairline); padding-top: 1.25rem;
     }
-    .card-desc {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .card-stats {
-      display: flex;
-      gap: 1rem;
-      margin-top: auto;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--faint);
-    }
-    .stat {
-      text-align: left;
-    }
-    .stat-num {
-      font-family: 'Fraunces', serif;
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--ink);
-    }
+    .stats { display: flex; gap: 1.75rem; }
+    .stat-num { font-size: 1.15rem; font-weight: 600; }
     .stat-label {
-      font-size: 0.7rem;
+      font-size: 0.64rem; letter-spacing: 0.09em; text-transform: uppercase;
       color: var(--muted);
-      letter-spacing: 0.03em;
     }
-    .card-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--accent);
-      margin-top: 0.25rem;
+    .open-cta {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-size: 0.82rem; font-weight: 600; color: var(--accent-ink);
     }
-    .card-arrow svg { transition: transform 0.15s; }
-    .tool-card:hover .card-arrow svg { transform: translateX(3px); }
+    .open-cta svg { width: 15px; height: 15px; transition: transform 0.15s; }
+    .featured:hover .open-cta svg { transform: translateX(3px); }
 
-    /* ─── Footer ──────────────────────────────────────────── */
-    .footer {
-      border-top: 1px solid var(--faint);
-      padding: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    /* ── Drawing board (roadmap) ─────────────────────────── */
+    .board { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+    .board-list { list-style: none; border-top: 1px solid var(--hairline); }
+    .board-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: baseline; column-gap: 1rem; row-gap: 0.2rem;
+      padding: 1.05rem 0.25rem; border-bottom: 1px solid var(--hairline);
     }
-    .footer-name {
-      font-size: 0.85rem;
-      color: var(--muted);
+    .board-marker {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      font-size: 0.72rem; color: var(--muted);
     }
-    .footer-name a {
-      color: var(--ink);
-      font-weight: 500;
-      text-decoration: none;
-      border-bottom: 1px solid var(--faint);
+    .diamond {
+      width: 7px; height: 7px; border: 1px solid var(--rule);
+      transform: rotate(45deg); flex: none;
     }
-    .footer-name a:hover { border-color: var(--ink); }
-    .footer-right {
-      font-size: 0.78rem;
-      color: var(--muted);
+    .board-title { font-weight: 500; font-size: 0.97rem; }
+    .board-desc {
+      grid-column: 2; font-size: 0.85rem; color: var(--muted); max-width: 58ch;
+    }
+    .board-status {
+      grid-row: 1; grid-column: 3;
+      font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted);
+      border: 1px dashed var(--rule); border-radius: 4px;
+      padding: 0.22rem 0.55rem; white-space: nowrap;
     }
 
-    /* ─── Mobile ──────────────────────────────────────────── */
-    @media (max-width: 640px) {
-      .topbar { padding: 1rem 1.25rem; }
-      .hero, .tools-section { padding: 0 1.25rem; }
-      .hero { margin: 3.5rem auto 3rem; }
-      .tools-grid { grid-template-columns: 1fr; }
-      .footer { padding: 1.5rem 1.25rem; flex-direction: column; align-items: flex-start; }
+    /* ── Title-block footer ──────────────────────────────── */
+    .titleblock { margin-top: auto; padding: clamp(2rem, 5vw, 3rem) 0 1.25rem; }
+    .tb-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      border: 1px solid var(--rule); border-radius: 6px;
+      background: var(--sheet); overflow: hidden;
+    }
+    .tb-cell { padding: 0.7rem 0.875rem; border-top: 1px solid var(--hairline); }
+    .tb-cell:nth-child(-n+2) { border-top: none; }
+    .tb-cell:nth-child(odd) { border-right: 1px solid var(--hairline); }
+    .tb-key {
+      display: block; font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.15rem;
+    }
+    .tb-val { font-size: 0.84rem; font-weight: 500; }
+    .tb-val a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+    .tb-val a:hover { border-color: var(--accent); color: var(--accent-ink); }
+    .colophon {
+      text-align: right; font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 0.06em; margin-top: 0.75rem;
+    }
+
+    /* ── Breakpoints ─────────────────────────────────────── */
+    @media (min-width: 768px) {
+      .hero-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; }
+      .tb-grid { grid-template-columns: 2fr 2fr 2fr 1fr 1fr; }
+      .tb-cell { border-top: none; border-right: 1px solid var(--hairline); }
+      .tb-cell:nth-child(odd) { border-right: 1px solid var(--hairline); }
+      .tb-cell:last-child { border-right: none; }
+    }
+    @media (max-width: 480px) {
+      .board-item { grid-template-columns: auto 1fr; }
+      .board-status { grid-row: auto; grid-column: 2; justify-self: start; }
+      .stats { gap: 1.25rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top bar -->
   <header class="topbar">
-    <a href="/" class="topbar-logo">by: Yazeed Alotaibi</a>
-    <nav class="topbar-nav">
-      <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener" class="li-btn">LinkedIn ↗</a>
-      <a href="mailto:yaz.otb.sa@gmail.com" class="li-btn">Email</a>
-    </nav>
+    <div class="wrap topbar-inner">
+      <a href="/" class="brand">
+        <svg class="brand-mark" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M11 5.5l5.5 5.5-5.5 5.5L5.5 11z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        Yazeed Alotaibi
+      </a>
+      <nav class="topbar-nav" aria-label="Contact">
+        <a class="pill" href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">
+          LinkedIn
+          <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M4 10l6-6M5.5 4H10v4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="pill" href="mailto:yaz.otb.sa@gmail.com">Email</a>
+        <button class="pill theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="15" height="15"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="15" height="15"><circle cx="8" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v1.75M8 12.75v1.75M14.5 8h-1.75M3.25 8H1.5m11.1-4.6l-1.24 1.24M4.64 11.36L3.4 12.6m9.2 0l-1.24-1.24M4.64 4.64L3.4 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </nav>
+    </div>
   </header>
 
-  <!-- Hero -->
   <section class="hero">
-    <p class="hero-eyebrow">Project Management · Tools &amp; Resources</p>
-    <h1>Built by a PM,<br><em>for PMs.</em></h1>
-    <p class="hero-sub">
-      Practical tools, calculators, dashboards, and AI resources for project managers
-      who need the right answer fast.
-    </p>
-  </section>
-
-  <!-- Tools -->
-  <section class="tools-section">
-    <p class="section-label">Tools</p>
-    <div class="tools-grid">
-
-      <!-- PM Calculation Desk — LIVE -->
-      <a class="tool-card" href="pm-calculation-desk.html">
-        <span class="card-domain">Calculators</span>
-        <h2 class="card-title">The Project Manager's Calculation Desk</h2>
-        <p class="card-desc">
-          Every PM formula you'll ever need — EVM, PERT, risk, quality, procurement, agile, and more.
-          Each one explained and color-coded so you know what the result actually means.
+    <div class="wrap hero-grid">
+      <div>
+        <p class="kicker mono">Sheet 01 · Index of tools</p>
+        <h1>Tools that show their work.</h1>
+        <p class="hero-sub">
+          Calculators and references for working project managers — every formula
+          explained, every result interpreted. Built and maintained by Yazeed Alotaibi.
         </p>
-        <div class="card-stats">
-          <div class="stat">
-            <div class="stat-num">14</div>
-            <div class="stat-label">Domains</div>
-          </div>
-          <div class="stat">
-            <div class="stat-num">33</div>
-            <div class="stat-label">Calculators</div>
-          </div>
-          <div class="stat">
-            <div class="stat-num">99</div>
-            <div class="stat-label">Metrics</div>
-          </div>
+        <div class="creds" aria-label="Credentials">
+          <span class="cred mono">RMP</span>
+          <span class="cred mono">PRINCE2</span>
         </div>
-        <span class="card-arrow">
-          Open tool
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-      </a>
-
-      <!-- Placeholder: Dashboard -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">Dashboards</span>
-        <h2 class="card-title">Project Status Dashboard</h2>
-        <p class="card-desc">
-          Visual dashboard templates for tracking project health, milestones, budget, and risk in one view.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
       </div>
 
-      <!-- Placeholder: AI tool -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">AI Tools</span>
-        <h2 class="card-title">AI Scope Statement Generator</h2>
-        <p class="card-desc">
-          Describe your project in plain language and get a structured, PMI-aligned scope statement draft.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
-      </div>
-
-      <!-- Placeholder: Estimation -->
-      <div class="tool-card soon">
-        <span class="card-domain coming">Estimation</span>
-        <h2 class="card-title">WBS Estimation Toolkit</h2>
-        <p class="card-desc">
-          Build a work breakdown structure, apply three-point estimates, and roll up confidence intervals automatically.
-        </p>
-        <span class="card-arrow" style="color: var(--muted);">Coming soon</span>
-      </div>
-
+      <figure class="hero-fig" aria-hidden="false">
+        <svg viewBox="0 0 340 210" role="img" aria-label="Earned value S-curve chart: planned value, earned value, and actual cost plotted over time up to a data date marker.">
+          <defs>
+            <pattern id="gp" width="17" height="17" patternUnits="userSpaceOnUse">
+              <path d="M17 0H0v17" fill="none" stroke="var(--grid-line)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="340" height="210" fill="var(--sheet)"/>
+          <rect width="340" height="210" fill="url(#gp)"/>
+          <!-- axes -->
+          <path d="M36 16v170h288" fill="none" stroke="var(--rule)" stroke-width="1"/>
+          <text x="30" y="16" font-family="JetBrains Mono, monospace" font-size="8" fill="var(--muted)" text-anchor="end" transform="rotate(-90 30 16)"></text>
+          <text x="14" y="105" font-family="JetBrains Mono, monospace" font-size="8" fill="var(--muted)" text-anchor="middle" transform="rotate(-90 14 105)">VALUE</text>
+          <text x="180" y="200" font-family="JetBrains Mono, monospace" font-size="8" fill="var(--muted)" text-anchor="middle">TIME</text>
+          <!-- BAC line -->
+          <path d="M36 36h288" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 4"/>
+          <text x="322" y="31" font-family="JetBrains Mono, monospace" font-size="8" fill="var(--muted)" text-anchor="end">BAC</text>
+          <!-- PV: planned S-curve to BAC -->
+          <path d="M36 186 C 110 182, 140 120, 190 78 S 290 38, 324 36" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <!-- AC: actual cost, above EV -->
+          <path d="M36 186 C 90 180, 130 130, 208 96" fill="none" stroke="var(--rule)" stroke-width="1.5"/>
+          <!-- EV: earned value, behind plan -->
+          <path d="M36 186 C 96 184, 138 142, 208 112" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <!-- data date -->
+          <path d="M208 26v160" stroke="var(--rule)" stroke-width="1"/>
+          <path d="M208 20l5 6-5 6-5-6z" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="216" y="30" font-family="JetBrains Mono, monospace" font-size="8" fill="var(--muted)">DATA DATE</text>
+          <!-- series labels -->
+          <text x="300" y="60" font-family="JetBrains Mono, monospace" font-size="9" fill="var(--muted)">PV</text>
+          <text x="216" y="94" font-family="JetBrains Mono, monospace" font-size="9" fill="var(--muted)">AC</text>
+          <text x="216" y="126" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="var(--accent)">EV</text>
+        </svg>
+        <figcaption class="fig-caption mono">
+          <span>Fig. 01 — Earned value S-curve</span>
+          <span>Scale — none</span>
+        </figcaption>
+      </figure>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p class="footer-name">
-      Made by <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
-    </p>
-    <p class="footer-right">&copy; 2026 yazeed.blog</p>
+  <section class="tools">
+    <div class="wrap">
+      <div class="dim" aria-hidden="true">
+        <span class="dim-tick"></span><span class="dim-line"></span>
+        <span class="dim-label mono">Index of tools</span>
+        <span class="dim-line"></span><span class="dim-tick"></span>
+      </div>
+
+      <a class="featured" href="pm-calculation-desk.html">
+        <div class="featured-head">
+          <span class="sheet-no mono">SHEET 02</span>
+          <span class="tag">Calculators</span>
+        </div>
+        <h2>The Project Manager's Calculation Desk</h2>
+        <p>
+          EVM, PERT, risk, quality, procurement, agile, and more — interactive
+          calculators that explain each input and interpret each result, so the
+          number always comes with its meaning.
+        </p>
+        <div class="featured-foot">
+          <div class="stats mono">
+            <div><div class="stat-num">14</div><div class="stat-label">Domains</div></div>
+            <div><div class="stat-num">33</div><div class="stat-label">Calculators</div></div>
+            <div><div class="stat-num">99</div><div class="stat-label">Metrics</div></div>
+          </div>
+          <span class="open-cta">
+            Open the desk
+            <svg viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M3 7.5h9M8 3l4.5 4.5L8 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <div class="board">
+        <div class="dim" aria-hidden="true">
+          <span class="dim-tick"></span><span class="dim-line"></span>
+          <span class="dim-label mono">On the drawing board</span>
+          <span class="dim-line"></span><span class="dim-tick"></span>
+        </div>
+        <ul class="board-list">
+          <li class="board-item">
+            <span class="board-marker mono"><span class="diamond" aria-hidden="true"></span>03</span>
+            <span class="board-title">Project Status Dashboard</span>
+            <span class="board-desc">Track project health, milestones, budget, and risk in one view.</span>
+            <span class="board-status mono">In draft</span>
+          </li>
+          <li class="board-item">
+            <span class="board-marker mono"><span class="diamond" aria-hidden="true"></span>04</span>
+            <span class="board-title">AI Scope Statement Generator</span>
+            <span class="board-desc">Describe the project in plain language, get a structured PMI-aligned scope statement.</span>
+            <span class="board-status mono">In draft</span>
+          </li>
+          <li class="board-item">
+            <span class="board-marker mono"><span class="diamond" aria-hidden="true"></span>05</span>
+            <span class="board-title">WBS Estimation Toolkit</span>
+            <span class="board-desc">Build a work breakdown structure, apply three-point estimates, roll up confidence.</span>
+            <span class="board-status mono">In draft</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="titleblock">
+    <div class="wrap">
+      <div class="tb-grid" role="contentinfo">
+        <div class="tb-cell">
+          <span class="tb-key mono">Project</span>
+          <span class="tb-val">yazeed.blog</span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key mono">Author</span>
+          <span class="tb-val"><a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a></span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key mono">Contact</span>
+          <span class="tb-val"><a href="mailto:yaz.otb.sa@gmail.com">yaz.otb.sa@gmail.com</a></span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key mono">Rev</span>
+          <span class="tb-val mono">02</span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key mono">Date</span>
+          <span class="tb-val mono">2026</span>
+        </div>
+      </div>
+      <p class="colophon mono">© 2026 yazeed.blog</p>
+    </div>
   </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('theme-toggle');
+      function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+      btn.setAttribute('aria-pressed', String(isDark()));
+      btn.addEventListener('click', function () {
+        var next = isDark() ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        btn.setAttribute('aria-pressed', String(next === 'dark'));
+        try { localStorage.setItem('yz-theme', next); } catch (e) {}
+      });
+    })();
+  </script>
 
 </body>
 </html>
