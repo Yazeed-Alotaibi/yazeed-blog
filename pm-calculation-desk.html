@@ -5,43 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Project Manager's Calculation Desk</title>
   <meta name="description" content="Interactive project management calculators — earned value, PERT estimation, float, EMV, NPV, procurement and agile forecasting — with every formula and parameter explained.">
+  <link rel="canonical" href="https://yazeed.blog/pm-calculation-desk.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yazeed.blog/pm-calculation-desk.html">
+  <meta property="og:title" content="The Project Manager's Calculation Desk">
+  <meta property="og:description" content="14 domains · 33 calculators · 99 metrics — every formula explained, every result interpreted.">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23151c2e'/%3E%3Cpath d='M16 7l9 9-9 9-9-9z' fill='none' stroke='%238fa3f5' stroke-width='2'/%3E%3C/svg%3E">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('yz-theme'); } catch (e) {}
+      if (t === 'dark' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-/* PM Calculation Desk — editorial light theme.
-   Direction: warm paper, ink typography (Fraunces display / Inter UI),
-   dark chalk-strip formulas, semantic tones reserved for interpretation. */
+/* PM Calculation Desk — "drafting sheet" system.
+   Direction: an engineer's drawing sheet. Cool vellum paper, white sheets,
+   hairline rules, dimension-line callouts, milestone diamonds, blueprint
+   formula strips, live figures. IBM Plex Sans UI / JetBrains Mono data.
+   Semantic tones reserved for interpretation. Light + dark ("night shift"). */
 
 :root {
-  --paper: #f6f4ee;
-  --card: #fffefa;
-  --ink: #1c1b17;
-  --ink-soft: #6b675c;
-  --ink-faint: #948f81;
-  --line: #e4dfd2;
-  --line-strong: #cfc8b6;
-  --chalk: #23221d;
-  --chalk-text: #f0ead9;
+  --vellum:       #f6f7f9;
+  --sheet:        #ffffff;
+  --ink:          #171a1f;
+  --muted:        #5b6472;
+  --hairline:     #e2e5ea;
+  --rule:         #c7ccd4;
+  --accent:       #2b49c9;
+  --accent-ink:   #2b49c9;
+  --accent-soft:  #e9edfb;
+  --print-bg:     #151c2e;
+  --print-text:   #b7c6f0;
+  --grid-line:    rgba(43, 73, 201, 0.07);
+  --shadow:       0 2px 10px rgba(23, 26, 31, 0.05);
+  --focus-ring:   0 0 0 2px var(--vellum), 0 0 0 4px var(--accent);
 
-  --accent: #2b49c9;
-  --accent-soft: #eceffc;
-  --good: #1c7a4d;
-  --good-soft: #e8f4ec;
-  --warn: #9a6c07;
-  --warn-soft: #faf3e0;
-  --bad: #bb3a3a;
-  --bad-soft: #f9ecec;
+  --good:       #157a4d;
+  --good-soft:  #e7f3ec;
+  --warn:       #8a6100;
+  --warn-soft:  #f8f1dd;
+  --bad:        #b93838;
+  --bad-soft:   #f9ebeb;
 
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  --font-ui:   "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
 
-  --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
-  --space-section: clamp(3.5rem, 2.5rem + 3vw, 6rem);
-  --radius: 14px;
+  --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
+  --space-section: clamp(3rem, 2rem + 3vw, 5rem);
+  --radius: 8px;
   --dur: 180ms;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="dark"] {
+  --vellum:       #0f1216;
+  --sheet:        #161b22;
+  --ink:          #e7eaef;
+  --muted:        #9aa4b2;
+  --hairline:     #272e39;
+  --rule:         #3a4350;
+  --accent:       #8fa3f5;
+  --accent-ink:   #a5b6f7;
+  --accent-soft:  #1d2536;
+  --print-bg:     #10182a;
+  --print-text:   #a9bcf2;
+  --grid-line:    rgba(143, 163, 245, 0.08);
+  --shadow:       0 2px 10px rgba(0, 0, 0, 0.35);
+
+  --good:       #5fc08c;
+  --good-soft:  #142519;
+  --warn:       #d2a548;
+  --warn-soft:  #2a2313;
+  --bad:        #e08585;
+  --bad-soft:   #2b1919;
 }
 
 * { box-sizing: border-box; }
@@ -50,503 +94,554 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--vellum);
   color: var(--ink);
   font-family: var(--font-ui);
   font-size: var(--text-base);
   line-height: 1.55;
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 272px minmax(0, 1fr);
 }
+
+.mono, .sheet-no { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
 
 /* ------------------------------------------------------------ sidebar */
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
-  padding: 1.75rem 1.25rem;
-  border-right: 1px solid var(--line);
-  background: var(--paper);
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--hairline);
+  background: var(--vellum);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
+.home-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  width: fit-content;
+  transition: color var(--dur) var(--ease);
+}
+.home-link:hover { color: var(--accent-ink); }
+
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.625rem;
 }
-
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 10px;
-  background: var(--chalk);
-  color: var(--chalk-text);
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
+.brand-mark { width: 30px; height: 30px; flex: none; color: var(--accent); }
 .brand strong {
   display: block;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-
 .brand span {
   display: block;
-  font-size: 0.72rem;
-  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-top: 0.2rem;
 }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--sheet);
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.theme-toggle:hover { border-color: var(--rule); color: var(--ink); }
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .search input {
   width: 100%;
+  min-height: 44px;
   padding: 0.55rem 0.75rem;
-  font: inherit;
-  font-size: 0.85rem;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--sheet);
   color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--line-strong);
-  border-radius: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
+.search input::placeholder { color: var(--muted); opacity: 0.85; }
+.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-.search input::placeholder { color: var(--ink-faint); }
-
-.search input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-#cat-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
+#cat-nav { display: flex; flex-direction: column; gap: 2px; }
 #cat-nav a {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.6rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  border-left: 3px solid transparent;
-  color: var(--ink-soft);
-  font-size: 0.86rem;
+  padding: 0.42rem 0.5rem;
+  border-left: 2px solid transparent;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
   text-decoration: none;
-  transition: color var(--dur) var(--ease), background var(--dur) var(--ease),
-              border-color var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-
-#cat-nav a .nav-num {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--ink-faint);
-}
-
-#cat-nav a:hover { background: var(--card); color: var(--ink); }
-
-#cat-nav a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-#cat-nav a.active {
-  border-left-color: var(--accent);
-  background: var(--card);
-  color: var(--ink);
-  font-weight: 600;
-}
-
+#cat-nav a:hover { color: var(--ink); background: var(--accent-soft); }
+#cat-nav a.active { color: var(--accent-ink); border-left-color: var(--accent); }
 #cat-nav a.dimmed { opacity: 0.35; }
+.nav-num {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--muted);
+  flex: none;
+  width: 1.4em;
+}
+#cat-nav a.active .nav-num { color: var(--accent-ink); }
 
 .sidebar footer {
   margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
   font-size: 0.72rem;
-  color: var(--ink-faint);
-  line-height: 1.5;
+  line-height: 1.55;
+  color: var(--muted);
 }
+.sidebar .credit { margin: 0.6rem 0 0; }
+.sidebar .credit a,
+.page-foot .credit a {
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.sidebar .credit a:hover,
+.page-foot .credit a:hover { color: var(--accent-ink); border-color: var(--accent); }
 
 /* --------------------------------------------------------------- main */
 main {
-  padding: 0 clamp(1.25rem, 4vw, 4rem) 5rem;
-  max-width: 1060px;
+  min-width: 0;
+  padding: 0 clamp(1.25rem, 4vw, 3.5rem) 3rem;
 }
+.measure { max-width: 1160px; margin-inline: auto; }
 
+/* ---------------------------------------------------------------- hero */
 .hero {
-  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(2rem, 4vw, 3rem);
-  border-bottom: 1px solid var(--line-strong);
+  max-width: 1160px;
+  margin-inline: auto;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--hairline);
 }
-
 .kicker {
-  margin: 0 0 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  color: var(--accent);
+  color: var(--accent-ink);
+  margin: 0 0 1rem;
 }
-
 .hero h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.4rem);
-  font-weight: 560;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
-  max-width: 16ch;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.875rem;
 }
-
-.hero h1 em {
-  font-style: italic;
-  color: var(--accent);
+.hero h1 em { font-style: normal; color: var(--accent-ink); }
+.lede {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 62ch;
+  margin: 0 0 1.25rem;
 }
-
-.hero .lede {
-  margin: 1.4rem 0 0;
-  max-width: 58ch;
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
-  color: var(--ink-soft);
-}
-
 #hero-stats {
   display: inline-block;
-  margin-top: 1.5rem;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.74rem;
-  color: var(--ink-soft);
-  background: var(--card);
-}
-
-/* ---------------------------------------------------------- category */
-.category { padding-top: var(--space-section); }
-
-.cat-head {
-  display: flex;
-  gap: 1.25rem;
-  align-items: baseline;
-  margin-bottom: 1.75rem;
-}
-
-.cat-num {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 1.5rem + 2vw, 3.2rem);
-  font-weight: 300;
-  font-style: italic;
-  color: var(--line-strong);
-  line-height: 1;
-}
-
-.cat-head h2 {
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--sheet);
+  padding: 0.45rem 0.75rem;
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.2rem);
-  font-weight: 560;
-  letter-spacing: -0.01em;
 }
 
+/* ---------------------------------------------------------- categories */
+.category { max-width: 1160px; margin-inline: auto; padding-top: var(--space-section); }
+
+.cat-head { margin-bottom: 1.75rem; }
+.cat-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+.cat-rule .tick { width: 1px; height: 9px; background: var(--rule); flex: none; }
+.cat-rule .line { height: 1px; background: var(--rule); flex: 1; }
+.cat-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  flex: none;
+}
+.cat-head h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
 .cat-blurb {
-  margin: 0.45rem 0 0;
-  max-width: 62ch;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 72ch;
+  margin: 0;
 }
 
-/* --------------------------------------------------------------- card */
+/* --------------------------------------------------------------- cards */
 .calc-card {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius);
-  padding: clamp(1.25rem, 2.5vw, 2rem);
-  margin-bottom: 1.5rem;
-  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
-              border-color var(--dur) var(--ease);
+  box-shadow: var(--shadow);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  margin-top: 1.25rem;
+  transition: border-color var(--dur) var(--ease);
 }
-
-.calc-card:hover {
-  border-color: var(--line-strong);
-  box-shadow: 0 10px 30px -18px rgba(28, 27, 23, 0.25);
-}
-
-.calc-card:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 10px 30px -18px rgba(43, 73, 201, 0.35);
-}
+.calc-card:focus-within { border-color: var(--rule); }
 
 .card-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem 1rem;
+  gap: 0.35rem 1rem;
+  margin-bottom: 0.6rem;
 }
-
 .card-head h3 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.12rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.tagline {
+  letter-spacing: -0.015em;
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--accent);
-  letter-spacing: 0.04em;
 }
-
+.tagline {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0;
+}
 .about {
-  margin: 0.8rem 0 1.1rem;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-  max-width: 72ch;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 76ch;
+  margin: 0 0 1rem;
 }
 
 .formula {
-  background: var(--chalk);
-  border-radius: 10px;
-  padding: 0.9rem 1.15rem;
-  margin-bottom: 1.4rem;
+  background: var(--print-bg);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.1rem;
   overflow-x: auto;
 }
-
 .formula code {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.84rem;
-  line-height: 1.9;
-  color: var(--chalk-text);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: var(--print-text);
   white-space: pre;
 }
 
-/* ------------------------------------------------------ inputs/outputs */
+/* -------------------------------------------------------------- figures */
+.fig {
+  margin: 0 0 1.1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--sheet);
+}
+.fig-svg svg { display: block; width: 100%; height: auto; }
+.fig-cap {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.8rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fig-cap .fig-state.live { color: var(--good); }
+
+/* ------------------------------------------------------------------ io */
 .io {
   display: grid;
   grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
-  gap: clamp(1.25rem, 3vw, 2.25rem);
+  gap: 1.5rem 2rem;
 }
-
 .io h4 {
-  margin: 0 0 0.9rem;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ink-faint);
+  color: var(--muted);
+  margin: 0 0 0.8rem;
 }
 
-.field { margin-bottom: 1rem; }
-
+.field { margin-bottom: 0.9rem; }
 .field label {
   display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-bottom: 0.15rem;
 }
-
 .field input {
   width: 100%;
-  padding: 0.5rem 0.15rem;
-  font: inherit;
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  color: var(--ink);
-  background: transparent;
+  min-height: 40px;
+  padding: 0.3rem 0.1rem;
   border: none;
-  border-bottom: 2px solid var(--line-strong);
+  border-bottom: 2px solid var(--rule);
   border-radius: 0;
-  transition: border-color var(--dur) var(--ease);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-
-.field input::placeholder { color: var(--ink-faint); font-size: 0.85rem; }
-
-.field input:hover { border-bottom-color: var(--ink-soft); }
-
+.field input::placeholder { color: var(--muted); opacity: 0.6; }
 .field input:focus {
   outline: none;
+  box-shadow: none;
   border-bottom-color: var(--accent);
+  background: var(--accent-soft);
 }
-
 .field-meaning {
-  margin: 0.35rem 0 0;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--ink-soft);
+  font-size: 0.74rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0.3rem 0 0;
 }
 
 .result-group {
-  margin: 1.2rem 0 0.7rem;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.95rem;
+  grid-column: 1 / -1;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
   font-weight: 500;
-  color: var(--ink-soft);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1rem 0 0.6rem;
 }
-
-.result-group:first-child { margin-top: 0; }
+.outputs .result-group:first-child { margin-top: 0; }
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.75rem;
 }
 
 .result {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--line-strong);
-  border-radius: 10px;
-  padding: 0.7rem 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  border: 1px solid var(--hairline);
+  border-left: 2px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.6rem 0.75rem;
+  background: var(--sheet);
   transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-
 .r-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ink-soft);
-}
-
-.r-value {
-  font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  font-variant-numeric: tabular-nums;
-}
-
-.r-meaning {
-  font-size: 0.72rem;
-  line-height: 1.45;
-  color: var(--ink-soft);
-}
-
-.r-verdict {
-  font-size: 0.74rem;
-  font-weight: 600;
-  line-height: 1.4;
-  padding-top: 0.35rem;
-  margin-top: 0.15rem;
-  border-top: 1px dashed var(--line-strong);
-}
-
-.result.good { border-left-color: var(--good); background: var(--good-soft); }
-.result.good .r-verdict { color: var(--good); }
-
-.result.warn { border-left-color: var(--warn); background: var(--warn-soft); }
-.result.warn .r-verdict { color: var(--warn); }
-
-.result.bad { border-left-color: var(--bad); background: var(--bad-soft); }
-.result.bad .r-verdict { color: var(--bad); }
-
-.result.info { border-left-color: var(--accent); }
-.result.info .r-verdict { color: var(--accent); }
-
-.result.has-value .r-value { color: var(--ink); }
-
-/* --------------------------------------------------------------- foot */
-.page-foot {
-  margin-top: var(--space-section);
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-  font-size: 0.78rem;
-  color: var(--ink-faint);
-  max-width: 70ch;
-}
-
-.credit {
   display: block;
-  margin: 0.9rem 0 0;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--line);
-  font-size: 0.78rem;
-  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.02em;
 }
-
-.credit a {
-  color: var(--accent);
+.r-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.12rem;
   font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--dur) var(--ease);
+  margin: 0.15rem 0;
+}
+.r-meaning {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.r-verdict {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.45;
+  margin-top: 0.4rem;
 }
 
-.credit a:hover { border-bottom-color: var(--accent); }
+.result.good  { border-left-color: var(--good); background: var(--good-soft); }
+.result.warn  { border-left-color: var(--warn); background: var(--warn-soft); }
+.result.bad   { border-left-color: var(--bad);  background: var(--bad-soft); }
+.result.info  { border-left-color: var(--accent); background: var(--accent-soft); }
+.result.good .r-verdict { color: var(--good); }
+.result.warn .r-verdict { color: var(--warn); }
+.result.bad  .r-verdict { color: var(--bad); }
+.result.info .r-verdict { color: var(--accent-ink); }
 
-.credit a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+/* ----------------------------------------------------- title-block foot */
+.page-foot {
+  max-width: 1160px;
+  margin-inline: auto;
+  padding-top: var(--space-section);
+}
+.foot-notes {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 72ch;
+  margin: 0 0 1.5rem;
+}
+.tb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--sheet);
+  overflow: hidden;
+}
+.tb-cell { padding: 0.7rem 0.875rem; border-top: 1px solid var(--hairline); }
+.tb-cell:nth-child(-n+2) { border-top: none; }
+.tb-cell:nth-child(odd) { border-right: 1px solid var(--hairline); }
+.tb-key {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.tb-val { font-size: 0.84rem; font-weight: 500; }
+.tb-val a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.tb-val a:hover { color: var(--accent-ink); border-color: var(--accent); }
+.colophon {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-top: 0.75rem;
 }
 
-/* --------------------------------------------------------- responsive */
-@media (max-width: 920px) {
-  /* minmax(0,…) so pre-formatted formula lines can't widen the page */
-  body { grid-template-columns: minmax(0, 1fr); }
+/* -------------------------------------------------------- breakpoints */
+@media (min-width: 768px) {
+  .tb-grid { grid-template-columns: 2fr 2fr 2fr 1fr 1fr; }
+  .tb-cell { border-top: none; border-right: 1px solid var(--hairline); }
+  .tb-cell:last-child { border-right: none; }
+}
 
+@media (max-width: 1023px) {
+  body { display: block; }
   .sidebar {
     position: static;
     height: auto;
     border-right: none;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--hairline);
+    padding: 1rem 1.25rem 1.25rem;
   }
-
-  #cat-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
+  #cat-nav { flex-direction: row; flex-wrap: wrap; gap: 0.4rem; }
   #cat-nav a {
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    background: var(--sheet);
+    padding: 0.5rem 0.7rem;
+    min-height: 44px;
   }
-
   #cat-nav a.active { border-color: var(--accent); }
-
   .sidebar footer { display: none; }
+}
 
+@media (max-width: 767px) {
   .io { grid-template-columns: 1fr; }
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  * { transition-duration: 0.01ms !important; }
+  *, *::before, *::after { transition: none !important; }
 }
-
   </style>
 </head>
 <body>
 
   <aside class="sidebar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">Σ</span>
-      <div>
-        <strong>Calculation Desk</strong>
-        <span>for project managers</span>
+    <a class="home-link" href="index.html">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M9.5 6h-7M6 2.5L2.5 6 6 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      yazeed.blog
+    </a>
+
+    <div class="brand-row">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="27" height="27" rx="5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M15 7.5l7.5 7.5-7.5 7.5L7.5 15z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <strong>Calculation Desk</strong>
+          <span>for project managers</span>
+        </div>
       </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">
+        <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v1.75M8 12.75v1.75M14.5 8h-1.75M3.25 8H1.5m11.1-4.6l-1.24 1.24M4.64 11.36L3.4 12.6m9.2 0l-1.24-1.24M4.64 4.64L3.4 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
     </div>
 
     <label class="search">
-      <span class="sr-only" hidden>Search calculators</span>
+      <span class="sr-only">Search calculators</span>
       <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" aria-label="Search calculators">
     </label>
 
@@ -563,7 +658,7 @@ main {
 
   <main>
     <header class="hero">
-      <p class="kicker">Every formula · explained</p>
+      <p class="kicker">Sheet 02 · Every formula, explained</p>
       <h1>The Project Manager's <em>Calculation Desk</em></h1>
       <p class="lede">
         One page for the numbers behind project decisions. Each calculator
@@ -576,14 +671,37 @@ main {
     <div id="calc-sections"></div>
 
     <footer class="page-foot">
-      Built as a study and working reference. Values compute locally in your
-      browser — nothing is sent anywhere. Interpretations are rules of thumb;
-      real decisions deserve context the formulas can't see.
-      <span class="credit">Made by
-        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
-      </span>
+      <p class="foot-notes">
+        Built as a study and working reference. Values compute locally in your
+        browser — nothing is sent anywhere. Interpretations are rules of thumb;
+        real decisions deserve context the formulas can't see.
+      </p>
+      <div class="tb-grid">
+        <div class="tb-cell">
+          <span class="tb-key">Project</span>
+          <span class="tb-val">yazeed.blog</span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key">Sheet</span>
+          <span class="tb-val mono">02 — Calculation Desk</span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key">Author</span>
+          <span class="tb-val"><a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a></span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key">Rev</span>
+          <span class="tb-val mono">02</span>
+        </div>
+        <div class="tb-cell">
+          <span class="tb-key">Date</span>
+          <span class="tb-val mono">2026</span>
+        </div>
+      </div>
+      <p class="colophon">© 2026 yazeed.blog</p>
     </footer>
   </main>
+
 
   <script>
 /* PM Calculation Desk — calculator definitions.
@@ -2046,9 +2164,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   </script>
   <script>
-/* PM Calculation Desk — rendering and live computation.
-   Reads PM_DATA (data.js), builds the sidebar nav and one card per
-   calculator, and recomputes a card's outputs on every keystroke. */
+/* PM Calculation Desk — rendering, live computation, and figures.
+   Reads PM_DATA, builds the sidebar nav and one card per calculator,
+   recomputes a card's outputs on every keystroke, and keeps the flagship
+   figures in sync with the same values. Figures fall back to specimen
+   data until the card's own inputs are valid. */
 
 (function () {
   'use strict';
@@ -2074,6 +2194,460 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         return Math.round(val).toLocaleString('en-US');
       default:
         return Number(val.toFixed(2)).toLocaleString('en-US');
+    }
+  }
+
+  /* ------------------------------------------------------------ figures
+     Shared drawing helpers. All figures render into a 560×230 viewBox,
+     use theme CSS variables for every colour, and show all key values as
+     text so colour is never the only signal. */
+
+  var FW = 560, FH = 230;
+  var FL = 48, FR = 16, FT = 20, FB = 32;
+  var PW = FW - FL - FR, PH = FH - FT - FB;
+
+  function fnum(n) { return Math.round(n * 100) / 100; }
+
+  function nshort(n) {
+    if (!Number.isFinite(n)) return '—';
+    var a = Math.abs(n);
+    if (a >= 1e9) return fnum(n / 1e9) + 'B';
+    if (a >= 1e6) return fnum(n / 1e6) + 'M';
+    if (a >= 1e3) return fnum(n / 1e3) + 'k';
+    return String(Number(n.toFixed(2)));
+  }
+
+  function num(v) { return typeof v === 'number' && Number.isFinite(v); }
+
+  function poly(pts) {
+    var d = '';
+    for (var i = 0; i < pts.length; i++) {
+      d += (i ? 'L' : 'M') + fnum(pts[i][0]) + ' ' + fnum(pts[i][1]);
+    }
+    return d;
+  }
+
+  function txt(x, y, s, opts) {
+    opts = opts || {};
+    return '<text x="' + fnum(x) + '" y="' + fnum(y) + '"' +
+      ' font-family="JetBrains Mono, monospace" font-size="' + (opts.size || 9) + '"' +
+      ' fill="' + (opts.fill || 'var(--muted)') + '"' +
+      (opts.anchor ? ' text-anchor="' + opts.anchor + '"' : '') +
+      (opts.weight ? ' font-weight="' + opts.weight + '"' : '') +
+      (opts.transform ? ' transform="' + opts.transform + '"' : '') +
+      '>' + s + '</text>';
+  }
+
+  function line(x1, y1, x2, y2, stroke, width, dash) {
+    return '<path d="M' + fnum(x1) + ' ' + fnum(y1) + 'L' + fnum(x2) + ' ' + fnum(y2) + '"' +
+      ' stroke="' + stroke + '" stroke-width="' + (width || 1) + '" fill="none"' +
+      (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
+  }
+
+  function diamond(x, y, r, stroke, fill) {
+    return '<path d="M' + fnum(x) + ' ' + fnum(y - r) + 'L' + fnum(x + r) + ' ' + fnum(y) +
+      'L' + fnum(x) + ' ' + fnum(y + r) + 'L' + fnum(x - r) + ' ' + fnum(y) + 'Z"' +
+      ' stroke="' + stroke + '" stroke-width="1.5" fill="' + (fill || 'var(--sheet)') + '"/>';
+  }
+
+  function svgWrap(inner, aria) {
+    return '<svg viewBox="0 0 ' + FW + ' ' + FH + '" role="img" aria-label="' + aria + '">' +
+      '<rect width="' + FW + '" height="' + FH + '" fill="var(--sheet)"/>' + inner + '</svg>';
+  }
+
+  function frame() {
+    return line(FL, FT, FL, FT + PH, 'var(--rule)') +
+      line(FL, FT + PH, FL + PW, FT + PH, 'var(--rule)');
+  }
+
+  function parseFlowList(s) {
+    if (typeof s !== 'string' || !s.trim()) return null;
+    var parts = s.split(/[,;\s]+/).filter(Boolean).map(Number);
+    if (!parts.length) return null;
+    for (var i = 0; i < parts.length; i++) {
+      if (!Number.isFinite(parts[i])) return null;
+    }
+    return parts;
+  }
+
+  /* Smoothstep S-curve shape used by the EVM figure. */
+  function sstep(t) { return t * t * (3 - 2 * t); }
+
+  var FIGS = {
+
+    /* ---- Earned value S-curve --------------------------------------- */
+    'earned-value': {
+      caption: 'Fig. A — Earned value S-curve',
+      aria: 'S-curve chart of planned value, earned value, and actual cost over time, with the EAC forecast projected to completion.',
+      defaults: { bac: 100000, pv: 50000, ev: 45000, ac: 60000 },
+      use: function (v) {
+        if (!num(v.bac) || !num(v.pv) || !num(v.ev) || !num(v.ac)) return null;
+        if (v.bac <= 0 || v.pv <= 0 || v.pv > v.bac || v.ev < 0 || v.ac < 0 || v.ev > v.bac) return null;
+        return v;
+      },
+      render: function (v) {
+        var frac = v.pv / v.bac;
+        var lo = 0, hi = 1, tNow;
+        for (var i = 0; i < 40; i++) {
+          tNow = (lo + hi) / 2;
+          if (sstep(tNow) < frac) lo = tNow; else hi = tNow;
+        }
+        var cpi = v.ac > 0 ? v.ev / v.ac : null;
+        var eac = cpi ? v.bac / cpi : v.bac;
+        var ymax = Math.max(v.bac, eac, v.ac) * 1.08;
+
+        function X(t) { return FL + t * PW; }
+        function Y(val) { return FT + PH - (val / ymax) * PH; }
+
+        function curve(endT, endV) {
+          var pts = [];
+          for (var k = 0; k <= 28; k++) {
+            var u = k / 28;
+            pts.push([X(u * endT), Y(sstep(u) * endV)]);
+          }
+          return pts;
+        }
+
+        var s = frame();
+        for (var g = 1; g <= 3; g++) {
+          s += line(FL, FT + (PH * g) / 4, FL + PW, FT + (PH * g) / 4, 'var(--hairline)');
+        }
+        s += line(FL, Y(v.bac), FL + PW, Y(v.bac), 'var(--rule)', 1, '2 4');
+        s += txt(FL + PW, Y(v.bac) - 5, 'BAC ' + nshort(v.bac), { anchor: 'end' });
+
+        s += '<path d="' + poly(curve(1, v.bac)) + '" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>';
+        s += '<path d="' + poly(curve(tNow, v.ac)) + '" stroke="var(--muted)" stroke-width="1.5" fill="none"/>';
+        s += '<path d="' + poly(curve(tNow, v.ev)) + '" stroke="var(--accent)" stroke-width="2" fill="none"/>';
+        s += line(X(tNow), Y(v.ac), X(1), Y(eac), 'var(--warn)', 1.5, '4 4');
+        s += diamond(X(1) - 3, Y(eac), 4, 'var(--warn)');
+        s += txt(X(1) - 10, Y(eac) - 7, 'EAC ' + nshort(eac), { anchor: 'end', fill: 'var(--warn)' });
+
+        s += line(X(tNow), FT + 4, X(tNow), FT + PH, 'var(--rule)');
+        s += diamond(X(tNow), FT + 6, 5, 'var(--accent)');
+        s += txt(X(tNow) + 8, FT + 10, 'DATA DATE');
+
+        s += txt(X(tNow) + 8, Y(v.ac) + 3, 'AC ' + nshort(v.ac));
+        s += txt(X(tNow) + 8, Y(v.ev) + 12, 'EV ' + nshort(v.ev), { fill: 'var(--accent-ink)', weight: 600 });
+        s += txt(FL + PW * 0.62, Y(sstep(0.62) * v.bac) - 8, 'PV');
+        s += txt(FL - 6, FT + 8, nshort(ymax), { anchor: 'end', size: 8 });
+        s += txt(FL + PW / 2, FH - 8, 'TIME', { anchor: 'middle', size: 8 });
+        s += txt(14, FT + PH / 2, 'VALUE', { anchor: 'middle', size: 8, transform: 'rotate(-90 14 ' + (FT + PH / 2) + ')' });
+        return s;
+      }
+    },
+
+    /* ---- PERT three-point distribution ------------------------------ */
+    'three-point': {
+      caption: 'Fig. B — Three-point distribution',
+      aria: 'Distribution curve over the optimistic to pessimistic range, peaked at most likely, with the PERT mean and one-sigma band marked.',
+      defaults: { o: 4, m: 6, p: 12 },
+      use: function (v) {
+        if (!num(v.o) || !num(v.m) || !num(v.p)) return null;
+        if (!(v.o <= v.m && v.m <= v.p && v.p > v.o)) return null;
+        return v;
+      },
+      render: function (v) {
+        var span = v.p - v.o;
+        var lo = v.o - span * 0.07, hi = v.p + span * 0.07;
+        var te = (v.o + 4 * v.m + v.p) / 6;
+        var sd = span / 6;
+
+        function X(x) { return FL + ((x - lo) / (hi - lo)) * PW; }
+        function H(x) {
+          if (x <= v.o || x >= v.p) return 0;
+          if (x <= v.m) {
+            return v.m === v.o ? 1 : 0.5 * (1 - Math.cos(Math.PI * (x - v.o) / (v.m - v.o)));
+          }
+          return v.p === v.m ? 1 : 0.5 * (1 + Math.cos(Math.PI * (x - v.m) / (v.p - v.m)));
+        }
+        function Y(hval) { return FT + PH - hval * PH * 0.86; }
+
+        var base = FT + PH;
+        var s = frame();
+
+        var bl = Math.max(te - sd, lo), br = Math.min(te + sd, hi);
+        s += '<rect x="' + fnum(X(bl)) + '" y="' + FT + '" width="' + fnum(X(br) - X(bl)) +
+          '" height="' + PH + '" fill="var(--accent-soft)"/>';
+
+        var pts = [[X(v.o), base]];
+        for (var k = 0; k <= 56; k++) {
+          var x = v.o + (span * k) / 56;
+          pts.push([X(x), Y(H(x))]);
+        }
+        pts.push([X(v.p), base]);
+        s += '<path d="' + poly(pts) + '" stroke="var(--accent)" stroke-width="2" fill="none"/>';
+
+        s += line(X(te), Y(H(te)), X(te), base, 'var(--accent)', 1.5, '4 3');
+        s += diamond(X(te), base, 5, 'var(--accent)');
+        s += txt(X(te), FT + 10, 'PERT ' + fnum(te), { anchor: 'middle', fill: 'var(--accent-ink)', weight: 600 });
+        s += txt(X(te), FT + 22, '±1σ ' + fnum(sd), { anchor: 'middle', size: 8 });
+
+        [['O', v.o], ['M', v.m], ['P', v.p]].forEach(function (t) {
+          s += line(X(t[1]), base, X(t[1]), base + 5, 'var(--rule)', 1.5);
+          s += txt(X(t[1]), base + 16, t[0] + ' ' + fnum(t[1]), { anchor: 'middle' });
+        });
+        return s;
+      }
+    },
+
+    /* ---- Float bars -------------------------------------------------- */
+    'float': {
+      caption: 'Fig. C — Early vs late window',
+      aria: 'Bar diagram of the early start-finish window over the late start-finish window, with the total float dimension between them.',
+      defaults: { es: 5, ef: 9, ls: 8, lf: 12, succEs: 11 },
+      use: function (v) {
+        if (!num(v.es) || !num(v.ef) || !num(v.ls) || !num(v.lf)) return null;
+        if (v.ef < v.es || v.lf < v.ls) return null;
+        var o = { es: v.es, ef: v.ef, ls: v.ls, lf: v.lf };
+        if (num(v.succEs)) o.succEs = v.succEs;
+        return o;
+      },
+      render: function (v) {
+        var lo = Math.min(v.es, v.ls), hi = Math.max(v.lf, num(v.succEs) ? v.succEs : v.lf);
+        var pad = (hi - lo) * 0.1 || 1;
+        lo -= pad; hi += pad;
+        function X(x) { return FL + ((x - lo) / (hi - lo)) * PW; }
+
+        var tf = v.ls - v.es;
+        var tfColor = tf < 0 ? 'var(--bad)' : tf === 0 ? 'var(--warn)' : 'var(--good)';
+        var y1 = FT + 34, y2 = FT + 104, bh = 30;
+        var base = FT + PH;
+
+        var s = frame();
+
+        s += '<rect x="' + fnum(X(v.es)) + '" y="' + y1 + '" width="' + fnum(Math.max(X(v.ef) - X(v.es), 2)) +
+          '" height="' + bh + '" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>';
+        s += txt(X(v.es) - 8, y1 + bh / 2 + 3, 'EARLY', { anchor: 'end', size: 8 });
+
+        s += '<rect x="' + fnum(X(v.ls)) + '" y="' + y2 + '" width="' + fnum(Math.max(X(v.lf) - X(v.ls), 2)) +
+          '" height="' + bh + '" fill="none" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="4 3"/>';
+        s += txt(X(v.ls) - 8, y2 + bh / 2 + 3, 'LATE', { anchor: 'end', size: 8 });
+
+        var dy = (y1 + bh + y2) / 2;
+        s += line(X(v.es), y1 + bh, X(v.es), dy + 5, 'var(--hairline)');
+        s += line(X(v.ls), y2, X(v.ls), dy - 5, 'var(--hairline)');
+        s += line(X(v.es), dy, X(v.ls), dy, tfColor, 1.5);
+        s += line(X(v.es), dy - 4, X(v.es), dy + 4, tfColor, 1.5);
+        s += line(X(v.ls), dy - 4, X(v.ls), dy + 4, tfColor, 1.5);
+        s += txt((X(v.es) + X(v.ls)) / 2, dy - 7, 'TF = ' + fnum(tf), { anchor: 'middle', fill: tfColor, weight: 600 });
+
+        if (num(v.succEs)) {
+          var ff = v.succEs - v.ef;
+          var ffColor = ff < 0 ? 'var(--bad)' : ff === 0 ? 'var(--warn)' : 'var(--good)';
+          s += line(X(v.succEs), FT + 8, X(v.succEs), base, 'var(--rule)', 1, '3 3');
+          s += txt(X(v.succEs), FT + 14, 'SUCC ES', { size: 8 });
+          var fy = y1 + bh / 2;
+          s += line(X(v.ef), fy, X(v.succEs), fy, ffColor, 1.5, '2 3');
+          s += txt((X(v.ef) + X(v.succEs)) / 2, fy - 6, 'FF = ' + fnum(ff), { anchor: 'middle', fill: ffColor, size: 8 });
+        }
+
+        [v.es, v.ef, v.ls, v.lf].forEach(function (t) {
+          s += line(X(t), base, X(t), base + 5, 'var(--rule)');
+          s += txt(X(t), base + 16, fnum(t), { anchor: 'middle', size: 8 });
+        });
+        s += txt(FL + PW / 2, FH - 6, 'TIME', { anchor: 'middle', size: 8 });
+        return s;
+      }
+    },
+
+    /* ---- Probability–impact matrix ---------------------------------- */
+    'risk-score': {
+      caption: 'Fig. D — Probability–impact matrix',
+      aria: 'Five by five probability and impact matrix with cells shaded by risk score band and the entered risk marked.',
+      defaults: { p: 4, i: 3 },
+      use: function (v) {
+        if (!num(v.p) || !num(v.i)) return null;
+        if (v.p < 1 || v.p > 5 || v.i < 1 || v.i > 5) return null;
+        return v;
+      },
+      render: function (v) {
+        var cell = 32, gx = FL + (PW - cell * 5) / 2, gy = FT + 4;
+        var pr = Math.round(v.p), ir = Math.round(v.i);
+
+        var s = '';
+        for (var row = 0; row < 5; row++) {
+          for (var col = 0; col < 5; col++) {
+            var P = 5 - row, I = col + 1;
+            var score = P * I;
+            var fill = score >= 15 ? 'var(--bad-soft)' : score >= 8 ? 'var(--warn-soft)' : 'var(--good-soft)';
+            var x = gx + col * cell, y = gy + row * cell;
+            var sel = P === pr && I === ir;
+            s += '<rect x="' + x + '" y="' + y + '" width="' + cell + '" height="' + cell +
+              '" fill="' + fill + '" stroke="' + (sel ? 'var(--accent)' : 'var(--hairline)') +
+              '" stroke-width="' + (sel ? 2 : 1) + '"/>';
+            if (sel) s += diamond(x + cell / 2, y + cell / 2, 6, 'var(--accent)');
+          }
+        }
+        for (var k = 1; k <= 5; k++) {
+          s += txt(gx - 8, gy + (5 - k) * cell + cell / 2 + 3, String(k), { anchor: 'end', size: 8 });
+          s += txt(gx + (k - 1) * cell + cell / 2, gy + cell * 5 + 13, String(k), { anchor: 'middle', size: 8 });
+        }
+        s += txt(gx - 24, gy + cell * 2.5, 'PROBABILITY', { anchor: 'middle', size: 8, transform: 'rotate(-90 ' + (gx - 24) + ' ' + (gy + cell * 2.5) + ')' });
+        s += txt(gx + cell * 2.5, gy + cell * 5 + 26, 'IMPACT', { anchor: 'middle', size: 8 });
+
+        var lx = gx + cell * 5 + 28, ly = gy + 10;
+        [['HIGH ≥ 15', 'var(--bad-soft)', 'var(--bad)'],
+         ['MOD 8–12', 'var(--warn-soft)', 'var(--warn)'],
+         ['LOW ≤ 6', 'var(--good-soft)', 'var(--good)']].forEach(function (row2, idx) {
+          var y2 = ly + idx * 22;
+          s += '<rect x="' + lx + '" y="' + (y2 - 8) + '" width="12" height="12" fill="' + row2[1] + '" stroke="var(--hairline)"/>';
+          s += txt(lx + 18, y2 + 2, row2[0], { size: 8, fill: row2[2] });
+        });
+        s += txt(lx, ly + 76, 'SCORE ' + (pr * ir), { weight: 600, fill: 'var(--accent-ink)' });
+        return s;
+      }
+    },
+
+    /* ---- Process capability bell ------------------------------------ */
+    'cpk': {
+      caption: 'Fig. E — Process vs specification',
+      aria: 'Normal curve of the process centred on its mean, with lower and upper specification limits marked and out-of-spec tails shaded.',
+      defaults: { usl: 10, lsl: 4, mean: 6, sigma: 0.5 },
+      use: function (v) {
+        if (!num(v.usl) || !num(v.lsl) || !num(v.mean) || !num(v.sigma)) return null;
+        if (v.sigma <= 0 || v.usl <= v.lsl) return null;
+        return v;
+      },
+      render: function (v) {
+        var lo = Math.min(v.lsl, v.mean - 4 * v.sigma), hi = Math.max(v.usl, v.mean + 4 * v.sigma);
+        var pad = (hi - lo) * 0.06;
+        lo -= pad; hi += pad;
+        function X(x) { return FL + ((x - lo) / (hi - lo)) * PW; }
+        function H(x) { var z = (x - v.mean) / v.sigma; return Math.exp(-0.5 * z * z); }
+        function Y(hv) { return FT + PH - hv * PH * 0.85; }
+        var base = FT + PH;
+
+        function region(a, b, fill) {
+          if (b <= a) return '';
+          var pts = [[X(a), base]];
+          for (var k = 0; k <= 40; k++) {
+            var x = a + ((b - a) * k) / 40;
+            pts.push([X(x), Y(H(x))]);
+          }
+          pts.push([X(b), base]);
+          return '<path d="' + poly(pts) + 'Z" fill="' + fill + '" stroke="none"/>';
+        }
+
+        var s = frame();
+        s += region(Math.max(v.lsl, lo), Math.min(v.usl, hi), 'var(--accent-soft)');
+        s += region(lo, Math.min(v.lsl, hi), 'var(--bad-soft)');
+        s += region(Math.max(v.usl, lo), hi, 'var(--bad-soft)');
+
+        var pts = [];
+        for (var k = 0; k <= 72; k++) {
+          var x = lo + ((hi - lo) * k) / 72;
+          pts.push([X(x), Y(H(x))]);
+        }
+        s += '<path d="' + poly(pts) + '" stroke="var(--accent)" stroke-width="2" fill="none"/>';
+
+        s += line(X(v.lsl), FT + 6, X(v.lsl), base, 'var(--ink)', 1.5);
+        s += line(X(v.usl), FT + 6, X(v.usl), base, 'var(--ink)', 1.5);
+        s += txt(X(v.lsl), FT + 2 + 10, ' LSL ' + fnum(v.lsl), { size: 8 });
+        s += txt(X(v.usl), FT + 2 + 10, ' USL ' + fnum(v.usl), { size: 8 });
+        s += line(X(v.mean), Y(1), X(v.mean), base, 'var(--muted)', 1, '4 3');
+        s += diamond(X(v.mean), base, 4, 'var(--muted)');
+        s += txt(X(v.mean), base + 14, 'MEAN ' + fnum(v.mean), { anchor: 'middle', size: 8 });
+
+        var cp = (v.usl - v.lsl) / (6 * v.sigma);
+        var cpk = Math.min(v.usl - v.mean, v.mean - v.lsl) / (3 * v.sigma);
+        var tone = cpk >= 1.33 ? 'var(--good)' : cpk >= 1 ? 'var(--warn)' : 'var(--bad)';
+        s += txt(FL + PW, FT + 10, 'CP ' + fnum(cp) + ' · CPK ' + fnum(cpk), { anchor: 'end', fill: tone, weight: 600 });
+        return s;
+      }
+    },
+
+    /* ---- Cash flows & cumulative NPV -------------------------------- */
+    'npv': {
+      caption: 'Fig. F — Cash flows & cumulative NPV',
+      aria: 'Bar chart of the initial investment and periodic cash flows with a cumulative discounted value line crossing zero at break-even.',
+      defaults: { rate: 10, inv: 1000, flows: '500, 500, 500' },
+      use: function (v) {
+        var flows = parseFlowList(v.flows);
+        if (!num(v.rate) || !num(v.inv) || !flows) return null;
+        return { rate: v.rate, inv: v.inv, list: flows };
+      },
+      render: function (v) {
+        var bars = [-v.inv];
+        var r = v.rate / 100;
+        var cum = [-v.inv];
+        for (var t = 0; t < v.list.length; t++) {
+          bars.push(v.list[t]);
+          cum.push(cum[t] + v.list[t] / Math.pow(1 + r, t + 1));
+        }
+        var all = bars.concat(cum);
+        var ymax = Math.max.apply(null, all.concat([0])) * 1.15 || 1;
+        var ymin = Math.min.apply(null, all.concat([0])) * 1.15 || -1;
+
+        var n = bars.length;
+        function X(i2) { return FL + ((i2 + 0.5) / n) * PW; }
+        function Y(val) { return FT + ((ymax - val) / (ymax - ymin)) * PH; }
+        var bw = Math.min((PW / n) * 0.44, 34);
+        var y0 = Y(0);
+
+        var s = frame();
+        s += line(FL, y0, FL + PW, y0, 'var(--rule)');
+
+        for (var i3 = 0; i3 < n; i3++) {
+          var val = bars[i3];
+          var up = val >= 0;
+          var stroke = i3 === 0 || !up ? 'var(--bad)' : 'var(--accent)';
+          var fill = i3 === 0 || !up ? 'var(--bad-soft)' : 'var(--accent-soft)';
+          var yTop = up ? Y(val) : y0;
+          var hgt = Math.abs(Y(val) - y0);
+          s += '<rect x="' + fnum(X(i3) - bw / 2) + '" y="' + fnum(yTop) + '" width="' + fnum(bw) +
+            '" height="' + fnum(Math.max(hgt, 1)) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.25"/>';
+        }
+
+        var pts = [];
+        for (var i4 = 0; i4 < n; i4++) pts.push([X(i4), Y(cum[i4])]);
+        s += '<path d="' + poly(pts) + '" stroke="var(--accent)" stroke-width="2" fill="none"/>';
+        for (var i5 = 0; i5 < n; i5++) s += diamond(X(i5), Y(cum[i5]), 3.5, 'var(--accent)');
+
+        for (var i6 = 1; i6 < n; i6++) {
+          if (cum[i6 - 1] < 0 && cum[i6] >= 0) {
+            var f = -cum[i6 - 1] / (cum[i6] - cum[i6 - 1]);
+            var bx = X(i6 - 1) + f * (X(i6) - X(i6 - 1));
+            s += diamond(bx, y0, 5, 'var(--good)', 'var(--good-soft)');
+            s += txt(bx, y0 - 10, 'BREAK-EVEN', { anchor: 'middle', size: 8, fill: 'var(--good)' });
+            break;
+          }
+        }
+
+        var step = Math.ceil(n / 9);
+        for (var i7 = 0; i7 < n; i7 += step) {
+          s += txt(X(i7), FT + PH + 14, 'T' + i7, { anchor: 'middle', size: 8 });
+        }
+        var npvEnd = cum[cum.length - 1];
+        s += txt(FL + PW, FT + 10, 'NPV ' + nshort(npvEnd), { anchor: 'end', weight: 600, fill: npvEnd >= 0 ? 'var(--good)' : 'var(--bad)' });
+        return s;
+      }
+    }
+  };
+
+  function figureShell(card) {
+    var f = FIGS[card.id];
+    return '<figure class="fig">' +
+      '<div class="fig-svg"></div>' +
+      '<figcaption class="fig-cap mono">' +
+        '<span>' + f.caption + '</span>' +
+        '<span class="fig-state"></span>' +
+      '</figcaption></figure>';
+  }
+
+  function renderFig(card, el, v) {
+    var f = FIGS[card.id];
+    if (!f) return;
+    var box = el.querySelector('.fig-svg');
+    var state = el.querySelector('.fig-state');
+    if (!box) return;
+    var u = f.use(v || {});
+    var live = !!u;
+    if (!live) u = f.use(f.defaults);
+    if (!u) return;
+    box.innerHTML = svgWrap(f.render(u), f.aria);
+    if (state) {
+      state.textContent = live ? 'Live data' : 'Specimen data';
+      state.classList.toggle('live', live);
     }
   }
 
@@ -2134,12 +2708,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
       '<div class="formula" role="img" aria-label="Formula">' +
         card.formula.map(function (l) { return '<code>' + l + '</code>'; }).join('') +
       '</div>' +
+      (FIGS[card.id] ? figureShell(card) : '') +
       '<div class="io">' +
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
       '</div>';
 
     el.addEventListener('input', function () { computeCard(card, el); });
+    if (FIGS[card.id]) renderFig(card, el, null);
     return el;
   }
 
@@ -2177,21 +2753,28 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         verdictEl.hidden = true;
       }
     });
+    renderFig(card, el, v);
   }
 
   /* --------------------------------------------------------- sections */
   var totalCards = 0, totalOutputs = 0;
+  var totalCats = DATA.categories.length;
 
   DATA.categories.forEach(function (cat, i) {
     var section = document.createElement('section');
     section.className = 'category';
     section.id = 'cat-' + cat.id;
     section.setAttribute('aria-labelledby', 'cat-h-' + cat.id);
+    var numStr = String(i + 1).padStart(2, '0');
     section.innerHTML =
       '<header class="cat-head">' +
-        '<span class="cat-num">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<div><h2 id="cat-h-' + cat.id + '">' + cat.name + '</h2>' +
-        '<p class="cat-blurb">' + cat.blurb + '</p></div>' +
+        '<div class="cat-rule" aria-hidden="true">' +
+          '<span class="tick"></span><span class="line"></span>' +
+          '<span class="cat-num">' + numStr + ' / ' + String(totalCats).padStart(2, '0') + '</span>' +
+          '<span class="line"></span><span class="tick"></span>' +
+        '</div>' +
+        '<h2 id="cat-h-' + cat.id + '">' + cat.name + '</h2>' +
+        '<p class="cat-blurb">' + cat.blurb + '</p>' +
       '</header>';
 
     cat.cards.forEach(function (card) {
@@ -2204,7 +2787,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
     var link = document.createElement('a');
     link.href = '#cat-' + cat.id;
     link.dataset.cat = cat.id;
-    link.innerHTML = '<span class="nav-num">' + String(i + 1).padStart(2, '0') + '</span>' + cat.name;
+    link.innerHTML = '<span class="nav-num">' + numStr + '</span>' + cat.name;
     navEl.appendChild(link);
   });
 
@@ -2248,8 +2831,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
     }, { rootMargin: '-20% 0px -70% 0px' });
     document.querySelectorAll('.category').forEach(function (s) { observer.observe(s); });
   }
-})();
 
+  /* ------------------------------------------------------------ theme */
+  var themeBtn = document.getElementById('theme-toggle');
+  if (themeBtn) {
+    var isDark = function () { return document.documentElement.getAttribute('data-theme') === 'dark'; };
+    themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      themeBtn.setAttribute('aria-pressed', String(next === 'dark'));
+      try { localStorage.setItem('yz-theme', next); } catch (e) {}
+    });
+  }
+})();
   </script>
 </body>
 </html>
