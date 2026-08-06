@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yazeed Alotaibi · PM Tools &amp; Resources</title>
-  <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2.">
+  <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2. 33 calculators across 14 domains, all computed in your browser.">
+  <meta name="color-scheme" content="light dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,9 +14,12 @@
    Direction: the reprographic drawing. Light mode is a diazo whiteprint —
    dark lines on pale stock. Dark mode is the cyanotype it was printed from —
    pale lines on prussian. Structure comes from drafting conventions: title
-   blocks, sheet numbers, hairline rules, tabular figures. The one signature
-   element is the status rail, which plots a verdict on a three-position
-   track so meaning never depends on color alone. */
+   blocks, sheet numbers, registration ticks, hairline rules, tabular figures.
+   The one signature element is the status rail, which plots a verdict on a
+   three-position track so meaning never depends on color alone.
+
+   Written mobile-first: the base rules are the phone sheet, and each
+   min-width query adds column structure as the drawing gets wider. */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,6 +34,7 @@
   --ink-3:       #55636e;
   --rule:        #ccd6dd;
   --rule-2:      #a9b8c2;
+  --grid:        rgba(13, 34, 51, 0.045);
 
   --accent:      #0b5f96;
   --accent-soft: #dce9f2;
@@ -41,15 +46,19 @@
   --strip-ink:   #d5e6f2;
   --strip-grid:  rgba(150, 200, 235, 0.15);
 
-  --shadow: 0 12px 28px -22px rgba(13, 34, 51, 0.55);
+  --shadow:   0 12px 28px -22px rgba(13, 34, 51, 0.55);
+  --shadow-2: 0 22px 46px -30px rgba(13, 34, 51, 0.6);
 
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
-  --gutter: clamp(1.25rem, 4vw, 3.5rem);
-  --dur: 180ms;
-  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --gutter: clamp(1.1rem, 4vw, 3.5rem);
+
+  /* Motion is purposeful and short: a hairline reacting, never a flourish. */
+  --dur:   170ms;
+  --dur-2: 260ms;
+  --ease:  cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,6 +73,7 @@
     --ink-3:       #8ba3b1;
     --rule:        #1d4055;
     --rule-2:      #2c5670;
+    --grid:        rgba(150, 200, 235, 0.05);
 
     --accent:      #6cb8e8;
     --accent-soft: #14344a;
@@ -75,15 +85,21 @@
     --strip-ink:   #cfe3f0;
     --strip-grid:  rgba(108, 184, 232, 0.13);
 
-    --shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.8);
+    --shadow:   0 12px 28px -22px rgba(0, 0, 0, 0.8);
+    --shadow-2: 0 22px 46px -30px rgba(0, 0, 0, 0.9);
   }
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--body);
-  background: var(--ground);
+  background-color: var(--ground);
+  /* The sheet is drawn on gridded stock. 48px module, hairline weight. */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
   color: var(--ink);
   font-size: 16px;
   line-height: 1.6;
@@ -92,9 +108,10 @@ body {
 }
 
 a { color: inherit; }
+[hidden] { display: none !important; }
 
 .wrap {
-  max-width: 1120px;
+  max-width: 1140px;
   margin: 0 auto;
   padding-inline: var(--gutter);
 }
@@ -109,8 +126,39 @@ a { color: inherit; }
   color: var(--ink-3);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 20;
+  padding: 0.9rem 1.1rem;
+  background: var(--sheet);
+  border: 1px solid var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip:focus { left: 0.5rem; top: 0.5rem; }
+
+:where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ─── Title bar ──────────────────────────────────────────────────── */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   border-bottom: 1px solid var(--rule);
   background: var(--sheet);
 }
@@ -118,18 +166,20 @@ a { color: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding-block: 0.85rem;
+  gap: 0.75rem;
+  padding-block: 0.6rem;
 }
 .mark {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.65rem;
+  min-height: 44px;
   text-decoration: none;
 }
 .mark-glyph {
   display: grid;
   place-items: center;
+  flex: none;
   width: 2.1rem;
   height: 2.1rem;
   border: 1px solid var(--rule-2);
@@ -138,7 +188,9 @@ a { color: inherit; }
   font-weight: 600;
   color: var(--accent);
   background: var(--sheet-sunk);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
+.mark:hover .mark-glyph { border-color: var(--accent); background: var(--accent-soft); }
 .mark-name {
   font-family: var(--display);
   font-variation-settings: "wdth" 108;
@@ -149,67 +201,96 @@ a { color: inherit; }
 .mark-role {
   display: block;
   font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.14em;
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
-.topbar-nav { display: flex; gap: 0.5rem; }
+.topbar-nav { display: flex; gap: 0.4rem; }
 .topbar-nav a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 0.9rem;
+  padding: 0 0.85rem;
   border: 1px solid var(--rule-2);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-decoration: none;
   background: var(--sheet);
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
 }
 .topbar-nav a:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
 
-:where(a, button, input):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+/* ─── Section heads — the sheet numbering system ─────────────────── */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule-2);
+  margin-bottom: 1.5rem;
+}
+.section-head h2 {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 106;
+  font-size: clamp(1.35rem, 1.1rem + 1.2vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.section-head .sheet-no {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.section-sub {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--ink-2);
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────── */
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
-  gap: clamp(2rem, 5vw, 4rem);
+  gap: clamp(1.75rem, 5vw, 3.5rem);
   align-items: start;
-  padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+  padding-block: clamp(1.4rem, 5vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
 }
-.hero-eyebrow { margin-bottom: 1.25rem; }
+.hero-eyebrow { margin-bottom: 0.55rem; }
 .hero h1 {
   font-family: var(--display);
   font-variation-settings: "wdth" 112;
-  font-size: clamp(2.3rem, 1.2rem + 4.4vw, 4rem);
+  font-size: clamp(2.35rem, 1.15rem + 5.2vw, 4.4rem);
   font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  line-height: 1;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 .hero h1 span { color: var(--accent); }
 .hero-lede {
-  margin-top: 1.35rem;
-  max-width: 46ch;
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.12rem);
+  margin-top: 0.85rem;
+  max-width: 44ch;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.14rem);
   color: var(--ink-2);
+  text-wrap: pretty;
 }
 .creds {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 1.75rem;
+  margin-top: 0.85rem;
   list-style: none;
 }
 .cred-pill {
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   padding: 0.3rem 0.6rem;
@@ -217,12 +298,87 @@ a { color: inherit; }
   color: var(--ink-2);
 }
 
+/* Tool preview — the short manifest, right under the headline so the
+   shape of the site is visible before a single scroll. */
+.preview {
+  margin-top: 1.1rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.75rem;
+}
+/* Three abreast even on the narrowest phone — the manifest has to clear the
+   fold alongside the headline and the calculator, so it stays one band tall. */
+.preview-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  list-style: none;
+}
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  min-height: 44px;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease),
+              transform var(--dur) var(--ease);
+}
+a.preview-item:hover {
+  border-color: var(--accent);
+  background: var(--sheet-sunk);
+  transform: translateX(2px);
+}
+.preview-item.soon { border-style: dashed; background: transparent; }
+.preview-no {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: var(--accent);
+  flex: none;
+}
+.preview-item.soon .preview-no { color: var(--ink-3); }
+.preview-name {
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+/* The qualifier is a desktop luxury; on a phone the name carries it alone. */
+.preview-meta {
+  display: none;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
 /* ─── Instrument: the live earned-value readout ──────────────────── */
 .instrument {
+  position: relative;
   border: 1px solid var(--rule-2);
   background: var(--sheet);
   box-shadow: var(--shadow);
 }
+/* Registration ticks — the corner marks a reprographic sheet is aligned by. */
+.instrument::before,
+.instrument::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--accent);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.instrument::before { top: -1px;    left: -1px;  border-right: 0; border-bottom: 0; }
+.instrument::after  { bottom: -1px; right: -1px; border-left: 0;  border-top: 0; }
+
 .instrument-head {
   display: flex;
   align-items: baseline;
@@ -234,12 +390,13 @@ a { color: inherit; }
 .instrument-head strong {
   font-family: var(--display);
   font-variation-settings: "wdth" 100;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
 }
+.instrument-head .label { color: var(--accent); }
 
 .strip {
-  padding: 0.85rem 1rem;
+  padding: 0.8rem 1rem;
   background-color: var(--strip);
   background-image:
     linear-gradient(var(--strip-grid) 1px, transparent 1px),
@@ -250,16 +407,16 @@ a { color: inherit; }
 .strip code {
   display: block;
   font-family: var(--mono);
-  font-size: 0.8rem;
-  line-height: 1.9;
+  font-size: 0.78rem;
+  line-height: 1.85;
   color: var(--strip-ink);
   white-space: pre;
 }
 
 .instrument-fields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.7rem;
   padding: 1rem;
   border-bottom: 1px solid var(--rule);
 }
@@ -276,30 +433,32 @@ a { color: inherit; }
 .ifield input {
   width: 100%;
   min-height: 44px;
-  padding: 0.4rem 0.5rem;
+  padding: 0.4rem 0.55rem;
   font-family: var(--mono);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
   background: var(--sheet-sunk);
   border: 1px solid var(--rule-2);
   border-radius: 0;
-  transition: border-color var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
+/* Drop the spinner buttons: they steal width a six-figure budget needs, and a
+   nudge control has no place on a drafting sheet. Arrow keys still step. */
+.ifield input::-webkit-outer-spin-button,
+.ifield input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ifield input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .ifield input:hover { border-color: var(--ink-3); }
 .ifield input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
 
-.instrument-out {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
+.instrument-out { display: grid; grid-template-columns: minmax(0, 1fr); }
 .readout {
   padding: 0.9rem 1rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
-.readout + .readout { border-left: 1px solid var(--rule); }
+.readout + .readout { border-top: 1px solid var(--rule); }
 .r-name {
   font-family: var(--mono);
   font-size: 0.66rem;
@@ -310,11 +469,12 @@ a { color: inherit; }
 }
 .r-value {
   font-family: var(--mono);
-  font-size: 2rem;
+  font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.4rem);
   font-weight: 500;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
+  transition: color var(--dur-2) var(--ease);
 }
 .r-note {
   font-size: 0.76rem;
@@ -330,13 +490,100 @@ a { color: inherit; }
   gap: 3px;
   height: 4px;
 }
-.rail i { background: var(--rule); }
+.rail i { background: var(--rule); transition: background var(--dur-2) var(--ease); }
 .tone-bad  .rail i:nth-child(1) { background: var(--bad); }
 .tone-warn .rail i:nth-child(2) { background: var(--warn); }
 .tone-good .rail i:nth-child(3) { background: var(--good); }
 .tone-bad  .r-value { color: var(--bad); }
 .tone-warn .r-value { color: var(--warn); }
 .tone-good .r-value { color: var(--good); }
+
+/* Secondary figures — the same inputs read as currency variances. */
+.variances {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+.variance {
+  padding: 0.6rem 1rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.variance + .variance { border-left: 1px solid var(--rule); }
+.v-name {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.v-value {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.v-good { color: var(--good); }
+.v-bad  { color: var(--bad); }
+
+/* How to use — three drafting notes, always visible, never a wall of text. */
+.howto {
+  border-top: 1px solid var(--rule);
+  padding: 0.85rem 1rem 0.95rem;
+}
+.howto-steps {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+  list-style: none;
+  counter-reset: step;
+}
+.howto-steps li {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.55rem;
+  font-size: 0.79rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+  counter-increment: step;
+}
+.howto-steps li::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: var(--accent);
+  padding-top: 0.15rem;
+}
+.howto-steps b { color: var(--ink); font-weight: 600; }
+.howto-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--rule);
+}
+.key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+.key-tick {
+  display: grid;
+  grid-template-columns: repeat(3, 5px);
+  gap: 2px;
+}
+.key-tick i { height: 4px; background: var(--rule); }
+.key-bad  i:nth-child(1) { background: var(--bad); }
+.key-warn i:nth-child(2) { background: var(--warn); }
+.key-good i:nth-child(3) { background: var(--good); }
 
 .instrument-foot {
   padding: 0.7rem 1rem;
@@ -348,37 +595,28 @@ a { color: inherit; }
 .instrument-foot a { color: var(--accent); font-weight: 500; }
 
 /* ─── Tools ──────────────────────────────────────────────────────── */
-.tools { padding-bottom: clamp(3.5rem, 7vw, 6rem); }
-.section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--rule-2);
-  margin-bottom: 1.75rem;
-}
+.tools { padding-bottom: clamp(2.5rem, 6vw, 4rem); }
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
 }
 
 .tool-card {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  padding: 1.25rem;
+  padding: 1.15rem;
   background: var(--sheet);
   border: 1px solid var(--rule-2);
   color: inherit;
   text-decoration: none;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
-              transform var(--dur) var(--ease);
+  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+              transform var(--dur-2) var(--ease);
 }
-.tool-card:hover {
+a.tool-card:hover {
   border-color: var(--accent);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-2);
   transform: translateY(-2px);
 }
 .tool-card.soon {
@@ -399,7 +637,7 @@ a { color: inherit; }
 .card-title {
   font-family: var(--display);
   font-variation-settings: "wdth" 104;
-  font-size: 1.2rem;
+  font-size: 1.18rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -442,7 +680,192 @@ a { color: inherit; }
 }
 .tool-card.soon .card-action { color: var(--ink-3); }
 .card-action svg { transition: transform var(--dur) var(--ease); }
-.tool-card:hover .card-action svg { transform: translateX(4px); }
+a.tool-card:hover .card-action svg { transform: translateX(4px); }
+
+/* ─── Catalog — progressive disclosure over all 33 calculators ───── */
+.catalog { padding-bottom: clamp(3rem, 7vw, 5.5rem); }
+
+.disclose {
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+}
+.disclose > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 500;
+  transition: background var(--dur) var(--ease);
+}
+.disclose > summary::-webkit-details-marker { display: none; }
+.disclose > summary:hover { background: var(--sheet-sunk); }
+.disclose-chev {
+  flex: none;
+  transition: transform var(--dur-2) var(--ease);
+  color: var(--accent);
+}
+.disclose[open] .disclose-chev { transform: rotate(90deg); }
+.disclose-title { font-size: 0.95rem; line-height: 1.3; }
+.disclose-count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+}
+.disclose-body {
+  border-top: 1px solid var(--rule);
+  padding: 1rem;
+}
+.disclose[open] .disclose-body { animation: unfold var(--dur-2) var(--ease) both; }
+@keyframes unfold {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.finder { display: grid; gap: 0.8rem; }
+.search-field { position: relative; display: block; }
+.search-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.5rem 0.7rem 0.5rem 2.3rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule-2);
+  border-radius: 0;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.search-field input:hover { border-color: var(--ink-3); }
+.search-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.search-icon {
+  position: absolute;
+  left: 0.72rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  pointer-events: none;
+}
+
+.domain-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
+}
+.chip:hover { border-color: var(--ink-2); background: var(--sheet-sunk); }
+.chip[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 500;
+}
+
+.finder-status {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.cat-domain { margin-top: 1.4rem; }
+.cat-domain-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+.cat-domain-head h3 {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 102;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.cat-domain-no {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--accent);
+}
+.cat-domain-n {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.cat-list { display: grid; }
+.cat-item {
+  display: block;
+  padding: 0.7rem 0.1rem 0.75rem;
+  min-height: 44px;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--dur) var(--ease), padding-inline-start var(--dur) var(--ease);
+}
+.cat-item:hover {
+  background: var(--sheet-sunk);
+  padding-inline-start: 0.5rem;
+}
+.cat-item-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.cat-item-desc {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cat-item-metrics {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.cat-item-metrics b { color: var(--accent); font-weight: 500; }
+
+.cat-empty {
+  margin-top: 1.25rem;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--rule-2);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+}
+.cat-empty a { color: var(--accent); font-weight: 500; }
 
 /* ─── Title block footer ─────────────────────────────────────────── */
 .footer {
@@ -451,40 +874,76 @@ a { color: inherit; }
 }
 .footer-inner {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 .tb-cell {
-  padding: 1.1rem var(--gutter);
-  border-right: 1px solid var(--rule);
+  padding: 1rem var(--gutter);
+  border-bottom: 1px solid var(--rule);
 }
-.tb-cell:last-child { border-right: none; }
+.tb-cell:last-child { border-bottom: none; }
 .tb-cell p {
   margin-top: 0.3rem;
   font-size: 0.85rem;
   color: var(--ink-2);
 }
-.tb-cell a { color: var(--accent); font-weight: 500; text-decoration: none; }
-.tb-cell a:hover { text-decoration: underline; }
-
-/* ─── Responsive ─────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .hero { grid-template-columns: minmax(0, 1fr); }
+/* The title-block link stands on its own line, so it is a real tap target
+   rather than a word inside a sentence — give it the full 44px. */
+.tb-cell p a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
 }
-@media (max-width: 460px) {
-  .instrument-fields { grid-template-columns: minmax(0, 1fr); }
-  .instrument-out { grid-template-columns: minmax(0, 1fr); }
-  .readout + .readout { border-left: none; border-top: 1px solid var(--rule); }
-  .topbar-inner { flex-wrap: wrap; }
-  .tb-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+.tb-cell p a:hover { text-decoration: underline; }
+
+/* ─── Wider sheets ───────────────────────────────────────────────── */
+/* 24em ≈ 384px: from a standard phone up, the three base measures sit abreast
+   so the whole instrument — inputs and both indices — clears the fold. Narrower
+   handsets stack them instead: three legible fields beat three cramped ones. */
+@media (min-width: 24em) {
+  .instrument-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .instrument-out { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .readout + .readout { border-top: none; border-left: 1px solid var(--rule); }
+}
+
+@media (min-width: 48em) {
+  .tools-grid { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
+  .preview-item { gap: 0.25rem; padding: 0.7rem 0.8rem; }
+  .preview-name { font-size: 0.88rem; }
+  .preview-meta { display: block; }
+  .footer-inner { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+  .tb-cell { border-bottom: none; border-right: 1px solid var(--rule); padding-block: 1.1rem; }
+  .tb-cell:last-child { border-right: none; }
+  .disclose-body { padding: 1.25rem; }
+  .cat-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; }
+}
+
+@media (min-width: 64em) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: clamp(2.5rem, 4vw, 4rem);
+  }
+  .hero-col-b { grid-column: 2; grid-row: 1; position: sticky; top: 5rem; }
+  .cat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  a.tool-card:hover, a.preview-item:hover { transform: none; }
+  .cat-item:hover { padding-inline-start: 0.1rem; }
 }
   </style>
 </head>
 <body>
+
+  <a class="skip" href="#main">Skip to content</a>
 
   <header class="topbar">
     <div class="wrap topbar-inner">
@@ -502,76 +961,133 @@ a { color: inherit; }
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="wrap">
-      <section class="hero">
-        <div>
+      <section class="hero" aria-labelledby="hero-h">
+        <div class="hero-col-a">
           <p class="label hero-eyebrow">Tools &amp; resources for project managers</p>
-          <h1>Know what the <span>number</span> means.</h1>
+          <h1 id="hero-h">Know what the <span>number</span> means.</h1>
           <p class="hero-lede">
-            Every project decision has arithmetic under it — earned value, float,
-            expected monetary value, procurement, agile forecasting. These tools run
-            the arithmetic, then tell you how to read the answer.
+            Earned value, float, expected monetary value, procurement, agile forecasting.
+            These tools run the arithmetic, then tell you how to read the answer.
           </p>
           <ul class="creds">
             <li class="cred-pill">PMI-RMP</li>
             <li class="cred-pill">PRINCE2</li>
           </ul>
+
+          <!-- Short manifest: the whole site, three lines, before any scrolling. -->
+          <div class="preview">
+            <p class="label">On this sheet</p>
+            <ul class="preview-list">
+              <li>
+                <a class="preview-item" href="#catalog">
+                  <span class="preview-no">01</span>
+                  <span class="preview-name">Calculation Desk</span>
+                  <span class="preview-meta">33 calculators</span>
+                </a>
+              </li>
+              <li>
+                <a class="preview-item" href="wbs-estimation-toolkit.html">
+                  <span class="preview-no">02</span>
+                  <span class="preview-name">WBS Estimation Toolkit</span>
+                  <span class="preview-meta">Three-point PERT</span>
+                </a>
+              </li>
+              <li>
+                <span class="preview-item soon">
+                  <span class="preview-no">03</span>
+                  <span class="preview-name">Status Dashboard</span>
+                  <span class="preview-meta">In progress</span>
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- The hero is the product in miniature: a real calculator, running. -->
-        <figure class="instrument" id="evm">
-          <figcaption class="instrument-head">
-            <strong>Earned value, live</strong>
-            <span class="label">Try it</span>
-          </figcaption>
+        <div class="hero-col-b">
+          <figure class="instrument" id="evm">
+            <figcaption class="instrument-head">
+              <strong>Earned value, live</strong>
+              <span class="label">Try it</span>
+            </figcaption>
 
-          <div class="strip">
-            <code>CPI = EV ÷ AC</code>
-            <code>SPI = EV ÷ PV</code>
-          </div>
+            <div class="strip">
+              <code>CPI = EV ÷ AC    CV = EV − AC</code>
+              <code>SPI = EV ÷ PV    SV = EV − PV</code>
+            </div>
 
-          <div class="instrument-fields">
-            <div class="ifield">
-              <label for="ev">EV earned</label>
-              <input id="ev" type="number" step="any" inputmode="decimal" value="108000" autocomplete="off">
+            <div class="instrument-fields">
+              <div class="ifield">
+                <label for="ev">EV earned</label>
+                <input id="ev" type="number" step="any" inputmode="decimal" value="108000" autocomplete="off">
+              </div>
+              <div class="ifield">
+                <label for="ac">AC spent</label>
+                <input id="ac" type="number" step="any" inputmode="decimal" value="96000" autocomplete="off">
+              </div>
+              <div class="ifield">
+                <label for="pv">PV planned</label>
+                <input id="pv" type="number" step="any" inputmode="decimal" value="120000" autocomplete="off">
+              </div>
             </div>
-            <div class="ifield">
-              <label for="ac">AC spent</label>
-              <input id="ac" type="number" step="any" inputmode="decimal" value="96000" autocomplete="off">
-            </div>
-            <div class="ifield">
-              <label for="pv">PV planned</label>
-              <input id="pv" type="number" step="any" inputmode="decimal" value="120000" autocomplete="off">
-            </div>
-          </div>
 
-          <div class="instrument-out" aria-live="polite">
-            <div class="readout" id="out-cpi">
-              <span class="r-name">CPI · cost</span>
-              <span class="r-value">—</span>
-              <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="r-note">Enter a value above.</span>
+            <div class="instrument-out" aria-live="polite">
+              <div class="readout" id="out-cpi">
+                <span class="r-name">CPI · cost</span>
+                <span class="r-value">—</span>
+                <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="r-note">Enter a value above.</span>
+              </div>
+              <div class="readout" id="out-spi">
+                <span class="r-name">SPI · schedule</span>
+                <span class="r-value">—</span>
+                <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="r-note">Enter a value above.</span>
+              </div>
             </div>
-            <div class="readout" id="out-spi">
-              <span class="r-name">SPI · schedule</span>
-              <span class="r-value">—</span>
-              <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="r-note">Enter a value above.</span>
-            </div>
-          </div>
 
-          <p class="instrument-foot">
-            Two of 99 metrics on the
-            <a href="pm-calculation-desk.html">Calculation Desk</a>.
-          </p>
-        </figure>
+            <div class="variances">
+              <div class="variance">
+                <span class="v-name">CV · cost variance</span>
+                <span class="v-value" id="out-cv">—</span>
+              </div>
+              <div class="variance">
+                <span class="v-name">SV · schedule variance</span>
+                <span class="v-value" id="out-sv">—</span>
+              </div>
+            </div>
+
+            <div class="howto">
+              <p class="label">How to use it</p>
+              <ol class="howto-steps">
+                <li><b>EV</b> — budgeted cost of the work actually finished: % complete × total budget.</li>
+                <li><b>AC</b> — what that finished work really cost. <b>PV</b> — what you planned to have earned by today.</li>
+                <li>Read each index against <b>1.00</b>: at or above is favourable, below is not. The filled tick moves left as it worsens.</li>
+              </ol>
+              <div class="howto-key" aria-hidden="true">
+                <span class="key-item"><span class="key-tick key-bad"><i></i><i></i><i></i></span>Below 0.95</span>
+                <span class="key-item"><span class="key-tick key-warn"><i></i><i></i><i></i></span>0.95–1.00</span>
+                <span class="key-item"><span class="key-tick key-good"><i></i><i></i><i></i></span>1.00 and up</span>
+              </div>
+            </div>
+
+            <p class="instrument-foot">
+              Four of 99 metrics on the
+              <a href="pm-calculation-desk.html">Calculation Desk</a>.
+            </p>
+          </figure>
+        </div>
       </section>
 
-      <section class="tools">
+      <section class="tools" aria-labelledby="tools-h">
         <div class="section-head">
-          <h2 class="label">Tools</h2>
-          <span class="label">2 available · 2 in progress</span>
+          <div>
+            <h2 id="tools-h">Tools</h2>
+            <span class="section-sub">Two live, two on the drawing board.</span>
+          </div>
+          <span class="sheet-no">Sheet 02</span>
         </div>
 
         <div class="tools-grid">
@@ -609,36 +1125,10 @@ a { color: inherit; }
             </span>
           </a>
 
-          <div class="tool-card soon">
-            <div class="card-index">
-              <span class="label card-domain">Dashboards</span>
-              <span class="label">02</span>
-            </div>
-            <h3 class="card-title">Project Status Dashboard</h3>
-            <p class="card-desc">
-              Visual dashboard templates for tracking project health, milestones, budget,
-              and risk in one view.
-            </p>
-            <span class="card-action">Coming soon</span>
-          </div>
-
-          <div class="tool-card soon">
-            <div class="card-index">
-              <span class="label card-domain">AI tools</span>
-              <span class="label">03</span>
-            </div>
-            <h3 class="card-title">AI Scope Statement Generator</h3>
-            <p class="card-desc">
-              Describe your project in plain language and get a structured, PMI-aligned
-              scope statement draft.
-            </p>
-            <span class="card-action">Coming soon</span>
-          </div>
-
           <a class="tool-card" href="wbs-estimation-toolkit.html">
             <div class="card-index">
               <span class="label card-domain">Estimation</span>
-              <span class="label">04</span>
+              <span class="label">02</span>
             </div>
             <h3 class="card-title">WBS Estimation Toolkit</h3>
             <p class="card-desc">
@@ -668,7 +1158,84 @@ a { color: inherit; }
             </span>
           </a>
 
+          <div class="tool-card soon">
+            <div class="card-index">
+              <span class="label card-domain">Dashboards</span>
+              <span class="label">03</span>
+            </div>
+            <h3 class="card-title">Project Status Dashboard</h3>
+            <p class="card-desc">
+              Visual dashboard templates for tracking project health, milestones, budget,
+              and risk in one view.
+            </p>
+            <span class="card-action">Coming soon</span>
+          </div>
+
+          <div class="tool-card soon">
+            <div class="card-index">
+              <span class="label card-domain">AI tools</span>
+              <span class="label">04</span>
+            </div>
+            <h3 class="card-title">AI Scope Statement Generator</h3>
+            <p class="card-desc">
+              Describe your project in plain language and get a structured, PMI-aligned
+              scope statement draft.
+            </p>
+            <span class="card-action">Coming soon</span>
+          </div>
+
         </div>
+      </section>
+
+      <section class="catalog" id="catalog" aria-labelledby="catalog-h">
+        <div class="section-head">
+          <div>
+            <h2 id="catalog-h">Calculator index</h2>
+            <span class="section-sub">
+              Every calculator on the Calculation Desk, by project-management domain.
+            </span>
+          </div>
+          <span class="sheet-no">Sheet 03</span>
+        </div>
+
+        <!-- Progressive disclosure: the index is long, so it stays folded until
+             it is asked for. <details> keeps that keyboard-operable, and
+             operable without JavaScript, for free. -->
+        <details class="disclose" id="disclose">
+          <summary>
+            <svg class="disclose-chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="disclose-title">Browse the full index &amp; search by metric</span>
+            <span class="disclose-count" id="disclose-count">14 domains · 33 calculators · 99 metrics</span>
+          </summary>
+
+          <div class="disclose-body">
+            <div class="finder">
+              <label class="search-field" for="cat-search">
+                <span class="visually-hidden">Search calculators, domains and metric names</span>
+                <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M9.2 9.2L12.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+                <input id="cat-search" type="search" autocomplete="off"
+                       placeholder="Search: CPI, contingency, Cpk, velocity, payback…">
+              </label>
+
+              <div class="domain-filters" id="domain-filters" role="group" aria-label="Filter by domain"></div>
+
+              <p class="finder-status" id="finder-status" role="status" aria-live="polite"></p>
+            </div>
+
+            <div id="cat-results"></div>
+
+            <p class="cat-empty" id="cat-empty" hidden>
+              Nothing matches that. Try a metric name — <em>float</em>, <em>DPMO</em>,
+              <em>runway</em> — or
+              <a href="pm-calculation-desk.html">open the Calculation Desk</a> and browse.
+            </p>
+          </div>
+        </details>
       </section>
     </div>
   </main>
@@ -695,9 +1262,8 @@ a { color: inherit; }
   </footer>
 
   <script>
-/* Hero instrument. The same two indices the Calculation Desk opens with,
-   wired live so the homepage demonstrates the product rather than
-   describing it. */
+/* Hero instrument. The same indices the Calculation Desk opens with, wired
+   live so the homepage demonstrates the product rather than describing it. */
 (function () {
   'use strict';
 
@@ -711,12 +1277,26 @@ a { color: inherit; }
 
   function read(el) {
     var n = parseFloat(el.value);
-    return Number.isFinite(n) ? n : null;
+    return isFinite(n) ? n : null;
   }
 
   function pct(n) { return Math.round(Math.abs(n) * 100); }
 
+  /* Thousands separators without Intl — the page ships no locale assumptions. */
+  function money(n) {
+    var whole = Math.round(Math.abs(n)).toString();
+    var out = '';
+    var c = 0;
+    for (var i = whole.length - 1; i >= 0; i--) {
+      out = whole.charAt(i) + out;
+      c += 1;
+      if (c % 3 === 0 && i > 0) out = ',' + out;
+    }
+    return (n < 0 ? '−' : '+') + out;
+  }
+
   function cpiVerdict(cpi) {
+    if (cpi <= 0) return { tone: 'bad', text: 'No value earned against the money spent.' };
     if (cpi >= 1.05) return { tone: 'good', text: 'Under budget. Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
     if (cpi >= 1) return { tone: 'good', text: 'On budget. Spending is tracking the work delivered.' };
     if (cpi >= 0.95) return { tone: 'warn', text: 'Slightly over budget. Watch the trend before it compounds.' };
@@ -724,6 +1304,7 @@ a { color: inherit; }
   }
 
   function spiVerdict(spi) {
+    if (spi <= 0) return { tone: 'bad', text: 'No scheduled work has been earned yet.' };
     if (spi >= 1.05) return { tone: 'good', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
     if (spi >= 1) return { tone: 'good', text: 'On schedule. Work is landing when it was planned to.' };
     if (spi >= 0.95) return { tone: 'warn', text: 'Slipping. ' + pct(spi) + '% of the scheduled work is done.' };
@@ -732,31 +1313,345 @@ a { color: inherit; }
 
   function paint(id, value, verdict) {
     var el = document.getElementById(id);
-    el.classList.remove('tone-good', 'tone-warn', 'tone-bad');
     if (value === null) {
+      el.className = 'readout';
       el.querySelector('.r-value').textContent = '—';
       el.querySelector('.r-note').textContent = 'Enter a value above.';
       return;
     }
-    el.classList.add('tone-' + verdict.tone);
+    el.className = 'readout tone-' + verdict.tone;
     el.querySelector('.r-value').textContent = value.toFixed(2);
     el.querySelector('.r-note').textContent = verdict.text;
+  }
+
+  function paintVariance(id, value) {
+    var el = document.getElementById(id);
+    if (value === null) { el.className = 'v-value'; el.textContent = '—'; return; }
+    el.className = 'v-value ' + (value < 0 ? 'v-bad' : 'v-good');
+    el.textContent = money(value);
   }
 
   function update() {
     var ev = read(fields.ev), ac = read(fields.ac), pv = read(fields.pv);
 
-    var cpi = (ev !== null && ac) ? ev / ac : null;
-    var spi = (ev !== null && pv) ? ev / pv : null;
+    var cpi = (ev !== null && ac !== null && ac > 0) ? ev / ac : null;
+    var spi = (ev !== null && pv !== null && pv > 0) ? ev / pv : null;
 
     paint('out-cpi', cpi, cpi === null ? null : cpiVerdict(cpi));
     paint('out-spi', spi, spi === null ? null : spiVerdict(spi));
+
+    paintVariance('out-cv', (ev !== null && ac !== null) ? ev - ac : null);
+    paintVariance('out-sv', (ev !== null && pv !== null) ? ev - pv : null);
   }
 
-  Object.keys(fields).forEach(function (k) {
-    fields[k].addEventListener('input', update);
-  });
+  var keys = ['ev', 'ac', 'pv'];
+  for (var i = 0; i < keys.length; i++) {
+    fields[keys[i]].addEventListener('input', update);
+  }
   update();
+})();
+
+/* Calculator index. Mirrors the Calculation Desk's taxonomy — 14 domains,
+   33 calculators, 99 metrics — so a visitor can find the right sheet by the
+   name of the number they are chasing, then land on that domain directly. */
+(function () {
+  'use strict';
+
+  var DOMAINS = [
+    { id: 'evm', name: 'Earned Value Management', items: [
+      { t: 'Earned value core & forecasting', d: 'CV · SV · CPI · SPI · EAC · ETC · VAC · TCPI',
+        m: ['Cost Variance (CV)', 'Schedule Variance (SV)', 'Cost Performance Index (CPI)',
+            'Schedule Performance Index (SPI)', 'Cost–Schedule Index (CSI)', '% Complete', '% Spent',
+            'EAC — typical variance', 'EAC — atypical variance', 'EAC — cost & schedule',
+            'ETC — Estimate to Complete', 'VAC — Variance at Completion',
+            'TCPI — to hit BAC', 'TCPI — to hit EAC'] },
+      { t: 'Time forecasting (SPI-based)', d: 'Planned duration ÷ SPI',
+        m: ['SPI', 'Forecast duration', 'Projected slip'] }
+    ] },
+    { id: 'burn', name: 'Budget & Burn Rate', items: [
+      { t: 'Burn rate & runway', d: 'Spend pace · runway · budget used',
+        m: ['Burn rate', 'Budget remaining', 'Runway (periods)', '% of budget used'] }
+    ] },
+    { id: 'estimation', name: 'Estimation', items: [
+      { t: 'Three-point estimate (PERT)', d: 'Triangular · Beta · σ · confidence ranges',
+        m: ['Triangular average', 'PERT (beta) estimate', 'Standard deviation (σ)', 'Variance (σ²)',
+            '68% confidence (±1σ)', '95% confidence (±2σ)', '99.7% confidence (±3σ)'] },
+      { t: 'Path uncertainty roll-up', d: 'σ(path) = √(Σ σ²)',
+        m: ['Path σ', 'Naive sum of σ’s'] },
+      { t: 'Learning curve', d: 'T(n) = T₁ × n^(log rate ÷ log 2)',
+        m: ['Time for unit n', 'Improvement vs unit 1'] }
+    ] },
+    { id: 'schedule', name: 'Schedule & Critical Path', items: [
+      { t: 'Float (slack)', d: 'Total float · free float · critical path test',
+        m: ['Total float', 'Cross-check (LF − EF)', 'Free float'] }
+    ] },
+    { id: 'compression', name: 'Schedule Compression', items: [
+      { t: 'Crash cost slope', d: '(Crash cost − Normal cost) ÷ time saved',
+        m: ['Cost slope', 'Maximum time saved', 'Full crash premium'] }
+    ] },
+    { id: 'resources', name: 'Resources & Team', items: [
+      { t: 'Full-time equivalents (FTE)', d: 'Effort ÷ capacity',
+        m: ['FTE required', 'Headcount (rounded up)'] },
+      { t: 'Utilization', d: 'Allocated ÷ available',
+        m: ['Utilization', 'Uncommitted hours'] },
+      { t: 'Loaded labor cost', d: 'Rate × (1 + overhead)',
+        m: ['Base cost', 'Loaded cost', 'Loaded hourly rate'] }
+    ] },
+    { id: 'comms', name: 'Communication', items: [
+      { t: 'Communication channels', d: 'n(n−1) ÷ 2',
+        m: ['Channels now', 'Channels after change', 'Channels added'] }
+    ] },
+    { id: 'risk', name: 'Risk', items: [
+      { t: 'Expected Monetary Value (EMV)', d: 'Probability × impact',
+        m: ['Expected Monetary Value', 'Impact if it happens'] },
+      { t: 'Qualitative risk score', d: 'Probability × impact, on a 1–5 scale',
+        m: ['Risk score'] },
+      { t: 'Contingency reserve roll-up', d: 'Σ EMV across the risk register',
+        m: ['Net EMV of the register', 'Suggested contingency reserve'] }
+    ] },
+    { id: 'decision', name: 'Decision Analysis', items: [
+      { t: 'Decision tree — compare two options', d: 'EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)',
+        m: ['EMV — Option A', 'EMV — Option B', 'Better option'] }
+    ] },
+    { id: 'quality', name: 'Quality & Six Sigma', items: [
+      { t: 'DPMO & sigma level', d: 'Defects per million opportunities',
+        m: ['DPMO', 'Process yield', 'Sigma level'] },
+      { t: 'Control limits (±3σ)', d: 'UCL · LCL · warning zone',
+        m: ['Upper control limit', 'Lower control limit', 'Warning zone (±2σ)'] },
+      { t: 'Process capability (Cp / Cpk)', d: 'Can the process meet the spec?',
+        m: ['Cp — potential capability', 'Cpk — actual capability'] },
+      { t: 'Cost of Quality (CoQ)', d: 'Conformance vs failure spend',
+        m: ['Cost of conformance', 'Cost of non-conformance', 'Total cost of quality',
+            'Failure share of CoQ'] }
+    ] },
+    { id: 'financial', name: 'Project Selection & Finance', items: [
+      { t: 'Return on Investment (ROI)', d: '(Benefit − Cost) ÷ Cost',
+        m: ['ROI', 'Net benefit'] },
+      { t: 'NPV · IRR · Payback', d: 'Discounted cash-flow appraisal',
+        m: ['Net Present Value', 'Internal Rate of Return', 'Benefit–Cost Ratio', 'Payback period'] },
+      { t: 'Present & Future Value', d: 'FV = PV(1 + r)ⁿ',
+        m: ['Future value', 'Present value', 'Doubling time (Rule of 72)'] },
+      { t: 'Break-even point', d: 'Fixed costs ÷ contribution margin',
+        m: ['Break-even units', 'Break-even revenue', 'Contribution margin / unit'] },
+      { t: 'Straight-line depreciation', d: '(Cost − Salvage) ÷ Useful life',
+        m: ['Depreciation per year', 'Depreciation rate'] },
+      { t: 'Weighted scoring model', d: 'Σ (weight × score)',
+        m: ['Weighted score', 'Raw weighted total'] }
+    ] },
+    { id: 'procurement', name: 'Procurement & Contracts', items: [
+      { t: 'Point of Total Assumption (PTA)', d: 'Where the seller starts paying for overruns',
+        m: ['Point of Total Assumption', 'Overrun absorbed before PTA'] },
+      { t: 'FPIF final fee & price', d: 'Settling an incentive contract',
+        m: ['Final fee', 'Final price (buyer pays)'] },
+      { t: 'CPIF final fee & price', d: 'Cost-plus with a bounded incentive',
+        m: ['Final fee', 'Final price (buyer pays)'] }
+    ] },
+    { id: 'agile', name: 'Agile Forecasting', items: [
+      { t: 'Velocity & release forecast', d: 'Backlog ÷ velocity',
+        m: ['Velocity', 'Sprints remaining', 'Calendar time remaining'] },
+      { t: 'Sprint capacity', d: 'People × days × hours × focus',
+        m: ['Raw hours', 'Plannable capacity (hours)'] },
+      { t: 'Say/do ratio', d: 'Delivered ÷ committed',
+        m: ['Say/do ratio', 'Commitment gap (points)'] }
+    ] },
+    { id: 'flow', name: 'Lean & Flow', items: [
+      { t: 'Little’s Law & flow efficiency', d: 'Cycle time = WIP ÷ throughput',
+        m: ['Average cycle time', 'Flow efficiency'] }
+    ] }
+  ];
+
+  var DESK = 'pm-calculation-desk.html';
+  var METRICS_SHOWN = 3;
+
+  var resultsEl = document.getElementById('cat-results');
+  var filtersEl = document.getElementById('domain-filters');
+  var searchEl = document.getElementById('cat-search');
+  var statusEl = document.getElementById('finder-status');
+  var emptyEl = document.getElementById('cat-empty');
+  var countEl = document.getElementById('disclose-count');
+  var discloseEl = document.getElementById('disclose');
+  if (!resultsEl || !filtersEl || !searchEl) return;
+
+  var activeDomain = 'all';
+  var totalItems = 0;
+  var totalMetrics = 0;
+  var rendered = [];
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  /* ------------------------------------------------------------- build */
+  for (var di = 0; di < DOMAINS.length; di++) {
+    var domain = DOMAINS[di];
+
+    var section = el('section', 'cat-domain');
+    var head = el('div', 'cat-domain-head');
+    head.appendChild(el('span', 'cat-domain-no', pad(di + 1)));
+
+    var h3 = el('h3', null, domain.name);
+    h3.id = 'cat-h-' + domain.id;
+    head.appendChild(h3);
+    section.setAttribute('aria-labelledby', h3.id);
+
+    var domainMetrics = 0;
+    var j;
+    for (j = 0; j < domain.items.length; j++) domainMetrics += domain.items[j].m.length;
+    head.appendChild(el('span', 'cat-domain-n',
+      domain.items.length + (domain.items.length === 1 ? ' calculator · ' : ' calculators · ') +
+      domainMetrics + ' metrics'));
+    section.appendChild(head);
+
+    var list = el('div', 'cat-list');
+    var entries = [];
+
+    for (j = 0; j < domain.items.length; j++) {
+      var item = domain.items[j];
+
+      var link = el('a', 'cat-item');
+      link.href = DESK + '#cat-' + domain.id;
+      link.appendChild(el('span', 'cat-item-title', item.t));
+      link.appendChild(el('span', 'cat-item-desc', item.d));
+
+      var metricsNode = el('span', 'cat-item-metrics');
+      link.appendChild(metricsNode);
+      list.appendChild(link);
+
+      entries.push({
+        node: link,
+        metricsNode: metricsNode,
+        metrics: item.m,
+        /* One lowercase blob per calculator: title, domain, description and
+           every metric name it produces. Search reads this and nothing else. */
+        blob: (item.t + ' ' + domain.name + ' ' + item.d + ' ' + item.m.join(' ')).toLowerCase()
+      });
+
+      totalItems += 1;
+      totalMetrics += item.m.length;
+    }
+
+    section.appendChild(list);
+    resultsEl.appendChild(section);
+    rendered.push({ id: domain.id, section: section, entries: entries });
+  }
+
+  if (countEl) {
+    countEl.textContent = DOMAINS.length + ' domains · ' + totalItems +
+      ' calculators · ' + totalMetrics + ' metrics';
+  }
+
+  /* ----------------------------------------------------------- filters */
+  function makeChip(id, text) {
+    var b = el('button', 'chip', text);
+    b.type = 'button';
+    b.setAttribute('data-domain', id);
+    b.setAttribute('aria-pressed', id === activeDomain ? 'true' : 'false');
+    b.addEventListener('click', function () {
+      var picked = b.getAttribute('data-domain');
+      /* Pressing the active domain again clears it — the chip is a toggle. */
+      activeDomain = (activeDomain === picked && picked !== 'all') ? 'all' : picked;
+      var chips = filtersEl.querySelectorAll('.chip');
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].setAttribute('aria-pressed',
+          chips[i].getAttribute('data-domain') === activeDomain ? 'true' : 'false');
+      }
+      apply();
+    });
+    return b;
+  }
+
+  filtersEl.appendChild(makeChip('all', 'All domains'));
+  for (var k = 0; k < DOMAINS.length; k++) {
+    filtersEl.appendChild(makeChip(DOMAINS[k].id, DOMAINS[k].name));
+  }
+
+  /* ------------------------------------------------------------ search */
+  /* Show the metrics that matched the query; with no query, show the first
+     few so the depth behind each calculator is visible at rest. */
+  function showMetrics(entry, query) {
+    var matched = [];
+    var i;
+    if (query) {
+      for (i = 0; i < entry.metrics.length; i++) {
+        if (entry.metrics[i].toLowerCase().indexOf(query) !== -1) matched.push(entry.metrics[i]);
+      }
+    }
+    var isMatch = matched.length > 0;
+    var pool = isMatch ? matched : entry.metrics;
+    var shown = Math.min(pool.length, METRICS_SHOWN);
+
+    entry.metricsNode.textContent = '';
+    for (i = 0; i < shown; i++) {
+      entry.metricsNode.appendChild(el(isMatch ? 'b' : 'span', null, pool[i]));
+      if (i < shown - 1) entry.metricsNode.appendChild(document.createTextNode(' · '));
+    }
+    var remaining = pool.length - shown;
+    if (remaining > 0) {
+      entry.metricsNode.appendChild(document.createTextNode(' + ' + remaining + ' more'));
+    }
+  }
+
+  function apply() {
+    var raw = searchEl.value.replace(/^\s+|\s+$/g, '');
+    var query = raw.toLowerCase();
+    var visible = 0;
+
+    for (var i = 0; i < rendered.length; i++) {
+      var domain = rendered[i];
+      var inDomain = activeDomain === 'all' || activeDomain === domain.id;
+      var shownHere = 0;
+
+      for (var j = 0; j < domain.entries.length; j++) {
+        var entry = domain.entries[j];
+        var show = inDomain && (!query || entry.blob.indexOf(query) !== -1);
+        entry.node.hidden = !show;
+        if (show) { shownHere += 1; showMetrics(entry, query); }
+      }
+
+      domain.section.hidden = shownHere === 0;
+      visible += shownHere;
+    }
+
+    if (emptyEl) emptyEl.hidden = visible !== 0;
+
+    if (statusEl) {
+      if (!query && activeDomain === 'all') {
+        statusEl.textContent = 'Showing all ' + totalItems + ' calculators';
+      } else {
+        statusEl.textContent = visible + (visible === 1 ? ' calculator' : ' calculators') +
+          ' matching' + (query ? ' “' + raw + '”' : '') +
+          (activeDomain === 'all' ? '' : ' in this domain');
+      }
+    }
+  }
+
+  searchEl.addEventListener('input', apply);
+  searchEl.addEventListener('search', apply);
+
+  if (discloseEl) {
+    /* Opening the index puts the caret where a visitor is about to type — but
+       only on a pointer-sized screen, so a phone keyboard never ambushes them. */
+    discloseEl.addEventListener('toggle', function () {
+      if (discloseEl.open && window.matchMedia &&
+          window.matchMedia('(min-width: 64em)').matches) {
+        searchEl.focus();
+      }
+    });
+
+    /* A link to #catalog should reveal the index, not scroll to a shut fold. */
+    var openFromHash = function () {
+      if (window.location.hash === '#catalog') discloseEl.open = true;
+    };
+    window.addEventListener('hashchange', openFromHash);
+    openFromHash();
+  }
+
+  apply();
 })();
   </script>
 
