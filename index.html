@@ -540,6 +540,10 @@ a.preview-item:hover {
   list-style: none;
   counter-reset: step;
 }
+/* Two columns: the counter, then the note. Every li must keep its prose inside
+   one .howto-text wrapper — a grid container turns each loose run of text into
+   its own anonymous item, which would drop the sentence into the 1.4rem
+   counter column and stack it one word wide. */
 .howto-steps li {
   display: grid;
   grid-template-columns: 1.4rem minmax(0, 1fr);
@@ -557,6 +561,7 @@ a.preview-item:hover {
   color: var(--accent);
   padding-top: 0.15rem;
 }
+.howto-text { grid-column: 2; }
 .howto-steps b { color: var(--ink); font-weight: 600; }
 .howto-key {
   display: flex;
@@ -1062,9 +1067,9 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
             <div class="howto">
               <p class="label">How to use it</p>
               <ol class="howto-steps">
-                <li><b>EV</b> — budgeted cost of the work actually finished: % complete × total budget.</li>
-                <li><b>AC</b> — what that finished work really cost. <b>PV</b> — what you planned to have earned by today.</li>
-                <li>Read each index against <b>1.00</b>: at or above is favourable, below is not. The filled tick moves left as it worsens.</li>
+                <li><span class="howto-text"><b>EV</b> — budgeted cost of the work actually finished: % complete × total budget.</span></li>
+                <li><span class="howto-text"><b>AC</b> — what that finished work really cost. <b>PV</b> — what you planned to have earned by today.</span></li>
+                <li><span class="howto-text">Read each index against <b>1.00</b>: at or above is favourable, below is not. The filled tick moves left as it worsens.</span></li>
               </ol>
               <div class="howto-key" aria-hidden="true">
                 <span class="key-item"><span class="key-tick key-bad"><i></i><i></i><i></i></span>Below 0.95</span>
