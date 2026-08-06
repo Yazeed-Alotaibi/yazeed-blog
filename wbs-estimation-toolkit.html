@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WBS Estimation Toolkit · Yazeed Alotaibi</title>
+  <meta name="description" content="Build a work breakdown structure, apply three-point PERT estimates, and roll up confidence intervals for duration and cost. Runs entirely in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+/* yazeed.blog — WBS estimation toolkit.
+   Same whiteprint sheet as the rest of the site. The one signature element
+   here is the dimension line: an estimate is a range, so it is drawn as a
+   range — extent ticks at ΣO and ΣP, the confidence band filled inside, and
+   the expected value marked where it actually falls. Where E sits inside the
+   envelope is the reading a single number throws away. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  color-scheme: light;
+
+  --ground:      #e7ecef;
+  --sheet:       #fbfcfd;
+  --sheet-sunk:  #f1f4f6;
+  --ink:         #0d2233;
+  --ink-2:       #4a5c69;
+  --ink-3:       #55636e;
+  --rule:        #ccd6dd;
+  --rule-2:      #a9b8c2;
+
+  --accent:      #0b5f96;
+  --accent-soft: #dce9f2;
+  --good:        #0f6b46;
+  --warn:        #8a5a06;
+  --bad:         #a8322f;
+
+  --band:        #b7d3e8;
+
+  --strip:       #0d2233;
+  --strip-ink:   #d5e6f2;
+  --strip-grid:  rgba(150, 200, 235, 0.15);
+
+  --shadow: 0 12px 28px -22px rgba(13, 34, 51, 0.55);
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --ground:      #0b2333;
+    --sheet:       #102c3e;
+    --sheet-sunk:  #0c2536;
+    --ink:         #e6eef3;
+    --ink-2:       #a8bcc8;
+    --ink-3:       #8ba3b1;
+    --rule:        #1d4055;
+    --rule-2:      #2c5670;
+
+    --accent:      #6cb8e8;
+    --accent-soft: #14344a;
+    --good:        #5cc79a;
+    --warn:        #e0b45c;
+    --bad:         #f0908a;
+
+    --band:        #2b5f83;
+
+    --strip:       #071a26;
+    --strip-ink:   #cfe3f0;
+    --strip-grid:  rgba(108, 184, 232, 0.13);
+
+    --shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.8);
+  }
+}
+
+body {
+  font-family: var(--body);
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:where(a, button, input, select):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ─── Title bar ──────────────────────────────────────────────────── */
+.topbar {
+  border-bottom: 1px solid var(--rule);
+  background: var(--sheet);
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.85rem;
+}
+.mark { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+.mark-glyph {
+  display: grid;
+  place-items: center;
+  width: 2.1rem; height: 2.1rem;
+  border: 1px solid var(--rule-2);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--sheet-sunk);
+}
+.mark-name {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 108;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.mark-role {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.topbar-nav { display: flex; gap: 0.5rem; }
+.topbar-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--rule-2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--sheet);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.topbar-nav a:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
+
+/* ─── Hero ───────────────────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem);
+}
+.hero h1 {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 112;
+  font-size: clamp(2.1rem, 1.2rem + 3.8vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-eyebrow { margin-bottom: 1.1rem; }
+.hero-lede {
+  margin-top: 1.3rem;
+  max-width: 48ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+  color: var(--ink-2);
+}
+
+/* ─── Instrument: project totals ─────────────────────────────────── */
+.instrument {
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+}
+.instrument-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.instrument-head strong {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 100;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.strip {
+  padding: 0.85rem 1rem;
+  background-color: var(--strip);
+  background-image:
+    linear-gradient(var(--strip-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  overflow-x: auto;
+}
+.strip code {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--strip-ink);
+  white-space: pre;
+}
+
+.total { padding: 1rem; border-bottom: 1px solid var(--rule); }
+.total + .total { border-bottom: 1px solid var(--rule); }
+.total-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.t-name {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.t-value {
+  font-family: var(--mono);
+  font-size: 1.9rem;
+  font-weight: 500;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.t-unit { font-size: 0.9rem; color: var(--ink-3); margin-left: 0.3rem; }
+.t-range {
+  margin-top: 0.15rem;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+/* ─── Signature: the dimension line ──────────────────────────────── */
+/* Extent ticks at ΣO and ΣP, the confidence band filled between, and a
+   strong marker at E. E's position inside the envelope is the reading:
+   left of centre is an optimistic skew, right is pessimistic. */
+.dim {
+  --lo: 0%; --hi: 100%; --e: 50%;
+  position: relative;
+  height: 26px;
+  margin-top: 0.9rem;
+}
+.dim-axis {
+  position: absolute;
+  top: 11px; left: 0; right: 0;
+  height: 1px;
+  background: var(--rule-2);
+}
+.dim-axis::before, .dim-axis::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 1px; height: 9px;
+  background: var(--rule-2);
+}
+.dim-axis::before { left: 0; }
+.dim-axis::after  { right: 0; }
+
+.dim-band {
+  position: absolute;
+  top: 7px;
+  left: var(--lo);
+  width: max(2px, calc(var(--hi) - var(--lo)));
+  height: 9px;
+  background: var(--band);
+}
+.dim-e {
+  position: absolute;
+  top: 3px;
+  left: var(--e);
+  width: 2px; height: 17px;
+  margin-left: -1px;
+  background: var(--accent);
+}
+.dim-scale {
+  position: absolute;
+  top: 20px; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.dim.is-empty .dim-band, .dim.is-empty .dim-e { display: none; }
+
+/* Confidence selector */
+.conf {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+.conf-set { display: flex; }
+.conf-set button {
+  min-height: 34px;
+  padding: 0 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.conf-set button + button { border-left: none; }
+.conf-set button:hover { background: var(--sheet-sunk); }
+.conf-set button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--sheet);
+}
+
+.instrument-foot {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.74rem;
+  color: var(--ink-3);
+}
+#warn { color: var(--bad); }
+
+/* ─── The sheet ──────────────────────────────────────────────────── */
+.sheet-section { padding-bottom: clamp(3rem, 6vw, 5rem); }
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule-2);
+  margin-bottom: 1.5rem;
+}
+
+.deliverable {
+  border: 1px solid var(--rule-2);
+  background: var(--sheet);
+  margin-bottom: 1rem;
+}
+.d-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+.d-code {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 1.6rem;
+}
+.d-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--display);
+  font-variation-settings: "wdth" 104;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.25rem 0.4rem;
+  min-height: 34px;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.d-name:hover { border-color: var(--rule-2); background: var(--sheet); }
+.d-name:focus { outline: none; border-color: var(--accent); background: var(--sheet); }
+
+/* Column headers — only meaningful in the wide layout. */
+.cols {
+  display: grid;
+  grid-template-columns: 3rem minmax(6rem, 1fr) repeat(3, 4.2rem) repeat(3, 5rem) 8.5rem 2.4rem;
+  gap: 0.35rem;
+  align-items: end;
+  padding: 0.6rem 0.9rem 0.45rem;
+  border-bottom: 1px solid var(--rule);
+}
+.cols span {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.cols .grp {
+  grid-column: span 3;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.task {
+  display: grid;
+  grid-template-columns: 3rem minmax(6rem, 1fr) repeat(3, 4.2rem) repeat(3, 5rem) 8.5rem 2.4rem;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+.task:last-of-type { border-bottom: none; }
+.t-code {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.task input, .cell input {
+  width: 100%;
+  min-height: 38px;
+  padding: 0.3rem 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  transition: border-color var(--dur) var(--ease);
+}
+.task input[type="text"] {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  text-align: left;
+}
+.task input:hover { border-color: var(--rule-2); }
+.task input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+.t-out {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  line-height: 1.35;
+  text-align: right;
+}
+.t-out b { display: block; font-weight: 500; color: var(--ink); }
+.t-out span { font-size: 0.72rem; color: var(--ink-3); }
+
+.task.invalid { background: color-mix(in srgb, var(--bad) 7%, transparent); }
+.task.invalid .t-out b { color: var(--bad); }
+.t-flag {
+  grid-column: 1 / -1;
+  display: none;
+  font-size: 0.74rem;
+  color: var(--bad);
+  padding: 0 0 0.35rem 3.35rem;
+}
+.task.invalid .t-flag { display: block; }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 38px;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 1rem;
+  line-height: 1;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.icon-btn:hover { color: var(--bad); border-color: var(--rule-2); }
+/* In the deliverable header the button is a flex item, so it must not claim
+   the row's free space the way it does inside the task grid. */
+.d-head .icon-btn { flex: none; width: 2.4rem; }
+
+.d-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0.9rem;
+  border-top: 1px solid var(--rule-2);
+  background: var(--sheet-sunk);
+}
+.d-sub { flex: 1 1 20rem; min-width: 0; }
+.d-sub-line {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.d-sub-line b { font-weight: 500; color: var(--ink); }
+
+/* ─── Buttons ────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
+.btn-quiet {
+  min-height: 38px;
+  padding: 0 0.8rem;
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: transparent;
+  border-style: dashed;
+}
+.btn-quiet:hover { background: var(--sheet); border-style: solid; }
+.btn-danger:hover { color: var(--bad); border-color: var(--bad); }
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+.actions .spacer { flex: 1 1 auto; }
+
+.assumption {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--rule-2);
+  font-size: 0.82rem;
+  color: var(--ink-2);
+}
+
+/* ─── Title block footer ─────────────────────────────────────────── */
+.footer { border-top: 1px solid var(--rule-2); background: var(--sheet); }
+.footer-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.tb-cell { padding: 1.1rem var(--gutter); border-right: 1px solid var(--rule); }
+.tb-cell:last-child { border-right: none; }
+.tb-cell p { margin-top: 0.3rem; font-size: 0.85rem; color: var(--ink-2); }
+.tb-cell a { color: var(--accent); font-weight: 500; text-decoration: none; }
+.tb-cell a:hover { text-decoration: underline; }
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1040px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .instrument { max-width: 34rem; }
+}
+
+/* The group captions belong to the stacked layout only — the wide schedule
+   carries them in its column headers instead. */
+.grp-lab { display: none; }
+
+/* Below this the twelve-column schedule stops being readable, so each task
+   reflows into a stack: identity, then name, then each triplet under its own
+   caption. Three columns throughout, so O / M / P always line up. */
+@media (max-width: 840px) {
+  .cols { display: none; }
+  .task {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem 0.5rem;
+    padding: 1rem 0.9rem;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .t-code { grid-column: 1 / 3; grid-row: 1; align-self: center; font-size: 0.8rem; }
+  .task .icon-btn { grid-column: 3; grid-row: 1; justify-self: end; width: auto; padding: 0 0.7rem; }
+  .task .t-name-cell { grid-column: 1 / -1; }
+
+  .grp-lab {
+    display: block;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .grp-lab::before { content: attr(data-g); }
+
+  .task .cell::before {
+    content: attr(data-lab);
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    margin-bottom: 0.2rem;
+  }
+  .t-out {
+    grid-column: 1 / -1;
+    text-align: left;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+  }
+  .t-out b { display: inline; }
+  .t-out span { margin-left: 0.35rem; margin-right: 0.9rem; }
+  .t-flag { padding-left: 0; }
+}
+
+@media (max-width: 460px) {
+  .topbar-inner { flex-wrap: wrap; }
+  .tb-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ─── Print: render the sheet as a schedule ──────────────────────── */
+@media print {
+  :root {
+    --ground: #fff; --sheet: #fff; --sheet-sunk: #fff;
+    --ink: #000; --ink-2: #333; --ink-3: #555;
+    --rule: #bbb; --rule-2: #888; --accent: #000; --band: #ccc;
+  }
+  body { background: #fff; font-size: 11pt; }
+  .topbar-nav, .actions, .conf, .icon-btn, .btn, .strip { display: none !important; }
+  .instrument { box-shadow: none; }
+  .hero { padding-block: 0 1rem; grid-template-columns: minmax(0, 1fr); }
+  .hero-lede { display: none; }
+  .cols { display: grid; }
+  .task { grid-template-columns: 3rem minmax(6rem, 1fr) repeat(3, 4.2rem) repeat(3, 5rem) 8.5rem; page-break-inside: avoid; }
+  .task input, .d-name {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    min-height: 0;
+  }
+  .deliverable { page-break-inside: avoid; border-color: #888; }
+  .footer { border-top: 1px solid #888; }
+}
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="/" class="mark">
+        <span class="mark-glyph" aria-hidden="true">YA</span>
+        <span>
+          <span class="mark-name">Yazeed Alotaibi</span>
+          <span class="mark-role">Project management</span>
+        </span>
+      </a>
+      <nav class="topbar-nav" aria-label="Site">
+        <a href="index.html">All tools</a>
+        <a href="pm-calculation-desk.html">Calculation Desk</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <section class="hero">
+        <div>
+          <p class="label hero-eyebrow">Estimation · three-point PERT</p>
+          <h1>An estimate is a <em>range</em>, not a number.</h1>
+          <p class="hero-lede">
+            Break the work down, give each task an optimistic, likely, and
+            pessimistic figure, and this rolls the whole thing up — expected
+            duration and cost, with the confidence interval around them.
+            Deviations combine in quadrature, which is the part most
+            spreadsheets get wrong.
+          </p>
+        </div>
+
+        <figure class="instrument">
+          <figcaption class="instrument-head">
+            <strong>Project total</strong>
+            <span class="label" id="scope-note">0 tasks</span>
+          </figcaption>
+
+          <div class="strip">
+            <code>E = (O + 4M + P) ÷ 6</code>
+            <code>σ = (P − O) ÷ 6</code>
+            <code>σ total = √(Σσ²)</code>
+          </div>
+
+          <div class="total" aria-live="polite">
+            <div class="total-head">
+              <span class="t-name">Duration</span>
+              <span class="t-range" id="dur-range">—</span>
+            </div>
+            <div class="t-value"><span id="dur-e">—</span><span class="t-unit">days</span></div>
+            <div class="dim is-empty" id="dur-dim">
+              <div class="dim-axis"></div>
+              <div class="dim-band"></div>
+              <div class="dim-e"></div>
+              <div class="dim-scale"><span id="dur-lo">—</span><span id="dur-hi">—</span></div>
+            </div>
+          </div>
+
+          <div class="total" aria-live="polite">
+            <div class="total-head">
+              <span class="t-name">Cost</span>
+              <span class="t-range" id="cost-range">—</span>
+            </div>
+            <div class="t-value"><span id="cost-e">—</span></div>
+            <div class="dim is-empty" id="cost-dim">
+              <div class="dim-axis"></div>
+              <div class="dim-band"></div>
+              <div class="dim-e"></div>
+              <div class="dim-scale"><span id="cost-lo">—</span><span id="cost-hi">—</span></div>
+            </div>
+          </div>
+
+          <div class="conf">
+            <span class="label" id="conf-label">Confidence</span>
+            <div class="conf-set" role="group" aria-labelledby="conf-label">
+              <button type="button" data-z="1"     aria-pressed="false">68%</button>
+              <button type="button" data-z="1.645" aria-pressed="true">90%</button>
+              <button type="button" data-z="1.96"  aria-pressed="false">95%</button>
+            </div>
+          </div>
+
+          <p class="instrument-foot" id="warn" hidden></p>
+
+          <p class="instrument-foot">
+            The band is the confidence interval. The ticks are the absolute
+            best and worst case — every task at its optimistic figure, then
+            every task at its pessimistic one.
+          </p>
+        </figure>
+      </section>
+
+      <section class="sheet-section">
+        <div class="section-head">
+          <h2 class="label">Work breakdown</h2>
+          <span class="label">Optimistic · most likely · pessimistic, per task</span>
+        </div>
+
+        <div id="sheet"></div>
+
+        <button type="button" class="btn" data-action="add-deliverable">Add deliverable</button>
+
+        <div class="actions">
+          <button type="button" class="btn" data-action="csv">Download CSV</button>
+          <button type="button" class="btn" data-action="print">Print sheet</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn-danger" data-action="clear">Clear sheet</button>
+        </div>
+
+        <p class="assumption">
+          Rolled-up deviation assumes tasks vary independently. Where the same
+          risk drives several tasks — one vendor, one scarce specialist, one
+          permit — the real spread is wider than this shows. Treat the band as a
+          floor on your uncertainty, not a ceiling.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="tb-cell">
+        <span class="label">Made by</span>
+        <p><a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a></p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Conventions</span>
+        <p>PMBOK beta-PERT</p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Your data</span>
+        <p>Saved in this browser only. Nothing is sent anywhere.</p>
+      </div>
+      <div class="tb-cell">
+        <span class="label">Sheet</span>
+        <p>yazeed.blog &middot; 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+/* WBS estimation toolkit.
+
+   State is a project holding deliverables holding tasks. Every task carries
+   optimistic / most likely / pessimistic figures for duration and cost.
+
+   Two render paths, deliberately separate: build() rewrites the DOM when the
+   structure changes, recompute() only rewrites computed text and the dimension
+   lines. Typing calls recompute() alone, so an input never loses focus
+   mid-keystroke. */
+(function () {
+  'use strict';
+
+  var KEY = 'yb.wbs.v1';
+  var Z = { '1': '68%', '1.645': '90%', '1.96': '95%' };
+
+  var state = load() || seed();
+  var z = 1.645;
+  var saveTimer = null;
+
+  var sheet = document.getElementById('sheet');
+
+  /* ── Model ─────────────────────────────────────────────────────── */
+
+  function uid() {
+    return Math.random().toString(36).slice(2, 9);
+  }
+
+  function blankTask(name) {
+    return { id: uid(), name: name || '', dO: null, dM: null, dP: null,
+             cO: null, cM: null, cP: null };
+  }
+
+  function seed() {
+    return {
+      v: 1,
+      deliverables: [
+        { id: uid(), name: 'Discovery & requirements', tasks: [
+          { id: uid(), name: 'Stakeholder interviews', dO: 4,  dM: 6,  dP: 12, cO: 8000,  cM: 11000, cP: 18000 },
+          { id: uid(), name: 'Requirements workshop',  dO: 2,  dM: 3,  dP: 5,  cO: 5000,  cM: 6500,  cP: 9000  }
+        ]},
+        { id: uid(), name: 'Build & integration', tasks: [
+          { id: uid(), name: 'Core implementation', dO: 15, dM: 22, dP: 40, cO: 45000, cM: 62000, cP: 95000 },
+          { id: uid(), name: 'Vendor integration',  dO: 5,  dM: 9,  dP: 25, cO: 12000, cM: 20000, cP: 48000 }
+        ]}
+      ]
+    };
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      var p = JSON.parse(raw);
+      if (!p || !Array.isArray(p.deliverables)) return null;
+      return p;
+    } catch (e) { return null; }
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 400);
+  }
+
+  function findD(id) {
+    for (var i = 0; i < state.deliverables.length; i++) {
+      if (state.deliverables[i].id === id) return state.deliverables[i];
+    }
+    return null;
+  }
+
+  function findT(d, id) {
+    for (var i = 0; i < d.tasks.length; i++) {
+      if (d.tasks[i].id === id) return d.tasks[i];
+    }
+    return null;
+  }
+
+  /* ── Mathematics ───────────────────────────────────────────────── */
+
+  function num(v) {
+    return typeof v === 'number' && isFinite(v) ? v : null;
+  }
+
+  /* A triplet only yields an estimate when all three figures are present.
+
+     σ is a distance, so it takes the absolute spread — a transposed O and P
+     would otherwise produce a negative deviation. E needs no such guard:
+     (O + 4M + P) / 6 is symmetric in O and P. The row is still flagged, since
+     an out-of-order triplet usually means M is wrong too. */
+  function pert(o, m, p) {
+    o = num(o); m = num(m); p = num(p);
+    if (o === null || m === null || p === null) return null;
+    return {
+      e: (o + 4 * m + p) / 6,
+      sd: Math.abs(p - o) / 6,
+      o: Math.min(o, p),
+      p: Math.max(o, p)
+    };
+  }
+
+  function taskPert(t, kind) {
+    return kind === 'd' ? pert(t.dO, t.dM, t.dP) : pert(t.cO, t.cM, t.cP);
+  }
+
+  /* Deviations add in quadrature, not linearly — σ 3 and σ 4 give 5, not 7. */
+  function rollup(tasks, kind) {
+    var e = 0, varSum = 0, lo = 0, hi = 0, n = 0;
+    for (var i = 0; i < tasks.length; i++) {
+      var r = taskPert(tasks[i], kind);
+      if (!r) continue;
+      e += r.e; varSum += r.sd * r.sd; lo += r.o; hi += r.p; n++;
+    }
+    if (!n) return null;
+    return { e: e, sd: Math.sqrt(varSum), lo: lo, hi: hi, n: n };
+  }
+
+  function projectRollup(kind) {
+    var all = [];
+    state.deliverables.forEach(function (d) {
+      all = all.concat(d.tasks);
+    });
+    return rollup(all, kind);
+  }
+
+  /* ── Formatting ────────────────────────────────────────────────── */
+
+  function fmt(n) {
+    if (n === null || !isFinite(n)) return '—';
+    if (Math.abs(n) >= 1000) return Math.round(n).toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toFixed(0);
+    return n.toFixed(1);
+  }
+
+  function ordered(o, m, p) {
+    o = num(o); m = num(m); p = num(p);
+    if (o === null || m === null || p === null) return true;
+    return o <= m && m <= p;
+  }
+
+  function taskValid(t) {
+    return ordered(t.dO, t.dM, t.dP) && ordered(t.cO, t.cM, t.cP);
+  }
+
+  /* ── Build: rewrite the DOM when structure changes ─────────────── */
+
+  /* `aria` is the full description a screen reader needs; `short` is the
+     one-letter caption the stacked layout shows under its group heading. */
+  function cell(did, tid, field, aria, short, val) {
+    return '<div class="cell" data-lab="' + short + '">' +
+      '<input type="number" step="any" inputmode="decimal" autocomplete="off"' +
+      ' aria-label="' + aria + '"' +
+      ' data-d="' + did + '" data-t="' + tid + '" data-f="' + field + '"' +
+      ' value="' + (val === null || val === undefined ? '' : val) + '"></div>';
+  }
+
+  function build() {
+    var html = '';
+
+    state.deliverables.forEach(function (d, di) {
+      var code = String(di + 1);
+
+      html += '<section class="deliverable" data-d="' + d.id + '">';
+
+      html += '<div class="d-head">' +
+        '<span class="d-code">' + code + '</span>' +
+        '<input class="d-name" type="text" value="' + esc(d.name) + '"' +
+        ' placeholder="Name this deliverable" aria-label="Deliverable ' + code + ' name"' +
+        ' data-d="' + d.id + '" data-f="name">' +
+        '<button type="button" class="icon-btn" data-action="del-deliverable" data-d="' + d.id + '"' +
+        ' aria-label="Delete deliverable ' + code + '" title="Delete deliverable">×</button>' +
+        '</div>';
+
+      html += '<div class="cols">' +
+        '<span></span><span>Task</span>' +
+        '<span class="grp">Duration · days</span>' +
+        '<span class="grp">Cost</span>' +
+        '<span style="text-align:right">Expected</span><span></span>' +
+        '</div>';
+
+      html += '<div class="cols" style="border-bottom:1px solid var(--rule);padding-top:0">' +
+        '<span></span><span></span>' +
+        '<span style="text-align:center">O</span><span style="text-align:center">M</span><span style="text-align:center">P</span>' +
+        '<span style="text-align:center">O</span><span style="text-align:center">M</span><span style="text-align:center">P</span>' +
+        '<span></span><span></span>' +
+        '</div>';
+
+      d.tasks.forEach(function (t, ti) {
+        var tcode = code + '.' + (ti + 1);
+        html += '<div class="task" data-t="' + t.id + '" data-d="' + d.id + '">' +
+          '<span class="t-code">' + tcode + '</span>' +
+          '<div class="t-name-cell"><input type="text" value="' + esc(t.name) + '"' +
+            ' placeholder="What is the work?" aria-label="Task ' + tcode + ' name"' +
+            ' data-d="' + d.id + '" data-t="' + t.id + '" data-f="name"></div>' +
+          '<div class="grp-lab" data-g="Duration · days"></div>' +
+          cell(d.id, t.id, 'dO', 'Duration optimistic', 'O', t.dO) +
+          cell(d.id, t.id, 'dM', 'Duration most likely', 'M', t.dM) +
+          cell(d.id, t.id, 'dP', 'Duration pessimistic', 'P', t.dP) +
+          '<div class="grp-lab" data-g="Cost"></div>' +
+          cell(d.id, t.id, 'cO', 'Cost optimistic', 'O', t.cO) +
+          cell(d.id, t.id, 'cM', 'Cost most likely', 'M', t.cM) +
+          cell(d.id, t.id, 'cP', 'Cost pessimistic', 'P', t.cP) +
+          '<div class="t-out" data-out="' + t.id + '"></div>' +
+          '<button type="button" class="icon-btn" data-action="del-task"' +
+            ' data-d="' + d.id + '" data-t="' + t.id + '"' +
+            ' aria-label="Delete task ' + tcode + '" title="Delete task">×</button>' +
+          '<p class="t-flag">Optimistic, most likely, and pessimistic must run in that order. Check this row.</p>' +
+          '</div>';
+      });
+
+      html += '<div class="d-foot">' +
+        '<div class="d-sub"><div class="d-sub-line" data-sub="' + d.id + '"></div>' +
+          '<div class="dim is-empty" data-dim="' + d.id + '">' +
+            '<div class="dim-axis"></div><div class="dim-band"></div><div class="dim-e"></div>' +
+            '<div class="dim-scale"><span data-lo="' + d.id + '">—</span><span data-hi="' + d.id + '">—</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="btn btn-quiet" data-action="add-task" data-d="' + d.id + '">Add task</button>' +
+        '</div>';
+
+      html += '</section>';
+    });
+
+    if (!state.deliverables.length) {
+      html = '<p class="assumption" style="margin-top:0">' +
+        'Nothing here yet. Add a deliverable to start breaking the work down.</p>';
+    }
+
+    sheet.innerHTML = html;
+    recompute();
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* ── Recompute: rewrite only computed output ───────────────────── */
+
+  /* The dimension line. Position is measured across the O..P envelope, so
+     where E lands inside it carries the skew of the estimate. */
+  function paintDim(el, r, loEl, hiEl) {
+    if (!el) return;
+    if (!r) {
+      el.classList.add('is-empty');
+      if (loEl) loEl.textContent = '—';
+      if (hiEl) hiEl.textContent = '—';
+      return;
+    }
+    var span = r.hi - r.lo;
+    var pos = function (v) {
+      if (span <= 0) return 50;
+      return Math.max(0, Math.min(100, ((v - r.lo) / span) * 100));
+    };
+    el.classList.remove('is-empty');
+    el.style.setProperty('--lo', pos(r.e - z * r.sd) + '%');
+    el.style.setProperty('--hi', pos(r.e + z * r.sd) + '%');
+    el.style.setProperty('--e', pos(r.e) + '%');
+    if (loEl) loEl.textContent = fmt(r.lo);
+    if (hiEl) hiEl.textContent = fmt(r.hi);
+  }
+
+  function band(r) {
+    if (!r) return '—';
+    return fmt(Math.max(0, r.e - z * r.sd)) + ' – ' + fmt(r.e + z * r.sd);
+  }
+
+  function recompute() {
+    /* Per-task output and the ordering flag. */
+    state.deliverables.forEach(function (d) {
+      d.tasks.forEach(function (t) {
+        var out = sheet.querySelector('[data-out="' + t.id + '"]');
+        var row = sheet.querySelector('.task[data-t="' + t.id + '"]');
+        if (row) row.classList.toggle('invalid', !taskValid(t));
+        if (!out) return;
+
+        var rd = taskPert(t, 'd'), rc = taskPert(t, 'c');
+        if (!rd && !rc) { out.innerHTML = '<span>—</span>'; return; }
+        out.innerHTML =
+          '<b>' + (rd ? fmt(rd.e) + ' d' : '—') + '</b>' +
+          '<span>' + (rd ? '± ' + fmt(rd.sd) : '') + '</span><br>' +
+          '<b>' + (rc ? fmt(rc.e) : '—') + '</b>' +
+          '<span>' + (rc ? '± ' + fmt(rc.sd) : '') + '</span>';
+      });
+
+      /* Deliverable subtotal. */
+      var sd = rollup(d.tasks, 'd'), sc = rollup(d.tasks, 'c');
+      var sub = sheet.querySelector('[data-sub="' + d.id + '"]');
+      if (sub) {
+        sub.innerHTML =
+          '<span>Duration <b>' + (sd ? fmt(sd.e) + ' d' : '—') + '</b></span>' +
+          '<span>Cost <b>' + (sc ? fmt(sc.e) : '—') + '</b></span>' +
+          '<span>' + Z[String(z)] + ' <b>' + band(sd) + ' d</b></span>';
+      }
+      paintDim(
+        sheet.querySelector('[data-dim="' + d.id + '"]'), sd,
+        sheet.querySelector('[data-lo="' + d.id + '"]'),
+        sheet.querySelector('[data-hi="' + d.id + '"]')
+      );
+    });
+
+    /* Project total. */
+    var pd = projectRollup('d'), pc = projectRollup('c');
+
+    document.getElementById('dur-e').textContent = pd ? fmt(pd.e) : '—';
+    document.getElementById('cost-e').textContent = pc ? fmt(pc.e) : '—';
+    document.getElementById('dur-range').textContent = pd ? Z[String(z)] + ' · ' + band(pd) : '—';
+    document.getElementById('cost-range').textContent = pc ? Z[String(z)] + ' · ' + band(pc) : '—';
+
+    paintDim(document.getElementById('dur-dim'), pd,
+      document.getElementById('dur-lo'), document.getElementById('dur-hi'));
+    paintDim(document.getElementById('cost-dim'), pc,
+      document.getElementById('cost-lo'), document.getElementById('cost-hi'));
+
+    /* A flagged row still feeds the roll-up, so say so at the total rather
+       than letting a bad triplet quietly move the project number. */
+    var bad = 0;
+    state.deliverables.forEach(function (d) {
+      d.tasks.forEach(function (t) { if (!taskValid(t)) bad++; });
+    });
+    var warn = document.getElementById('warn');
+    warn.hidden = !bad;
+    warn.textContent = bad === 1
+      ? 'One task has its figures out of order. The totals include it — fix the flagged row.'
+      : bad + ' tasks have their figures out of order. The totals include them — fix the flagged rows.';
+
+    var count = 0;
+    state.deliverables.forEach(function (d) { count += d.tasks.length; });
+    document.getElementById('scope-note').textContent =
+      state.deliverables.length + (state.deliverables.length === 1 ? ' deliverable · ' : ' deliverables · ') +
+      count + (count === 1 ? ' task' : ' tasks');
+  }
+
+  /* ── Events ────────────────────────────────────────────────────── */
+
+  sheet.addEventListener('input', function (ev) {
+    var el = ev.target;
+    var f = el.getAttribute('data-f');
+    if (!f) return;
+
+    var d = findD(el.getAttribute('data-d'));
+    if (!d) return;
+
+    var tid = el.getAttribute('data-t');
+    var target = tid ? findT(d, tid) : d;
+    if (!target) return;
+
+    if (f === 'name') {
+      target.name = el.value;
+    } else {
+      var v = parseFloat(el.value);
+      target[f] = isFinite(v) ? v : null;
+      recompute();
+    }
+    scheduleSave();
+  });
+
+  sheet.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    var d = findD(btn.getAttribute('data-d'));
+
+    if (action === 'add-task' && d) {
+      d.tasks.push(blankTask(''));
+      build(); save();
+      var rows = sheet.querySelectorAll('.deliverable[data-d="' + d.id + '"] .task input[type="text"]');
+      if (rows.length) rows[rows.length - 1].focus();
+    }
+
+    if (action === 'del-task' && d) {
+      d.tasks = d.tasks.filter(function (t) { return t.id !== btn.getAttribute('data-t'); });
+      build(); save();
+    }
+
+    if (action === 'del-deliverable' && d) {
+      var n = d.tasks.length;
+      var ok = !n || window.confirm('Delete "' + (d.name || 'this deliverable') + '" and its ' +
+        n + (n === 1 ? ' task' : ' tasks') + '?');
+      if (!ok) return;
+      state.deliverables = state.deliverables.filter(function (x) { return x.id !== d.id; });
+      build(); save();
+    }
+  });
+
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('[data-action]');
+    if (!btn || sheet.contains(btn)) return;
+
+    var action = btn.getAttribute('data-action');
+
+    if (action === 'add-deliverable') {
+      state.deliverables.push({ id: uid(), name: '', tasks: [blankTask('')] });
+      build(); save();
+      var heads = sheet.querySelectorAll('.d-name');
+      if (heads.length) heads[heads.length - 1].focus();
+    }
+
+    if (action === 'print') window.print();
+
+    if (action === 'csv') downloadCsv();
+
+    if (action === 'clear') {
+      if (!window.confirm('Clear the whole sheet? This cannot be undone.')) return;
+      state = { v: 1, deliverables: [] };
+      build(); save();
+    }
+  });
+
+  /* Confidence selector. */
+  Array.prototype.forEach.call(document.querySelectorAll('.conf-set button'), function (b) {
+    b.addEventListener('click', function () {
+      z = parseFloat(b.getAttribute('data-z'));
+      Array.prototype.forEach.call(document.querySelectorAll('.conf-set button'), function (o) {
+        o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+      });
+      recompute();
+    });
+  });
+
+  /* ── Export ────────────────────────────────────────────────────── */
+
+  function q(v) {
+    var s = String(v === null || v === undefined ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function downloadCsv() {
+    var rows = [[
+      'WBS', 'Level', 'Name',
+      'Duration O', 'Duration M', 'Duration P', 'Duration E', 'Duration SD',
+      'Cost O', 'Cost M', 'Cost P', 'Cost E', 'Cost SD'
+    ]];
+
+    function line(code, level, name, rd, rc, t) {
+      return [
+        code, level, name,
+        t ? t.dO : '', t ? t.dM : '', t ? t.dP : '',
+        rd ? rd.e.toFixed(2) : '', rd ? rd.sd.toFixed(2) : '',
+        t ? t.cO : '', t ? t.cM : '', t ? t.cP : '',
+        rc ? rc.e.toFixed(2) : '', rc ? rc.sd.toFixed(2) : ''
+      ];
+    }
+
+    state.deliverables.forEach(function (d, di) {
+      var code = String(di + 1);
+      rows.push(line(code, 'Deliverable', d.name,
+        rollup(d.tasks, 'd'), rollup(d.tasks, 'c'), null));
+      d.tasks.forEach(function (t, ti) {
+        rows.push(line(code + '.' + (ti + 1), 'Task', t.name,
+          taskPert(t, 'd'), taskPert(t, 'c'), t));
+      });
+    });
+
+    rows.push(line('', 'Project total', 'All deliverables',
+      projectRollup('d'), projectRollup('c'), null));
+
+    var csv = rows.map(function (r) { return r.map(q).join(','); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'wbs-estimate.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  build();
+})();
+  </script>
+
+</body>
+</html>
