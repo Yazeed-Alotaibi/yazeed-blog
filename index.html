@@ -8,85 +8,91 @@
   <meta name="color-scheme" content="light dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-/* yazeed.blog — whiteprint / blueprint.
-   Direction: the reprographic drawing. Light mode is a diazo whiteprint —
-   dark lines on pale stock. Dark mode is the cyanotype it was printed from —
-   pale lines on prussian. Structure comes from drafting conventions: title
-   blocks, sheet numbers, registration ticks, hairline rules, tabular figures.
-   The one signature element is the status rail, which plots a verdict on a
-   three-position track so meaning never depends on color alone.
+/* yazeed.blog — bench instrument.
+   Direction: the site is a bench of calibrated instruments, not a drawing.
+   Light mode is the instrument under daylight — putty enamel body, off-white
+   dial faces, engraved near-black lettering. Dark mode is the same instrument
+   lit from within. Structure comes from panel conventions: milled recesses,
+   engraved label plates, graduated scales, tabular figures.
 
-   Written mobile-first: the base rules are the phone sheet, and each
-   min-width query adds column structure as the drawing gets wider. */
+   The signature is the gauge. An index read against 1.00 IS a needle against a
+   graduated arc, so it is drawn as one. Verdict is carried by needle position
+   and a zone word first, colour only third — it survives greyscale.
+
+   Written mobile-first: the base rules are the phone panel, and each min-width
+   query adds column structure as the bench gets wider. */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   color-scheme: light;
 
-  --ground:      #e7ecef;
-  --sheet:       #fbfcfd;
-  --sheet-sunk:  #f1f4f6;
-  --ink:         #0d2233;
-  --ink-2:       #4a5c69;
-  --ink-3:       #55636e;
-  --rule:        #ccd6dd;
-  --rule-2:      #a9b8c2;
-  --grid:        rgba(13, 34, 51, 0.045);
+  --ground:      #d9d7cf;   /* putty enamel — the bench top */
+  --panel:       #f3f2ed;   /* dial face */
+  --panel-sunk:  #e6e4db;   /* milled recess */
+  --ink:         #15181a;
+  --ink-2:       #565a5d;
+  --ink-3:       #74797c;
+  --rule:        #c6c4b9;
+  --rule-2:      #a9a79c;
 
-  --accent:      #0b5f96;
-  --accent-soft: #dce9f2;
-  --good:        #0f6b46;
-  --warn:        #8a5a06;
-  --bad:         #a8322f;
+  /* Indigo is the brand mark only. It is never a verdict, so it can never be
+     confused with the good/warn/bad scale. */
+  --accent:      #3b3690;
+  --accent-soft: #e0dff0;
 
-  --strip:       #0d2233;
-  --strip-ink:   #d5e6f2;
-  --strip-grid:  rgba(150, 200, 235, 0.15);
+  --good:        #1f6b4f;
+  --warn:        #8f6304;
+  --bad:         #a32c22;
 
-  --shadow:   0 12px 28px -22px rgba(13, 34, 51, 0.55);
-  --shadow-2: 0 22px 46px -30px rgba(13, 34, 51, 0.6);
+  --engrave:     #1b1e22;   /* the dark formula plate */
+  --engrave-ink: #d7dbd2;
 
-  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --display: "Big Shoulders Display", "Haettenschweiler", Impact, sans-serif;
+  --body:    "Libre Franklin", system-ui, -apple-system, sans-serif;
   --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  /* Panel depth: a lip catches the light, a recess swallows it. */
+  --lip:  inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+  --sunk: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+  --lift: 0 1px 0 rgba(0,0,0,.07), 0 14px 30px -24px rgba(0,0,0,.5);
 
   --gutter: clamp(1.1rem, 4vw, 3.5rem);
 
-  /* Motion is purposeful and short: a hairline reacting, never a flourish. */
-  --dur:   170ms;
-  --dur-2: 260ms;
-  --ease:  cubic-bezier(0.2, 0.7, 0.3, 1);
+  /* Motion is instrument behaviour: a needle settling, never a flourish. */
+  --dur:   160ms;
+  --dur-2: 700ms;
+  --ease:  cubic-bezier(.2,.7,.3,1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
 
-    --ground:      #0b2333;
-    --sheet:       #102c3e;
-    --sheet-sunk:  #0c2536;
-    --ink:         #e6eef3;
-    --ink-2:       #a8bcc8;
-    --ink-3:       #8ba3b1;
-    --rule:        #1d4055;
-    --rule-2:      #2c5670;
-    --grid:        rgba(150, 200, 235, 0.05);
+    --ground:      #131518;
+    --panel:       #1d2126;
+    --panel-sunk:  #171a1e;
+    --ink:         #eceae2;
+    --ink-2:       #9aa0a5;
+    --ink-3:       #7e858a;
+    --rule:        #2f353b;
+    --rule-2:      #454d54;
 
-    --accent:      #6cb8e8;
-    --accent-soft: #14344a;
-    --good:        #5cc79a;
-    --warn:        #e0b45c;
-    --bad:         #f0908a;
+    --accent:      #9d97ff;
+    --accent-soft: #24234a;
 
-    --strip:       #071a26;
-    --strip-ink:   #cfe3f0;
-    --strip-grid:  rgba(108, 184, 232, 0.13);
+    --good:        #52c295;
+    --warn:        #d9a83f;
+    --bad:         #ef8177;
 
-    --shadow:   0 12px 28px -22px rgba(0, 0, 0, 0.8);
-    --shadow-2: 0 22px 46px -30px rgba(0, 0, 0, 0.9);
+    --engrave:     #0e1012;
+    --engrave-ink: #c9cec4;
+
+    --lip:  inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.4);
+    --sunk: inset 0 2px 5px rgba(0,0,0,.5);
+    --lift: 0 1px 0 rgba(0,0,0,.5), 0 14px 30px -24px rgba(0,0,0,.9);
   }
 }
 
@@ -94,12 +100,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--body);
-  background-color: var(--ground);
-  /* The sheet is drawn on gridded stock. 48px module, hairline weight. */
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background: var(--ground);
   color: var(--ink);
   font-size: 16px;
   line-height: 1.6;
@@ -111,19 +112,24 @@ a { color: inherit; }
 [hidden] { display: none !important; }
 
 .wrap {
-  max-width: 1140px;
+  max-width: 1160px;
   margin: 0 auto;
   padding-inline: var(--gutter);
 }
 
-/* Drafting labels — the small caps meta that annotates a sheet. */
+/* Engraved label plate — small mono caps sitting in a milled recess. */
 .label {
+  display: inline-block;
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: .64rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--ink-3);
+  background: var(--panel-sunk);
+  box-shadow: var(--sunk);
+  border-radius: 2px;
+  padding: .3rem .55rem;
 }
 
 .visually-hidden {
@@ -141,808 +147,576 @@ a { color: inherit; }
   left: -9999px;
   top: 0;
   z-index: 20;
-  padding: 0.9rem 1.1rem;
-  background: var(--sheet);
+  padding: .9rem 1.1rem;
+  background: var(--panel);
   border: 1px solid var(--accent);
+  border-radius: 2px;
   font-weight: 600;
   text-decoration: none;
 }
-.skip:focus { left: 0.5rem; top: 0.5rem; }
+.skip:focus { left: .5rem; top: .5rem; }
 
-:where(a, button, input, summary, [tabindex]):focus-visible {
+:where(a, button, input, summary):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* ─── Title bar ──────────────────────────────────────────────────── */
+/* ── header ───────────────────────────────────────────────────────────── */
+
 .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background: var(--panel);
   border-bottom: 1px solid var(--rule);
-  background: var(--sheet);
+  box-shadow: var(--lip);
 }
 .topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding-block: 0.6rem;
+  gap: 1rem;
+  padding-block: .8rem;
 }
-.mark {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-height: 44px;
-  text-decoration: none;
-}
+.mark { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
 .mark-glyph {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 2.1rem;
-  height: 2.1rem;
-  border: 1px solid var(--rule-2);
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--sheet-sunk);
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-}
-.mark:hover .mark-glyph { border-color: var(--accent); background: var(--accent-soft); }
-.mark-name {
   font-family: var(--display);
-  font-variation-settings: "wdth" 108;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: .02em;
+  color: var(--panel);
+  background: var(--accent);
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 2px;
+  flex: none;
 }
+.mark-name { display: block; font-weight: 600; font-size: .93rem; letter-spacing: -.01em; }
 .mark-role {
   display: block;
   font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.13em;
+  font-size: .62rem;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
-
-.topbar-nav { display: flex; gap: 0.4rem; }
+.topbar-nav { display: flex; gap: 1.1rem; font-size: .86rem; }
 .topbar-nav a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 0.85rem;
-  border: 1px solid var(--rule-2);
-  font-size: 0.8rem;
-  font-weight: 500;
   text-decoration: none;
-  background: var(--sheet);
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
-              color var(--dur) var(--ease);
-}
-.topbar-nav a:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
-
-/* ─── Section heads — the sheet numbering system ─────────────────── */
-.section-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--rule-2);
-  margin-bottom: 1.5rem;
-}
-.section-head h2 {
-  font-family: var(--display);
-  font-variation-settings: "wdth" 106;
-  font-size: clamp(1.35rem, 1.1rem + 1.2vw, 1.9rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-.section-head .sheet-no {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-.section-sub {
-  display: block;
-  margin-top: 0.3rem;
-  font-size: 0.85rem;
   color: var(--ink-2);
+  display: flex; align-items: center;
+  min-height: 44px;
+  transition: color var(--dur) var(--ease);
 }
+.topbar-nav a:hover { color: var(--accent); }
 
-/* ─── Hero ───────────────────────────────────────────────────────── */
+/* ── hero ─────────────────────────────────────────────────────────────── */
+
 .hero {
   display: grid;
-  gap: clamp(1.75rem, 5vw, 3.5rem);
-  align-items: start;
-  padding-block: clamp(1.4rem, 5vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+  gap: 2.4rem;
+  padding-block: clamp(2.2rem, 6vw, 4.2rem);
 }
-.hero-eyebrow { margin-bottom: 0.55rem; }
-.hero h1 {
+@media (min-width: 62em) {
+  .hero { grid-template-columns: 1fr 1fr; gap: 3.2rem; align-items: start; }
+}
+
+h1 {
   font-family: var(--display);
-  font-variation-settings: "wdth" 112;
-  font-size: clamp(2.35rem, 1.15rem + 5.2vw, 4.4rem);
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
+  font-size: clamp(3.2rem, 11vw, 6.2rem);
+  line-height: .88;
+  letter-spacing: -.005em;
+  text-transform: uppercase;
+  margin: 1rem 0 0;
 }
-.hero h1 span { color: var(--accent); }
+h1 span { color: var(--accent); }
+
 .hero-lede {
-  margin-top: 0.85rem;
-  max-width: 44ch;
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.14rem);
+  margin-top: 1.25rem;
+  font-size: 1.05rem;
   color: var(--ink-2);
-  text-wrap: pretty;
+  max-width: 46ch;
 }
-.creds {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.85rem;
-  list-style: none;
-}
+
+.creds { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; margin-top: 1.3rem; }
 .cred-pill {
   font-family: var(--mono);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--rule-2);
+  font-size: .68rem;
+  letter-spacing: .1em;
   color: var(--ink-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  padding: .4rem .6rem;
 }
 
-/* Tool preview — the short manifest, right under the headline so the
-   shape of the site is visible before a single scroll. */
-.preview {
-  margin-top: 1.1rem;
-  border-top: 1px solid var(--rule);
-  padding-top: 0.75rem;
-}
-/* Three abreast even on the narrowest phone — the manifest has to clear the
-   fold alongside the headline and the calculator, so it stays one band tall. */
-.preview-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-  list-style: none;
-}
+/* Short manifest: the whole bench, three lines, before any scrolling.
+   Each row carries its own build state rather than an ordinal — the list is
+   not a sequence, so a number would be decoration. */
+.preview { margin-top: 2rem; }
+.preview-list { list-style: none; margin-top: .7rem; border-top: 1px solid var(--rule); }
 .preview-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.1rem;
-  min-height: 44px;
-  padding: 0.45rem 0.5rem;
-  border: 1px solid var(--rule-2);
-  background: var(--sheet);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .9rem;
+  min-height: 52px;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--rule);
   text-decoration: none;
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease),
-              transform var(--dur) var(--ease);
+  transition: padding-inline-start var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-a.preview-item:hover {
-  border-color: var(--accent);
-  background: var(--sheet-sunk);
-  transform: translateX(2px);
-}
-.preview-item.soon { border-style: dashed; background: transparent; }
+a.preview-item:hover { padding-inline-start: .5rem; color: var(--accent); }
+.preview-item.soon { color: var(--ink-3); }
 .preview-no {
   font-family: var(--mono);
-  font-size: 0.66rem;
-  font-weight: 500;
-  color: var(--accent);
-  flex: none;
-}
-.preview-item.soon .preview-no { color: var(--ink-3); }
-.preview-name {
-  font-size: 0.76rem;
-  font-weight: 500;
-  line-height: 1.2;
-}
-/* The qualifier is a desktop luxury; on a phone the name carries it alone. */
-.preview-meta {
-  display: none;
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.1em;
+  font-size: .58rem;
+  font-weight: 600;
+  letter-spacing: .14em;
   text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: .2rem .4rem;
+  opacity: .75;
+}
+.preview-name { font-weight: 600; font-size: .96rem; }
+.preview-meta {
+  font-family: var(--mono);
+  font-size: .68rem;
   color: var(--ink-3);
-  white-space: nowrap;
+  text-align: right;
 }
 
-/* ─── Instrument: the live earned-value readout ──────────────────── */
+/* ── the instrument ───────────────────────────────────────────────────── */
+
 .instrument {
-  position: relative;
-  border: 1px solid var(--rule-2);
-  background: var(--sheet);
-  box-shadow: var(--shadow);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--lift), var(--lip);
+  overflow: hidden;
 }
-/* Registration ticks — the corner marks a reprographic sheet is aligned by. */
-.instrument::before,
-.instrument::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 1px solid var(--accent);
-  opacity: 0.55;
-  pointer-events: none;
-}
-.instrument::before { top: -1px;    left: -1px;  border-right: 0; border-bottom: 0; }
-.instrument::after  { bottom: -1px; right: -1px; border-left: 0;  border-top: 0; }
-
 .instrument-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.7rem 1rem;
+  padding: .85rem 1.1rem;
+  background: var(--panel-sunk);
   border-bottom: 1px solid var(--rule);
 }
-.instrument-head strong {
-  font-family: var(--display);
-  font-variation-settings: "wdth" 100;
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-.instrument-head .label { color: var(--accent); }
+.instrument-head strong { font-size: .93rem; font-weight: 600; letter-spacing: -.01em; }
 
+/* The formula plate — etched into a dark inlay, the way a scale is on a case. */
 .strip {
-  padding: 0.8rem 1rem;
-  background-color: var(--strip);
-  background-image:
-    linear-gradient(var(--strip-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background: var(--engrave);
+  color: var(--engrave-ink);
+  padding: .75rem 1.1rem;
   overflow-x: auto;
 }
 .strip code {
   display: block;
   font-family: var(--mono);
-  font-size: 0.78rem;
-  line-height: 1.85;
-  color: var(--strip-ink);
+  font-size: .72rem;
+  letter-spacing: .02em;
   white-space: pre;
+  line-height: 1.9;
 }
 
 .instrument-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.7rem;
-  padding: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
   border-bottom: 1px solid var(--rule);
 }
+.ifield { background: var(--panel); padding: .8rem .85rem; }
 .ifield label {
   display: block;
   font-family: var(--mono);
-  font-size: 0.64rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-size: .61rem;
+  letter-spacing: .13em;
   text-transform: uppercase;
   color: var(--ink-3);
-  margin-bottom: 0.3rem;
+  margin-bottom: .35rem;
 }
 .ifield input {
   width: 100%;
   min-height: 44px;
-  padding: 0.4rem 0.55rem;
   font-family: var(--mono);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
-  background: var(--sheet-sunk);
-  border: 1px solid var(--rule-2);
-  border-radius: 0;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  background: var(--panel-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--sunk);
+  padding: .4rem .5rem;
 }
-/* Drop the spinner buttons: they steal width a six-figure budget needs, and a
-   nudge control has no place on a drafting sheet. Arrow keys still step. */
-.ifield input::-webkit-outer-spin-button,
-.ifield input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.ifield input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
-.ifield input:hover { border-color: var(--ink-3); }
-.ifield input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
 
-.instrument-out { display: grid; grid-template-columns: minmax(0, 1fr); }
-.readout {
-  padding: 0.9rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+/* Gauges — the signature element. */
+.instrument-out {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
 }
-.readout + .readout { border-top: 1px solid var(--rule); }
-.r-name {
+.gauge { background: var(--panel); padding: 1rem .8rem 1.15rem; text-align: center; }
+.gauge svg { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto .1rem; }
+
+.g-arc { fill: none; stroke-width: 7; opacity: .32; }
+.g-zone-bad  { stroke: var(--bad); }
+.g-zone-warn { stroke: var(--warn); }
+.g-zone-good { stroke: var(--good); }
+.g-tick { stroke: var(--ink-3); stroke-width: 1; }
+.g-tick.major { stroke: var(--ink); stroke-width: 1.6; }
+.g-tlabel { font-family: var(--mono); font-size: 9px; fill: var(--ink-3); text-anchor: middle; }
+.g-needle {
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  transform-origin: 100px 100px;
+  transition: transform var(--dur-2) var(--ease);
+}
+.g-hub { fill: var(--ink); }
+
+.g-name {
+  display: block;
   font-family: var(--mono);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-size: .61rem;
+  letter-spacing: .13em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
-.r-value {
+.g-value {
+  display: block;
+  margin-top: .2rem;
   font-family: var(--mono);
-  font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.4rem);
-  font-weight: 500;
-  line-height: 1;
+  font-size: 2rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  transition: color var(--dur-2) var(--ease);
+  line-height: 1.1;
 }
-.r-note {
-  font-size: 0.76rem;
-  line-height: 1.45;
-  color: var(--ink-2);
+.g-verdict {
+  display: inline-block;
+  margin-top: .4rem;
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: .25rem .5rem;
 }
+.g-note { display: block; margin-top: .55rem; font-size: .79rem; color: var(--ink-2); }
 
-/* The signature: a three-position RAG track. The filled tick carries the
-   verdict positionally, so the reading survives without color. */
-.rail {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-  height: 4px;
-}
-.rail i { background: var(--rule); transition: background var(--dur-2) var(--ease); }
-.tone-bad  .rail i:nth-child(1) { background: var(--bad); }
-.tone-warn .rail i:nth-child(2) { background: var(--warn); }
-.tone-good .rail i:nth-child(3) { background: var(--good); }
-.tone-bad  .r-value { color: var(--bad); }
-.tone-warn .r-value { color: var(--warn); }
-.tone-good .r-value { color: var(--good); }
+.tone-good .g-value, .tone-good .g-verdict { color: var(--good); }
+.tone-warn .g-value, .tone-warn .g-verdict { color: var(--warn); }
+.tone-bad  .g-value, .tone-bad  .g-verdict { color: var(--bad); }
 
-/* Secondary figures — the same inputs read as currency variances. */
 .variances {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--rule);
-  background: var(--sheet-sunk);
+  gap: 1px;
+  background: var(--rule);
+  border-block: 1px solid var(--rule);
 }
-.variance {
-  padding: 0.6rem 1rem 0.7rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-.variance + .variance { border-left: 1px solid var(--rule); }
+@media (min-width: 26em) { .variances { grid-template-columns: 1fr 1fr; } }
+.variance { background: var(--panel-sunk); padding: .7rem .85rem; }
 .v-name {
+  display: block;
   font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
+  font-size: .59rem;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .v-value {
+  display: block;
+  margin-top: .15rem;
   font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .v-good { color: var(--good); }
 .v-bad  { color: var(--bad); }
 
-/* How to use — three drafting notes, always visible, never a wall of text. */
-.howto {
-  border-top: 1px solid var(--rule);
-  padding: 0.85rem 1rem 0.95rem;
-}
-.howto-steps {
-  display: grid;
-  gap: 0.45rem;
-  margin-top: 0.55rem;
-  list-style: none;
-  counter-reset: step;
-}
-/* Two columns: the counter, then the note. Every li must keep its prose inside
-   one .howto-text wrapper — a grid container turns each loose run of text into
-   its own anonymous item, which would drop the sentence into the 1.4rem
-   counter column and stack it one word wide. */
-.howto-steps li {
-  display: grid;
-  grid-template-columns: 1.4rem minmax(0, 1fr);
-  gap: 0.55rem;
-  font-size: 0.79rem;
-  line-height: 1.45;
-  color: var(--ink-2);
-  counter-increment: step;
-}
-.howto-steps li::before {
-  content: counter(step, decimal-leading-zero);
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  font-weight: 500;
-  color: var(--accent);
-  padding-top: 0.15rem;
-}
-.howto-text { grid-column: 2; }
-.howto-steps b { color: var(--ink); font-weight: 600; }
-.howto-key {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.9rem;
-  margin-top: 0.7rem;
-  padding-top: 0.6rem;
-  border-top: 1px dashed var(--rule);
-}
-.key-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.06em;
-  color: var(--ink-2);
-}
-.key-tick {
-  display: grid;
-  grid-template-columns: repeat(3, 5px);
-  gap: 2px;
-}
-.key-tick i { height: 4px; background: var(--rule); }
-.key-bad  i:nth-child(1) { background: var(--bad); }
-.key-warn i:nth-child(2) { background: var(--warn); }
-.key-good i:nth-child(3) { background: var(--good); }
+.howto { padding: 1rem 1.1rem; }
+.howto-steps { margin-top: .7rem; padding-left: 1.15rem; }
+.howto-steps li { font-size: .85rem; color: var(--ink-2); margin-bottom: .45rem; }
+.howto-steps li::marker { font-family: var(--mono); font-size: .78rem; color: var(--ink-3); }
+.howto-text b { color: var(--ink); font-weight: 600; }
 
 .instrument-foot {
-  padding: 0.7rem 1rem;
+  padding: .8rem 1.1rem;
   border-top: 1px solid var(--rule);
-  background: var(--sheet-sunk);
-  font-size: 0.74rem;
-  color: var(--ink-3);
+  background: var(--panel-sunk);
+  font-size: .81rem;
+  color: var(--ink-2);
 }
-.instrument-foot a { color: var(--accent); font-weight: 500; }
+.instrument-foot a { color: var(--accent); text-underline-offset: 3px; }
 
-/* ─── Tools ──────────────────────────────────────────────────────── */
-.tools { padding-bottom: clamp(2.5rem, 6vw, 4rem); }
-.tools-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.9rem;
+/* ── sections ─────────────────────────────────────────────────────────── */
+
+.tools, .catalog { padding-block: clamp(1.8rem, 5vw, 3.2rem); }
+
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 6vw, 3.2rem);
+  line-height: .95;
+  text-transform: uppercase;
 }
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: .8rem;
+  border-bottom: 1.5px solid var(--ink);
+}
+.section-sub { display: block; margin-top: .35rem; font-size: .92rem; color: var(--ink-2); }
+.sheet-no {
+  flex: none;
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-bottom: .2rem;
+}
+
+.tools-grid { display: grid; gap: 1rem; }
+@media (min-width: 46em) { .tools-grid { grid-template-columns: 1fr 1fr; } }
 
 .tool-card {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--lift), var(--lip);
   padding: 1.15rem;
-  background: var(--sheet);
-  border: 1px solid var(--rule-2);
-  color: inherit;
   text-decoration: none;
-  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
-              transform var(--dur-2) var(--ease);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-a.tool-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-2);
-  transform: translateY(-2px);
-}
-.tool-card.soon {
-  background: transparent;
-  border-style: dashed;
-  border-color: var(--rule-2);
-}
+a.tool-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tool-card.soon { opacity: .72; }
 
-.card-index {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-.card-domain { color: var(--accent); }
-.tool-card.soon .card-domain { color: var(--ink-3); }
-
+.card-index { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
 .card-title {
   font-family: var(--display);
-  font-variation-settings: "wdth" 104;
-  font-size: 1.18rem;
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
+  font-size: 1.7rem;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: .8rem 0 .55rem;
 }
-.card-desc {
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: var(--ink-2);
-}
+.card-desc { font-size: .9rem; color: var(--ink-2); }
 
 .card-stats {
   display: flex;
-  gap: 1.5rem;
-  margin-top: auto;
-  padding-top: 0.85rem;
+  gap: 1.7rem;
+  margin-top: 1rem;
+  padding-top: .9rem;
   border-top: 1px solid var(--rule);
 }
 .stat-num {
   font-family: var(--mono);
-  font-size: 1.15rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
+  line-height: 1;
 }
 .stat-label {
+  margin-top: .25rem;
   font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+  font-size: .57rem;
+  letter-spacing: .13em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
 .card-action {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  font-weight: 500;
+  gap: .4rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  font-family: var(--mono);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
   color: var(--accent);
 }
 .tool-card.soon .card-action { color: var(--ink-3); }
 .card-action svg { transition: transform var(--dur) var(--ease); }
-a.tool-card:hover .card-action svg { transform: translateX(4px); }
+a.tool-card:hover .card-action svg { transform: translateX(3px); }
 
-/* ─── Catalog — progressive disclosure over all 33 calculators ───── */
-.catalog { padding-bottom: clamp(3rem, 7vw, 5.5rem); }
+/* ── calculator index ─────────────────────────────────────────────────── */
 
 .disclose {
-  border: 1px solid var(--rule-2);
-  background: var(--sheet);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--lift), var(--lip);
 }
-.disclose > summary {
+.disclose summary {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: .7rem;
+  flex-wrap: wrap;
   min-height: 56px;
-  padding: 0.75rem 1rem;
+  padding: .85rem 1.1rem;
   cursor: pointer;
   list-style: none;
-  font-weight: 500;
-  transition: background var(--dur) var(--ease);
 }
-.disclose > summary::-webkit-details-marker { display: none; }
-.disclose > summary:hover { background: var(--sheet-sunk); }
-.disclose-chev {
-  flex: none;
-  transition: transform var(--dur-2) var(--ease);
-  color: var(--accent);
-}
+.disclose summary::-webkit-details-marker { display: none; }
+.disclose-chev { flex: none; color: var(--accent); transition: transform var(--dur) var(--ease); }
 .disclose[open] .disclose-chev { transform: rotate(90deg); }
-.disclose-title { font-size: 0.95rem; line-height: 1.3; }
+.disclose-title { font-weight: 600; font-size: .95rem; }
 .disclose-count {
   margin-left: auto;
   font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: .66rem;
+  letter-spacing: .06em;
   color: var(--ink-3);
-  text-align: right;
 }
-.disclose-body {
-  border-top: 1px solid var(--rule);
-  padding: 1rem;
-}
-.disclose[open] .disclose-body { animation: unfold var(--dur-2) var(--ease) both; }
-@keyframes unfold {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: none; }
-}
+.disclose-body { border-top: 1px solid var(--rule); padding: 1.1rem; }
 
-.finder { display: grid; gap: 0.8rem; }
-.search-field { position: relative; display: block; }
-.search-field input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0.5rem 0.7rem 0.5rem 2.3rem;
-  font-family: var(--body);
-  font-size: 0.95rem;
-  color: var(--ink);
-  background: var(--sheet-sunk);
-  border: 1px solid var(--rule-2);
-  border-radius: 0;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-}
-.search-field input:hover { border-color: var(--ink-3); }
-.search-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
-.search-icon {
-  position: absolute;
-  left: 0.72rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--ink-3);
-  pointer-events: none;
-}
-
-.domain-filters {
+.finder { margin-bottom: 1.3rem; }
+.search-field {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-.chip {
-  display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 0.75rem;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: var(--ink-2);
-  background: var(--sheet);
-  border: 1px solid var(--rule-2);
-  cursor: pointer;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
-              color var(--dur) var(--ease);
+  gap: .6rem;
+  background: var(--panel-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--sunk);
+  padding: 0 .75rem;
 }
-.chip:hover { border-color: var(--ink-2); background: var(--sheet-sunk); }
+.search-field:focus-within { border-color: var(--accent); }
+.search-icon { flex: none; color: var(--ink-3); }
+.search-field input {
+  flex: 1;
+  min-height: 48px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: .95rem;
+}
+.search-field input:focus { outline: none; }
+
+.domain-filters { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
+.chip {
+  min-height: 36px;
+  padding: .35rem .65rem;
+  font-family: var(--mono);
+  font-size: .65rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
 .chip[aria-pressed="true"] {
-  color: var(--accent);
+  color: var(--panel);
+  background: var(--accent);
   border-color: var(--accent);
-  background: var(--accent-soft);
-  font-weight: 500;
 }
 
 .finder-status {
+  margin-top: .8rem;
   font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: .68rem;
   color: var(--ink-3);
 }
 
-.cat-domain { margin-top: 1.4rem; }
+.cat-domain { margin-bottom: 1.6rem; }
 .cat-domain-head {
   display: flex;
   align-items: baseline;
-  gap: 0.6rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--rule);
-}
-.cat-domain-head h3 {
-  font-family: var(--display);
-  font-variation-settings: "wdth" 102;
-  font-size: 0.98rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  gap: .7rem;
+  flex-wrap: wrap;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--rule-2);
 }
 .cat-domain-no {
   font-family: var(--mono);
-  font-size: 0.66rem;
+  font-size: .68rem;
+  font-weight: 600;
   color: var(--accent);
+}
+.cat-domain-head h3 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1;
+  text-transform: uppercase;
 }
 .cat-domain-n {
   margin-left: auto;
   font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: .62rem;
+  letter-spacing: .06em;
   color: var(--ink-3);
-  white-space: nowrap;
 }
 
-.cat-list { display: grid; }
+.cat-list { display: grid; gap: 1px; background: var(--rule); margin-top: 1px; }
 .cat-item {
   display: block;
-  padding: 0.7rem 0.1rem 0.75rem;
-  min-height: 44px;
-  border-bottom: 1px solid var(--rule);
+  background: var(--panel);
+  padding: .75rem .2rem .75rem 0;
   text-decoration: none;
-  color: inherit;
   transition: background var(--dur) var(--ease), padding-inline-start var(--dur) var(--ease);
 }
-.cat-item:hover {
-  background: var(--sheet-sunk);
-  padding-inline-start: 0.5rem;
-}
-.cat-item-title {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
+.cat-item:hover { background: var(--accent-soft); padding-inline-start: .6rem; }
+.cat-item-title { display: block; font-weight: 600; font-size: .92rem; }
 .cat-item-desc {
   display: block;
-  margin-top: 0.15rem;
+  margin-top: .1rem;
   font-family: var(--mono);
-  font-size: 0.68rem;
-  line-height: 1.5;
-  color: var(--ink-3);
-  overflow-wrap: anywhere;
+  font-size: .7rem;
+  color: var(--ink-2);
 }
 .cat-item-metrics {
   display: block;
-  margin-top: 0.35rem;
-  font-size: 0.72rem;
-  line-height: 1.45;
-  color: var(--ink-2);
+  margin-top: .3rem;
+  font-size: .78rem;
+  color: var(--ink-3);
 }
-.cat-item-metrics b { color: var(--accent); font-weight: 500; }
+.cat-item-metrics b { color: var(--accent); font-weight: 600; }
 
-.cat-empty {
-  margin-top: 1.25rem;
-  padding: 1.5rem 1rem;
-  border: 1px dashed var(--rule-2);
-  text-align: center;
-  font-size: 0.88rem;
-  color: var(--ink-2);
-}
-.cat-empty a { color: var(--accent); font-weight: 500; }
+.cat-empty { font-size: .9rem; color: var(--ink-2); }
+.cat-empty a { color: var(--accent); }
 
-/* ─── Title block footer ─────────────────────────────────────────── */
+/* ── footer ───────────────────────────────────────────────────────────── */
+
 .footer {
-  border-top: 1px solid var(--rule-2);
-  background: var(--sheet);
+  margin-top: 2rem;
+  background: var(--panel);
+  border-top: 1px solid var(--rule);
+  box-shadow: var(--lip);
 }
 .footer-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 1.4rem var(--gutter);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
 }
-.tb-cell {
-  padding: 1rem var(--gutter);
-  border-bottom: 1px solid var(--rule);
-}
-.tb-cell:last-child { border-bottom: none; }
-.tb-cell p {
-  margin-top: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--ink-2);
-}
-/* The title-block link stands on its own line, so it is a real tap target
-   rather than a word inside a sentence — give it the full 44px. */
-.tb-cell p a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--accent);
-  font-weight: 500;
-  text-decoration: none;
-}
-.tb-cell p a:hover { text-decoration: underline; }
-
-/* ─── Wider sheets ───────────────────────────────────────────────── */
-/* 24em ≈ 384px: from a standard phone up, the three base measures sit abreast
-   so the whole instrument — inputs and both indices — clears the fold. Narrower
-   handsets stack them instead: three legible fields beat three cramped ones. */
-@media (min-width: 24em) {
-  .instrument-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .instrument-out { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .readout + .readout { border-top: none; border-left: 1px solid var(--rule); }
-}
-
-@media (min-width: 48em) {
-  .tools-grid { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
-  .preview-item { gap: 0.25rem; padding: 0.7rem 0.8rem; }
-  .preview-name { font-size: 0.88rem; }
-  .preview-meta { display: block; }
-  .footer-inner { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
-  .tb-cell { border-bottom: none; border-right: 1px solid var(--rule); padding-block: 1.1rem; }
-  .tb-cell:last-child { border-right: none; }
-  .disclose-body { padding: 1.25rem; }
-  .cat-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; }
-}
-
-@media (min-width: 64em) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
-    gap: clamp(2.5rem, 4vw, 4rem);
-  }
-  .hero-col-b { grid-column: 2; grid-row: 1; position: sticky; top: 5rem; }
-  .cat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+@media (min-width: 46em) { .footer-inner { grid-template-columns: repeat(4, 1fr); } }
+.tb-cell p { margin-top: .35rem; font-size: .82rem; color: var(--ink-2); }
+.tb-cell a { color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-  a.tool-card:hover, a.preview-item:hover { transform: none; }
-  .cat-item:hover { padding-inline-start: 0.1rem; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
   </style>
 </head>
@@ -970,7 +744,7 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
     <div class="wrap">
       <section class="hero" aria-labelledby="hero-h">
         <div class="hero-col-a">
-          <p class="label hero-eyebrow">Tools &amp; resources for project managers</p>
+          <p class="label">Tools &amp; resources for project managers</p>
           <h1 id="hero-h">Know what the <span>number</span> means.</h1>
           <p class="hero-lede">
             Earned value, float, expected monetary value, procurement, agile forecasting.
@@ -981,27 +755,27 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
             <li class="cred-pill">PRINCE2</li>
           </ul>
 
-          <!-- Short manifest: the whole site, three lines, before any scrolling. -->
+          <!-- Short manifest: the whole bench, three lines, before any scrolling. -->
           <div class="preview">
-            <p class="label">On this sheet</p>
+            <p class="label">On the bench</p>
             <ul class="preview-list">
               <li>
                 <a class="preview-item" href="#catalog">
-                  <span class="preview-no">01</span>
+                  <span class="preview-no">Live</span>
                   <span class="preview-name">Calculation Desk</span>
                   <span class="preview-meta">33 calculators</span>
                 </a>
               </li>
               <li>
                 <a class="preview-item" href="wbs-estimation-toolkit.html">
-                  <span class="preview-no">02</span>
+                  <span class="preview-no">Live</span>
                   <span class="preview-name">WBS Estimation Toolkit</span>
                   <span class="preview-meta">Three-point PERT</span>
                 </a>
               </li>
               <li>
                 <span class="preview-item soon">
-                  <span class="preview-no">03</span>
+                  <span class="preview-no">Building</span>
                   <span class="preview-name">Status Dashboard</span>
                   <span class="preview-meta">In progress</span>
                 </span>
@@ -1039,17 +813,19 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
             </div>
 
             <div class="instrument-out" aria-live="polite">
-              <div class="readout" id="out-cpi">
-                <span class="r-name">CPI · cost</span>
-                <span class="r-value">—</span>
-                <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="r-note">Enter a value above.</span>
+              <div class="gauge" id="out-cpi">
+                <svg viewBox="-6 0 212 130" role="img" aria-label="Cost performance index, plotted against 1.00"></svg>
+                <span class="g-name">CPI · cost</span>
+                <span class="g-value">—</span>
+                <span class="g-verdict">Awaiting input</span>
+                <span class="g-note">Enter a value above.</span>
               </div>
-              <div class="readout" id="out-spi">
-                <span class="r-name">SPI · schedule</span>
-                <span class="r-value">—</span>
-                <span class="rail" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="r-note">Enter a value above.</span>
+              <div class="gauge" id="out-spi">
+                <svg viewBox="-6 0 212 130" role="img" aria-label="Schedule performance index, plotted against 1.00"></svg>
+                <span class="g-name">SPI · schedule</span>
+                <span class="g-value">—</span>
+                <span class="g-verdict">Awaiting input</span>
+                <span class="g-note">Enter a value above.</span>
               </div>
             </div>
 
@@ -1069,13 +845,8 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
               <ol class="howto-steps">
                 <li><span class="howto-text"><b>EV</b> — budgeted cost of the work actually finished: % complete × total budget.</span></li>
                 <li><span class="howto-text"><b>AC</b> — what that finished work really cost. <b>PV</b> — what you planned to have earned by today.</span></li>
-                <li><span class="howto-text">Read each index against <b>1.00</b>: at or above is favourable, below is not. The filled tick moves left as it worsens.</span></li>
+                <li><span class="howto-text">Read each needle against the <b>1.00</b> mark. Right of it is favourable, left of it is not.</span></li>
               </ol>
-              <div class="howto-key" aria-hidden="true">
-                <span class="key-item"><span class="key-tick key-bad"><i></i><i></i><i></i></span>Below 0.95</span>
-                <span class="key-item"><span class="key-tick key-warn"><i></i><i></i><i></i></span>0.95–1.00</span>
-                <span class="key-item"><span class="key-tick key-good"><i></i><i></i><i></i></span>1.00 and up</span>
-              </div>
             </div>
 
             <p class="instrument-foot">
@@ -1090,23 +861,22 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
         <div class="section-head">
           <div>
             <h2 id="tools-h">Tools</h2>
-            <span class="section-sub">Two live, two on the drawing board.</span>
+            <span class="section-sub">Two live, two on the bench.</span>
           </div>
-          <span class="sheet-no">Sheet 02</span>
+          <span class="sheet-no">4 tools</span>
         </div>
 
         <div class="tools-grid">
 
           <a class="tool-card" href="pm-calculation-desk.html">
             <div class="card-index">
-              <span class="label card-domain">Calculators</span>
-              <span class="label">01</span>
+              <span class="label">Calculators</span>
+              <span class="label">Live</span>
             </div>
             <h3 class="card-title">The Project Manager's Calculation Desk</h3>
             <p class="card-desc">
               Every PM formula you'll ever need — EVM, PERT, risk, quality, procurement,
-              agile, and more. Each one explained and colour-coded so you know what the
-              result actually means.
+              agile, and more. Each one explained, and each result read for you.
             </p>
             <div class="card-stats">
               <div class="stat">
@@ -1132,8 +902,8 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
 
           <a class="tool-card" href="wbs-estimation-toolkit.html">
             <div class="card-index">
-              <span class="label card-domain">Estimation</span>
-              <span class="label">02</span>
+              <span class="label">Estimation</span>
+              <span class="label">Live</span>
             </div>
             <h3 class="card-title">WBS Estimation Toolkit</h3>
             <p class="card-desc">
@@ -1165,8 +935,8 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
 
           <div class="tool-card soon">
             <div class="card-index">
-              <span class="label card-domain">Dashboards</span>
-              <span class="label">03</span>
+              <span class="label">Dashboards</span>
+              <span class="label">Building</span>
             </div>
             <h3 class="card-title">Project Status Dashboard</h3>
             <p class="card-desc">
@@ -1178,8 +948,8 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
 
           <div class="tool-card soon">
             <div class="card-index">
-              <span class="label card-domain">AI tools</span>
-              <span class="label">04</span>
+              <span class="label">AI tools</span>
+              <span class="label">Building</span>
             </div>
             <h3 class="card-title">AI Scope Statement Generator</h3>
             <p class="card-desc">
@@ -1200,7 +970,7 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
               Every calculator on the Calculation Desk, by project-management domain.
             </span>
           </div>
-          <span class="sheet-no">Sheet 03</span>
+          <span class="sheet-no">14 domains</span>
         </div>
 
         <!-- Progressive disclosure: the index is long, so it stays folded until
@@ -1260,7 +1030,7 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
         <p>Computed in your browser. Nothing is sent anywhere.</p>
       </div>
       <div class="tb-cell">
-        <span class="label">Sheet</span>
+        <span class="label">Bench</span>
         <p>yazeed.blog &middot; 2026</p>
       </div>
     </div>
@@ -1268,9 +1038,13 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
 
   <script>
 /* Hero instrument. The same indices the Calculation Desk opens with, wired
-   live so the homepage demonstrates the product rather than describing it. */
+   live so the homepage demonstrates the product rather than describing it.
+   Each index is drawn as a needle on a graduated arc, because that is what
+   reading a ratio against 1.00 actually is. */
 (function () {
   'use strict';
+
+  var LO = 0.70, HI = 1.30, CX = 100, CY = 100, R = 74;
 
   var fields = {
     ev: document.getElementById('ev'),
@@ -1280,9 +1054,49 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
   var figure = document.getElementById('evm');
   if (!figure || !fields.ev) return;
 
-  function read(el) {
-    var n = parseFloat(el.value);
-    return isFinite(n) ? n : null;
+  function angleFor(v) {
+    var clamped = Math.min(HI, Math.max(LO, v));
+    return 180 - ((clamped - LO) / (HI - LO)) * 180;
+  }
+
+  function polar(deg, r) {
+    var rad = deg * Math.PI / 180;
+    return [CX + r * Math.cos(rad), CY - r * Math.sin(rad)];
+  }
+
+  function arcPath(from, to) {
+    var a = polar(angleFor(from), R), b = polar(angleFor(to), R);
+    return 'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2) +
+           'A' + R + ' ' + R + ' 0 0 1 ' + b[0].toFixed(2) + ' ' + b[1].toFixed(2);
+  }
+
+  /* The dial face is identical on both gauges, so it is drawn once per SVG
+     and never touched again — only the needle moves. */
+  function drawFace(svg) {
+    var s = '<path class="g-arc g-zone-bad" d="' + arcPath(LO, 0.95) + '"/>' +
+            '<path class="g-arc g-zone-warn" d="' + arcPath(0.95, 1.00) + '"/>' +
+            '<path class="g-arc g-zone-good" d="' + arcPath(1.00, HI) + '"/>';
+
+    var ticks = [0.70, 0.80, 0.90, 1.00, 1.10, 1.20, 1.30];
+    for (var i = 0; i < ticks.length; i++) {
+      var v = ticks[i], deg = angleFor(v), major = v === 1.00;
+      var outer = polar(deg, R + 5), inner = polar(deg, major ? R - 12 : R - 7);
+      s += '<line class="g-tick' + (major ? ' major' : '') +
+           '" x1="' + outer[0].toFixed(1) + '" y1="' + outer[1].toFixed(1) +
+           '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '"/>';
+
+      if (v === LO || v === 1.00 || v === HI) {
+        var lab = polar(deg, R + 15);
+        s += '<text class="g-tlabel" x="' + lab[0].toFixed(1) + '" y="' +
+             (lab[1] + 4).toFixed(1) + '">' + v.toFixed(2) + '</text>';
+      }
+    }
+
+    s += '<line class="g-needle" x1="' + CX + '" y1="' + CY +
+         '" x2="' + CX + '" y2="' + (CY - R + 14) + '"/>' +
+         '<circle class="g-hub" cx="' + CX + '" cy="' + CY + '" r="4.5"/>';
+
+    svg.innerHTML = s;
   }
 
   function pct(n) { return Math.round(Math.abs(n) * 100); }
@@ -1300,33 +1114,45 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
     return (n < 0 ? '−' : '+') + out;
   }
 
+  function read(el) {
+    var n = parseFloat(el.value);
+    return isFinite(n) ? n : null;
+  }
+
   function cpiVerdict(cpi) {
-    if (cpi <= 0) return { tone: 'bad', text: 'No value earned against the money spent.' };
-    if (cpi >= 1.05) return { tone: 'good', text: 'Under budget. Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
-    if (cpi >= 1) return { tone: 'good', text: 'On budget. Spending is tracking the work delivered.' };
-    if (cpi >= 0.95) return { tone: 'warn', text: 'Slightly over budget. Watch the trend before it compounds.' };
-    return { tone: 'bad', text: 'Over budget by ' + pct(1 / cpi - 1) + '%. Costs are outrunning the work delivered.' };
+    if (cpi <= 0) return { tone: 'bad', word: 'Over budget', text: 'No value earned against the money spent.' };
+    if (cpi >= 1.05) return { tone: 'good', word: 'Under budget', text: 'Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
+    if (cpi >= 1) return { tone: 'good', word: 'On budget', text: 'Spending is tracking the work delivered.' };
+    if (cpi >= 0.95) return { tone: 'warn', word: 'Watch', text: 'Slightly over budget. Watch the trend before it compounds.' };
+    return { tone: 'bad', word: 'Over budget', text: 'Over budget by ' + pct(1 / cpi - 1) + '%. Costs are outrunning the work delivered.' };
   }
 
   function spiVerdict(spi) {
-    if (spi <= 0) return { tone: 'bad', text: 'No scheduled work has been earned yet.' };
-    if (spi >= 1.05) return { tone: 'good', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
-    if (spi >= 1) return { tone: 'good', text: 'On schedule. Work is landing when it was planned to.' };
-    if (spi >= 0.95) return { tone: 'warn', text: 'Slipping. ' + pct(spi) + '% of the scheduled work is done.' };
-    return { tone: 'bad', text: 'Behind plan. Only ' + pct(spi) + '% of the scheduled work is done.' };
+    if (spi <= 0) return { tone: 'bad', word: 'Behind', text: 'No scheduled work has been earned yet.' };
+    if (spi >= 1.05) return { tone: 'good', word: 'Ahead', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
+    if (spi >= 1) return { tone: 'good', word: 'On schedule', text: 'Work is landing when it was planned to.' };
+    if (spi >= 0.95) return { tone: 'warn', word: 'Slipping', text: pct(spi) + '% of the scheduled work is done.' };
+    return { tone: 'bad', word: 'Behind', text: 'Only ' + pct(spi) + '% of the scheduled work is done.' };
   }
 
   function paint(id, value, verdict) {
     var el = document.getElementById(id);
+    var needle = el.querySelector('.g-needle');
+
     if (value === null) {
-      el.className = 'readout';
-      el.querySelector('.r-value').textContent = '—';
-      el.querySelector('.r-note').textContent = 'Enter a value above.';
+      el.className = 'gauge';
+      needle.setAttribute('transform', 'rotate(-90)');
+      el.querySelector('.g-value').textContent = '—';
+      el.querySelector('.g-verdict').textContent = 'Awaiting input';
+      el.querySelector('.g-note').textContent = 'Enter a value above.';
       return;
     }
-    el.className = 'readout tone-' + verdict.tone;
-    el.querySelector('.r-value').textContent = value.toFixed(2);
-    el.querySelector('.r-note').textContent = verdict.text;
+
+    el.className = 'gauge tone-' + verdict.tone;
+    needle.setAttribute('transform', 'rotate(' + (90 - angleFor(value)).toFixed(2) + ')');
+    el.querySelector('.g-value').textContent = value.toFixed(2);
+    el.querySelector('.g-verdict').textContent = verdict.word;
+    el.querySelector('.g-note').textContent = verdict.text;
   }
 
   function paintVariance(id, value) {
@@ -1349,11 +1175,18 @@ a.tool-card:hover .card-action svg { transform: translateX(4px); }
     paintVariance('out-sv', (ev !== null && pv !== null) ? ev - pv : null);
   }
 
+  drawFace(document.querySelector('#out-cpi svg'));
+  drawFace(document.querySelector('#out-spi svg'));
+
   var keys = ['ev', 'ac', 'pv'];
   for (var i = 0; i < keys.length; i++) {
     fields[keys[i]].addEventListener('input', update);
   }
-  update();
+
+  /* Needles rest at zero, then sweep to the reading — an instrument coming up
+     to power. One frame of delay is what lets the CSS transition run. */
+  if (window.requestAnimationFrame) window.requestAnimationFrame(update);
+  else update();
 })();
 
 /* Calculator index. Mirrors the Calculation Desk's taxonomy — 14 domains,
