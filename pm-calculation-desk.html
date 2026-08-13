@@ -137,7 +137,11 @@ body {
   gap: 0.7rem;
   padding-bottom: 1.1rem;
   border-bottom: 1px solid var(--rule);
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--dur) var(--ease);
 }
+.brand:hover { opacity: 0.75; }
 
 .brand-mark {
   display: grid;
@@ -171,6 +175,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
+
+.sidebar-sticky { display: flex; flex-direction: column; gap: 1.1rem; }
 
 .search input {
   width: 100%;
@@ -639,9 +645,45 @@ main {
   .sidebar {
     position: static;
     height: auto;
+    /* overflow-y:auto from the desktop rule would otherwise become the
+       nearest scrolling ancestor for .sidebar-sticky below, even though it
+       never actually scrolls at this width — and that silently breaks the
+       sticky positioning against the real page scroller. */
+    overflow-y: visible;
     border-right: none;
     border-bottom: 1px solid var(--rule-2);
+    padding-bottom: 0;
   }
+
+  /* Search and the category row are the only wayfinding a phone user keeps
+     once they start reading cards. `position: sticky` cannot do that here —
+     its containing block is .sidebar, which on this layout is only as tall
+     as the brand strip and finder themselves, so the sticky box would run
+     out of room to stick within a few pixels of scroll. `position: fixed`
+     pins it to the viewport instead, with .sidebar-top's margin-top
+     reserving exactly the space it occupies so nothing sits underneath it
+     at rest. That reserved height is derived, not guessed: every dimension
+     inside the bar is a fixed rem value set elsewhere in this stylesheet —
+     0.6rem top padding + 2.75rem search input (44px min-height) + 0.6rem
+     gap + 2.75rem nav row (44px min-height) + 0.15rem nav scroll clearance
+     + 0.6rem bottom padding + a 1px border, rounded up for safety. */
+  .sidebar-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem 0.6rem;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--rule-2);
+    box-shadow: var(--shadow);
+  }
+
+  /* Reserving the fixed bar's height happens further down this stylesheet,
+     immediately after .sidebar-top's own rule defines its base margin —
+     the mobile override has to follow the rule it overrides in source
+     order, or an equal-specificity later rule silently wins the cascade. */
 
   /* One scrolling row rather than a wrapped block: 14 stacked pills pushed
      the whole page below the fold on a phone. */
@@ -651,7 +693,7 @@ main {
     gap: 0.4rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.15rem;
     scrollbar-width: thin;
   }
 
@@ -678,26 +720,291 @@ main {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
+/* ------------------------------------------------------------- charts */
+/* An instrument drawn on the same sheet as everything else: square frame,
+   hairline grid, tabular figures, no fill that does not mean something.
+   Every colour resolves to a token, so the plot inverts with the sheet. */
+
+.charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--rule);
+}
+
+.chart {
+  margin: 0;
+  min-width: 0;
+  border: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+
+.chart-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.75rem 0.55rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.chart-title {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.chart-purpose {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  padding: 0.5rem 0.75rem 0;
+}
+
+.ch-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--ink-2);
+}
+
+/* The legend swatch is a line, not a block, so it shows the dash pattern
+   that distinguishes the series without relying on its colour. */
+.ch-key-line {
+  width: 18px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-color: currentColor;
+}
+.ch-key-line.ch-ls-dashed { border-top-style: dashed; }
+.ch-key-line.ch-ls-dotted { border-top-style: dotted; }
+
+.chart-plot {
+  padding: 0.35rem 0.4rem 0.1rem;
+  min-height: 2px;
+}
+
+.chart-plot svg { display: block; width: 100%; height: auto; }
+
+.chart-empty,
+.chart-summary {
+  margin: 0;
+  padding: 0.55rem 0.75rem 0.7rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.chart-empty {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+}
+
+.chart.is-empty { border-style: dashed; }
+
+.chart-data { border-top: 1px solid var(--rule); }
+
+.chart-data > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.chart-data > summary::-webkit-details-marker { display: none; }
+.chart-data > summary::before {
+  content: "+";
+  margin-right: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+.chart-data[open] > summary::before { content: "−"; }
+.chart-data > summary:hover { color: var(--ink); background: var(--sheet); }
+
+.chart-table-wrap { overflow-x: auto; padding: 0 0.75rem 0.75rem; }
+
+.chart-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+.chart-table th,
+.chart-table td {
+  padding: 0.3rem 0.5rem 0.3rem 0;
+  text-align: right;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.chart-table thead th {
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.chart-table th[scope="row"] { text-align: left; font-weight: 500; color: var(--ink-2); }
+.chart-table thead th:first-child { text-align: left; }
+
+/* --- plot internals ---------------------------------------------- */
+.ch-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
+.ch-grid  { stroke: var(--rule); stroke-width: 1; }
+.ch-zero  { stroke: var(--rule-2); stroke-width: 1; }
+.ch-ref { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.8; }
+
+.ch-tick, .ch-cat, .ch-val, .ch-axis, .ch-reflabel, .ch-zonelabel, .ch-cellnum, .ch-bandlabel {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  fill: var(--ink-3);
+}
+.ch-tick      { font-size: 9.5px; }
+.ch-cat       { font-size: 10px; fill: var(--ink-2); }
+.ch-cat-sub   { font-size: 8.5px; fill: var(--ink-3); }
+.ch-val       { font-size: 10px; fill: var(--ink); font-weight: 500; }
+.ch-val-strong{ font-size: 11px; font-weight: 600; }
+.ch-axis      { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ch-reflabel  { font-size: 8.5px; fill: var(--accent); letter-spacing: 0.06em; }
+.ch-zonelabel { font-size: 8.5px; letter-spacing: 0.05em; }
+.ch-bandlabel { font-size: 9px; fill: var(--ink-2); }
+.ch-cellnum   { font-size: 9.5px; fill: var(--ink-3); }
+
+.ch-t-neutral { --ch: var(--ink-3); --ch-soft: var(--rule); }
+.ch-t-accent  { --ch: var(--accent); --ch-soft: var(--accent-soft); }
+.ch-t-good    { --ch: var(--good); --ch-soft: var(--good-soft); }
+.ch-t-warn    { --ch: var(--warn); --ch-soft: var(--warn-soft); }
+.ch-t-bad     { --ch: var(--bad); --ch-soft: var(--bad-soft); }
+
+.ch-bar { fill: var(--ch-soft); stroke: var(--ch); stroke-width: 1; }
+.ch-band { fill: var(--ch-soft); stroke: var(--ch); stroke-width: 1; }
+.ch-band-div { stroke: var(--rule-2); stroke-width: 1; }
+.ch-line { fill: none; stroke: var(--ch); stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; }
+.ch-ls-dashed { stroke-dasharray: 5 4; }
+.ch-ls-dotted { stroke-dasharray: 1.5 3; }
+.ch-area { fill: var(--ch-soft); opacity: 0.55; stroke: none; }
+.ch-point { fill: var(--ch); stroke: var(--sheet); stroke-width: 1.5; }
+.ch-needle { fill: var(--ch); stroke: var(--sheet); stroke-width: 1; }
+.ch-cross { stroke: var(--ch); stroke-width: 1; opacity: 0.5; }
+
+.ch-stem { stroke: var(--rule-2); stroke-width: 1; }
+.ch-stem-e { stroke: var(--accent); stroke-width: 1.5; }
+.ch-marker-rule { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+
+.ch-zone-good { fill: var(--good-soft); opacity: 0.5; }
+.ch-zone-bad  { fill: var(--bad-soft); opacity: 0.45; }
+
+.ch-dist-fill { fill: var(--accent-soft); opacity: 0.4; stroke: none; }
+.ch-dist-band { fill: var(--accent-soft); stroke: none; opacity: 0.95; }
+
+.ch-cell { stroke: var(--sheet); stroke-width: 1; }
+.ch-band-good { fill: var(--good-soft); }
+.ch-band-warn { fill: var(--warn-soft); }
+.ch-band-bad  { fill: var(--bad-soft); }
+.ch-cellmark  { fill: none; stroke: var(--ink); stroke-width: 2; }
+.ch-cellmark2 { fill: none; stroke: var(--sheet); stroke-width: 1; }
+
+.ch-hatch { fill: url(#ch-hatch-pattern); stroke: none; opacity: 0.55; }
+.ch-hatch-stroke { stroke: var(--ink-2); stroke-width: 2; }
+
+@media (min-width: 60em) {
+  .charts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chart-wide { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-data > summary { transition: none; }
+}
+
+/* ------------------------------------------------------- site nav (desk) */
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -1.5rem -1.25rem 1.1rem;
+  padding: 0.55rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+.sidebar-top a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  text-decoration: none;
+  border: 1px solid var(--rule-2);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.sidebar-top a:hover { border-color: var(--accent); color: var(--ink); background: var(--sheet); }
+
+@media (max-width: 920px) {
+  /* Reserves exactly the fixed finder bar's own height (see .sidebar-sticky
+     above) so .sidebar-top renders below it instead of hidden underneath —
+     see the note on .sidebar-sticky for how this figure is derived. */
+  /* .sidebar's own 1.5rem top padding already contributes part of this
+     gap, so the margin only needs to make up the remainder. */
+  .sidebar-top { margin-top: 6.02rem; }
+}
+
   </style>
 </head>
 <body>
 
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="ch-hatch-pattern" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="6" class="ch-hatch-stroke"></line>
+      </pattern>
+    </defs>
+  </svg>
+
   <aside class="sidebar">
-    <div class="brand">
+    <div class="sidebar-top">
+      <a href="index.html">All tools</a>
+      <a href="wbs-estimation-toolkit.html">WBS toolkit</a>
+    </div>
+    <a class="brand" href="index.html" aria-label="Yazeed Alotaibi — home">
       <span class="brand-mark" aria-hidden="true">Σ</span>
       <div>
         <strong>Calculation Desk</strong>
         <span>for project managers</span>
       </div>
-    </div>
+    </a>
 
-    <div class="search">
-      <label class="sr-only" for="search">Search calculators</label>
-      <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" autocomplete="off">
-      <span class="search-hint">Press <kbd>/</kbd> to search</span>
-    </div>
+    <div class="sidebar-sticky">
+      <div class="search">
+        <label class="sr-only" for="search">Search calculators</label>
+        <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" autocomplete="off">
+        <span class="search-hint">Press <kbd>/</kbd> to search</span>
+      </div>
 
-    <nav id="cat-nav" aria-label="Calculation categories"></nav>
+      <nav id="cat-nav" aria-label="Calculation categories"></nav>
+    </div>
 
     <footer>
       Formulas follow PMBOK / PMP-exam conventions. Enter any consistent
@@ -772,11 +1079,14 @@ var PM_DATA = (function () {
   }
 
   function npvOf(rate, inv, flows) {
+    /* A rate at or below −100% discounts every future flow to infinity —
+       not a real cost of capital, just a division by zero in disguise. */
+    if (rate <= -1) return null;
     var v = -inv;
     for (var t = 0; t < flows.length; t++) {
       v += flows[t] / Math.pow(1 + rate, t + 1);
     }
-    return v;
+    return Number.isFinite(v) ? v : null;
   }
 
   function irrOf(inv, flows) {
@@ -929,6 +1239,79 @@ var PM_DATA = (function () {
               },
               interpret: function (x) { return x <= 1 ? good('The revised target is achievable at current efficiency.') : warn('Even the revised target demands improvement.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Cost position',
+              purpose: 'What was planned, what was earned, what it cost — against the budget line.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (!ok(v.pv, v.ev, v.ac)) return null;
+                var series = [
+                  { label: 'PV', sub: 'planned', value: v.pv, tone: 'neutral' },
+                  { label: 'EV', sub: 'earned', value: v.ev, tone: 'accent' },
+                  { label: 'AC', sub: 'spent', value: v.ac, tone: ok(r.cv) && r.cv < 0 ? 'bad' : 'good' }
+                ];
+                if (typeof r.eacTypical === 'number') {
+                  series.push({
+                    label: 'EAC', sub: 'forecast', value: r.eacTypical,
+                    tone: ok(v.bac) && r.eacTypical > v.bac ? 'bad' : 'good', hatch: true
+                  });
+                }
+                return {
+                  series: series,
+                  refValue: ok(v.bac) ? v.bac : undefined,
+                  refLabel: 'BAC',
+                  catHead: 'Measure',
+                  summary: 'Earned ' + f2(v.ev) + ' of value for ' + f2(v.ac) + ' spent, against ' +
+                    f2(v.pv) + ' planned by now' +
+                    (typeof r.eacTypical === 'number' && ok(v.bac)
+                      ? '. At today’s efficiency the project lands at ' + f2(r.eacTypical) +
+                        ' against a ' + f2(v.bac) + ' budget.'
+                      : '.')
+                };
+              }
+            },
+            {
+              title: 'CPI–SPI quadrant',
+              purpose: 'Cost efficiency against schedule efficiency, crossed at 1.00.',
+              kind: 'quadrant',
+              build: function (v, r) {
+                if (!ok(r.cpi, r.spi)) return null;
+                var tone = r.cpi >= 1 && r.spi >= 1 ? 'good'
+                  : r.cpi < 1 && r.spi < 1 ? 'bad' : 'warn';
+                return {
+                  x: r.cpi, y: r.spi, refX: 1, refY: 1,
+                  xLabel: 'CPI — cost', yLabel: 'SPI — schedule',
+                  goodLabel: 'on budget, on plan',
+                  badLabel: 'over budget, behind plan',
+                  tone: tone,
+                  summary: 'CPI ' + f2(r.cpi) + ' and SPI ' + f2(r.spi) + ' place the project ' +
+                    (tone === 'good' ? 'in the favourable quadrant — at or better than plan on both axes.'
+                      : tone === 'bad' ? 'in the unfavourable quadrant — behind on both cost and schedule.'
+                      : 'in a mixed quadrant: one axis is holding, the other is not.')
+                };
+              }
+            },
+            {
+              title: 'TCPI required efficiency',
+              purpose: 'The cost performance the remaining work must sustain to still hit BAC.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (typeof r.tcpiBac !== 'number') return null;
+                return {
+                  value: r.tcpiBac, min: 0.6, max: 1.6, target: 1, targetLabel: 'current CPI target',
+                  zones: [
+                    { from: 0.6, to: 1, tone: 'good', label: 'achievable' },
+                    { from: 1, to: 1.1, tone: 'warn', label: 'a stretch' },
+                    { from: 1.1, to: 1.6, tone: 'bad', label: 'unrealistic' }
+                  ],
+                  label: 'TCPI', scaleLabel: 'Efficiency required on remaining work',
+                  summary: 'Remaining work must run at ' + f2(r.tcpiBac) + ' efficiency to land on the original budget' +
+                    (typeof r.cpi === 'number' ? ', versus ' + f2(r.cpi) + ' achieved to date.' : '.')
+                };
+              }
+            }
           ]
         },
         {
@@ -960,6 +1343,26 @@ var PM_DATA = (function () {
               meaning: 'Forecast minus plan — the schedule overrun taking shape.',
               compute: function (v) { return ok(v.plannedDur, v.ev, v.pv) && v.ev !== 0 ? v.plannedDur / (v.ev / v.pv) - v.plannedDur : null; },
               interpret: function (x) { return x > 0 ? bad('Trending ' + f2(x) + ' time unit(s) late — compress the schedule or move the date.') : good('Trending on time or early.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Planned vs forecast duration',
+              purpose: 'Where the project lands if today’s pace holds — not a certainty, a trend.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (!ok(v.plannedDur) || typeof r.forecastDur !== 'number') return null;
+                return {
+                  series: [
+                    { label: 'Planned', value: v.plannedDur, tone: 'neutral' },
+                    { label: 'Forecast', value: r.forecastDur, tone: r.forecastDur > v.plannedDur ? 'bad' : 'good', hatch: r.forecastDur > v.plannedDur }
+                  ],
+                  catHead: 'Duration',
+                  summary: 'At the current pace (SPI ' + f2(r.spi) + '), the project is trending toward ' +
+                    f2(r.forecastDur) + ' time units against a plan of ' + f2(v.plannedDur) +
+                    ' — an approximation that firms up as the project progresses, not a committed date.'
+                };
+              }
             }
           ]
         }
@@ -1016,6 +1419,25 @@ var PM_DATA = (function () {
               meaning: 'Share of total funds already consumed.',
               compute: function (v) { return ok(v.budget, v.spent) && v.budget !== 0 ? (v.spent / v.budget) * 100 : null; },
               interpret: function (x) { return x > 100 ? bad('Over budget.') : warn('Meaningful only next to % of work complete — see Earned Value.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Runway vs plan',
+              purpose: 'Whether the remaining money outlasts the remaining work.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (typeof r.runway !== 'number' || !ok(v.planLeft)) return null;
+                return {
+                  series: [
+                    { label: 'Runway', sub: 'at current burn', value: r.runway, tone: r.runway >= v.planLeft ? 'good' : 'bad' },
+                    { label: 'Plan', sub: 'periods remaining', value: v.planLeft, tone: 'neutral' }
+                  ],
+                  catHead: 'Periods',
+                  summary: 'At the current burn rate the budget lasts ' + f2(r.runway) + ' more period(s), against ' +
+                    f2(v.planLeft) + ' period(s) of planned work remaining.'
+                };
+              }
             }
           ]
         }
@@ -1098,6 +1520,17 @@ var PM_DATA = (function () {
               },
               interpret: function () { return info('PERT ± 3σ.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Three-point distribution',
+              purpose: 'The shape of the estimate, the PERT expected value, and the 68% band around it.',
+              kind: 'distribution',
+              build: function (v, r) {
+                if (!ok(v.o, v.m, v.p) || typeof r.pert !== 'number' || typeof r.sd !== 'number') return null;
+                return { o: v.o, m: v.m, p: v.p, e: r.pert, sd: r.sd, clipId: 'dist-three-point' };
+              }
+            }
           ]
         },
         {
@@ -1140,6 +1573,28 @@ var PM_DATA = (function () {
                 return warn('Overstates risk by ' + f2(x - Math.sqrt(sq)) + ' — pad the path, not every task.');
               }
             }
+          ],
+          charts: [
+            {
+              title: 'Roll-up vs naive sum',
+              purpose: 'Why adding standard deviations overstates a path’s real uncertainty.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (typeof r.pathSigma !== 'number' || typeof r.naiveSum !== 'number') return null;
+                var s = parseFlows(v.sigmas) || [];
+                var series = s.map(function (sig, i) {
+                  return { label: 'σ' + (i + 1), value: sig, tone: 'neutral' };
+                });
+                series.push({ label: 'Path σ', sub: 'rolled up', value: r.pathSigma, tone: 'good' });
+                series.push({ label: 'Naive sum', sub: 'if added', value: r.naiveSum, tone: 'warn', hatch: true });
+                return {
+                  series: series,
+                  catHead: 'Uncertainty',
+                  summary: 'The path’s real uncertainty rolls up to σ = ' + f2(r.pathSigma) +
+                    ' — simply summing the activity σ’s would overstate it at ' + f2(r.naiveSum) + '.'
+                };
+              }
+            }
           ]
         },
         {
@@ -1165,6 +1620,31 @@ var PM_DATA = (function () {
               meaning: 'How much faster unit n is than the first attempt.',
               compute: function (v) { return ok(v.t1, v.rate, v.n) && v.t1 > 0 && v.rate > 0 && v.rate <= 100 && v.n >= 1 ? (1 - Math.pow(v.n, Math.log(v.rate / 100) / Math.log(2))) * 100 : null; },
               interpret: function () { return warn('Estimating every repetition at T₁ quietly pads the plan.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Learning curve',
+              purpose: 'Per-unit time against a flat no-learning baseline, with the selected unit marked.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (typeof r.tn !== 'number' || !ok(v.t1, v.rate, v.n) || v.t1 <= 0 || v.rate <= 0 || v.rate > 100 || v.n < 1 || v.n > 100000) return null;
+                var exp = Math.log(v.rate / 100) / Math.log(2);
+                var maxN = Math.min(2000, Math.max(8, Math.ceil(v.n * 2)));
+                var pts = [], i;
+                for (i = 1; i <= maxN; i++) pts.push([i, v.t1 * Math.pow(i, exp)]);
+                var flat = [[1, v.t1], [maxN, v.t1]];
+                return {
+                  series: [
+                    { label: (v.rate) + '% learning curve', points: pts, tone: 'accent', style: 'solid' },
+                    { label: 'No learning (flat)', points: flat, tone: 'neutral', style: 'dashed' }
+                  ],
+                  markers: [{ x: v.n, y: r.tn, label: 'unit ' + v.n, tone: 'accent' }],
+                  xLabel: 'Unit number', yLabel: 'Time (or cost) per unit', zeroBase: true,
+                  summary: 'Unit ' + v.n + ' takes ' + f2(r.tn) + ' at an ' + v.rate +
+                    '% learning rate, against ' + f2(v.t1) + ' with no learning at all.'
+                };
+              }
             }
           ]
         }
@@ -1212,6 +1692,29 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.succEs, v.ef) ? v.succEs - v.ef : null; },
               interpret: function (x) { return x > 0 ? good('Can slip without touching the successor.') : x === 0 ? warn('Any slip pushes the successor immediately.') : bad('Already overlapping the successor.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Early vs late window',
+              purpose: 'How much room the activity has before it becomes critical.',
+              kind: 'windows',
+              build: function (v, r) {
+                if (!ok(v.es, v.ef, v.ls, v.lf)) return null;
+                var rows = [
+                  { label: 'Early (ES→EF)', from: v.es, to: v.ef, tone: 'accent' },
+                  { label: 'Late (LS→LF)', from: v.ls, to: v.lf, tone: typeof r.tf === 'number' && r.tf === 0 ? 'bad' : 'neutral', hatch: true,
+                    note: typeof r.tf === 'number' ? f2(r.tf) + ' float' : undefined }
+                ];
+                var marks = ok(v.succEs) ? [{ at: v.succEs, label: 'successor ES' }] : [];
+                return {
+                  rows: rows, marks: marks,
+                  summary: typeof r.tf === 'number'
+                    ? (r.tf === 0 ? 'Zero float — the early and late windows coincide; this activity is on the critical path.'
+                        : 'The late window trails the early one by ' + f2(r.tf) + ' — the total float available before this activity delays the finish.')
+                    : 'Early window ' + f2(v.es) + '–' + f2(v.ef) + ', late window ' + f2(v.ls) + '–' + f2(v.lf) + '.'
+                };
+              }
+            }
           ]
         }
       ]
@@ -1253,6 +1756,29 @@ var PM_DATA = (function () {
               meaning: 'Total extra cost of buying all the available time.',
               compute: function (v) { return ok(v.normalCost, v.crashCost) ? v.crashCost - v.normalCost : null; },
               interpret: function () { return info('Weigh against the cost of being late: penalties, lost revenue, standing armies.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Normal vs crash',
+              purpose: 'The cost slope drawn as a line — its gradient is the price of each time unit saved.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (!ok(v.normalCost, v.crashCost, v.normalDur, v.crashDur) || v.normalDur === v.crashDur) return null;
+                var pts = [[v.crashDur, v.crashCost], [v.normalDur, v.normalCost]].sort(function (a, b) { return a[0] - b[0]; });
+                return {
+                  series: [{ label: 'Cost vs duration', points: pts, tone: typeof r.slope === 'number' && r.slope < 0 ? 'good' : 'accent' }],
+                  markers: [
+                    { x: v.normalDur, y: v.normalCost, label: 'normal', tone: 'neutral' },
+                    { x: v.crashDur, y: v.crashCost, label: 'crash', tone: 'accent' }
+                  ],
+                  xLabel: 'Duration', yLabel: 'Cost',
+                  summary: typeof r.slope === 'number'
+                    ? 'Compressing from ' + f2(v.normalDur) + ' to ' + f2(v.crashDur) +
+                      ' costs ' + f2(r.slope) + ' per time unit saved — applies to this activity only, and only while it stays on the critical path.'
+                    : 'Normal ' + f2(v.normalDur) + '/' + f2(v.normalCost) + ', crash ' + f2(v.crashDur) + '/' + f2(v.crashCost) + '.'
+                };
+              }
             }
           ]
         }
@@ -1313,6 +1839,28 @@ var PM_DATA = (function () {
               meaning: 'Hours left for the work nobody predicted.',
               compute: function (v) { return ok(v.allocated, v.available) ? v.available - v.allocated : null; },
               interpret: function (x) { return x < 0 ? bad('Negative slack is unpaid overtime in disguise.') : info('Slack is capacity insurance, not waste.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Commitment level',
+              purpose: 'Where utilization sits against the point delays start to amplify.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (typeof r.util !== 'number') return null;
+                return {
+                  value: r.util, min: 0, max: 120, target: 85, targetLabel: '~85% threshold',
+                  zones: [
+                    { from: 0, to: 85, tone: 'good', label: 'healthy margin' },
+                    { from: 85, to: 100, tone: 'warn', label: 'thin' },
+                    { from: 100, to: 120, tone: 'bad', label: 'over-allocated' }
+                  ],
+                  label: 'Utilization', valueFmt: function (n) { return n.toFixed(0) + '%'; },
+                  tickFmt: function (n) { return n + '%'; },
+                  summary: 'Committed to ' + f2(r.util) + '% of available hours' +
+                    (r.util > 100 ? ' — already over-allocated.' : r.util >= 85 ? ', in the thin margin above 85%.' : ', with healthy headroom.')
+                };
+              }
             }
           ]
         },
@@ -1386,6 +1934,28 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.n, v.n2) ? v.n2 * (v.n2 - 1) / 2 - v.n * (v.n - 1) / 2 : null; },
               interpret: function (x, v) { return x > 0 ? warn('Adding ' + f2(v.n2 - v.n) + ' people creates ' + f2(x) + ' new channels — onboarding and sync overhead grows.') : x < 0 ? good('Fewer channels: coordination gets simpler.') : info('No change.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Channel growth',
+              purpose: 'Why one more person on a large team costs more coordination than on a small one.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (!ok(v.n) || v.n < 0 || v.n > 500 || (ok(v.n2) && (v.n2 < 0 || v.n2 > 500))) return null;
+                var maxN = Math.max(20, Math.ceil((ok(v.n2) ? Math.max(v.n, v.n2) : v.n) * 1.3));
+                var pts = [], i;
+                for (i = 0; i <= maxN; i++) pts.push([i, i * (i - 1) / 2]);
+                var markers = [{ x: v.n, y: v.n * (v.n - 1) / 2, label: 'now (' + v.n + ')', tone: 'accent' }];
+                if (ok(v.n2)) markers.push({ x: v.n2, y: v.n2 * (v.n2 - 1) / 2, label: 'after (' + v.n2 + ')', tone: typeof r.delta === 'number' && r.delta > 0 ? 'warn' : 'good' });
+                return {
+                  series: [{ label: 'n(n−1)/2', points: pts, tone: 'accent' }],
+                  markers: markers,
+                  xLabel: 'People', yLabel: 'Communication channels', zeroBase: true,
+                  summary: v.n + ' people create ' + f2(v.n * (v.n - 1) / 2) + ' channels' +
+                    (ok(v.n2) ? '; ' + v.n2 + ' would create ' + f2(v.n2 * (v.n2 - 1) / 2) + ' — the curve steepens as the team grows.' : '.')
+                };
+              }
+            }
           ]
         }
       ]
@@ -1420,6 +1990,27 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.impact) ? v.impact : null; },
               interpret: function () { return info('Reserves cover portfolios of risks, not single worst cases.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'EMV against full exposure',
+              purpose: 'The average outcome versus what actually happens if the event fires.',
+              kind: 'rangeplot',
+              build: function (v, r) {
+                if (typeof r.emv !== 'number' || !ok(v.impact)) return null;
+                var lo = Math.min(0, v.impact), hi = Math.max(0, v.impact);
+                return {
+                  bands: [{ from: lo, to: hi, tone: v.impact < 0 ? 'bad' : 'good', label: 'full impact range', hatch: true }],
+                  marks: [
+                    { at: 0, label: 'no event' },
+                    { at: r.emv, label: 'EMV', strong: true },
+                    { at: v.impact, label: 'if it fires' }
+                  ],
+                  summary: 'EMV is ' + f2(r.emv) + ', the probability-weighted average — but if the event actually fires, the effect is the full ' +
+                    f2(v.impact) + ', not the average.'
+                };
+              }
+            }
           ]
         },
         {
@@ -1438,6 +2029,17 @@ var PM_DATA = (function () {
               meaning: 'Position in the 25-cell probability–impact matrix.',
               compute: function (v) { return ok(v.p, v.i) ? v.p * v.i : null; },
               interpret: function (x) { return x >= 15 ? bad('High: plan a response now and assign an owner.') : x >= 8 ? warn('Moderate: watchlist with a named owner and trigger conditions.') : good('Low: accept and monitor at routine reviews.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Probability–impact matrix',
+              purpose: 'Where this risk sits in the standard 5×5 grid.',
+              kind: 'matrix',
+              build: function (v, r) {
+                if (!ok(v.p, v.i)) return null;
+                return { p: v.p, i: v.i, size: 5 };
+              }
             }
           ]
         },
@@ -1479,6 +2081,27 @@ var PM_DATA = (function () {
                 return Math.max(0, -sum);
               },
               interpret: function () { return info('An average across many futures — single big risks may need explicit response plans instead.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Register contribution',
+              purpose: 'Which risks drive the reserve — each risk’s own EMV, side by side.',
+              kind: 'bars',
+              build: function (v, r) {
+                var p = parseFlows(v.probs), im = parseFlows(v.impacts);
+                if (!p || !im || p.length !== im.length || typeof r.netEmv !== 'number') return null;
+                var series = p.map(function (pr, i) {
+                  var e = (pr / 100) * im[i];
+                  return { label: 'R' + (i + 1), value: e, tone: e < 0 ? 'bad' : e > 0 ? 'good' : 'neutral' };
+                });
+                return {
+                  series: series,
+                  catHead: 'Risk',
+                  summary: 'Net EMV across the register is ' + f2(r.netEmv) +
+                    (typeof r.reserve === 'number' && r.reserve > 0 ? '; suggested reserve ' + f2(r.reserve) + '.' : '.')
+                };
+              }
             }
           ]
         }
@@ -1536,6 +2159,26 @@ var PM_DATA = (function () {
               },
               interpret: function () { return info('The margin is the expected cost of choosing the weaker branch.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Expected value comparison',
+              purpose: 'Which branch wins on average, and how wide a bet each one is.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (typeof r.emvA !== 'number' || typeof r.emvB !== 'number') return null;
+                return {
+                  series: [
+                    { label: 'A', sub: 'EMV', value: r.emvA, tone: r.emvA >= r.emvB ? 'good' : 'neutral' },
+                    { label: 'B', sub: 'EMV', value: r.emvB, tone: r.emvB > r.emvA ? 'good' : 'neutral' }
+                  ],
+                  refValue: 0, refLabel: 'break-even',
+                  catHead: 'Option',
+                  summary: 'Option A has an expected value of ' + f2(r.emvA) + ', option B ' + f2(r.emvB) +
+                    ' — the higher figure wins on average, but EMV alone does not show which option is the wider bet.'
+                };
+              }
+            }
           ]
         }
       ]
@@ -1586,6 +2229,28 @@ var PM_DATA = (function () {
               },
               interpret: function (x) { return typeof x === 'number' && x >= 6 ? good('Six Sigma performance.') : info('Approximation — accurate between roughly 1.5σ and 6σ.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Sigma level',
+              purpose: 'Process performance on the Six Sigma scale.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (typeof r.sigma !== 'number') return null; /* r.sigma is a string at 0 defects — no chart then */
+                return {
+                  value: r.sigma, min: 1.5, max: 6.5,
+                  zones: [
+                    { from: 1.5, to: 3, tone: 'bad', label: 'redesign needed' },
+                    { from: 3, to: 4, tone: 'warn', label: 'industry average' },
+                    { from: 4, to: 6.5, tone: 'good', label: 'world class' }
+                  ],
+                  label: 'Sigma level', valueFmt: function (n) { return n.toFixed(2) + 'σ'; },
+                  tickFmt: function (n) { return n.toFixed(1) + 'σ'; },
+                  summary: 'The process runs at ' + f2(r.sigma) + 'σ, against ' + f2(v.defects) + ' defects observed in ' +
+                    f2(v.units) + ' units.'
+                };
+              }
+            }
           ]
         },
         {
@@ -1616,6 +2281,28 @@ var PM_DATA = (function () {
               meaning: 'Inner band where points are legal but worth watching.',
               compute: function (v) { return ok(v.mean, v.sigma) ? f2(v.mean - 2 * v.sigma) + ' – ' + f2(v.mean + 2 * v.sigma) : null; },
               interpret: function () { return info('Roughly 95% of in-control points should land inside this.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Control band',
+              purpose: 'The mean, the ±2σ warning zone, and the ±3σ control limits on one axis.',
+              kind: 'rangeplot',
+              build: function (v, r) {
+                if (typeof r.ucl !== 'number' || typeof r.lcl !== 'number' || !ok(v.mean, v.sigma)) return null;
+                return {
+                  bands: [
+                    { from: v.mean - 2 * v.sigma, to: v.mean + 2 * v.sigma, tone: 'good', label: 'warning zone (±2σ)' },
+                    { from: r.lcl, to: v.mean - 2 * v.sigma, tone: 'warn', label: 'LCL–2σ', hatch: true },
+                    { from: v.mean + 2 * v.sigma, to: r.ucl, tone: 'warn', label: '2σ–UCL', hatch: true }
+                  ],
+                  marks: [
+                    { at: r.lcl, label: 'LCL' }, { at: v.mean, label: 'mean', strong: true }, { at: r.ucl, label: 'UCL' }
+                  ],
+                  summary: 'Normal variation runs from ' + f2(r.lcl) + ' to ' + f2(r.ucl) +
+                    '; a point outside that band is a signal, not noise.'
+                };
+              }
             }
           ]
         },
@@ -1649,6 +2336,31 @@ var PM_DATA = (function () {
                 if (x >= 1.33) return good('Capable — meets the common ≥ 1.33 bar.');
                 if (ok(v.usl, v.lsl, v.sigma) && v.sigma > 0 && (v.usl - v.lsl) / (6 * v.sigma) >= 1.33) return warn('Cp is fine but Cpk is not: the process is off-centre — re-centre before re-engineering.');
                 return x >= 1 ? warn('Marginal — improvement needed.') : bad('Not capable of meeting the specification.');
+              }
+            }
+          ],
+          charts: [
+            {
+              title: 'Spec window vs process spread',
+              purpose: 'Whether the ±3σ process spread fits inside the customer’s spec limits, and how centred it is.',
+              kind: 'rangeplot',
+              build: function (v, r) {
+                if (!ok(v.usl, v.lsl, v.mean, v.sigma) || v.sigma <= 0) return null;
+                return {
+                  bands: [
+                    { from: v.lsl, to: v.usl, tone: 'accent', label: 'specification (LSL–USL)' },
+                    { from: v.mean - 3 * v.sigma, to: v.mean + 3 * v.sigma,
+                      tone: typeof r.cpk === 'number' && r.cpk >= 1.33 ? 'good' : typeof r.cpk === 'number' && r.cpk >= 1 ? 'warn' : 'bad',
+                      label: 'process spread (±3σ)', hatch: true }
+                  ],
+                  marks: [{ at: v.mean, label: 'process mean', strong: true }],
+                  summary: typeof r.cp === 'number' && typeof r.cpk === 'number'
+                    ? 'Cp ' + f2(r.cp) + ', Cpk ' + f2(r.cpk) +
+                      (r.cpk >= 1.33 ? ' — the process spread sits comfortably inside the spec.'
+                        : r.cp >= 1.33 ? ' — the spread would fit if the process were centred; it currently is not.'
+                        : ' — the process spread is wider than the spec window.')
+                    : ''
+                };
               }
             }
           ]
@@ -1697,6 +2409,28 @@ var PM_DATA = (function () {
                 return total > 0 ? ((v.internal + v.external) / total) * 100 : null;
               },
               interpret: function (x) { return x > 50 ? bad('Paying for failure more than prevention — shift spend upstream.') : x > 30 ? warn('Failure costs are significant — review where defects originate.') : good('Spend is weighted toward prevention, where it returns most.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Conformance vs failure spend',
+              purpose: 'Where quality money goes — investment against the cost of failure.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (!ok(v.prevention, v.appraisal, v.internal, v.external)) return null;
+                return {
+                  series: [
+                    { label: 'Prevention', value: v.prevention, tone: 'good' },
+                    { label: 'Appraisal', value: v.appraisal, tone: 'good' },
+                    { label: 'Internal fail', value: v.internal, tone: 'bad', hatch: true },
+                    { label: 'External fail', value: v.external, tone: 'bad', hatch: true }
+                  ],
+                  catHead: 'Category',
+                  summary: typeof r.failShare === 'number'
+                    ? 'Failure costs are ' + f2(r.failShare) + '% of total quality spend of ' + f2(r.total) + '.'
+                    : ''
+                };
+              }
             }
           ]
         }
@@ -1774,7 +2508,8 @@ var PM_DATA = (function () {
               compute: function (v) {
                 var flows = parseFlows(v.flows);
                 if (!ok(v.rate, v.inv) || !flows || v.inv === 0) return null;
-                return (npvOf(v.rate / 100, v.inv, flows) + v.inv) / v.inv;
+                var npv = npvOf(v.rate / 100, v.inv, flows);
+                return npv !== null ? (npv + v.inv) / v.inv : null;
               },
               interpret: function (x) { return x > 1 ? good('Each 1.00 invested returns ' + f2(x) + ' in present value.') : bad('Returns less than it costs.'); }
             },
@@ -1796,6 +2531,41 @@ var PM_DATA = (function () {
               },
               interpret: function () { return warn('Ignores everything after recovery and the time value of money — never use alone.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Cumulative cash flow',
+              purpose: 'Discounted against undiscounted — where the project actually breaks even.',
+              kind: 'curve',
+              build: function (v, r) {
+                var flows = parseFlows(v.flows);
+                if (!ok(v.rate, v.inv) || !flows || !flows.length) return null;
+                var undis = [[0, -v.inv]], dis = [[0, -v.inv]];
+                var cu = -v.inv, cd = -v.inv, t;
+                for (t = 0; t < flows.length; t++) {
+                  cu += flows[t];
+                  cd += flows[t] / Math.pow(1 + v.rate / 100, t + 1);
+                  undis.push([t + 1, cu]);
+                  dis.push([t + 1, cd]);
+                }
+                var markers = [];
+                var pbMatch = typeof r.payback === 'string' && /^([\d.]+) periods$/.exec(r.payback);
+                if (pbMatch) markers.push({ x: parseFloat(pbMatch[1]), y: 0, label: 'payback', tone: 'accent' });
+                return {
+                  series: [
+                    { label: 'Undiscounted', points: undis, tone: 'neutral', style: 'dashed' },
+                    { label: 'Discounted', points: dis, tone: 'accent', style: 'solid' }
+                  ],
+                  markers: markers,
+                  refY: 0, refLabel: 'break-even',
+                  xLabel: 'Period', yLabel: 'Cumulative cash flow', zeroBase: true,
+                  summary: typeof r.npv === 'number'
+                    ? 'Discounted cumulative cash flow ends at ' + f2(r.npv) + ' in today’s money' +
+                      (typeof r.payback === 'string' ? '; undiscounted capital is recovered at ' + r.payback + '.' : '.')
+                    : ''
+                };
+              }
+            }
           ]
         },
         {
@@ -1813,13 +2583,23 @@ var PM_DATA = (function () {
             {
               key: 'fv', label: 'Future value', format: 'money',
               meaning: 'What the amount grows to if invested today at the given rate.',
-              compute: function (v) { return ok(v.amount, v.rate, v.n) ? v.amount * Math.pow(1 + v.rate / 100, v.n) : null; },
+              compute: function (v) {
+                if (!ok(v.amount, v.rate, v.n) || v.rate <= -100) return null;
+                var r = v.amount * Math.pow(1 + v.rate / 100, v.n);
+                return Number.isFinite(r) ? r : null;
+              },
               interpret: function () { return info('Treats the amount as invested today.'); }
             },
             {
               key: 'pv', label: 'Present value', format: 'money',
               meaning: 'What a payment of that amount, received n periods from now, is worth today.',
-              compute: function (v) { return ok(v.amount, v.rate, v.n) ? v.amount / Math.pow(1 + v.rate / 100, v.n) : null; },
+              compute: function (v) {
+                if (!ok(v.amount, v.rate, v.n) || v.rate <= -100) return null;
+                var base = Math.pow(1 + v.rate / 100, v.n);
+                if (base === 0) return null;
+                var r = v.amount / base;
+                return Number.isFinite(r) ? r : null;
+              },
               interpret: function () { return info('Treats the amount as received in the future.'); }
             },
             {
@@ -1859,6 +2639,28 @@ var PM_DATA = (function () {
               meaning: 'Price − variable cost: what each sale contributes to fixed costs.',
               compute: function (v) { return ok(v.price, v.varCost) ? v.price - v.varCost : null; },
               interpret: function (x) { return x <= 0 ? bad('Non-positive margin: no volume can ever break even.') : info('Higher margin means fewer units to break even.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Revenue vs cost',
+              purpose: 'Where the revenue line crosses total cost.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (!ok(v.fixed, v.price, v.varCost) || v.price - v.varCost <= 0 || typeof r.units !== 'number') return null;
+                var maxU = r.units * 2;
+                var rev = [[0, 0], [maxU, v.price * maxU]];
+                var cost = [[0, v.fixed], [maxU, v.fixed + v.varCost * maxU]];
+                return {
+                  series: [
+                    { label: 'Revenue', points: rev, tone: 'good' },
+                    { label: 'Total cost', points: cost, tone: 'neutral', style: 'dashed' }
+                  ],
+                  markers: [{ x: r.units, y: r.revenue, label: 'break-even', tone: 'accent' }],
+                  xLabel: 'Units', yLabel: 'Amount', zeroBase: true,
+                  summary: 'Revenue overtakes total cost at ' + f2(r.units) + ' units (' + f2(r.revenue) + ' of revenue).'
+                };
+              }
             }
           ]
         },
@@ -1926,6 +2728,25 @@ var PM_DATA = (function () {
                 return w && s && w.length !== s.length ? bad('Weights and scores must have the same number of entries.') : info('Same ranking as the weighted average, different scale.');
               }
             }
+          ],
+          charts: [
+            {
+              title: 'Weighted contribution',
+              purpose: 'Each criterion’s share of the total score — the weights, made visible.',
+              kind: 'bars',
+              build: function (v, r) {
+                var w = parseFlows(v.weights), s = parseFlows(v.scores);
+                if (!w || !s || w.length !== s.length || typeof r.raw !== 'number') return null;
+                var series = w.map(function (wt, i) {
+                  return { label: 'C' + (i + 1), sub: 'w' + wt, value: wt * s[i], tone: 'accent' };
+                });
+                return {
+                  series: series,
+                  catHead: 'Criterion',
+                  summary: 'Weighted total ' + f2(r.raw) + (typeof r.weighted === 'number' ? ' (weighted average ' + f2(r.weighted) + ' on the original scoring scale).' : '.')
+                };
+              }
+            }
           ]
         }
       ]
@@ -1962,6 +2783,30 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.ceiling, v.targetPrice, v.targetCost, v.buyerShare) && v.buyerShare > 0 ? (v.ceiling - v.targetPrice) / (v.buyerShare / 100) : null; },
               interpret: function () { return info('Shared per the ratio inside this band.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Shared-risk band',
+              purpose: 'Target cost, the point of total assumption, and the ceiling on one cost axis.',
+              kind: 'rangeplot',
+              build: function (v, r) {
+                if (typeof r.pta !== 'number' || !ok(v.targetCost, v.ceiling)) return null;
+                return {
+                  bands: [
+                    { from: v.targetCost, to: r.pta, tone: 'good', label: 'shared per ' + v.buyerShare + '/' + (100 - v.buyerShare) },
+                    { from: r.pta, to: v.ceiling, tone: 'bad', label: 'seller alone', hatch: true }
+                  ],
+                  marks: [
+                    { at: v.targetCost, label: 'target cost' },
+                    { at: r.pta, label: 'PTA', strong: true },
+                    { at: v.ceiling, label: 'ceiling' }
+                  ],
+                  summary: 'Costs are shared ' + v.buyerShare + '/' + (100 - v.buyerShare) +
+                    ' up to ' + f2(r.pta) + '; every dollar above that comes out of the seller’s fee alone, up to the ' +
+                    f2(v.ceiling) + ' ceiling.'
+                };
+              }
+            }
           ]
         },
         {
@@ -1996,6 +2841,34 @@ var PM_DATA = (function () {
                 return ok(v.ceiling) ? Math.min(price, v.ceiling) : price;
               },
               interpret: function (x, v) { return ok(v.ceiling) && x >= v.ceiling ? warn('Ceiling reached — the seller absorbs everything above it.') : info('Within the shared-risk band.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Final price vs actual cost',
+              purpose: 'The slope changes at the PTA and flattens at the ceiling — that bend is where seller risk changes.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (typeof r.finalPrice !== 'number' || !ok(v.targetCost, v.targetFee, v.sellerShare)) return null;
+                var lo = Math.min(v.actualCost, v.targetCost) * 0.7;
+                var hi = ok(v.ceiling) ? v.ceiling * 1.15 : Math.max(v.actualCost, v.targetCost) * 1.6;
+                var N = 40, pts = [], i, ac, price;
+                for (i = 0; i <= N; i++) {
+                  ac = lo + (hi - lo) * (i / N);
+                  price = ac + v.targetFee + (v.targetCost - ac) * (v.sellerShare / 100);
+                  if (ok(v.ceiling)) price = Math.min(price, v.ceiling);
+                  pts.push([ac, price]);
+                }
+                return {
+                  series: [{ label: 'Final price', points: pts, tone: 'accent' }],
+                  markers: [{ x: v.actualCost, y: r.finalPrice, label: 'entered cost', tone: 'accent' }],
+                  refY: ok(v.ceiling) ? v.ceiling : undefined, refLabel: ok(v.ceiling) ? 'ceiling' : undefined,
+                  xLabel: 'Actual cost', yLabel: 'Final price',
+                  summary: 'Seller share ' + v.sellerShare + '% of the delta from target cost. At the entered actual cost of ' +
+                    f2(v.actualCost) + ', the buyer pays ' + f2(r.finalPrice) +
+                    (ok(v.ceiling) && r.finalPrice >= v.ceiling ? ' — the ceiling is reached.' : '.')
+                };
+              }
             }
           ]
         },
@@ -2046,6 +2919,35 @@ var PM_DATA = (function () {
               },
               interpret: function () { return info('Once the fee hits its floor, every extra cost dollar passes straight to the buyer.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Seller fee vs actual cost',
+              purpose: 'The fee moves with performance, then clamps flat at the negotiated floor and ceiling.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (typeof r.fee !== 'number' || !ok(v.targetCost, v.targetFee, v.sellerShare)) return null;
+                var lo = Math.min(v.actualCost, v.targetCost) * 0.6;
+                var hi = Math.max(v.actualCost, v.targetCost) * 1.6;
+                var N = 40, pts = [], i, ac, fee;
+                for (i = 0; i <= N; i++) {
+                  ac = lo + (hi - lo) * (i / N);
+                  fee = v.targetFee + (v.targetCost - ac) * (v.sellerShare / 100);
+                  if (ok(v.maxFee)) fee = Math.min(fee, v.maxFee);
+                  if (ok(v.minFee)) fee = Math.max(fee, v.minFee);
+                  pts.push([ac, fee]);
+                }
+                return {
+                  series: [{ label: 'Seller fee', points: pts, tone: 'accent' }],
+                  markers: [{ x: v.actualCost, y: r.fee, label: 'entered cost', tone: 'accent' }],
+                  refY: v.targetFee, refLabel: 'target fee',
+                  xLabel: 'Actual cost', yLabel: 'Fee',
+                  summary: 'Seller share ' + v.sellerShare + '% of the delta from target cost' +
+                    (ok(v.minFee) || ok(v.maxFee) ? ', clamped between the negotiated fee floor and ceiling' : '') +
+                    '. At the entered actual cost, the fee is ' + f2(r.fee) + '.'
+                };
+              }
+            }
           ]
         }
       ]
@@ -2095,6 +2997,27 @@ var PM_DATA = (function () {
               },
               interpret: function () { return warn('Assumes stable scope and team — re-forecast every sprint.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Backlog burndown forecast',
+              purpose: 'The remaining backlog burning down at the team’s demonstrated velocity.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (typeof r.velocity !== 'number' || !ok(v.backlog) || r.velocity <= 0) return null;
+                var sprints = Math.ceil(v.backlog / r.velocity);
+                if (!(sprints >= 0) || sprints > 5000) return null;
+                var pts = [], s;
+                for (s = 0; s <= sprints; s++) pts.push([s, Math.max(0, v.backlog - r.velocity * s)]);
+                return {
+                  series: [{ label: 'Remaining backlog', points: pts, tone: 'accent' }],
+                  markers: typeof r.sprintsLeft === 'number' ? [{ x: r.sprintsLeft, y: 0, label: 'done', tone: 'good' }] : [],
+                  refY: 0, xLabel: 'Sprint', yLabel: 'Backlog (points)', zeroBase: true,
+                  summary: 'At a velocity of ' + f2(r.velocity) + ' points/sprint, ' + f2(v.backlog) +
+                    ' remaining points clear in ' + f2(r.sprintsLeft) + ' sprints — a forecast, not a commitment.'
+                };
+              }
+            }
           ]
         },
         {
@@ -2122,6 +3045,25 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.members, v.days, v.hoursPerDay, v.focus) ? v.members * v.days * v.hoursPerDay * (v.focus / 100) : null; },
               interpret: function () { return info('Compare against the task-hour sum of the proposed sprint backlog.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'Raw vs plannable capacity',
+              purpose: 'The focus factor is the gap — committing to raw hours is how sprints fail.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (typeof r.raw !== 'number' || typeof r.capacity !== 'number') return null;
+                return {
+                  series: [
+                    { label: 'Raw hours', value: r.raw, tone: 'warn', hatch: true },
+                    { label: 'Plannable', value: r.capacity, tone: 'good' }
+                  ],
+                  catHead: 'Hours',
+                  summary: 'Of ' + f2(r.raw) + ' raw hours, only ' + f2(r.capacity) + ' are realistically plannable at a ' +
+                    f2(v.focus) + '% focus factor.'
+                };
+              }
+            }
           ]
         },
         {
@@ -2146,6 +3088,29 @@ var PM_DATA = (function () {
               meaning: 'Delivered minus committed — negative means work rolled over.',
               compute: function (v) { return ok(v.committed, v.delivered) ? v.delivered - v.committed : null; },
               interpret: function (x) { return x < 0 ? info('Rolled-over work distorts the next sprint’s plan — re-estimate it.') : info('Zero gap is the goal, not a big positive one.'); }
+            }
+          ],
+          charts: [
+            {
+              title: 'Forecast reliability',
+              purpose: 'Where the say/do ratio sits against the reliable band.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (typeof r.ratio !== 'number') return null;
+                return {
+                  value: r.ratio, min: 40, max: 160, target: 100, targetLabel: '100%',
+                  zones: [
+                    { from: 40, to: 85, tone: 'warn', label: 'over-committing' },
+                    { from: 85, to: 110, tone: 'good', label: 'reliable' },
+                    { from: 110, to: 160, tone: 'warn', label: 'possibly sandbagged' }
+                  ],
+                  label: 'Say/do', valueFmt: function (n) { return n.toFixed(0) + '%'; },
+                  tickFmt: function (n) { return n + '%'; },
+                  summary: 'Delivered ' + f2(r.ratio) + '% of what was committed' +
+                    (r.ratio >= 85 && r.ratio <= 110 ? ' — inside the reliable band.'
+                      : r.ratio < 85 ? ' — chronic over-commitment.' : ' — consistently beating commitments; check the forecasts aren’t sandbagged.')
+                };
+              }
             }
           ]
         }
@@ -2185,6 +3150,27 @@ var PM_DATA = (function () {
               compute: function (v) { return ok(v.wip, v.throughput, v.workTime) && v.throughput > 0 && v.wip > 0 ? (v.workTime / (v.wip / v.throughput)) * 100 : null; },
               interpret: function (x) { return x >= 40 ? good('Exceptional — most knowledge work sits at 5–15%.') : x >= 15 ? info('Typical to good for knowledge work.') : warn('Items spend most of their life waiting — attack queues, not people.'); }
             }
+          ],
+          charts: [
+            {
+              title: 'WIP vs cycle time',
+              purpose: 'The linear relationship behind WIP limits — at fixed throughput, cycle time tracks WIP directly.',
+              kind: 'curve',
+              build: function (v, r) {
+                if (!ok(v.throughput) || v.throughput <= 0 || typeof r.cycleTime !== 'number' || !ok(v.wip) || v.wip < 0 || v.wip > 100000) return null;
+                var maxWip = Math.min(2000, Math.max(8, Math.ceil(v.wip * 2)));
+                var pts = [], w;
+                for (w = 0; w <= maxWip; w++) pts.push([w, w / v.throughput]);
+                return {
+                  series: [{ label: 'Cycle time', points: pts, tone: 'accent' }],
+                  markers: [{ x: v.wip, y: r.cycleTime, label: 'current WIP', tone: 'accent' }],
+                  xLabel: 'Work in progress', yLabel: 'Cycle time', zeroBase: true,
+                  summary: 'At a throughput of ' + f2(v.throughput) + ' items/period, ' + f2(v.wip) +
+                    ' items in progress means a cycle time of ' + f2(r.cycleTime) +
+                    ' — halving WIP halves cycle time without anyone working faster.'
+                };
+              }
+            }
           ]
         }
       ]
@@ -2196,6 +3182,962 @@ var PM_DATA = (function () {
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
+  </script>
+  <script>
+/* PM Calculation Desk — instrument plotting.
+
+   Charts here are drawings on the same sheet as everything else: hairline
+   rules, tabular figures, square frames, no fills that mean nothing. A chart
+   earns its place only when it shows a relationship the numbers alone hide.
+
+   The contract: a card's `charts` array holds builders. Each builder receives
+   the values the reader typed (v) and the results the card already computed
+   (r), and returns a plot spec — or null when the inputs cannot support one.
+   Builders never recompute a formula; computeCard is the single source of
+   truth and hands them its own output. */
+
+var PM_CHARTS = (function () {
+  'use strict';
+
+  /* ── geometry ──────────────────────────────────────────────────── */
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* Round to a readable step so gridlines land on numbers a person would
+     choose: 1, 2, 2.5, 5, 10 × a power of ten. */
+  function niceStep(raw) {
+    if (!(raw > 0)) return 1;
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var norm = raw / mag;
+    var step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10;
+    return step * mag;
+  }
+
+  function ticks(min, max, target) {
+    if (!isFinite(min) || !isFinite(max)) return [];
+    if (min === max) { min -= 0.5; max += 0.5; }
+    var step = niceStep((max - min) / (target || 4));
+    var start = Math.ceil(min / step) * step;
+    var out = [];
+    for (var t = start; t <= max + step * 0.001 && out.length < 24; t += step) {
+      out.push(Math.abs(t) < step * 1e-9 ? 0 : t);
+    }
+    return out;
+  }
+
+  /* Axis figures need to stay short — a six-figure budget cannot print in
+     full on a 360px sheet without colliding with its neighbour. */
+  function short(n) {
+    if (!isFinite(n)) return '—';
+    var a = Math.abs(n);
+    if (a >= 1e9) return trim(n / 1e9) + 'B';
+    if (a >= 1e6) return trim(n / 1e6) + 'M';
+    if (a >= 1e4) return trim(n / 1e3) + 'k';
+    if (a >= 100) return String(Math.round(n));
+    if (a >= 1) return trim(n);
+    if (a === 0) return '0';
+    return trim(n);
+  }
+
+  function trim(n) {
+    var r = Math.round(n * 100) / 100;
+    return String(r);
+  }
+
+  function full(n) {
+    if (!isFinite(n)) return '—';
+    return Number(n.toFixed(2)).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  /* ── primitives ────────────────────────────────────────────────── */
+
+  function svgOpen(w, h) {
+    return '<svg class="ch-svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h +
+      '" role="img" focusable="false" aria-hidden="true">';
+  }
+
+  function line(x1, y1, x2, y2, cls) {
+    return '<line class="' + cls + '" x1="' + r1(x1) + '" y1="' + r1(y1) +
+      '" x2="' + r1(x2) + '" y2="' + r1(y2) + '"/>';
+  }
+
+  function text(x, y, str, cls, anchor) {
+    return '<text class="' + cls + '" x="' + r1(x) + '" y="' + r1(y) +
+      '" text-anchor="' + (anchor || 'middle') + '">' + esc(str) + '</text>';
+  }
+
+  function rect(x, y, w, h, cls) {
+    if (!(w > 0)) w = 0;
+    if (!(h > 0)) h = 0;
+    return '<rect class="' + cls + '" x="' + r1(x) + '" y="' + r1(y) +
+      '" width="' + r1(w) + '" height="' + r1(h) + '"/>';
+  }
+
+  /* Half-pixel offsets keep hairlines from smearing across two device rows. */
+  function r1(n) { return Math.round(n * 10) / 10; }
+  function crisp(n) { return Math.round(n) + 0.5; }
+
+  function plotFrame(w, h, pad) {
+    return rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b, 'ch-frame');
+  }
+
+  /* ── vertical / horizontal gridlines with labels ───────────────── */
+
+  function yAxis(w, h, pad, sy, vals, fmt) {
+    var out = '';
+    for (var i = 0; i < vals.length; i++) {
+      var y = crisp(sy(vals[i]));
+      out += line(pad.l, y, w - pad.r, y, 'ch-grid');
+      out += text(pad.l - 6, y + 3.5, (fmt || short)(vals[i]), 'ch-tick', 'end');
+    }
+    return out;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     RENDERERS
+     Each takes (spec, w) and returns { svg, summary, table }.
+     `table` is the accessible data view; `summary` the one-line reading.
+     ══════════════════════════════════════════════════════════════════ */
+
+  var R = {};
+
+  /* ── bars: categorical comparison against an optional reference ──── */
+  R.bars = function (spec, w) {
+    var series = spec.series.filter(function (s) { return isFinite(s.value); });
+    if (!series.length) return null;
+
+    var h = spec.height || 190;
+    var pad = { t: 18, r: 14, b: 44, l: 48 };
+    var vals = series.map(function (s) { return s.value; });
+    if (isFinite(spec.refValue)) vals.push(spec.refValue);
+    var lo = Math.min(0, Math.min.apply(null, vals));
+    var hi = Math.max(0, Math.max.apply(null, vals));
+    if (lo === hi) hi = lo + 1;
+    var span = hi - lo;
+    lo -= span * 0.04; hi += span * 0.08;
+
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    var sy = function (v) { return pad.t + ph - ((v - lo) / (hi - lo)) * ph; };
+
+    var out = svgOpen(w, h);
+    out += yAxis(w, h, pad, sy, ticks(lo, hi, 4), spec.tickFmt);
+    out += plotFrame(w, h, pad);
+
+    var n = series.length;
+    var slot = pw / n;
+    var bw = Math.min(slot * 0.56, 54);
+    var zeroY = sy(0);
+
+    for (var i = 0; i < n; i++) {
+      var s = series[i];
+      var cx = pad.l + slot * (i + 0.5);
+      var y = sy(s.value);
+      var top = Math.min(y, zeroY), hgt = Math.abs(y - zeroY);
+      /* A hairline at least 1px tall so a zero-value bar still reads as a
+         measured zero rather than a missing entry. */
+      out += rect(cx - bw / 2, top, bw, Math.max(hgt, 1), 'ch-bar ch-t-' + (s.tone || 'neutral'));
+      /* Pattern overlay, so a bar's role survives greyscale. */
+      if (s.hatch) out += rect(cx - bw / 2, top, bw, Math.max(hgt, 1), 'ch-hatch');
+      out += text(cx, h - pad.b + 14, s.label, 'ch-cat');
+      if (s.sub) out += text(cx, h - pad.b + 26, s.sub, 'ch-cat ch-cat-sub');
+      out += text(cx, top - 5, (spec.valueFmt || short)(s.value), 'ch-val');
+    }
+
+    out += line(pad.l, crisp(zeroY), w - pad.r, crisp(zeroY), 'ch-zero');
+
+    if (isFinite(spec.refValue)) {
+      var ry = crisp(sy(spec.refValue));
+      out += line(pad.l, ry, w - pad.r, ry, 'ch-ref');
+      out += text(w - pad.r - 3, ry - 5, spec.refLabel || '', 'ch-reflabel', 'end');
+    }
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: spec.summary || series.map(function (s) {
+        return s.label + ' ' + full(s.value);
+      }).join('; ') + '.',
+      table: {
+        head: [spec.catHead || 'Measure', spec.valHead || 'Value'],
+        rows: series.map(function (s) { return [s.label + (s.sub ? ' (' + s.sub + ')' : ''), full(s.value)]; })
+          .concat(isFinite(spec.refValue) ? [[spec.refLabel || 'Reference', full(spec.refValue)]] : [])
+      }
+    };
+  };
+
+  /* ── quadrant: two indices against a crossed reference ──────────── */
+  R.quadrant = function (spec, w) {
+    if (!isFinite(spec.x) || !isFinite(spec.y)) return null;
+
+    var h = spec.height || 232;
+    var pad = { t: 16, r: 16, b: 38, l: 46 };
+    var rx = isFinite(spec.refX) ? spec.refX : 1;
+    var ry = isFinite(spec.refY) ? spec.refY : 1;
+
+    /* Keep the reference cross centred so the four zones stay equal — a
+       lopsided cross reads as a verdict the data has not earned. */
+    var reach = Math.max(
+      Math.abs(spec.x - rx), Math.abs(spec.y - ry), spec.minReach || 0.25
+    ) * 1.25;
+    var xlo = rx - reach, xhi = rx + reach;
+    var ylo = ry - reach, yhi = ry + reach;
+
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    var sx = function (v) { return pad.l + ((v - xlo) / (xhi - xlo)) * pw; };
+    var sy = function (v) { return pad.t + ph - ((v - ylo) / (yhi - ylo)) * ph; };
+
+    var out = svgOpen(w, h);
+
+    var cxr = sx(rx), cyr = sy(ry);
+    /* The favourable quadrant is shaded, not coloured: a wash plus the
+       corner labels carries the meaning without depending on hue. */
+    out += rect(cxr, pad.t, w - pad.r - cxr, cyr - pad.t, 'ch-zone-good');
+    out += rect(pad.l, cyr, cxr - pad.l, h - pad.b - cyr, 'ch-zone-bad');
+
+    var i;
+    var xt = ticks(xlo, xhi, 3), yt = ticks(ylo, yhi, 3);
+    for (i = 0; i < yt.length; i++) {
+      var gy = crisp(sy(yt[i]));
+      out += line(pad.l, gy, w - pad.r, gy, 'ch-grid');
+      out += text(pad.l - 6, gy + 3.5, trim(yt[i]), 'ch-tick', 'end');
+    }
+    for (i = 0; i < xt.length; i++) {
+      var gx = crisp(sx(xt[i]));
+      out += line(gx, pad.t, gx, h - pad.b, 'ch-grid');
+      out += text(gx, h - pad.b + 14, trim(xt[i]), 'ch-tick');
+    }
+
+    out += plotFrame(w, h, pad);
+    out += line(crisp(cxr), pad.t, crisp(cxr), h - pad.b, 'ch-ref');
+    out += line(pad.l, crisp(cyr), w - pad.r, crisp(cyr), 'ch-ref');
+
+    out += text(w - pad.r - 4, pad.t + 12, spec.goodLabel || 'favourable', 'ch-zonelabel', 'end');
+    out += text(pad.l + 4, h - pad.b - 5, spec.badLabel || 'unfavourable', 'ch-zonelabel', 'start');
+
+    /* Clamp the plotted point inside the frame so an extreme index still
+       shows a direction instead of vanishing off the sheet. */
+    var px = Math.max(pad.l + 3, Math.min(w - pad.r - 3, sx(spec.x)));
+    var py = Math.max(pad.t + 3, Math.min(h - pad.b - 3, sy(spec.y)));
+    out += line(px - 7, py, px + 7, py, 'ch-cross');
+    out += line(px, py - 7, px, py + 7, 'ch-cross');
+    out += '<circle class="ch-point ch-t-' + (spec.tone || 'neutral') + '" cx="' + r1(px) +
+      '" cy="' + r1(py) + '" r="4.5"/>';
+    out += text(
+      px, py - 12,
+      trim(spec.x) + ' / ' + trim(spec.y),
+      'ch-val',
+      px > w - pad.r - 46 ? 'end' : px < pad.l + 46 ? 'start' : 'middle'
+    );
+
+    out += text(pad.l + pw / 2, h - 6, spec.xLabel || '', 'ch-axis');
+    out += '<text class="ch-axis" transform="translate(11,' + r1(pad.t + ph / 2) +
+      ') rotate(-90)" text-anchor="middle">' + esc(spec.yLabel || '') + '</text>';
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: spec.summary || ((spec.xLabel || 'x') + ' ' + trim(spec.x) + ', ' +
+        (spec.yLabel || 'y') + ' ' + trim(spec.y) + '.'),
+      table: {
+        head: ['Axis', 'Value', 'Reference'],
+        rows: [
+          [spec.xLabel || 'x', trim(spec.x), trim(rx)],
+          [spec.yLabel || 'y', trim(spec.y), trim(ry)]
+        ]
+      }
+    };
+  };
+
+  /* ── matrix: a discrete probability–impact grid ─────────────────── */
+  R.matrix = function (spec, w) {
+    var p = spec.p, im = spec.i;
+    if (!isFinite(p) || !isFinite(im)) return null;
+    var size = spec.size || 5;
+    p = Math.max(1, Math.min(size, Math.round(p)));
+    im = Math.max(1, Math.min(size, Math.round(im)));
+
+    var pad = { t: 14, r: 14, b: 36, l: 42 };
+    var cell = Math.max(22, Math.min(46, (w - pad.l - pad.r) / size));
+    var gw = cell * size;
+    var h = pad.t + gw + pad.b;
+
+    var out = svgOpen(w, h);
+    var x0 = pad.l, y0 = pad.t;
+
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        var prob = size - r;            /* top row = highest probability */
+        var imp = c + 1;
+        var score = prob * imp;
+        var band = score >= 15 ? 'bad' : score >= 8 ? 'warn' : 'good';
+        var cx = x0 + c * cell, cy = y0 + r * cell;
+        out += rect(cx, cy, cell, cell, 'ch-cell ch-band-' + band);
+        out += text(cx + cell / 2, cy + cell / 2 + 3.5, String(score), 'ch-cellnum');
+      }
+    }
+
+    /* The entered risk is marked by an open square — position and outline,
+       not fill colour, is what identifies it. */
+    var mc = x0 + (im - 1) * cell, mr = y0 + (size - p) * cell;
+    out += rect(mc + 2, mr + 2, cell - 4, cell - 4, 'ch-cellmark');
+    out += rect(mc + 5, mr + 5, cell - 10, cell - 10, 'ch-cellmark2');
+
+    for (var k = 1; k <= size; k++) {
+      out += text(x0 + (k - 0.5) * cell, h - pad.b + 14, String(k), 'ch-tick');
+      out += text(x0 - 7, y0 + (size - k + 0.5) * cell + 3.5, String(k), 'ch-tick', 'end');
+    }
+    out += text(x0 + gw / 2, h - 6, 'Impact →', 'ch-axis');
+    out += '<text class="ch-axis" transform="translate(10,' + r1(y0 + gw / 2) +
+      ') rotate(-90)" text-anchor="middle">Probability →</text>';
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: 'Probability ' + p + ' × impact ' + im + ' places this risk at score ' +
+        (p * im) + ' of ' + (size * size) + '.',
+      table: {
+        head: ['Probability', 'Impact', 'Score', 'Band'],
+        rows: [[String(p), String(im), String(p * im),
+          p * im >= 15 ? 'High' : p * im >= 8 ? 'Moderate' : 'Low']]
+      }
+    };
+  };
+
+  /* ── curve: one or more series over a numeric x, with markers ───── */
+  R.curve = function (spec, w) {
+    var series = (spec.series || []).filter(function (s) { return s.points && s.points.length > 1; });
+    if (!series.length) return null;
+
+    var h = spec.height || 200;
+    var pad = { t: 18, r: 16, b: 40, l: 52 };
+    var xs = [], ys = [];
+    series.forEach(function (s) {
+      s.points.forEach(function (pt) {
+        if (isFinite(pt[0]) && isFinite(pt[1])) { xs.push(pt[0]); ys.push(pt[1]); }
+      });
+    });
+    if (xs.length < 2) return null;
+    (spec.markers || []).forEach(function (m) {
+      if (isFinite(m.x)) xs.push(m.x);
+      if (isFinite(m.y)) ys.push(m.y);
+    });
+    if (isFinite(spec.refY)) ys.push(spec.refY);
+
+    var xlo = Math.min.apply(null, xs), xhi = Math.max.apply(null, xs);
+    var ylo = Math.min.apply(null, ys), yhi = Math.max.apply(null, ys);
+    if (spec.zeroBase) { ylo = Math.min(0, ylo); yhi = Math.max(0, yhi); }
+    if (xlo === xhi) xhi = xlo + 1;
+    if (ylo === yhi) { ylo -= 0.5; yhi += 0.5; }
+    var yspan = yhi - ylo;
+    ylo -= yspan * 0.08; yhi += yspan * 0.12;
+
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    var sx = function (v) { return pad.l + ((v - xlo) / (xhi - xlo)) * pw; };
+    var sy = function (v) { return pad.t + ph - ((v - ylo) / (yhi - ylo)) * ph; };
+
+    var out = svgOpen(w, h);
+    out += yAxis(w, h, pad, sy, ticks(ylo, yhi, 4), spec.tickFmt);
+
+    var xt = ticks(xlo, xhi, Math.max(2, Math.min(5, Math.floor(w / 78))));
+    for (var i = 0; i < xt.length; i++) {
+      var gx = crisp(sx(xt[i]));
+      out += line(gx, pad.t, gx, h - pad.b, 'ch-grid');
+      out += text(gx, h - pad.b + 14, short(xt[i]), 'ch-tick');
+    }
+    out += plotFrame(w, h, pad);
+
+    if (ylo < 0 && yhi > 0) out += line(pad.l, crisp(sy(0)), w - pad.r, crisp(sy(0)), 'ch-zero');
+    if (isFinite(spec.refY)) {
+      var ry = crisp(sy(spec.refY));
+      out += line(pad.l, ry, w - pad.r, ry, 'ch-ref');
+      if (spec.refLabel) out += text(w - pad.r - 3, ry - 5, spec.refLabel, 'ch-reflabel', 'end');
+    }
+    if (isFinite(spec.refX)) {
+      var rxx = crisp(sx(spec.refX));
+      out += line(rxx, pad.t, rxx, h - pad.b, 'ch-ref');
+      if (spec.refXLabel) {
+        out += text(rxx + 4, pad.t + 11, spec.refXLabel, 'ch-reflabel',
+          rxx > w - pad.r - 70 ? 'end' : 'start');
+      }
+    }
+
+    /* Line style, not just colour, separates the series — a dashed baseline
+       stays a baseline in greyscale and for a dichromatic reader. */
+    series.forEach(function (s, si) {
+      var d = '';
+      s.points.forEach(function (pt, k) {
+        if (!isFinite(pt[0]) || !isFinite(pt[1])) return;
+        d += (k === 0 || !d ? 'M' : 'L') + r1(sx(pt[0])) + ' ' + r1(sy(pt[1]));
+      });
+      if (s.fill) {
+        var base = sy(Math.max(ylo, Math.min(yhi, 0)));
+        out += '<path class="ch-area ch-t-' + (s.tone || 'accent') + '" d="' + d +
+          'L' + r1(sx(s.points[s.points.length - 1][0])) + ' ' + r1(base) +
+          'L' + r1(sx(s.points[0][0])) + ' ' + r1(base) + 'Z"/>';
+      }
+      out += '<path class="ch-line ch-ls-' + (s.style || (si === 0 ? 'solid' : 'dashed')) +
+        ' ch-t-' + (s.tone || 'accent') + '" d="' + d + '"/>';
+    });
+
+    (spec.markers || []).forEach(function (m) {
+      if (!isFinite(m.x) || !isFinite(m.y)) return;
+      var mx = sx(m.x), my = sy(m.y);
+      out += line(mx, pad.t, mx, h - pad.b, 'ch-marker-rule');
+      out += '<circle class="ch-point ch-t-' + (m.tone || 'accent') + '" cx="' + r1(mx) +
+        '" cy="' + r1(my) + '" r="4"/>';
+      if (m.label) {
+        out += text(mx, my - 10, m.label, 'ch-val',
+          mx > w - pad.r - 50 ? 'end' : mx < pad.l + 50 ? 'start' : 'middle');
+      }
+    });
+
+    out += text(pad.l + pw / 2, h - 5, spec.xLabel || '', 'ch-axis');
+    if (spec.yLabel) {
+      out += '<text class="ch-axis" transform="translate(11,' + r1(pad.t + ph / 2) +
+        ') rotate(-90)" text-anchor="middle">' + esc(spec.yLabel) + '</text>';
+    }
+    out += '</svg>';
+
+    var legend = series.length > 1 ? series.map(function (s) {
+      return { label: s.label, style: s.style || 'solid', tone: s.tone || 'accent' };
+    }) : null;
+
+    return {
+      svg: out,
+      summary: spec.summary || '',
+      legend: legend,
+      table: spec.table || {
+        head: [spec.xLabel || 'x'].concat(series.map(function (s) { return s.label; })),
+        rows: sampleRows(series, spec)
+      }
+    };
+  };
+
+  /* The data view is a reading aid, not a dump: sample a long curve down to
+     a dozen rows so a screen-reader user gets the shape, not 400 numbers. */
+  function sampleRows(series, spec) {
+    var base = series[0].points;
+    var stride = Math.max(1, Math.ceil(base.length / 12));
+    var rows = [];
+    for (var i = 0; i < base.length; i += stride) {
+      var row = [short(base[i][0])];
+      for (var s = 0; s < series.length; s++) {
+        var pt = series[s].points[i];
+        row.push(pt ? (spec.tickFmt || full)(pt[1]) : '—');
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  /* ── distribution: three-point spread with the PERT estimate ────── */
+  R.distribution = function (spec, w) {
+    var o = spec.o, m = spec.m, p = spec.p, e = spec.e, sd = spec.sd;
+    if (!isFinite(o) || !isFinite(m) || !isFinite(p) || !isFinite(e)) return null;
+    if (p < o) return null;
+
+    var h = spec.height || 190;
+    var pad = { t: 16, r: 18, b: 42, l: 18 };
+    var span = p - o;
+    var xlo = o - span * 0.12 - (span === 0 ? 1 : 0);
+    var xhi = p + span * 0.12 + (span === 0 ? 1 : 0);
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    var sx = function (v) { return pad.l + ((v - xlo) / (xhi - xlo)) * pw; };
+
+    /* Beta-PERT density, sampled. Shape parameters follow the standard
+       PERT parameterisation with lambda = 4. */
+    var pts = [], i, dens = [], maxD = 0;
+    var N = 96;
+    if (span > 0) {
+      var a = 1 + 4 * (m - o) / span;
+      var b = 1 + 4 * (p - m) / span;
+      for (i = 0; i <= N; i++) {
+        var t = i / N;
+        var d = (t <= 0 || t >= 1) ? 0 : Math.exp((a - 1) * Math.log(t) + (b - 1) * Math.log(1 - t));
+        if (!isFinite(d)) d = 0;
+        dens.push(d);
+        if (d > maxD) maxD = d;
+      }
+    }
+    if (!(maxD > 0)) { for (i = 0; i <= N; i++) dens[i] = i === 0 || i === N ? 0 : 1; maxD = 1; }
+
+    var baseY = pad.t + ph;
+    for (i = 0; i <= N; i++) {
+      pts.push([sx(o + (i / N) * span), baseY - (dens[i] / maxD) * (ph - 8)]);
+    }
+
+    var out = svgOpen(w, h);
+    var d0 = '';
+    for (i = 0; i < pts.length; i++) d0 += (i ? 'L' : 'M') + r1(pts[i][0]) + ' ' + r1(pts[i][1]);
+
+    /* Confidence band clipped to the curve: shows where the committed range
+       actually sits under the distribution. */
+    if (isFinite(sd) && sd > 0) {
+      var lo1 = Math.max(o, e - sd), hi1 = Math.min(p, e + sd);
+      out += '<clipPath id="' + spec.clipId + '"><rect x="' + r1(sx(lo1)) + '" y="' + pad.t +
+        '" width="' + r1(Math.max(0, sx(hi1) - sx(lo1))) + '" height="' + r1(ph) + '"/></clipPath>';
+      out += '<path class="ch-dist-band" clip-path="url(#' + spec.clipId + ')" d="' + d0 +
+        'L' + r1(sx(p)) + ' ' + r1(baseY) + 'L' + r1(sx(o)) + ' ' + r1(baseY) + 'Z"/>';
+    }
+    out += '<path class="ch-dist-fill" d="' + d0 + 'L' + r1(sx(p)) + ' ' + r1(baseY) +
+      'L' + r1(sx(o)) + ' ' + r1(baseY) + 'Z"/>';
+    out += '<path class="ch-line ch-t-accent" d="' + d0 + '"/>';
+    out += line(pad.l, crisp(baseY), w - pad.r, crisp(baseY), 'ch-zero');
+
+    function stem(v, label, cls, side) {
+      if (!isFinite(v)) return '';
+      var x = sx(v);
+      var s = line(crisp(x), pad.t + 2, crisp(x), baseY, cls);
+      s += text(x, baseY + 14, label, 'ch-cat', side || 'middle');
+      s += text(x, baseY + 26, short(v), 'ch-val', side || 'middle');
+      return s;
+    }
+
+    out += stem(o, 'O', 'ch-stem', sx(o) < pad.l + 22 ? 'start' : 'middle');
+    out += stem(m, 'M', 'ch-stem');
+    out += stem(p, 'P', 'ch-stem', sx(p) > w - pad.r - 22 ? 'end' : 'middle');
+    out += line(crisp(sx(e)), pad.t, crisp(sx(e)), baseY, 'ch-stem-e');
+    out += text(sx(e), pad.t - 4, 'E ' + short(e), 'ch-val ch-val-strong');
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: 'Optimistic ' + full(o) + ', most likely ' + full(m) + ', pessimistic ' + full(p) +
+        '. PERT estimate ' + full(e) +
+        (isFinite(sd) && sd > 0 ? ', with the shaded band covering ' + full(e - sd) + ' to ' + full(e + sd) +
+          ' — about a 68% chance the outcome lands inside it.' : '.'),
+      table: {
+        head: ['Point', 'Value'],
+        rows: [['Optimistic (O)', full(o)], ['Most likely (M)', full(m)], ['Pessimistic (P)', full(p)],
+          ['PERT estimate (E)', full(e)]].concat(
+          isFinite(sd) ? [['Standard deviation (σ)', full(sd)],
+            ['68% range', full(e - sd) + ' – ' + full(e + sd)]] : [])
+      }
+    };
+  };
+
+  /* ── rangeplot: a value and its bands on one number line ────────── */
+  R.rangeplot = function (spec, w) {
+    var marks = (spec.marks || []).filter(function (m) { return isFinite(m.at); });
+    var bands = (spec.bands || []).filter(function (b) { return isFinite(b.from) && isFinite(b.to); });
+    if (!marks.length && !bands.length) return null;
+
+    var vals = [];
+    marks.forEach(function (m) { vals.push(m.at); });
+    bands.forEach(function (b) { vals.push(b.from, b.to); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if (lo === hi) { lo -= 1; hi += 1; }
+    var span = hi - lo;
+    lo -= span * 0.1; hi += span * 0.1;
+
+    var rows = Math.max(1, bands.length);
+    var h = spec.height || (72 + rows * 20);
+    var pad = { t: 14, r: 16, b: 40, l: 16 };
+    var pw = w - pad.l - pad.r;
+    var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
+    var axisY = h - pad.b;
+
+    var out = svgOpen(w, h);
+    var xt = ticks(lo, hi, Math.max(2, Math.min(5, Math.floor(w / 84))));
+    for (var i = 0; i < xt.length; i++) {
+      var gx = crisp(sx(xt[i]));
+      out += line(gx, pad.t, gx, axisY, 'ch-grid');
+      out += text(gx, axisY + 14, (spec.tickFmt || short)(xt[i]), 'ch-tick');
+    }
+
+    var bandTop = pad.t + 4;
+    var bandH = Math.max(12, (axisY - bandTop - 6) / rows - 6);
+    bands.forEach(function (b, k) {
+      var x1 = sx(Math.min(b.from, b.to)), x2 = sx(Math.max(b.from, b.to));
+      var y = bandTop + k * (bandH + 6);
+      out += rect(x1, y, Math.max(x2 - x1, 1), bandH, 'ch-band ch-t-' + (b.tone || 'neutral'));
+      if (b.hatch) out += rect(x1, y, Math.max(x2 - x1, 1), bandH, 'ch-hatch');
+      if (b.label) {
+        out += text(x1 + 5, y + bandH / 2 + 3.5, b.label, 'ch-bandlabel', 'start');
+      }
+    });
+
+    out += line(pad.l, crisp(axisY), w - pad.r, crisp(axisY), 'ch-zero');
+
+    marks.forEach(function (m) {
+      var x = sx(m.at);
+      out += line(crisp(x), pad.t, crisp(x), axisY + 4, 'ch-stem' + (m.strong ? '-e' : ''));
+      var anchor = x > w - pad.r - 44 ? 'end' : x < pad.l + 44 ? 'start' : 'middle';
+      out += text(x, axisY + 26, m.label, 'ch-cat', anchor);
+      out += text(x, axisY + 37, (spec.valueFmt || short)(m.at), 'ch-val', anchor);
+    });
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: spec.summary || marks.map(function (m) {
+        return m.label + ' at ' + full(m.at);
+      }).join('; ') + '.',
+      table: {
+        head: ['Point', 'Value'],
+        rows: marks.map(function (m) { return [m.label, full(m.at)]; })
+          .concat(bands.map(function (b) {
+            return [b.label || 'Band', full(b.from) + ' – ' + full(b.to)];
+          }))
+      }
+    };
+  };
+
+  /* ── meter: one reading against labelled threshold zones ────────── */
+  R.meter = function (spec, w) {
+    if (!isFinite(spec.value)) return null;
+    var zones = (spec.zones || []).filter(function (z) { return isFinite(z.from) && isFinite(z.to); });
+    if (!zones.length) return null;
+
+    var lo = spec.min, hi = spec.max;
+    zones.forEach(function (z) {
+      lo = isFinite(lo) ? Math.min(lo, z.from) : z.from;
+      hi = isFinite(hi) ? Math.max(hi, z.to) : z.to;
+    });
+    /* An out-of-range reading widens the scale rather than pinning silently,
+       so the reader can see how far past the last threshold it sits. */
+    lo = Math.min(lo, spec.value);
+    hi = Math.max(hi, spec.value);
+    if (lo === hi) { lo -= 1; hi += 1; }
+
+    var h = spec.height || 108;
+    var pad = { t: 30, r: 16, b: 34, l: 16 };
+    var pw = w - pad.l - pad.r;
+    var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
+    var barY = pad.t, barH = 20;
+
+    var out = svgOpen(w, h);
+    zones.forEach(function (z) {
+      var x1 = sx(z.from), x2 = sx(z.to);
+      out += rect(x1, barY, Math.max(x2 - x1, 1), barH, 'ch-band ch-t-' + (z.tone || 'neutral'));
+      if (z.hatch) out += rect(x1, barY, Math.max(x2 - x1, 1), barH, 'ch-hatch');
+      if (z.label && x2 - x1 > 46) {
+        out += text((x1 + x2) / 2, barY + barH + 13, z.label, 'ch-cat');
+      }
+      out += line(crisp(x2), barY, crisp(x2), barY + barH, 'ch-band-div');
+    });
+    out += rect(pad.l, barY, pw, barH, 'ch-frame');
+
+    if (isFinite(spec.target)) {
+      var tx = crisp(sx(spec.target));
+      out += line(tx, barY - 5, tx, barY + barH + 5, 'ch-ref');
+      out += text(sx(spec.target), barY - 9, spec.targetLabel || '', 'ch-reflabel');
+    }
+
+    /* The reading is a filled triangle above the scale: position carries the
+       verdict, so it survives greyscale. */
+    var vx = sx(spec.value);
+    out += '<path class="ch-needle ch-t-' + (spec.tone || 'neutral') + '" d="M' + r1(vx) + ' ' +
+      r1(barY - 1) + 'l-6 -9 h12 Z"/>';
+    var anchor = vx > w - pad.r - 40 ? 'end' : vx < pad.l + 40 ? 'start' : 'middle';
+    out += text(vx, barY - 14, (spec.valueFmt || trim)(spec.value), 'ch-val ch-val-strong', anchor);
+    out += text(pad.l, h - 6, (spec.tickFmt || short)(lo), 'ch-tick', 'start');
+    out += text(w - pad.r, h - 6, (spec.tickFmt || short)(hi), 'ch-tick', 'end');
+    if (spec.scaleLabel) out += text(pad.l + pw / 2, h - 6, spec.scaleLabel, 'ch-axis');
+    out += '</svg>';
+
+    var inZone = null;
+    for (var i = 0; i < zones.length; i++) {
+      if (spec.value >= zones[i].from && spec.value <= zones[i].to) { inZone = zones[i]; break; }
+    }
+
+    return {
+      svg: out,
+      summary: spec.summary || ((spec.label || 'Reading') + ' ' + full(spec.value) +
+        (inZone && inZone.label ? ', in the ' + inZone.label + ' band.' : '.')),
+      table: {
+        head: ['Band', 'From', 'To'],
+        rows: zones.map(function (z) { return [z.label || '—', full(z.from), full(z.to)]; })
+          .concat([[(spec.label || 'Reading'), full(spec.value), '']])
+      }
+    };
+  };
+
+  /* ── windows: early and late activity windows on a shared axis ──── */
+  R.windows = function (spec, w) {
+    var rows = (spec.rows || []).filter(function (r) { return isFinite(r.from) && isFinite(r.to); });
+    if (!rows.length) return null;
+
+    var vals = [];
+    rows.forEach(function (r) { vals.push(r.from, r.to); });
+    (spec.marks || []).forEach(function (m) { if (isFinite(m.at)) vals.push(m.at); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if (lo === hi) hi = lo + 1;
+    var span = hi - lo;
+    lo -= span * 0.08; hi += span * 0.12;
+
+    /* The label column and the note column are both sized from their own
+       longest string — a mono-font character estimate, since an SVG string
+       builder has no live text measurement to call. Reserving real space
+       for both keeps every row's text inside the frame instead of running
+       off either edge. */
+    var maxLabelLen = 0, maxNoteLen = 0, hasNote = false;
+    rows.forEach(function (r) {
+      maxLabelLen = Math.max(maxLabelLen, String(r.label || '').length);
+      if (r.note) { hasNote = true; maxNoteLen = Math.max(maxNoteLen, String(r.note).length); }
+    });
+    var padL = Math.max(50, Math.min(160, 14 + maxLabelLen * 5.6));
+    var padR = hasNote ? Math.max(16, Math.min(120, 12 + maxNoteLen * 5.6)) : 16;
+
+    var pad = { t: 16, r: padR, b: 34, l: padL };
+    var rowH = 26;
+    var h = pad.t + rows.length * rowH + pad.b;
+    var pw = w - pad.l - pad.r;
+    var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
+    var axisY = h - pad.b;
+
+    var out = svgOpen(w, h);
+    var xt = ticks(lo, hi, Math.max(2, Math.min(6, Math.floor(w / 70))));
+    for (var i = 0; i < xt.length; i++) {
+      var gx = crisp(sx(xt[i]));
+      out += line(gx, pad.t, gx, axisY, 'ch-grid');
+      out += text(gx, axisY + 14, short(xt[i]), 'ch-tick');
+    }
+
+    rows.forEach(function (r, k) {
+      var y = pad.t + k * rowH + 4;
+      var bh = rowH - 12;
+      var x1 = sx(Math.min(r.from, r.to)), x2 = sx(Math.max(r.from, r.to));
+      out += rect(x1, y, Math.max(x2 - x1, 2), bh, 'ch-bar ch-t-' + (r.tone || 'neutral'));
+      if (r.hatch) out += rect(x1, y, Math.max(x2 - x1, 2), bh, 'ch-hatch');
+      out += text(pad.l - 7, y + bh / 2 + 3.5, r.label, 'ch-cat', 'end');
+      /* The note sits in a fixed right-hand column, not trailing the bar —
+         a bar that reaches the frame edge would otherwise push its own
+         note off the drawing. */
+      if (r.note) out += text(w - 4, y + bh / 2 + 3.5, r.note, 'ch-val', 'end');
+    });
+
+    (spec.marks || []).forEach(function (m) {
+      if (!isFinite(m.at)) return;
+      var x = crisp(sx(m.at));
+      out += line(x, pad.t - 2, x, axisY, 'ch-stem-e');
+      out += text(sx(m.at), axisY + 26, m.label, 'ch-cat',
+        sx(m.at) > w - pad.r - 40 ? 'end' : 'middle');
+    });
+
+    out += line(pad.l, crisp(axisY), w - pad.r, crisp(axisY), 'ch-zero');
+    out += '</svg>';
+
+    return {
+      svg: out,
+      summary: spec.summary || rows.map(function (r) {
+        return r.label + ' from ' + full(r.from) + ' to ' + full(r.to);
+      }).join('; ') + '.',
+      table: {
+        head: ['Window', 'From', 'To', 'Span'],
+        rows: rows.map(function (r) {
+          return [r.label, full(r.from), full(r.to), full(Math.abs(r.to - r.from))];
+        })
+      }
+    };
+  };
+
+  return {
+    renderers: R,
+    esc: esc,
+    short: short,
+    full: full,
+    trim: trim,
+    ticks: ticks
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_CHARTS;
+  </script>
+  <script>
+/* PM Calculation Desk — chart mounting and lifecycle.
+
+   A chart is inert until it is worth drawing: the plot area stays empty until
+   the card scrolls near the viewport, and redraws only when the reader
+   changes an input or the sheet changes width past a threshold. That
+   threshold matters — redrawing on every sub-pixel resize is how a chart and
+   its container start fighting each other. */
+
+var PM_CHART_MOUNT = (function () {
+  'use strict';
+
+  var R = PM_CHARTS.renderers;
+  var uid = 0;
+
+  /* A chart draws only when the reader can plausibly see it. */
+  var io = null;
+  if (typeof IntersectionObserver !== 'undefined') {
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        var inst = e.target.__chart;
+        if (inst) { inst.visible = true; inst.draw(); }
+      });
+    }, { rootMargin: '300px 0px' });
+  }
+
+  function build(card, chartDef) {
+    var id = 'ch' + (++uid);
+    var fig = document.createElement('figure');
+    fig.className = 'chart';
+    fig.setAttribute('aria-labelledby', id + '-t');
+    fig.innerHTML =
+      '<figcaption class="chart-head">' +
+        '<span class="chart-title" id="' + id + '-t">' + PM_CHARTS.esc(chartDef.title) + '</span>' +
+        '<span class="chart-purpose">' + PM_CHARTS.esc(chartDef.purpose) + '</span>' +
+      '</figcaption>' +
+      '<div class="chart-legend" hidden></div>' +
+      '<div class="chart-plot"></div>' +
+      '<p class="chart-empty">Enter the parameters to plot this.</p>' +
+      '<p class="chart-summary"></p>' +
+      '<details class="chart-data">' +
+        '<summary>View data</summary>' +
+        '<div class="chart-table-wrap"></div>' +
+      '</details>';
+
+    var plot = fig.querySelector('.chart-plot');
+    var legendEl = fig.querySelector('.chart-legend');
+    var emptyEl = fig.querySelector('.chart-empty');
+    var sumEl = fig.querySelector('.chart-summary');
+    var details = fig.querySelector('.chart-data');
+    var tableWrap = fig.querySelector('.chart-table-wrap');
+
+    var inst = {
+      def: chartDef,
+      spec: null,
+      visible: false,
+      lastW: 0,
+      drawnSpec: null,
+
+      /* Called by computeCard with the values and the results it just
+         produced. The builder never recomputes — it reads. */
+      update: function (v, results) {
+        var spec = null;
+        try { spec = chartDef.build(v, results); } catch (err) { spec = null; }
+        inst.spec = spec;
+        inst.drawnSpec = null;
+        if (inst.visible) inst.draw();
+      },
+
+      draw: function () {
+        var w = Math.round(plot.clientWidth);
+        if (!w) return;
+        /* Sub-threshold width jitter is ignored so a redraw can never change
+           the width that triggered it. */
+        if (inst.drawnSpec === inst.spec && Math.abs(w - inst.lastW) < 8) return;
+        inst.lastW = w;
+        inst.drawnSpec = inst.spec;
+
+        if (!inst.spec) {
+          plot.innerHTML = '';
+          legendEl.hidden = true;
+          emptyEl.hidden = false;
+          sumEl.textContent = '';
+          details.hidden = true;
+          details.open = false;
+          fig.classList.add('is-empty');
+          return;
+        }
+
+        var render = R[chartDef.kind];
+        var out = null;
+        /* A chart that fails to draw must never take the calculator with it:
+           the numbers are the product, the plot is the commentary. */
+        try {
+          out = render ? render(inst.spec, w) : null;
+        } catch (err) {
+          out = null;
+        }
+
+        if (!out) {
+          plot.innerHTML = '';
+          legendEl.hidden = true;
+          emptyEl.hidden = false;
+          sumEl.textContent = '';
+          details.hidden = true;
+          fig.classList.add('is-empty');
+          return;
+        }
+
+        fig.classList.remove('is-empty');
+        emptyEl.hidden = true;
+        plot.innerHTML = out.svg;
+        details.hidden = false;
+
+        if (out.legend && out.legend.length) {
+          legendEl.innerHTML = out.legend.map(function (l) {
+            return '<span class="ch-key"><i class="ch-key-line ch-ls-' + l.style +
+              ' ch-t-' + l.tone + '"></i>' + PM_CHARTS.esc(l.label) + '</span>';
+          }).join('');
+          legendEl.hidden = false;
+        } else {
+          legendEl.hidden = true;
+        }
+
+        sumEl.textContent = out.summary || '';
+
+        if (details.open) inst.fillTable(out.table);
+        else inst.pendingTable = out.table;
+      },
+
+      fillTable: function (t) {
+        if (!t) { tableWrap.innerHTML = ''; return; }
+        tableWrap.innerHTML =
+          '<table class="chart-table"><caption class="sr-only">' +
+            PM_CHARTS.esc(chartDef.title) + ' — plotted values</caption><thead><tr>' +
+            t.head.map(function (c) { return '<th scope="col">' + PM_CHARTS.esc(c) + '</th>'; }).join('') +
+          '</tr></thead><tbody>' +
+            t.rows.map(function (row) {
+              return '<tr>' + row.map(function (c, i) {
+                return i === 0
+                  ? '<th scope="row">' + PM_CHARTS.esc(c) + '</th>'
+                  : '<td>' + PM_CHARTS.esc(c) + '</td>';
+              }).join('') + '</tr>';
+            }).join('') +
+          '</tbody></table>';
+      }
+    };
+
+    details.addEventListener('toggle', function () {
+      if (details.open) inst.fillTable(inst.pendingTable);
+    });
+
+    fig.__chart = inst;
+    if (io) io.observe(fig); else { inst.visible = true; }
+    return { el: fig, inst: inst };
+  }
+
+  /* One resize pass for the whole sheet, rather than an observer per chart:
+     33 independent ResizeObservers is how a page starts dropping frames. */
+  var all = [];
+  var resizeTimer = null;
+  function onResize() {
+    if (resizeTimer) return;
+    resizeTimer = setTimeout(function () {
+      resizeTimer = null;
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].visible) all[i].draw();
+      }
+    }, 140);
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', onResize);
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      /* Colours come from CSS custom properties, so a scheme flip needs no
+         redraw — but Safari < 14 needs the listener guard anyway. */
+      if (mq.addEventListener) mq.addEventListener('change', onResize);
+    }
+  }
+
+  return {
+    build: function (card, chartDef) {
+      var made = build(card, chartDef);
+      all.push(made.inst);
+      return made;
+    }
+  };
+})();
   </script>
   <script>
 /* PM Calculation Desk — rendering and live computation.
@@ -2232,14 +4174,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
   /* --------------------------------------------------------- building */
   function inputField(inp) {
     var type = inp.type === 'text' ? 'text' : 'number';
+    var descId = 'f-' + inp.cardId + '-' + inp.key + '-meaning';
     return '' +
       '<div class="field">' +
         '<label for="f-' + inp.cardId + '-' + inp.key + '">' + inp.label + '</label>' +
         '<input id="f-' + inp.cardId + '-' + inp.key + '" type="' + type + '"' +
           (type === 'number' ? ' step="any" inputmode="decimal"' : '') +
           ' data-key="' + inp.key + '" data-type="' + (inp.type || 'number') + '"' +
+          ' aria-describedby="' + descId + '"' +
           ' placeholder="' + (inp.placeholder || '') + '" autocomplete="off">' +
-        '<p class="field-meaning">' + inp.meaning + '</p>' +
+        '<p class="field-meaning" id="' + descId + '">' + inp.meaning + '</p>' +
       '</div>';
   }
 
@@ -2299,6 +4243,21 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
       '</div>';
 
+    /* Charts are optional per card — only a genuine relationship between
+       inputs, results and a decision earns one. Mounted lazily; each
+       instance starts empty until the reader types, same as the results. */
+    if (card.charts && card.charts.length && window.PM_CHART_MOUNT) {
+      var wrap = document.createElement('div');
+      wrap.className = 'charts';
+      card.chartInstances = [];
+      card.charts.forEach(function (def) {
+        var made = PM_CHART_MOUNT.build(card, def);
+        card.chartInstances.push(made.inst);
+        wrap.appendChild(made.el);
+      });
+      el.appendChild(wrap);
+    }
+
     el.addEventListener('input', function () { computeCard(card, el); });
     return el;
   }
@@ -2315,12 +4274,17 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   function computeCard(card, el) {
     var v = readValues(card, el);
+    /* Every output the card just computed, keyed the same way PM_DATA keys
+       it — the one map a chart builder is allowed to read instead of
+       re-deriving a formula. */
+    var results = {};
     card.outputs.forEach(function (out) {
       var chip = el.querySelector('.result[data-out="' + out.key + '"]');
       var valueEl = chip.querySelector('.r-value');
       var verdictEl = chip.querySelector('.r-verdict');
       var val = null;
       try { val = out.compute(v); } catch (e) { val = null; }
+      results[out.key] = val;
 
       valueEl.textContent = formatValue(val, out.format);
       chip.classList.remove('good', 'warn', 'bad', 'info');
@@ -2337,6 +4301,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
         verdictEl.hidden = true;
       }
     });
+
+    if (card.chartInstances) {
+      card.chartInstances.forEach(function (inst) { inst.update(v, results); });
+    }
   }
 
   /* --------------------------------------------------------- sections */
