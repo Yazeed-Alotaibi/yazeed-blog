@@ -34,25 +34,32 @@ These are not preferences. Breaking one breaks the site's premise.
 
 ## Design language
 
-The site is styled as a reprographic drawing — a "whiteprint". Light mode is a
-diazo print, dark lines on pale stock; dark mode is the cyanotype it was printed
-from, pale lines on prussian blue. Structure comes from drafting conventions:
-title blocks, sheet numbers, hairline rules, tabular figures.
+The site is styled as a bench of calibrated instruments. Light mode is the
+instrument under daylight — putty enamel body, off-white dial faces, engraved
+near-black lettering; dark mode is the same instrument lit from within.
+Structure comes from panel conventions: milled recesses, engraved label plates,
+graduated scales, tabular figures.
 
-- **Typefaces.** Archivo (display, variable width), IBM Plex Sans (body),
-  IBM Plex Mono (labels, all numbers).
+- **Typefaces.** Big Shoulders Display (headings only — it is condensed and set
+  uppercase, so it is wrong for names, small labels, and text fields),
+  Libre Franklin (body), IBM Plex Mono (labels, all numbers).
 - **Colour.** Defined once as custom properties in `:root`, overridden under
   `@media (prefers-color-scheme: dark)`. Never hardcode a hex value in a rule —
   add a property.
+- **Indigo `--accent` is the brand mark only.** It is never a verdict, so it can
+  never be confused with the good/warn/bad scale.
 - **Numbers** are always mono with `font-variant-numeric: tabular-nums`.
-- **Meaning never depends on colour alone.** The status rail on `index.html`
-  plots a verdict positionally across three ticks so it survives greyscale and
+- **Meaning never depends on colour alone.** The hero gauge on `index.html`
+  plots a verdict by needle position and states it as a word; the status track
+  on the desk fills one of three graduated positions. Both survive greyscale and
   colour blindness. Any new status indicator must do the same.
+- **Depth is `--lip` and `--sunk`**, never an ad-hoc shadow. A lip catches the
+  light on a raised panel; a recess swallows it on a sunken one.
 - **Minimum 44px touch targets** on anything interactive.
-- **Respect `prefers-reduced-motion`.** Both existing pages already do.
+- **Respect `prefers-reduced-motion`.** All three pages already do.
 
 Copy the custom properties and font stack from `index.html` when adding a page —
-consistency across sheets is the point.
+consistency across the bench is the point.
 
 ## Skills
 
