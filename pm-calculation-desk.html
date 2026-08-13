@@ -7,45 +7,51 @@
   <meta name="description" content="Interactive project management calculators — earned value, PERT estimation, float, EMV, NPV, procurement and agile forecasting — with every formula and parameter explained.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-/* PM Calculation Desk — whiteprint / blueprint.
-   Direction: the reprographic drawing. Light mode is a diazo whiteprint —
-   dark lines on pale stock. Dark mode is the cyanotype it was printed from —
-   pale lines on prussian. Formulas sit on a gridded strip, as if drawn on the
-   sheet. Every result carries a status rail: a three-position RAG track whose
-   filled tick states the verdict positionally, so the reading survives
-   without color. */
+/* PM Calculation Desk — bench instrument.
+   Direction: a bench of calibrated instruments. Light mode is the instrument
+   under daylight — putty enamel body, off-white dial faces, engraved
+   near-black lettering. Dark mode is the same instrument lit from within.
+   Formulas are etched into a dark inlay. Every result carries a status
+   track: a three-position graduated scale whose filled segment states the
+   verdict positionally, so the reading survives without colour. */
 
 :root {
   color-scheme: light;
 
-  --ground:      #e7ecef;
-  --sheet:       #fbfcfd;
-  --sheet-sunk:  #f1f4f6;
-  --ink:         #0d2233;
-  --ink-2:       #4a5c69;
-  --ink-3:       #55636e;
-  --rule:        #ccd6dd;
-  --rule-2:      #a9b8c2;
+  --ground:      #d9d7cf;
+  --sheet:       #f3f2ed;
+  --sheet-sunk:  #e6e4db;
+  --ink:         #15181a;
+  --ink-2:       #565a5d;
+  --ink-3:       #74797c;
+  --rule:        #c6c4b9;
+  --rule-2:      #a9a79c;
 
-  --accent:      #0b5f96;
-  --accent-soft: #dce9f2;
-  --good:        #0f6b46;
-  --good-soft:   #e2eeea;
-  --warn:        #8a5a06;
-  --warn-soft:   #f3ece0;
-  --bad:         #a8322f;
-  --bad-soft:    #f4e3e2;
+  /* Indigo is the brand mark only. It is never a verdict, so it can never be
+     confused with the good/warn/bad scale. */
+  --accent:      #3b3690;
+  --accent-soft: #e2e1f1;
+  --good:        #1f6b4f;
+  --good-soft:   #dfe9e4;
+  --warn:        #8f6304;
+  --warn-soft:   #f0e8d6;
+  --bad:         #a32c22;
+  --bad-soft:    #f2e0dd;
 
-  --strip:       #0d2233;
-  --strip-ink:   #d5e6f2;
-  --strip-grid:  rgba(150, 200, 235, 0.15);
+  --strip:       #1b1e22;
+  --strip-ink:   #d7dbd2;
+  --strip-grid:  rgba(215, 219, 210, 0.09);
 
-  --shadow: 0 14px 32px -26px rgba(13, 34, 51, 0.6);
+  --shadow: 0 1px 0 rgba(0,0,0,.07), 0 14px 30px -24px rgba(0,0,0,.5);
 
-  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  /* Panel depth: a lip catches the light, a recess swallows it. */
+  --lip:  inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+  --sunk: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+
+  --display: "Big Shoulders Display", "Haettenschweiler", Impact, sans-serif;
+  --body:    "Libre Franklin", system-ui, -apple-system, sans-serif;
   --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
   --text-base: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
@@ -58,29 +64,32 @@
   :root {
     color-scheme: dark;
 
-    --ground:      #0b2333;
-    --sheet:       #102c3e;
-    --sheet-sunk:  #0c2536;
-    --ink:         #e6eef3;
-    --ink-2:       #a8bcc8;
-    --ink-3:       #8ba3b1;
-    --rule:        #1d4055;
-    --rule-2:      #2c5670;
+    --ground:      #131518;
+    --sheet:       #1d2126;
+    --sheet-sunk:  #171a1e;
+    --ink:         #eceae2;
+    --ink-2:       #9aa0a5;
+    --ink-3:       #7e858a;
+    --rule:        #2f353b;
+    --rule-2:      #454d54;
 
-    --accent:      #6cb8e8;
-    --accent-soft: #14344a;
-    --good:        #5cc79a;
-    --good-soft:   #10322a;
-    --warn:        #e0b45c;
-    --warn-soft:   #322816;
-    --bad:         #f0908a;
-    --bad-soft:    #3a1d1e;
+    --accent:      #9d97ff;
+    --accent-soft: #24234a;
+    --good:        #52c295;
+    --good-soft:   #16302a;
+    --warn:        #d9a83f;
+    --warn-soft:   #322a16;
+    --bad:         #ef8177;
+    --bad-soft:    #3a1f1d;
 
-    --strip:       #071a26;
-    --strip-ink:   #cfe3f0;
-    --strip-grid:  rgba(108, 184, 232, 0.13);
+    --strip:       #0e1012;
+    --strip-ink:   #c9cec4;
+    --strip-grid:  rgba(201, 206, 196, 0.07);
 
-    --shadow: 0 14px 32px -26px rgba(0, 0, 0, 0.85);
+    --shadow: 0 1px 0 rgba(0,0,0,.5), 0 14px 30px -24px rgba(0,0,0,.9);
+
+    --lip:  inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.4);
+    --sunk: inset 0 2px 5px rgba(0,0,0,.5);
   }
 }
 
@@ -158,9 +167,8 @@ body {
 
 .brand strong {
   display: block;
-  font-family: var(--display);
-  font-variation-settings: "wdth" 106;
-  font-size: 1rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -268,7 +276,7 @@ body {
 /* --------------------------------------------------------------- main */
 main {
   padding: 0 clamp(1.25rem, 4vw, 4rem) 5rem;
-  max-width: 1080px;
+  max-width: 1240px;
 }
 
 .hero {
@@ -289,11 +297,11 @@ main {
 .hero h1 {
   margin: 0;
   font-family: var(--display);
-  font-variation-settings: "wdth" 112;
-  font-size: clamp(2.2rem, 1.3rem + 4vw, 4rem);
+  font-size: clamp(2.6rem, 1.4rem + 5vw, 4.8rem);
   font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
   max-width: 18ch;
   text-wrap: balance;
 }
@@ -345,10 +353,11 @@ main {
 .cat-head h2 {
   margin: 0;
   font-family: var(--display);
-  font-variation-settings: "wdth" 106;
-  font-size: clamp(1.4rem, 1.15rem + 1.2vw, 2rem);
+  font-size: clamp(1.65rem, 1.2rem + 1.6vw, 2.4rem);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .cat-blurb {
@@ -395,10 +404,11 @@ main {
 .card-head h3 {
   margin: 0;
   font-family: var(--display);
-  font-variation-settings: "wdth" 102;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: -0.015em;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .tagline {
@@ -416,15 +426,13 @@ main {
   max-width: 74ch;
 }
 
-/* The formula sits on gridded stock, like a figure drawn on the sheet. */
+/* The formula is etched into a dark inlay, the way a scale is on a case. */
 .formula {
   padding: 0.85rem 1.05rem;
   margin-bottom: 1.3rem;
-  background-color: var(--strip);
-  background-image:
-    linear-gradient(var(--strip-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background: var(--strip);
+  border-radius: 2px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
   overflow-x: auto;
 }
 
@@ -517,6 +525,8 @@ main {
 .result {
   background: var(--sheet-sunk);
   border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: var(--lip);
   padding: 0.7rem 0.8rem 0.75rem;
   display: flex;
   flex-direction: column;
@@ -543,17 +553,23 @@ main {
   color: var(--ink-3);
 }
 
-/* The status rail: three positions, bad → watch → good. The filled tick
-   states the verdict by position, so it reads without color too. */
+/* The status track: a milled groove graduated into three positions,
+   bad → watch → good. The filled segment states the verdict by position, so
+   it reads without colour too. */
 .r-rail {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-  height: 3px;
-  margin: 0.1rem 0 0.05rem;
+  gap: 2px;
+  height: 7px;
+  margin: 0.25rem 0 0.1rem;
+  padding: 2px;
+  background: var(--sheet-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--sunk);
 }
 
-.r-rail i { background: var(--rule); }
+.r-rail i { background: var(--rule-2); border-radius: 1px; }
 
 .r-meaning {
   font-size: 0.72rem;
@@ -602,9 +618,9 @@ main {
   display: block;
   margin-bottom: 0.4rem;
   font-family: var(--display);
-  font-variation-settings: "wdth" 104;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 600;
+  text-transform: uppercase;
   color: var(--ink);
 }
 
@@ -738,7 +754,10 @@ main {
   margin: 0;
   min-width: 0;
   border: 1px solid var(--rule);
+  border-radius: 3px;
   background: var(--sheet-sunk);
+  box-shadow: var(--lip);
+  overflow: hidden;
 }
 
 .chart-head {
@@ -793,8 +812,13 @@ main {
 .ch-key-line.ch-ls-dotted { border-top-style: dotted; }
 
 .chart-plot {
-  padding: 0.35rem 0.4rem 0.1rem;
+  margin: 0.6rem;
+  padding: 0.7rem 0.6rem 0.5rem;
   min-height: 2px;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--sunk);
 }
 
 .chart-plot svg { display: block; width: 100%; height: auto; }
@@ -814,7 +838,11 @@ main {
   color: var(--ink-3);
 }
 
-.chart.is-empty { border-style: dashed; }
+.chart.is-empty { border-style: dashed; box-shadow: none; }
+
+/* An empty plot has nothing to recess — the window frame alone would read as
+   a control the reader can do something with. */
+.chart.is-empty .chart-plot { display: none; }
 
 .chart-data { border-top: 1px solid var(--rule); }
 
@@ -869,8 +897,8 @@ main {
 .chart-table thead th:first-child { text-align: left; }
 
 /* --- plot internals ---------------------------------------------- */
-.ch-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
-.ch-grid  { stroke: var(--rule); stroke-width: 1; }
+.ch-frame { fill: none; stroke: none; }
+.ch-grid  { stroke: var(--rule); stroke-width: 1; opacity: 0.7; }
 .ch-zero  { stroke: var(--rule-2); stroke-width: 1; }
 .ch-ref { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.8; }
 
@@ -896,10 +924,10 @@ main {
 .ch-t-warn    { --ch: var(--warn); --ch-soft: var(--warn-soft); }
 .ch-t-bad     { --ch: var(--bad); --ch-soft: var(--bad-soft); }
 
-.ch-bar { fill: var(--ch-soft); stroke: var(--ch); stroke-width: 1; }
+.ch-bar { fill: var(--ch-soft); stroke: var(--ch); stroke-width: 1.4; }
 .ch-band { fill: var(--ch-soft); stroke: var(--ch); stroke-width: 1; }
 .ch-band-div { stroke: var(--rule-2); stroke-width: 1; }
-.ch-line { fill: none; stroke: var(--ch); stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; }
+.ch-line { fill: none; stroke: var(--ch); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
 .ch-ls-dashed { stroke-dasharray: 5 4; }
 .ch-ls-dotted { stroke-dasharray: 1.5 3; }
 .ch-area { fill: var(--ch-soft); opacity: 0.55; stroke: none; }
@@ -927,7 +955,7 @@ main {
 .ch-hatch { fill: url(#ch-hatch-pattern); stroke: none; opacity: 0.55; }
 .ch-hatch-stroke { stroke: var(--ink-2); stroke-width: 2; }
 
-@media (min-width: 60em) {
+@media (min-width: 100em) {
   .charts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .chart-wide { grid-column: 1 / -1; }
 }

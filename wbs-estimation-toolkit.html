@@ -7,10 +7,10 @@
   <meta name="description" content="Build a work breakdown structure, apply three-point PERT estimates, and roll up confidence intervals for duration and cost. Runs entirely in your browser.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
 /* yazeed.blog — WBS estimation toolkit.
-   Same whiteprint sheet as the rest of the site. The one signature element
+   Same bench-instrument panel as the rest of the site. The one signature element
    here is the dimension line: an estimate is a range, so it is drawn as a
    range — extent ticks at ΣO and ΣP, the confidence band filled inside, and
    the expected value marked where it actually falls. Where E sits inside the
@@ -21,31 +21,37 @@
 :root {
   color-scheme: light;
 
-  --ground:      #e7ecef;
-  --sheet:       #fbfcfd;
-  --sheet-sunk:  #f1f4f6;
-  --ink:         #0d2233;
-  --ink-2:       #4a5c69;
-  --ink-3:       #55636e;
-  --rule:        #ccd6dd;
-  --rule-2:      #a9b8c2;
+  --ground:      #d9d7cf;
+  --sheet:       #f3f2ed;
+  --sheet-sunk:  #e6e4db;
+  --ink:         #15181a;
+  --ink-2:       #565a5d;
+  --ink-3:       #74797c;
+  --rule:        #c6c4b9;
+  --rule-2:      #a9a79c;
 
-  --accent:      #0b5f96;
-  --accent-soft: #dce9f2;
-  --good:        #0f6b46;
-  --warn:        #8a5a06;
-  --bad:         #a8322f;
+  /* Indigo is the brand mark only. It is never a verdict, so it can never be
+     confused with the good/warn/bad scale. */
+  --accent:      #3b3690;
+  --accent-soft: #e2e1f1;
+  --good:        #1f6b4f;
+  --warn:        #8f6304;
+  --bad:         #a32c22;
 
-  --band:        #b7d3e8;
+  --band:        #c3c1e0;
 
-  --strip:       #0d2233;
-  --strip-ink:   #d5e6f2;
-  --strip-grid:  rgba(150, 200, 235, 0.15);
+  --strip:       #1b1e22;
+  --strip-ink:   #d7dbd2;
+  --strip-grid:  rgba(215, 219, 210, 0.09);
 
-  --shadow: 0 12px 28px -22px rgba(13, 34, 51, 0.55);
+  --shadow: 0 1px 0 rgba(0,0,0,.07), 0 14px 30px -24px rgba(0,0,0,.5);
 
-  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --body:    "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  /* Panel depth: a lip catches the light, a recess swallows it. */
+  --lip:  inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+  --sunk: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+
+  --display: "Big Shoulders Display", "Haettenschweiler", Impact, sans-serif;
+  --body:    "Libre Franklin", system-ui, -apple-system, sans-serif;
   --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
@@ -57,26 +63,29 @@
   :root {
     color-scheme: dark;
 
-    --ground:      #0b2333;
-    --sheet:       #102c3e;
-    --sheet-sunk:  #0c2536;
-    --ink:         #e6eef3;
-    --ink-2:       #a8bcc8;
-    --ink-3:       #8ba3b1;
-    --rule:        #1d4055;
-    --rule-2:      #2c5670;
+    --ground:      #131518;
+    --sheet:       #1d2126;
+    --sheet-sunk:  #171a1e;
+    --ink:         #eceae2;
+    --ink-2:       #9aa0a5;
+    --ink-3:       #7e858a;
+    --rule:        #2f353b;
+    --rule-2:      #454d54;
 
-    --accent:      #6cb8e8;
-    --accent-soft: #14344a;
-    --good:        #5cc79a;
-    --warn:        #e0b45c;
-    --bad:         #f0908a;
+    --accent:      #9d97ff;
+    --accent-soft: #24234a;
+    --good:        #52c295;
+    --warn:        #d9a83f;
+    --bad:         #ef8177;
 
-    --band:        #2b5f83;
+    --band:        #363568;
 
-    --strip:       #071a26;
-    --strip-ink:   #cfe3f0;
-    --strip-grid:  rgba(108, 184, 232, 0.13);
+    --strip:       #0e1012;
+    --strip-ink:   #c9cec4;
+    --strip-grid:  rgba(201, 206, 196, 0.07);
+
+    --lip:  inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.4);
+    --sunk: inset 0 2px 5px rgba(0,0,0,.5);
 
     --shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.8);
   }
@@ -149,10 +158,10 @@ a { color: inherit; }
   background: var(--sheet-sunk);
 }
 .mark-name {
-  font-family: var(--display);
-  font-variation-settings: "wdth" 108;
-  font-size: 0.95rem;
+  font-family: var(--body);
+  font-size: 0.93rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .mark-role {
   display: block;
@@ -187,11 +196,11 @@ a { color: inherit; }
 }
 .hero h1 {
   font-family: var(--display);
-  font-variation-settings: "wdth" 112;
-  font-size: clamp(2.1rem, 1.2rem + 3.8vw, 3.5rem);
+  font-size: clamp(2.6rem, 1.4rem + 4.6vw, 4.4rem);
   font-weight: 700;
-  line-height: 1.03;
-  letter-spacing: -0.025em;
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 .hero h1 em { font-style: normal; color: var(--accent); }
@@ -218,19 +227,17 @@ a { color: inherit; }
   border-bottom: 1px solid var(--rule);
 }
 .instrument-head strong {
-  font-family: var(--display);
-  font-variation-settings: "wdth" 100;
-  font-size: 0.9rem;
+  font-family: var(--body);
+  font-size: 0.93rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .strip {
   padding: 0.85rem 1rem;
-  background-color: var(--strip);
-  background-image:
-    linear-gradient(var(--strip-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background: var(--strip);
+  border-radius: 2px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
   overflow-x: auto;
 }
 .strip code {
@@ -403,9 +410,8 @@ a { color: inherit; }
 .d-name {
   flex: 1 1 auto;
   min-width: 0;
-  font-family: var(--display);
-  font-variation-settings: "wdth" 104;
-  font-size: 1.02rem;
+  font-family: var(--body);
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--ink);
   background: transparent;
