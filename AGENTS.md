@@ -61,6 +61,24 @@ graduated scales, tabular figures.
 Copy the custom properties and font stack from `index.html` when adding a page —
 consistency across the bench is the point.
 
+## Tests
+
+`node tests/baseline.js`, `tests/edge-cases.js`, `tests/charts.js`. They run on
+plain node with no dependencies, and they cover the arithmetic: formula results
+against known values, division and overflow guards, and the chart builders.
+
+**They do not render anything.** The builders are pure functions returning spec
+objects, and that is where the coverage stops — nothing mounts a chart in a
+document. A chart can be broken by CSS or by layout measurement while every one
+of those checks still passes, which has happened: a rule that hid an empty
+plot zeroed its width, and the width guard in `draw()` then refused to redraw
+it, stranding all thirty charts on their empty state permanently. The suite was
+green throughout.
+
+So a green run is not evidence that a chart draws. Open the page and look at it.
+Adding a browser to the test suite would mean adding a dependency, which the
+hard constraints above rule out — the manual check is the deliberate trade.
+
 ## Skills
 
 Vendored into the repository so both agents get the same guidance:
