@@ -5,3 +5,7 @@ Thumbs.db
 .env.*
 !.env.example
 node_modules/
+
+# Python bytecode, generated when a vendored skill script runs
+__pycache__/
+*.py[cod]
