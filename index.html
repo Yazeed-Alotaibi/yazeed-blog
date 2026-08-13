@@ -117,6 +117,18 @@ a { color: inherit; }
   padding-inline: var(--gutter);
 }
 
+/* Very large displays. 1160px is the right measure for a laptop, but past about
+   1600px the bench starts to read as a strip floating in ground. So the bench
+   top widens once and then stops — reading measures below are unaffected, since
+   they are capped in ch and widen nothing. A wider panel, not longer lines. */
+@media (min-width: 100em) {
+  .wrap { max-width: 1400px; }
+  /* The cards are the one place the extra width would land as longer lines,
+     so their prose is capped here — and only here, so narrower screens keep
+     the measure they already had. */
+  .card-desc { max-width: 54ch; }
+}
+
 /* Engraved label plate — small mono caps sitting in a milled recess. */
 .label {
   display: inline-block;
@@ -779,6 +791,13 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
                 <span class="preview-item soon">
                   <span class="preview-no">Building</span>
                   <span class="preview-name">Status Dashboard</span>
+                  <span class="preview-meta">In progress</span>
+                </span>
+              </li>
+              <li>
+                <span class="preview-item soon">
+                  <span class="preview-no">Building</span>
+                  <span class="preview-name">AI Scope Statement Generator</span>
                   <span class="preview-meta">In progress</span>
                 </span>
               </li>
