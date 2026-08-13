@@ -84,6 +84,29 @@ So a green run is not evidence that a chart draws. Open the page and look at it.
 Adding a browser to the test suite would mean adding a dependency, which the
 hard constraints above rule out — the manual check is the deliberate trade.
 
+### Look at it in a foreground tab
+
+A chart draws from an `IntersectionObserver` — the plot is built only once the
+reader can plausibly see it. Chrome defers observer callbacks in a hidden or
+backgrounded tab, so `inst.visible` never flips and `update()` never reaches
+`inst.draw()`. A check run headlessly, or driven by automation in a tab sitting
+behind another window, therefore finds every chart stranded on its empty state
+and reports the whole desk broken — with measurements that look conclusive.
+
+That has already produced one false alarm: thirty charts declared dead, when the
+only thing wrong was that nobody was looking at the tab.
+
+Before trusting any rendering result, confirm the page was actually visible:
+
+```js
+document.visibilityState === 'visible'   // must be true, or the result is noise
+```
+
+A blank plot is evidence of a fault only when that holds *and* the calculator
+above it has values in its fields. An untouched calculator has no spec to plot,
+so its empty state is correct — on a desk where you have filled in one
+calculator, twenty-nine blank charts are the expected result, not a symptom.
+
 ## Skills
 
 Vendored into the repository so both agents get the same guidance:
