@@ -14,7 +14,12 @@ directly with no build step:
 |---|---|
 | `index.html` | Landing page — hero, a live earned-value calculator, and the tools grid |
 | `pm-calculation-desk.html` | 14 domains · 33 calculators · 99 metrics, rendered from a `PM_DATA` object |
-| `wbs-estimation-toolkit.html` | *(in progress)* Work breakdown structure with three-point PERT estimation |
+| `wbs-estimation-toolkit.html` | Work breakdown structure with three-point PERT estimation |
+
+Two further tools are announced on the landing page as `Building` cards and have
+no file yet: **Project Status Dashboard** and **AI Scope Statement Generator**.
+They appear twice on `index.html` — in the hero's "On the bench" list and in the
+tools grid. Both listings must agree; they have drifted apart before.
 
 ## Hard constraints
 
