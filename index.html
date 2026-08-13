@@ -33,10 +33,10 @@
   --panel:       #f3f2ed;   /* dial face */
   --panel-sunk:  #e6e4db;   /* milled recess */
   --ink:         #15181a;
-  --ink-2:       #565a5d;
-  --ink-3:       #74797c;
+  --ink-2:       #43474a;
+  --ink-3:       #585c5e;
   --rule:        #c6c4b9;
-  --rule-2:      #a9a79c;
+  --rule-2:      #87867d;
 
   /* Indigo is the brand mark only. It is never a verdict, so it can never be
      confused with the good/warn/bad scale. */
@@ -44,7 +44,7 @@
   --accent-soft: #e0dff0;
 
   --good:        #1f6b4f;
-  --warn:        #8f6304;
+  --warn:        #7d5703;
   --bad:         #a32c22;
 
   --engrave:     #1b1e22;   /* the dark formula plate */
@@ -76,9 +76,9 @@
     --panel-sunk:  #171a1e;
     --ink:         #eceae2;
     --ink-2:       #9aa0a5;
-    --ink-3:       #7e858a;
+    --ink-3:       #8a9095;
     --rule:        #2f353b;
-    --rule-2:      #454d54;
+    --rule-2:      #6a7075;
 
     --accent:      #9d97ff;
     --accent-soft: #24234a;
@@ -175,7 +175,7 @@ a { color: inherit; }
   gap: 1rem;
   padding-block: .8rem;
 }
-.mark { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
+.mark { display: flex; align-items: center; gap: .7rem; min-height: 44px; text-decoration: none; }
 .mark-glyph {
   font-family: var(--display);
   font-weight: 800;
@@ -595,7 +595,9 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
   box-shadow: var(--sunk);
   padding: 0 .75rem;
 }
-.search-field:focus-within { border-color: var(--accent); }
+/* The input suppresses its own ring so the whole field reads as one control;
+   the field must then carry a ring itself, not just a colour change. */
+.search-field:focus-within { border-color: var(--accent); box-shadow: var(--sunk), 0 0 0 2px var(--accent-soft); }
 .search-icon { flex: none; color: var(--ink-3); }
 .search-field input {
   flex: 1;
@@ -610,7 +612,7 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
 
 .domain-filters { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
 .chip {
-  min-height: 36px;
+  min-height: 44px;
   padding: .35rem .65rem;
   font-family: var(--mono);
   font-size: .65rem;

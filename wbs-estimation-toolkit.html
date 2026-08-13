@@ -25,17 +25,17 @@
   --sheet:       #f3f2ed;
   --sheet-sunk:  #e6e4db;
   --ink:         #15181a;
-  --ink-2:       #565a5d;
-  --ink-3:       #74797c;
+  --ink-2:       #43474a;
+  --ink-3:       #585c5e;
   --rule:        #c6c4b9;
-  --rule-2:      #a9a79c;
+  --rule-2:      #87867d;
 
   /* Indigo is the brand mark only. It is never a verdict, so it can never be
      confused with the good/warn/bad scale. */
   --accent:      #3b3690;
   --accent-soft: #e2e1f1;
   --good:        #1f6b4f;
-  --warn:        #8f6304;
+  --warn:        #7d5703;
   --bad:         #a32c22;
 
   --band:        #c3c1e0;
@@ -68,9 +68,9 @@
     --sheet-sunk:  #171a1e;
     --ink:         #eceae2;
     --ink-2:       #9aa0a5;
-    --ink-3:       #7e858a;
+    --ink-3:       #8a9095;
     --rule:        #2f353b;
-    --rule-2:      #454d54;
+    --rule-2:      #6a7075;
 
     --accent:      #9d97ff;
     --accent-soft: #24234a;
@@ -145,7 +145,7 @@ a { color: inherit; }
   gap: 1rem;
   padding-block: 0.85rem;
 }
-.mark { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+.mark { display: flex; align-items: center; gap: 0.7rem; min-height: 44px; text-decoration: none; }
 .mark-glyph {
   display: grid;
   place-items: center;
@@ -347,7 +347,7 @@ a { color: inherit; }
 }
 .conf-set { display: flex; }
 .conf-set button {
-  min-height: 34px;
+  min-height: 44px;
   padding: 0 0.7rem;
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -417,11 +417,12 @@ a { color: inherit; }
   background: transparent;
   border: 1px solid transparent;
   padding: 0.25rem 0.4rem;
-  min-height: 34px;
+  min-height: 44px;
   transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .d-name:hover { border-color: var(--rule-2); background: var(--sheet); }
-.d-name:focus { outline: none; border-color: var(--accent); background: var(--sheet); }
+/* A border-colour change alone is a colour-only focus signal — carry a ring too. */
+.d-name:focus { outline: none; border-color: var(--accent); background: var(--sheet); box-shadow: 0 0 0 2px var(--accent-soft); }
 
 /* Column headers — only meaningful in the wide layout. */
 .cols {
@@ -465,7 +466,7 @@ a { color: inherit; }
 
 .task input, .cell input {
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0.3rem 0.45rem;
   font-family: var(--mono);
   font-size: 0.85rem;
@@ -510,7 +511,7 @@ a { color: inherit; }
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   color: var(--ink-3);
   background: transparent;
   border: 1px solid transparent;
@@ -565,7 +566,7 @@ a { color: inherit; }
 }
 .btn:hover { background: var(--sheet-sunk); border-color: var(--ink-2); }
 .btn-quiet {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 0.8rem;
   font-size: 0.8rem;
   color: var(--accent);
