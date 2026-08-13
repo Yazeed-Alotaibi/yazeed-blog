@@ -104,13 +104,42 @@ guardrail: neither agent can end up standing on the other's work.
    and say so rather than editing it.
 4. **Rebase before you publish.** `git pull --rebase origin main` before merging,
    so main stays linear and conflicts surface in your worktree, not on the remote.
-5. **Publishing goes live.** main is the published site — merging is deploying.
-   Verify in a browser first.
+5. **Merging is not deploying.** Pushing main publishes nothing on its own —
+   see below. Verify in a browser before you merge, and again after you deploy.
 
 ### Publishing a finished unit
+
+Merging to main is step one of two. It updates the repository, not the site.
 
 ```bash
 git pull --rebase origin main
 git checkout main && git merge --ff-only <your-branch>
 git push origin main
 ```
+
+Then deploy to Hostinger, which is a manual step in hPanel that no agent can
+perform. Until someone does it, main and yazeed.blog hold different code.
+
+The hosting is not described anywhere in this repository, so it is easy to
+assume a push went live when it did not. What is actually true:
+
+- yazeed.blog is served by **Hostinger** (`server: hcdn`), not GitHub Pages.
+  The `github.io` URL returns "Site not found".
+- There is no CI in this repository — no `.github/workflows`, no `CNAME`, no
+  `netlify.toml` or `vercel.json`. Nothing here copies files to Hostinger.
+- The three root HTML files are the deployed artifact. They belong in
+  `public_html` on the host.
+
+Check what the live site is really running before claiming anything about it.
+This compares the deployed page against a commit, byte for byte:
+
+```bash
+curl -sSL -o /tmp/live.html https://yazeed.blog
+git show <commit>:index.html > /tmp/want.html
+cmp /tmp/live.html /tmp/want.html && echo "live matches <commit>"
+```
+
+`x-hcdn-cache-status` in the response headers tells you whether you are
+looking at Hostinger's CDN cache or its origin — `DYNAMIC` means the origin
+itself served that content, so stale bytes there are a missing deploy rather
+than a cache to wait out.
