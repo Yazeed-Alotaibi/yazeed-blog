@@ -1510,7 +1510,13 @@ var PM_DATA = (function () {
               key: 'sd', label: 'Standard deviation (σ)', format: 'num',
               meaning: 'How spread out the outcome could be. A wide O–P gap means low confidence.',
               compute: function (v) { return ok(v.o, v.p) ? (v.p - v.o) / 6 : null; },
-              interpret: function (x, v) { return ok(v.m) && v.m !== 0 && Math.abs(x / v.m) > 0.25 ? warn('High uncertainty relative to the estimate — refine the inputs.') : info('Uncertainty of a single activity.'); }
+              /* A negative σ means P was entered below O. The arithmetic still
+                 produces a number, so say plainly that it is not a real spread
+                 rather than letting a negative deviation stand as a result. */
+              interpret: function (x, v) {
+                if (x < 0) return bad('Pessimistic is below optimistic — swap P and O. σ cannot be negative.');
+                return ok(v.m) && v.m !== 0 && Math.abs(x / v.m) > 0.25 ? warn('High uncertainty relative to the estimate — refine the inputs.') : info('Uncertainty of a single activity.');
+              }
             },
             {
               key: 'variance', label: 'Variance (σ²)', format: 'num',
@@ -4037,6 +4043,20 @@ var PM_CHART_MOUNT = (function () {
       lastW: 0,
       drawnSpec: null,
 
+      /* Whether the reader has actually typed anything into this card. It
+         separates "nothing entered yet" from "entered, but this combination
+         has no plot" — telling someone to enter parameters they can see on
+         screen is the more confusing of the two failures. */
+      hasValues: function () {
+        var card = fig.closest('.calc-card');
+        if (!card) return false;
+        var fields = card.querySelectorAll('.inputs input, .inputs select');
+        for (var i = 0; i < fields.length; i++) {
+          if (String(fields[i].value).trim() !== '') return true;
+        }
+        return false;
+      },
+
       /* Called by computeCard with the values and the results it just
          produced. The builder never recomputes — it reads. */
       update: function (v, results) {
@@ -4049,6 +4069,15 @@ var PM_CHART_MOUNT = (function () {
 
       draw: function () {
         var w = Math.round(plot.clientWidth);
+        /* The empty state hides the plot, which zeroes its width. Measuring
+           that zero and bailing would strand the chart in the empty state for
+           good: every later redraw would read the same zero and return here,
+           before the code that clears the class. So when there is a spec to
+           draw, unhide first and measure again. */
+        if (!w && inst.spec) {
+          fig.classList.remove('is-empty');
+          w = Math.round(plot.clientWidth);
+        }
         if (!w) return;
         /* Sub-threshold width jitter is ignored so a redraw can never change
            the width that triggered it. */
@@ -4059,6 +4088,9 @@ var PM_CHART_MOUNT = (function () {
         if (!inst.spec) {
           plot.innerHTML = '';
           legendEl.hidden = true;
+          emptyEl.textContent = inst.hasValues()
+            ? 'These parameters cannot be plotted. Check that the values make sense together.'
+            : 'Enter the parameters to plot this.';
           emptyEl.hidden = false;
           sumEl.textContent = '';
           details.hidden = true;
@@ -4080,6 +4112,9 @@ var PM_CHART_MOUNT = (function () {
         if (!out) {
           plot.innerHTML = '';
           legendEl.hidden = true;
+          /* There is a spec here, so the values exist — the plot itself is
+             what failed. Never ask for parameters that are already on screen. */
+          emptyEl.textContent = 'These parameters cannot be plotted. Check that the values make sense together.';
           emptyEl.hidden = false;
           sumEl.textContent = '';
           details.hidden = true;
