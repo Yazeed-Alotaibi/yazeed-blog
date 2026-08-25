@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yazeed Alotaibi · PM Tools &amp; Resources</title>
-  <meta name="description" content="Project management tools, calculators, dashboards, and resources by Yazeed Alotaibi, RMP · PRINCE2. 33 calculators across 14 domains, all computed in your browser.">
+  <title>Yazeed Alotaibi · Project Controls, PMO &amp; Risk — PM Tools</title>
+  <meta name="description" content="Project controls, PMO and risk management by Yazeed Alotaibi — PMP, PRINCE2, PMI-RMP. Free PM tools: 33 calculators across 14 domains, WBS three-point estimation, all computed in your browser.">
   <meta name="color-scheme" content="light dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -728,6 +728,86 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
 .tb-cell p { margin-top: .35rem; font-size: .82rem; color: var(--ink-2); }
 .tb-cell a { color: var(--accent); }
 
+/* ---- The bench-keeper ---------------------------------------------------
+   Who built the instruments, and out of what. The career is set as a
+   calibration log: period engraved in mono at the left margin the way a log
+   records its dates, sector stated as a word on its own plate. Nothing here
+   carries meaning in colour, so the whole record survives greyscale. */
+.about { padding-block: clamp(1.8rem, 5vw, 3.2rem); }
+
+.about-grid { display: grid; gap: 1.6rem; }
+@media (min-width: 62em) {
+  .about-grid { grid-template-columns: 1.3fr 1fr; gap: 2.6rem; align-items: start; }
+}
+
+.bio p { font-size: 1rem; color: var(--ink-2); max-width: 62ch; }
+.bio p + p { margin-top: .9rem; }
+.bio b { color: var(--ink); font-weight: 600; }
+.bio a { color: var(--accent); text-underline-offset: 3px; }
+.bio-contact { font-size: .92rem !important; margin-top: 1.2rem !important; }
+
+/* Credential plate. Every line on it is an identifier, so the whole plate is
+   mono-adjacent: names in body weight, issuers engraved beneath. */
+.plate {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--lift), var(--lip);
+  padding: 1.15rem;
+}
+.plate-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .6rem; margin-bottom: .95rem;
+}
+.cert-list { list-style: none; }
+.cert-row { padding: .5rem 0; border-top: 1px solid var(--rule); }
+.cert-row:first-child { border-top: 0; padding-top: 0; }
+.cert-name { display: block; font-size: .88rem; font-weight: 600; letter-spacing: -.01em; }
+.cert-by {
+  display: block; margin-top: .12rem;
+  font-family: var(--mono); font-size: .66rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.plate-foot {
+  margin-top: 1rem; padding-top: .85rem;
+  border-top: 1.5px solid var(--rule-2);
+  font-size: .84rem; color: var(--ink-2);
+}
+.plate-foot b { display: block; color: var(--ink); font-weight: 600; margin-bottom: .1rem; }
+
+/* The log itself. */
+.record { margin-top: 2.6rem; }
+.record-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 1rem; padding-bottom: .7rem; border-bottom: 1.5px solid var(--ink);
+}
+.record-title {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1; text-transform: uppercase;
+}
+.record-list { list-style: none; }
+.record-row { display: grid; gap: .45rem; padding: 1.15rem 0; border-bottom: 1px solid var(--rule); }
+@media (min-width: 46em) {
+  .record-row { grid-template-columns: 9.5rem 1fr; gap: 1.5rem; align-items: start; }
+}
+.record-when {
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--ink-3);
+  font-variant-numeric: tabular-nums; padding-top: .2rem;
+}
+.record-role { font-weight: 600; font-size: 1rem; letter-spacing: -.01em; }
+.record-org { display: block; margin-top: .15rem; font-size: .87rem; color: var(--ink-2); }
+.record-tag { margin-top: .55rem; }
+.record-points { list-style: none; margin-top: .6rem; }
+.record-points li {
+  position: relative; padding-left: .95rem; margin-top: .32rem;
+  font-size: .88rem; color: var(--ink-2);
+}
+.record-points li::before {
+  content: ""; position: absolute; left: 0; top: .55em;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--rule-2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
@@ -747,7 +827,8 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
           <span class="mark-role">Project management</span>
         </span>
       </a>
-      <nav class="topbar-nav" aria-label="Contact">
+      <nav class="topbar-nav" aria-label="About and contact">
+        <a href="#about">About</a>
         <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
         <a href="mailto:yaz.otb.sa@gmail.com">Email</a>
       </nav>
@@ -983,6 +1064,168 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
         </div>
       </section>
 
+      <!-- The bench-keeper. The tools above are the argument; this is the
+           person making it. Kept after the tools deliberately — the work
+           should land before the credentials do. -->
+      <section class="about" id="about" aria-labelledby="about-h">
+        <div class="section-head">
+          <div>
+            <h2 id="about-h">At the bench</h2>
+            <span class="section-sub">Who builds these, and what they were built out of.</span>
+          </div>
+          <span class="sheet-no">Record</span>
+        </div>
+
+        <div class="about-grid">
+          <div class="bio">
+            <p>
+              I'm <b>Yazeed Alotaibi</b> — a mechanical engineer who moved into project
+              controls and never quite put the instruments down.
+            </p>
+            <p>
+              The work has run from <b>mining</b> to <b>aviation</b> to <b>government</b>:
+              multibillion-riyal RFP packages and cost estimates under Front-End Loading
+              at Ma'aden, a PMO framework and stage-gate system built from nothing at
+              Riyadh Airports, portfolio governance and leadership reporting at ELM, and
+              project controls in an EPMO at ZATCA.
+            </p>
+            <p>
+              These tools exist because the arithmetic on this bench is the arithmetic I
+              actually use. A CPI of 0.87 is not a number to be reported — it is a
+              sentence about the project, and most software stops just before saying it.
+              Everything here says it.
+            </p>
+            <p class="bio-contact">
+              Based in Riyadh, Saudi Arabia. Reachable on
+              <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
+              or by <a href="mailto:yaz.otb.sa@gmail.com">email</a>.
+            </p>
+          </div>
+
+          <div class="plate">
+            <div class="plate-head">
+              <span class="label">Certifications</span>
+              <span class="sheet-no">7 held</span>
+            </div>
+            <ul class="cert-list">
+              <li class="cert-row">
+                <span class="cert-name">Project Management Professional · PMP</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">PRINCE2&reg; Practitioner</span>
+                <span class="cert-by">AXELOS</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Risk Management Professional · PMI-RMP</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified KPI Professional · C-KPI</span>
+                <span class="cert-by">KPI Institute</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified Associate in Project Management · CAPM</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified Six Sigma Green Belt · CSSGB</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">OSHA 30 Hours · General Industry</span>
+                <span class="cert-by">IASP</span>
+              </li>
+            </ul>
+            <p class="plate-foot">
+              <b>BSc Mechanical Engineering</b>
+              Prince Sattam Bin Abdulaziz University, 2022
+            </p>
+          </div>
+        </div>
+
+        <div class="record">
+          <div class="record-head">
+            <h3 class="record-title">Record</h3>
+            <span class="sheet-no">2022 &ndash; present</span>
+          </div>
+
+          <ul class="record-list">
+            <li class="record-row">
+              <span class="record-when">Jan 2026 &mdash; Present</span>
+              <div>
+                <span class="record-role">Project Control Engineer &mdash; EPMO</span>
+                <span class="record-org">ZATCA &middot; Zakat, Tax and Customs Authority</span>
+                <div class="record-tag"><span class="label">Government</span></div>
+                <ul class="record-points">
+                  <li>Project controls for Eastern Region land-port projects.</li>
+                  <li>Leading the adoption of AI within the Project Control Department.</li>
+                  <li>Weekly and monthly project status reporting to stakeholders.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="record-row">
+              <span class="record-when">Oct 2023 &mdash; Nov 2025</span>
+              <div>
+                <span class="record-role">Project Engineer &mdash; Project Development</span>
+                <span class="record-org">Ma'aden &middot; Saudi Arabian Mining Company</span>
+                <div class="record-tag"><span class="label">Mining</span></div>
+                <ul class="record-points">
+                  <li>Built multibillion-riyal RFP packages and cost estimates through feasibility.</li>
+                  <li>Held projects to Front-End Loading (FEL) methodology and Ma'aden standards.</li>
+                  <li>Ran tendering, technical bid evaluations, and vendor selection.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="record-row">
+              <span class="record-when">Jun 2023 &mdash; Sep 2023</span>
+              <div>
+                <span class="record-role">Assistant Project Manager &mdash; PMO</span>
+                <span class="record-org">ELM &middot; Emdad Al Khebrat</span>
+                <div class="record-tag"><span class="label">Enterprise</span></div>
+                <ul class="record-points">
+                  <li>Consolidated schedules and enforced governance across the portfolio.</li>
+                  <li>Prepared portfolio reporting for senior leadership decisions.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="record-row">
+              <span class="record-when">Aug 2022 &mdash; Feb 2023</span>
+              <div>
+                <span class="record-role">Project Management Specialist &mdash; PMO</span>
+                <span class="record-org">Riyadh Airports Company</span>
+                <div class="record-tag"><span class="label">Aviation</span></div>
+                <ul class="record-points">
+                  <li>Helped establish the PMO framework and governance structure.</li>
+                  <li>Designed and implemented a stage-gate system for approval and monitoring.</li>
+                  <li>Ran PMO maturity assessments, site audits, and business-case validation.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="record-row">
+              <span class="record-when">Aug 2022 &mdash; Feb 2023</span>
+              <div>
+                <span class="record-role">Data Management Coordinator</span>
+                <span class="record-org">Project Management Institute &middot; KSA Chapter</span>
+                <div class="record-tag"><span class="label">Professional body</span></div>
+              </div>
+            </li>
+
+            <li class="record-row">
+              <span class="record-when">Jan 2022 &mdash; Jun 2022</span>
+              <div>
+                <span class="record-role">Mechanical Engineer &mdash; Quality Control</span>
+                <span class="record-org">Kharj Steel &middot; volunteer</span>
+                <div class="record-tag"><span class="label">Manufacturing</span></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <section class="catalog" id="catalog" aria-labelledby="catalog-h">
         <div class="section-head">
           <div>
@@ -1039,12 +1282,18 @@ a.tool-card:hover .card-action svg { transform: translateX(3px); }
   <footer class="footer">
     <div class="footer-inner">
       <div class="tb-cell">
-        <span class="label">Made by</span>
-        <p><a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a></p>
+        <span class="label">Built by</span>
+        <p>
+          <a href="#about">Yazeed Alotaibi</a> &mdash; project controls,
+          PMO &amp; risk. PMP &middot; PRINCE2 &middot; PMI-RMP.
+        </p>
       </div>
       <div class="tb-cell">
-        <span class="label">Conventions</span>
-        <p>PMBOK / PMP-exam formulas</p>
+        <span class="label">Get in touch</span>
+        <p>
+          <a href="mailto:yaz.otb.sa@gmail.com">Email</a> &middot;
+          <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
+        </p>
       </div>
       <div class="tb-cell">
         <span class="label">Your data</span>
