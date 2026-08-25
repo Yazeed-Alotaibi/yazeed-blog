@@ -1,0 +1,16 @@
+# Canonical host.
+#
+# www.yazeed.blog and yazeed.blog both answered 200 with byte-identical content
+# and neither redirected, so the two competed as duplicates — Google indexed the
+# www one. index.html carries a <link rel="canonical"> to the apex, which is a
+# strong hint; this makes it unambiguous.
+#
+# The <IfModule> guard is deliberate: if mod_rewrite is unavailable on the
+# origin this file does nothing at all rather than returning a 500. A broken
+# rewrite would take the whole site down, and the canonical tag alone is an
+# acceptable fallback.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.yazeed\.blog$ [NC]
+  RewriteRule ^(.*)$ https://yazeed.blog/$1 [R=301,L]
+</IfModule>
