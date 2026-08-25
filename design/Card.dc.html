@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap">
+  <style>
+    :root {
+      --ground:#d9d7cf; --sheet:#f3f2ed; --sunk:#e6e4db;
+      --ink:#15181a; --ink2:#43474a; --ink3:#585c5e;
+      --rule:#c6c4b9; --rule2:#87867d; --accent:#3b3690;
+      --good:#1f6b4f; --warn:#7d5703; --bad:#a32c22;
+      --strip:#1b1e22; --strip-ink:#d7dbd2;
+      --display:"Big Shoulders Display","Haettenschweiler",Impact,sans-serif;
+      --body:"Libre Franklin",system-ui,-apple-system,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+      --lip: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+      --sunkshadow: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; font-family: var(--body); }
+    a { color: var(--accent); } a:hover { color: var(--ink); }
+  </style>
+</helmet>
+
+<div style="width:900px; min-height:1000px; padding:2.2rem; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
+
+  <p style="font-family:var(--mono); font-size:0.64rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">Component &middot; calculator card</p>
+  <h2 style="margin-top:0.5rem; font-family:var(--display); font-weight:700; font-size:2.2rem; line-height:0.95; text-transform:uppercase;">Two states, one anatomy</h2>
+  <p style="margin-top:0.7rem; max-width:70ch; font-size:0.9rem; color:var(--ink2);">
+    Every one of the 33 calculators is this card. Empty, it still teaches: the
+    formula plate and each parameter's meaning are readable before a single
+    figure is typed.
+  </p>
+
+  <!-- EMPTY -->
+  <p style="margin:2rem 0 0.7rem; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">State 01 &mdash; untouched</p>
+  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.6rem; box-shadow:var(--lip);">
+    <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
+      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.2</span>
+      <h3 style="font-family:var(--display); font-weight:600; font-size:1.65rem; line-height:1; text-transform:uppercase;">Expected monetary value</h3>
+      <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">EMV</span>
+    </header>
+    <p style="margin:0.7rem 0 0.9rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
+      What a risk is worth in money once you weight it by how likely it is &mdash;
+      the number that decides whether a response is worth funding.
+    </p>
+    <div style="padding:0.8rem 1rem; margin-bottom:1.1rem; background:var(--strip); border-radius:2px; box-shadow:inset 0 2px 6px rgba(0,0,0,.35);">
+      <code style="display:block; font-family:var(--mono); font-size:0.82rem; line-height:1.95; color:var(--strip-ink); white-space:pre;">EMV = probability &times; impact</code>
+    </div>
+    <div style="display:grid; grid-template-columns:300px minmax(0,1fr); gap:1.8rem;">
+      <div>
+        <p style="margin:0 0 0.8rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; color:var(--ink3);">Parameters</p>
+        <div style="display:flex; flex-direction:column; gap:0.9rem;">
+          <sc-for list="{{emptyFields}}" as="f" hint-placeholder-count="2">
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.3rem;">{{f.label}}</label>
+              <div style="min-height:44px; display:flex; align-items:center; padding:0.45rem 0.55rem; font-family:var(--mono); font-size:0.92rem; color:var(--ink3); background:var(--sunk); border:1px solid var(--rule2); box-shadow:var(--sunkshadow);">{{f.placeholder}}</div>
+              <p style="margin:0.35rem 0 0; font-size:0.75rem; line-height:1.45; color:var(--ink2);">{{f.meaning}}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <p style="margin:0 0 0.8rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; color:var(--ink3);">Results</p>
+        <div style="background:var(--sunk); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--lip); padding:0.7rem 0.8rem 0.75rem; max-width:230px;">
+          <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">Expected monetary value</span>
+          <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; color:var(--ink3);">&mdash;</span>
+          <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
+            <span></span><span></span><span></span>
+          </span>
+          <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">Weighted cost of the risk if nothing changes.</span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- FILLED -->
+  <p style="margin:2rem 0 0.7rem; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">State 02 &mdash; answered</p>
+  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.6rem; box-shadow:var(--lip);">
+    <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
+      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.2</span>
+      <h3 style="font-family:var(--display); font-weight:600; font-size:1.65rem; line-height:1; text-transform:uppercase;">Expected monetary value</h3>
+      <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">EMV</span>
+    </header>
+    <div style="display:grid; grid-template-columns:300px minmax(0,1fr); gap:1.8rem; margin-top:1.1rem;">
+      <div style="display:flex; flex-direction:column; gap:0.9rem;">
+        <sc-for list="{{filledFields}}" as="f" hint-placeholder-count="2">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.3rem;">{{f.label}}</label>
+            <div style="min-height:44px; display:flex; align-items:center; padding:0.45rem 0.55rem; font-family:var(--mono); font-size:0.92rem; font-variant-numeric:tabular-nums; color:var(--ink); background:var(--sunk); border:1px solid var(--rule2); box-shadow:var(--sunkshadow);">{{f.value}}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div>
+        <div style="background:var(--sunk); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--lip); padding:0.7rem 0.8rem 0.75rem; max-width:230px;">
+          <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">Expected monetary value</span>
+          <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:var(--bad);">&minus;18,000</span>
+          <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
+            <span style="background:var(--bad);"></span><span></span><span></span>
+          </span>
+          <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">A response costing less than 18,000 is worth funding.</span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- the verdict rail -->
+  <p style="margin:2rem 0 0.7rem; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">The verdict rail &mdash; three stops, never colour alone</p>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem;">
+    <sc-for list="{{rails}}" as="r" hint-placeholder-count="3">
+      <div style="background:var(--sheet); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--lip); padding:0.8rem;">
+        <span style="display:block; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.11em; text-transform:uppercase; color:var(--ink3);">{{r.name}}</span>
+        <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.5rem 0 0.4rem; padding:2px; background:var(--sunk); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
+          <span style="background:{{r.s1}};"></span>
+          <span style="background:{{r.s2}};"></span>
+          <span style="background:{{r.s3}};"></span>
+        </span>
+        <span style="display:block; font-size:0.75rem; color:var(--ink2);">{{r.note}}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    var off = 'transparent';
+    return {
+      emptyFields: [
+        { label: 'Probability (%)', placeholder: 'e.g. 30',
+          meaning: 'How likely the risk is to occur, as a percentage.' },
+        { label: 'Impact', placeholder: 'e.g. −60000',
+          meaning: 'What it costs if it does. Negative for a threat, positive for an opportunity.' }
+      ],
+      filledFields: [
+        { label: 'Probability (%)', value: '30' },
+        { label: 'Impact', value: '−60,000' }
+      ],
+      rails: [
+        { name: 'Unfavourable', s1: '#a32c22', s2: off, s3: off, note: 'Left stop. Needs attention now.' },
+        { name: 'Watch', s1: off, s2: '#7d5703', s3: off, note: 'Middle stop. Drifting.' },
+        { name: 'Favourable', s1: off, s2: off, s3: '#1f6b4f', note: 'Right stop. Ahead of plan.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

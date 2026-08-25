@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap">
+  <style>
+    /* Light palette is the base so the artboard paints correctly even before
+       the theme tweak resolves; the root element overrides it. */
+    :root {
+      --ground:#d9d7cf; --sheet:#f3f2ed; --sunk:#e6e4db;
+      --ink:#15181a; --ink2:#43474a; --ink3:#585c5e;
+      --rule:#c6c4b9; --rule2:#87867d; --accent:#3b3690;
+      --good:#1f6b4f; --warn:#7d5703; --bad:#a32c22;
+      --strip:#1b1e22; --strip-ink:#d7dbd2;
+      --display:"Big Shoulders Display","Haettenschweiler",Impact,sans-serif;
+      --body:"Libre Franklin",system-ui,-apple-system,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+      --lip: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+      --sunkshadow: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; font-family: var(--body); }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:hover { color: var(--ink); }
+  </style>
+</helmet>
+
+<div style="--ground:{{c.ground}}; --sheet:{{c.sheet}}; --sunk:{{c.sunk}}; --ink:{{c.ink}}; --ink2:{{c.ink2}}; --ink3:{{c.ink3}}; --rule:{{c.rule}}; --rule2:{{c.rule2}}; --accent:{{c.accent}}; --good:{{c.good}}; --warn:{{c.warn}}; --bad:{{c.bad}}; --strip:{{c.strip}}; --strip-ink:{{c.stripInk}}; display:grid; grid-template-columns:272px minmax(0,1fr); width:1440px; min-height:1560px; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
+
+  <!-- ── sidebar: the desk's only navigation ─────────────────────────── -->
+  <aside style="display:flex; flex-direction:column; gap:1.1rem; padding:1.5rem 1.25rem; background:var(--sheet); border-right:1px solid var(--rule2);">
+
+    <div style="display:flex; align-items:center; gap:0.7rem; padding-bottom:1.1rem; border-bottom:1px solid var(--rule);">
+      <span style="display:grid; place-items:center; width:2.3rem; height:2.3rem; border:1px solid var(--rule2); background:var(--sunk); color:var(--accent); font-family:var(--mono); font-size:1rem; font-weight:500;">&Sigma;</span>
+      <div>
+        <strong style="display:block; font-size:0.95rem; font-weight:600; letter-spacing:-0.01em;">Calculation Desk</strong>
+        <span style="display:block; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink3);">for project managers</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="width:100%; min-height:44px; display:flex; align-items:center; padding:0.5rem 0.7rem; font-size:0.85rem; color:var(--ink3); background:var(--sunk); border:1px solid var(--rule2); box-shadow:var(--sunkshadow);">Find a formula&hellip; e.g. CPI, float, NPV</div>
+      <p style="margin-top:0.4rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink3);">Press <span style="border:1px solid var(--rule2); padding:0 0.25rem;">/</span> to search</p>
+    </div>
+
+    <nav style="display:flex; flex-direction:column;">
+      <sc-for list="{{cats}}" as="cat" hint-placeholder-count="14">
+        <div style="display:flex; align-items:baseline; gap:0.65rem; padding:0.55rem 0.7rem; border-left:2px solid {{cat.edge}}; background:{{cat.bg}}; color:{{cat.fg}}; font-size:0.85rem; font-weight:{{cat.weight}};">
+          <span style="font-family:var(--mono); font-size:0.7rem; font-variant-numeric:tabular-nums; color:var(--ink3);">{{cat.no}}</span>
+          <span>{{cat.name}}</span>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto; padding-top:1.1rem; border-top:1px solid var(--rule); font-size:0.78rem; line-height:1.5; color:var(--ink2);">
+      Formulas follow PMBOK / PMP-exam conventions. Enter any consistent
+      currency and time units &mdash; the math doesn't care which.
+      <p style="margin-top:0.6rem;">Built by <a href="#">Yazeed Alotaibi</a> &mdash; PMP &middot; PRINCE2 &middot; PMI-RMP</p>
+    </div>
+  </aside>
+
+  <!-- ── main: masthead, then straight into the desk ──────────────────── -->
+  <main style="padding:0 4rem 5rem; max-width:1240px;">
+
+    <header style="padding:3.4rem 0 2rem; border-bottom:1px solid var(--rule2);">
+      <p style="font-family:var(--mono); font-size:0.64rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">Every formula &middot; explained</p>
+      <h1 style="margin-top:0.7rem; font-family:var(--display); font-weight:700; font-size:4.4rem; line-height:0.9; text-transform:uppercase; letter-spacing:-0.005em;">The Project Manager's <span style="color:var(--accent);">Calculation Desk</span></h1>
+      <p style="margin-top:1.2rem; max-width:62ch; font-size:1.02rem; color:var(--ink2);">
+        One page for the numbers behind project decisions. Each calculator defines
+        what it measures and why it exists, explains every parameter you type in,
+        and tells you how to read the result &mdash; not just what it is.
+      </p>
+
+      <div style="display:flex; gap:2.4rem; margin-top:1.7rem;">
+        <sc-for list="{{figures}}" as="fig" hint-placeholder-count="3">
+          <div>
+            <span style="font-family:var(--mono); font-size:1.6rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums;">{{fig.n}}</span>
+            <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink3);">{{fig.label}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </header>
+
+    <!-- category 01 -->
+    <section style="padding-top:2.6rem;">
+      <div style="display:flex; gap:1.1rem; align-items:baseline; padding-bottom:1rem; border-bottom:1px solid var(--rule); margin-bottom:1.5rem;">
+        <span style="font-family:var(--mono); font-size:0.8rem; font-weight:500; color:var(--accent); font-variant-numeric:tabular-nums;">01</span>
+        <div>
+          <h2 style="font-family:var(--display); font-weight:700; font-size:2.6rem; line-height:0.95; text-transform:uppercase;">Earned Value Management</h2>
+          <p style="margin-top:0.6rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
+            One integrated system that answers three questions at once: are we on
+            budget, are we on schedule, and where will we land at completion?
+          </p>
+        </div>
+      </div>
+
+      <!-- 01.1 — the calculator card, filled -->
+      <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; margin-bottom:1.25rem; box-shadow:var(--lip);">
+
+        <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
+          <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">01.1</span>
+          <h3 style="font-family:var(--display); font-weight:600; font-size:1.8rem; line-height:1; text-transform:uppercase;">Earned value core &amp; forecasting</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+            <sc-for list="{{metrics}}" as="m" hint-placeholder-count="9">
+              <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">{{m}}</span>
+            </sc-for>
+          </div>
+        </header>
+
+        <p style="margin:0.75rem 0 1rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
+          Enter the four base measures below and every earned-value metric updates
+          live. The performance metrics describe project health today; the
+          forecasting metrics project that health forward to completion.
+        </p>
+
+        <div style="padding:0.85rem 1.05rem; margin-bottom:1.3rem; background:var(--strip); border-radius:2px; box-shadow:inset 0 2px 6px rgba(0,0,0,.35); overflow-x:auto;">
+          <code style="display:block; font-family:var(--mono); font-size:0.82rem; line-height:1.95; color:var(--strip-ink); white-space:pre;">CV  = EV &minus; AC          SV  = EV &minus; PV
+CPI = EV &divide; AC          SPI = EV &divide; PV
+EAC = BAC &divide; CPI        ETC = EAC &minus; AC
+VAC = BAC &minus; EAC
+TCPI = (BAC &minus; EV) &divide; (BAC &minus; AC)</code>
+        </div>
+
+        <div style="display:grid; grid-template-columns:340px minmax(0,1fr); gap:2.2rem;">
+
+          <!-- parameters -->
+          <div>
+            <p style="margin:0 0 0.9rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; color:var(--ink3);">Parameters</p>
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+              <sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+                <div>
+                  <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.3rem;">{{f.label}}</label>
+                  <div style="width:100%; min-height:44px; display:flex; align-items:center; padding:0.45rem 0.55rem; font-family:var(--mono); font-size:0.92rem; font-variant-numeric:tabular-nums; color:var(--ink); background:var(--sunk); border:1px solid var(--rule2); box-shadow:var(--sunkshadow);">{{f.value}}</div>
+                  <p style="margin:0.35rem 0 0; font-size:0.75rem; line-height:1.45; color:var(--ink2);">{{f.meaning}}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- results -->
+          <div>
+            <p style="margin:0 0 0.9rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; color:var(--ink3);">Results</p>
+            <p style="margin:0 0 0.65rem; font-family:var(--mono); font-size:0.66rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">Performance today</p>
+
+            <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0.65rem;">
+              <sc-for list="{{results}}" as="r" hint-placeholder-count="6">
+                <div style="background:var(--sunk); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--lip); padding:0.7rem 0.8rem 0.75rem;">
+                  <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">{{r.label}}</span>
+                  <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:{{r.tone}};">{{r.value}}</span>
+                  <!-- Verdict is position on a three-stop rail, never colour alone. -->
+                  <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
+                    <span style="background:{{r.s1}};"></span>
+                    <span style="background:{{r.s2}};"></span>
+                    <span style="background:{{r.s3}};"></span>
+                  </span>
+                  <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">{{r.meaning}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- the next card, cropped to show the desk continues -->
+      <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; box-shadow:var(--lip); max-height:150px; overflow:hidden;">
+        <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
+          <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">01.2</span>
+          <h3 style="font-family:var(--display); font-weight:600; font-size:1.8rem; line-height:1; text-transform:uppercase;">To-complete performance index</h3>
+        </header>
+        <p style="margin:0.75rem 0 0; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
+          The cost efficiency the remaining work must hit to still land on budget.
+        </p>
+      </article>
+    </section>
+  </main>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light","section":"Theme"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var light = {
+      ground:'#d9d7cf', sheet:'#f3f2ed', sunk:'#e6e4db',
+      ink:'#15181a', ink2:'#43474a', ink3:'#585c5e',
+      rule:'#c6c4b9', rule2:'#87867d', accent:'#3b3690',
+      good:'#1f6b4f', warn:'#7d5703', bad:'#a32c22',
+      strip:'#1b1e22', stripInk:'#d7dbd2', navBg:'#e2e1f1'
+    };
+    var dark = {
+      ground:'#131518', sheet:'#1d2126', sunk:'#171a1e',
+      ink:'#eceae2', ink2:'#9aa0a5', ink3:'#8a9095',
+      rule:'#2f353b', rule2:'#6a7075', accent:'#9d97ff',
+      good:'#52c295', warn:'#d9a83f', bad:'#ef8177',
+      strip:'#0e1012', stripInk:'#c9cec4', navBg:'#24234a'
+    };
+    var c = (this.props.theme === 'dark') ? dark : light;
+
+    var names = [
+      'Earned Value Management', 'Budget & Burn Rate', 'Estimation',
+      'Schedule & Critical Path', 'Schedule Compression', 'Resources & Team',
+      'Communication', 'Risk', 'Decision Analysis', 'Quality & Six Sigma',
+      'Project Selection & Finance', 'Procurement & Contracts',
+      'Agile Forecasting', 'Lean & Flow'
+    ];
+    var cats = names.map(function (name, i) {
+      var on = i === 0;
+      return {
+        no: (i + 1 < 10 ? '0' : '') + (i + 1),
+        name: name,
+        edge: on ? c.accent : 'transparent',
+        bg: on ? c.navBg : 'transparent',
+        fg: on ? c.ink : c.ink2,
+        weight: on ? '600' : '400'
+      };
+    });
+
+    // A project running behind and over — the case worth showing.
+    var r = function (label, value, tone, stop, meaning) {
+      var off = 'transparent';
+      return {
+        label: label, value: value, tone: tone, meaning: meaning,
+        s1: stop === 1 ? tone : off,
+        s2: stop === 2 ? tone : off,
+        s3: stop === 3 ? tone : off
+      };
+    };
+
+    return {
+      c: c,
+      figures: [
+        { n: '14', label: 'Domains' },
+        { n: '33', label: 'Calculators' },
+        { n: '99', label: 'Metrics' }
+      ],
+      metrics: ['CV', 'SV', 'CPI', 'SPI', 'EAC', 'ETC', 'VAC', 'TCPI'],
+      fields: [
+        { label: 'BAC — Budget at Completion', value: '100,000',
+          meaning: 'The total approved budget for all project work. The baseline everything else is measured against.' },
+        { label: 'PV — Planned Value', value: '50,000',
+          meaning: 'The budgeted cost of the work scheduled to be done by now (also called BCWS).' },
+        { label: 'EV — Earned Value', value: '45,000',
+          meaning: 'The budgeted cost of the work actually finished: % complete × BAC.' },
+        { label: 'AC — Actual Cost', value: '48,000',
+          meaning: 'What that finished work really cost, to date.' }
+      ],
+      results: [
+        r('Cost variance (CV)', '−3,000', c.bad, 1, 'Budget health in currency: value earned minus money spent.'),
+        r('Schedule variance (SV)', '−5,000', c.bad, 1, 'Schedule health in currency: work done minus work planned.'),
+        r('Cost performance index (CPI)', '0.94', c.warn, 2, 'Each unit spent is buying 0.94 of planned work.'),
+        r('Schedule performance index (SPI)', '0.90', c.bad, 1, 'Only 90% of the scheduled work is done.'),
+        r('Cost−schedule index (CSI)', '0.84', c.bad, 1, 'CPI × SPI — hard to recover once far below 1.'),
+        r('% complete', '45%', c.ink, 2, 'Share of the total scope actually finished: EV ÷ BAC.')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

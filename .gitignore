@@ -9,3 +9,8 @@ node_modules/
 # Python bytecode, generated when a vendored skill script runs
 __pycache__/
 *.py[cod]
+
+# The seeded design canvas: ~2.5 MB of editor payload wrapped around the
+# .dc.html sources beside it. Regenerate it with the design skill's
+# seed-canvas.mjs rather than tracking the build output.
+design/calculation-desk.html
