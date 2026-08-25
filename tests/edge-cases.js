@@ -12,7 +12,7 @@
 
 var H = require('./harness');
 
-var page = H.loadPage('pm-calculation-desk.html');
+var page = H.loadPage('index.html');
 var DATA = page.sandbox.PM_DATA;
 
 H.suite('edge-case sweep');

@@ -7,19 +7,20 @@ into a second one.
 
 ## What this project is
 
-A static site. Three self-contained HTML files at the repository root, served
+A static site. **One** self-contained HTML file at the repository root, served
 directly with no build step:
 
 | File | What it is |
 |---|---|
-| `index.html` | Landing page — hero, a live earned-value calculator, and the tools grid |
-| `pm-calculation-desk.html` | 14 domains · 33 calculators · 99 metrics, rendered from a `PM_DATA` object |
-| `wbs-estimation-toolkit.html` | Work breakdown structure with three-point PERT estimation |
+| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 33 calculators · 99 metrics rendered from a `PM_DATA` object |
 
-Two further tools are announced on the landing page as `Building` cards and have
-no file yet: **Project Status Dashboard** and **AI Scope Statement Generator**.
-They appear twice on `index.html` — in the hero's "On the bench" list and in the
-tools grid. Both listings must agree; they have drifted apart before.
+It was three files until the Calculation Desk was merged into `index.html` and
+`pm-calculation-desk.html` / `wbs-estimation-toolkit.html` were deleted. Both
+are recoverable from history if the WBS toolkit is ever wanted back.
+
+The page shell is the Desk's: `body` is a two-column grid, a sticky
+`aside.sidebar` (brand, search, 14-category nav) beside `main`. The landing
+hero and the About section live at the top of `main`, above `#calc-sections`.
 
 ## Hard constraints
 

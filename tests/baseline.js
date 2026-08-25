@@ -16,11 +16,11 @@ var H = require('./harness');
 var SNAP = path.join(__dirname, 'baseline.json');
 var write = process.argv.indexOf('--write') !== -1;
 
-var page = H.loadPage('pm-calculation-desk.html');
+var page = H.loadPage('index.html');
 var DATA = page.sandbox.PM_DATA;
 
 if (!DATA || !DATA.categories) {
-  console.error('Could not load PM_DATA from pm-calculation-desk.html');
+  console.error('Could not load PM_DATA from index.html');
   process.exit(1);
 }
 
