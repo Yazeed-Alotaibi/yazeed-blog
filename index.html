@@ -1349,10 +1349,9 @@ h2 {
 .tb-cell a { color: var(--accent); }
 
 /* ---- The bench-keeper ---------------------------------------------------
-   Who built the instruments, and out of what. The career is set as a
-   calibration log: period engraved in mono at the left margin the way a log
-   records its dates, sector stated as a word on its own plate. Nothing here
-   carries meaning in colour, so the whole record survives greyscale. */
+   Who built the instruments. Prose on the left, credentials engraved on a
+   plate to the right — every line on that plate is an identifier, so it is
+   set in mono. Nothing here carries meaning in colour. */
 .bench { padding-block: clamp(1.8rem, 5vw, 3.2rem); }
 
 .bench-grid { display: grid; gap: 1.6rem; }
@@ -1395,43 +1394,6 @@ h2 {
 }
 .plate-foot b { display: block; color: var(--ink); font-weight: 600; margin-bottom: .1rem; }
 
-/* The log itself. */
-.record { margin-top: 2.6rem; }
-.record-head {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 1rem; padding-bottom: .7rem; border-bottom: 1.5px solid var(--ink);
-}
-.record-title {
-  font-family: var(--display); font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1; text-transform: uppercase;
-}
-.record-list { list-style: none; }
-.record-row { display: grid; gap: .45rem; padding: 1.15rem 0; border-bottom: 1px solid var(--rule); }
-@media (min-width: 46em) {
-  .record-row { grid-template-columns: 9.5rem 1fr; gap: 1.5rem; align-items: start; }
-}
-.record-when {
-  font-family: var(--mono); font-size: .68rem; letter-spacing: .09em;
-  text-transform: uppercase; color: var(--ink-3);
-  font-variant-numeric: tabular-nums; padding-top: .2rem;
-}
-.record-role { font-weight: 600; font-size: 1rem; letter-spacing: -.01em; }
-.record-org { display: block; margin-top: .15rem; font-size: .87rem; color: var(--ink-2); }
-.record-tag { margin-top: .55rem; }
-.record-points { list-style: none; margin-top: .6rem; }
-.record-points li {
-  position: relative; padding-left: .95rem; margin-top: .32rem;
-  font-size: .88rem; color: var(--ink-2);
-}
-.record-points li::before {
-  content: ""; position: absolute; left: 0; top: .55em;
-  width: 4px; height: 4px; border-radius: 50%; background: var(--ink-3);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-}
   </style>
 </head>
 <body>
@@ -1594,9 +1556,9 @@ h2 {
         <div class="section-head">
           <div>
             <h2 id="about-h">At the bench</h2>
-            <span class="section-sub">Who builds these, and what they were built out of.</span>
+            <span class="section-sub">Who builds these.</span>
           </div>
-          <span class="sheet-no">Record</span>
+          <span class="sheet-no">About</span>
         </div>
 
         <div class="bench-grid">
@@ -1664,88 +1626,6 @@ h2 {
               Prince Sattam Bin Abdulaziz University, 2022
             </p>
           </div>
-        </div>
-
-        <div class="record">
-          <div class="record-head">
-            <h3 class="record-title">Record</h3>
-            <span class="sheet-no">2022 &ndash; present</span>
-          </div>
-
-          <ul class="record-list">
-            <li class="record-row">
-              <span class="record-when">Jan 2026 &mdash; Present</span>
-              <div>
-                <span class="record-role">Project Control Engineer &mdash; EPMO</span>
-                <span class="record-org">ZATCA &middot; Zakat, Tax and Customs Authority</span>
-                <div class="record-tag"><span class="label">Government</span></div>
-                <ul class="record-points">
-                  <li>Project controls for Eastern Region land-port projects.</li>
-                  <li>Leading the adoption of AI within the Project Control Department.</li>
-                  <li>Weekly and monthly project status reporting to stakeholders.</li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="record-row">
-              <span class="record-when">Oct 2023 &mdash; Nov 2025</span>
-              <div>
-                <span class="record-role">Project Engineer &mdash; Project Development</span>
-                <span class="record-org">Ma'aden &middot; Saudi Arabian Mining Company</span>
-                <div class="record-tag"><span class="label">Mining</span></div>
-                <ul class="record-points">
-                  <li>Built multibillion-riyal RFP packages and cost estimates through feasibility.</li>
-                  <li>Held projects to Front-End Loading (FEL) methodology and Ma'aden standards.</li>
-                  <li>Ran tendering, technical bid evaluations, and vendor selection.</li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="record-row">
-              <span class="record-when">Jun 2023 &mdash; Sep 2023</span>
-              <div>
-                <span class="record-role">Assistant Project Manager &mdash; PMO</span>
-                <span class="record-org">ELM &middot; Emdad Al Khebrat</span>
-                <div class="record-tag"><span class="label">Enterprise</span></div>
-                <ul class="record-points">
-                  <li>Consolidated schedules and enforced governance across the portfolio.</li>
-                  <li>Prepared portfolio reporting for senior leadership decisions.</li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="record-row">
-              <span class="record-when">Aug 2022 &mdash; Feb 2023</span>
-              <div>
-                <span class="record-role">Project Management Specialist &mdash; PMO</span>
-                <span class="record-org">Riyadh Airports Company</span>
-                <div class="record-tag"><span class="label">Aviation</span></div>
-                <ul class="record-points">
-                  <li>Helped establish the PMO framework and governance structure.</li>
-                  <li>Designed and implemented a stage-gate system for approval and monitoring.</li>
-                  <li>Ran PMO maturity assessments, site audits, and business-case validation.</li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="record-row">
-              <span class="record-when">Aug 2022 &mdash; Feb 2023</span>
-              <div>
-                <span class="record-role">Data Management Coordinator</span>
-                <span class="record-org">Project Management Institute &middot; KSA Chapter</span>
-                <div class="record-tag"><span class="label">Professional body</span></div>
-              </div>
-            </li>
-
-            <li class="record-row">
-              <span class="record-when">Jan 2022 &mdash; Jun 2022</span>
-              <div>
-                <span class="record-role">Mechanical Engineer &mdash; Quality Control</span>
-                <span class="record-org">Kharj Steel &middot; volunteer</span>
-                <div class="record-tag"><span class="label">Manufacturing</span></div>
-              </div>
-            </li>
-          </ul>
         </div>
       </section>
 
