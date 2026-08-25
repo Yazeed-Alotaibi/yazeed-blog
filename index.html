@@ -58,6 +58,20 @@
   --space-section: clamp(3.5rem, 2.5rem + 3vw, 5.5rem);
   --dur: 180ms;
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Aliases for the hero and bench-keeper rules, which came from a page whose
+     palette used these names for the same colours. Defined as var() rather
+     than literals so they follow the dark-mode overrides above without being
+     restated there. Without these, 23 rules resolve to nothing: the formula
+     plate loses its dark inlay, and every panel and label plate goes
+     transparent. */
+  --panel:       var(--sheet);
+  --panel-sunk:  var(--sheet-sunk);
+  --engrave:     var(--strip);
+  --engrave-ink: var(--strip-ink);
+  --lift:        var(--shadow);
+  --gutter:      clamp(1.1rem, 4vw, 3.5rem);
+  --dur-2:       700ms;
 }
 
 @media (prefers-color-scheme: dark) {
