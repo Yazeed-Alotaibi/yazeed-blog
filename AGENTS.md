@@ -164,9 +164,33 @@ git push origin main
 
 Hostinger serves yazeed.blog (`server: hcdn`, not GitHub Pages — the
 `github.io` URL returns "Site not found") and is connected to this repository,
-so it redeploys itself on a push to main. The three root HTML files are the
-deployed artifact. There is deliberately no CI here: no workflow, no `CNAME`,
-no host config to keep in sync.
+so it redeploys itself on a push to main. The deployed artifact is `index.html`
+plus `.htaccess` and the two redirect stubs described below. There is
+deliberately no CI here: no workflow, no build, no `CNAME`.
+
+`.htaccess` is the one piece of host config in the repository. Apache reads it
+on the origin, and it answers 301 for the three addresses that are not the
+canonical one: `www.yazeed.blog`, and the two retired tool pages
+`pm-calculation-desk.html` and `wbs-estimation-toolkit.html`.
+
+Every directive in it sits inside `<IfModule mod_rewrite.c>`, and any new one
+must too. That guard is the whole safety model: on a host without the module a
+guarded file is silently inert, while a bare `RewriteRule` outside it is a
+configuration error that returns **500 for every page on the site**. Verify
+before pushing — the guard only protects what it wraps:
+
+```bash
+awk '/^[[:space:]]*#/ {next}
+     /<IfModule/  {d=1}
+     /<\/IfModule>/ {d=0}
+     /Rewrite(Rule|Cond|Engine)/ {print (d ? "  inside  " : "OUTSIDE! ") $0}' .htaccess
+```
+
+The two stub HTML files are kept on purpose even though the 301s mean nothing
+ever reaches them. If mod_rewrite disappears, the guard switches the redirects
+off and the stubs' `<meta http-equiv="refresh">` still carries visitors to the
+right place — worse for search, but never a dead link. Deleting them removes
+that fallback.
 
 **The deploy is not instant.** Checking the live URL seconds after a push
 returns the *previous* commit's files, which reads exactly like a broken
