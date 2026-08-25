@@ -30,7 +30,7 @@
   </style>
 </helmet>
 
-<div style="--ground:{{c.ground}}; --sheet:{{c.sheet}}; --sunk:{{c.sunk}}; --ink:{{c.ink}}; --ink2:{{c.ink2}}; --ink3:{{c.ink3}}; --rule:{{c.rule}}; --rule2:{{c.rule2}}; --accent:{{c.accent}}; --good:{{c.good}}; --warn:{{c.warn}}; --bad:{{c.bad}}; --strip:{{c.strip}}; --strip-ink:{{c.stripInk}}; display:grid; grid-template-columns:272px minmax(0,1fr); width:1440px; min-height:1560px; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
+<div style="--ground:{{c.ground}}; --sheet:{{c.sheet}}; --sunk:{{c.sunk}}; --ink:{{c.ink}}; --ink2:{{c.ink2}}; --ink3:{{c.ink3}}; --rule:{{c.rule}}; --rule2:{{c.rule2}}; --accent:{{c.accent}}; --good:{{c.good}}; --warn:{{c.warn}}; --bad:{{c.bad}}; --strip:{{c.strip}}; --strip-ink:{{c.stripInk}}; display:grid; grid-template-columns:272px minmax(0,1fr); width:1440px; min-height:1880px; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
 
   <!-- ── sidebar: the desk's only navigation ─────────────────────────── -->
   <aside style="display:flex; flex-direction:column; gap:1.1rem; padding:1.5rem 1.25rem; background:var(--sheet); border-right:1px solid var(--rule2);">
@@ -51,7 +51,7 @@
     <nav style="display:flex; flex-direction:column;">
       <sc-for list="{{cats}}" as="cat" hint-placeholder-count="14">
         <div style="display:flex; align-items:baseline; gap:0.65rem; padding:0.55rem 0.7rem; border-left:2px solid {{cat.edge}}; background:{{cat.bg}}; color:{{cat.fg}}; font-size:0.85rem; font-weight:{{cat.weight}};">
-          <span style="font-family:var(--mono); font-size:0.7rem; font-variant-numeric:tabular-nums; color:var(--ink3);">{{cat.no}}</span>
+          <span style="font-family:var(--mono); font-size:0.66rem; font-variant-numeric:tabular-nums; color:{{cat.num}};">{{cat.no}}</span>
           <span>{{cat.name}}</span>
         </div>
       </sc-for>
@@ -91,7 +91,7 @@
       <div style="display:flex; gap:1.1rem; align-items:baseline; padding-bottom:1rem; border-bottom:1px solid var(--rule); margin-bottom:1.5rem;">
         <span style="font-family:var(--mono); font-size:0.8rem; font-weight:500; color:var(--accent); font-variant-numeric:tabular-nums;">01</span>
         <div>
-          <h2 style="font-family:var(--display); font-weight:700; font-size:2.6rem; line-height:0.95; text-transform:uppercase;">Earned Value Management</h2>
+          <h2 style="font-family:var(--display); font-weight:600; font-size:2.4rem; line-height:0.98; text-transform:uppercase;">Earned Value Management</h2>
           <p style="margin-top:0.6rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
             One integrated system that answers three questions at once: are we on
             budget, are we on schedule, and where will we land at completion?
@@ -104,9 +104,9 @@
 
         <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
           <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">01.1</span>
-          <h3 style="font-family:var(--display); font-weight:600; font-size:1.8rem; line-height:1; text-transform:uppercase;">Earned value core &amp; forecasting</h3>
+          <h3 style="font-family:var(--display); font-weight:600; font-size:1.5rem; line-height:1; text-transform:uppercase;">Earned value core &amp; forecasting</h3>
           <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-            <sc-for list="{{metrics}}" as="m" hint-placeholder-count="9">
+            <sc-for list="{{metrics}}" as="m" hint-placeholder-count="8">
               <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">{{m}}</span>
             </sc-for>
           </div>
@@ -149,16 +149,19 @@ TCPI = (BAC &minus; EV) &divide; (BAC &minus; AC)</code>
 
             <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0.65rem;">
               <sc-for list="{{results}}" as="r" hint-placeholder-count="6">
-                <div style="background:var(--sunk); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--lip); padding:0.7rem 0.8rem 0.75rem;">
+                <div style="background:{{r.bg}}; border:1px solid {{r.border}}; border-radius:3px; box-shadow:var(--lip); padding:0.7rem 0.8rem 0.75rem;">
                   <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">{{r.label}}</span>
-                  <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:{{r.tone}};">{{r.value}}</span>
-                  <!-- Verdict is position on a three-stop rail, never colour alone. -->
-                  <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
-                    <span style="background:{{r.s1}};"></span>
-                    <span style="background:{{r.s2}};"></span>
-                    <span style="background:{{r.s3}};"></span>
+                  <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:var(--ink);">{{r.value}}</span>
+                  <!-- Three fixed stops — bad, watch, good, left to right. The
+                       reading is the position that lights, never the hue. -->
+                  <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sunk); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
+                    <i style="border-radius:1px; background:{{r.s1}};"></i>
+                    <i style="border-radius:1px; background:{{r.s2}};"></i>
+                    <i style="border-radius:1px; background:{{r.s3}};"></i>
                   </span>
                   <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">{{r.meaning}}</span>
+                  <!-- The verdict is a sentence, so it survives greyscale. -->
+                  <span style="display:block; margin-top:0.4rem; padding-top:0.35rem; border-top:1px solid var(--rule); font-size:0.73rem; font-weight:600; line-height:1.4; color:{{r.tone}};">{{r.verdict}}</span>
                 </div>
               </sc-for>
             </div>
@@ -170,10 +173,10 @@ TCPI = (BAC &minus; EV) &divide; (BAC &minus; AC)</code>
       <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; box-shadow:var(--lip); max-height:150px; overflow:hidden;">
         <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
           <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">01.2</span>
-          <h3 style="font-family:var(--display); font-weight:600; font-size:1.8rem; line-height:1; text-transform:uppercase;">To-complete performance index</h3>
+          <h3 style="font-family:var(--display); font-weight:600; font-size:1.5rem; line-height:1; text-transform:uppercase;">Time forecasting (SPI-based)</h3>
         </header>
         <p style="margin:0.75rem 0 0; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
-          The cost efficiency the remaining work must hit to still land on budget.
+          Where the schedule lands if the current rate of progress holds.
         </p>
       </article>
     </section>
@@ -189,14 +192,16 @@ class Component extends DCLogic {
       ink:'#15181a', ink2:'#43474a', ink3:'#585c5e',
       rule:'#c6c4b9', rule2:'#87867d', accent:'#3b3690',
       good:'#1f6b4f', warn:'#7d5703', bad:'#a32c22',
-      strip:'#1b1e22', stripInk:'#d7dbd2', navBg:'#e2e1f1'
+      goodSoft:'#dfe9e4', warnSoft:'#f2ecdd', badSoft:'#f2e0dd',
+      strip:'#1b1e22', stripInk:'#d7dbd2', navBg:'#e6e4db'
     };
     var dark = {
       ground:'#131518', sheet:'#1d2126', sunk:'#171a1e',
       ink:'#eceae2', ink2:'#9aa0a5', ink3:'#8a9095',
       rule:'#2f353b', rule2:'#6a7075', accent:'#9d97ff',
       good:'#52c295', warn:'#d9a83f', bad:'#ef8177',
-      strip:'#0e1012', stripInk:'#c9cec4', navBg:'#24234a'
+      goodSoft:'#16302a', warnSoft:'#322a16', badSoft:'#3a1f1d',
+      strip:'#0e1012', stripInk:'#c9cec4', navBg:'#171a1e'
     };
     var c = (this.props.theme === 'dark') ? dark : light;
 
@@ -215,18 +220,28 @@ class Component extends DCLogic {
         edge: on ? c.accent : 'transparent',
         bg: on ? c.navBg : 'transparent',
         fg: on ? c.ink : c.ink2,
-        weight: on ? '600' : '400'
+        weight: on ? '600' : '400',
+        num: on ? c.accent : c.ink3
       };
     });
 
-    // A project running behind and over — the case worth showing.
-    var r = function (label, value, tone, stop, meaning) {
-      var off = 'transparent';
+    // A project running behind and over — the case worth showing, since a
+    // mockup that only ever renders "good" never exercises the scale.
+    // Tone, stop, chip background and border all follow from one verdict,
+    // exactly as the real desk derives them.
+    var soft = { good: c.goodSoft, warn: c.warnSoft, bad: c.badSoft };
+    var stopOf = { bad: 1, warn: 2, good: 3 };
+    var r = function (label, value, verdictTone, meaning, verdict) {
+      var tone = c[verdictTone];
+      var stop = stopOf[verdictTone];
+      var off = c.rule2;
       return {
-        label: label, value: value, tone: tone, meaning: meaning,
-        s1: stop === 1 ? tone : off,
-        s2: stop === 2 ? tone : off,
-        s3: stop === 3 ? tone : off
+        label: label, value: value, meaning: meaning,
+        tone: tone, verdict: verdict,
+        bg: soft[verdictTone], border: tone,
+        s1: stop === 1 ? c.bad : off,
+        s2: stop === 2 ? c.warn : off,
+        s3: stop === 3 ? c.good : off
       };
     };
 
@@ -249,12 +264,24 @@ class Component extends DCLogic {
           meaning: 'What that finished work really cost, to date.' }
       ],
       results: [
-        r('Cost variance (CV)', '−3,000', c.bad, 1, 'Budget health in currency: value earned minus money spent.'),
-        r('Schedule variance (SV)', '−5,000', c.bad, 1, 'Schedule health in currency: work done minus work planned.'),
-        r('Cost performance index (CPI)', '0.94', c.warn, 2, 'Each unit spent is buying 0.94 of planned work.'),
-        r('Schedule performance index (SPI)', '0.90', c.bad, 1, 'Only 90% of the scheduled work is done.'),
-        r('Cost−schedule index (CSI)', '0.84', c.bad, 1, 'CPI × SPI — hard to recover once far below 1.'),
-        r('% complete', '45%', c.ink, 2, 'Share of the total scope actually finished: EV ÷ BAC.')
+        r('Cost variance (CV)', '−3,000', 'bad',
+          'Budget health in currency: value earned minus money spent.',
+          'Over budget by this amount.'),
+        r('Schedule variance (SV)', '−5,000', 'bad',
+          'Schedule health in currency: work done minus work planned.',
+          'Behind schedule.'),
+        r('Cost performance index (CPI)', '0.94', 'bad',
+          'Cost efficiency: value earned per unit of money spent.',
+          'Each 1.00 spent earns only 0.94 of value.'),
+        r('Schedule performance index (SPI)', '0.90', 'bad',
+          'Schedule efficiency: rate of progress versus the plan.',
+          'Progressing at 90% of the planned rate.'),
+        r('Cost–schedule index (CSI)', '0.84', 'bad',
+          'CPI × SPI — a single overall-health number.',
+          'Recovery is statistically unlikely without intervention.'),
+        r('% complete', '45%', 'warn',
+          'Share of the total scope actually finished: EV ÷ BAC.',
+          'You have spent a larger share of budget than of scope.')
       ]
     };
   }

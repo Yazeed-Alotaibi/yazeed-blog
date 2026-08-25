@@ -27,7 +27,7 @@
   </style>
 </helmet>
 
-<div style="width:900px; min-height:1000px; padding:2.2rem; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
+<div style="width:900px; min-height:1320px; padding:2.2rem; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
 
   <p style="font-family:var(--mono); font-size:0.64rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">Component &middot; calculator card</p>
   <h2 style="margin-top:0.5rem; font-family:var(--display); font-weight:700; font-size:2.2rem; line-height:0.95; text-transform:uppercase;">Two states, one anatomy</h2>
@@ -39,10 +39,10 @@
 
   <!-- EMPTY -->
   <p style="margin:2rem 0 0.7rem; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">State 01 &mdash; untouched</p>
-  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.6rem; box-shadow:var(--lip);">
+  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; box-shadow:var(--lip);">
     <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
-      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.2</span>
-      <h3 style="font-family:var(--display); font-weight:600; font-size:1.65rem; line-height:1; text-transform:uppercase;">Expected monetary value</h3>
+      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.1</span>
+      <h3 style="font-family:var(--display); font-weight:600; font-size:1.5rem; line-height:1; text-transform:uppercase;">Expected Monetary Value (EMV)</h3>
       <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">EMV</span>
     </header>
     <p style="margin:0.7rem 0 0.9rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
@@ -71,7 +71,7 @@
           <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">Expected monetary value</span>
           <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; color:var(--ink3);">&mdash;</span>
           <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
-            <span></span><span></span><span></span>
+            <i style="border-radius:1px; background:var(--rule2);"></i><i style="border-radius:1px; background:var(--rule2);"></i><i style="border-radius:1px; background:var(--rule2);"></i>
           </span>
           <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">Weighted cost of the risk if nothing changes.</span>
         </div>
@@ -81,10 +81,10 @@
 
   <!-- FILLED -->
   <p style="margin:2rem 0 0.7rem; font-family:var(--mono); font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">State 02 &mdash; answered</p>
-  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.6rem; box-shadow:var(--lip);">
+  <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; box-shadow:var(--lip);">
     <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
-      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.2</span>
-      <h3 style="font-family:var(--display); font-weight:600; font-size:1.65rem; line-height:1; text-transform:uppercase;">Expected monetary value</h3>
+      <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">08.1</span>
+      <h3 style="font-family:var(--display); font-weight:600; font-size:1.5rem; line-height:1; text-transform:uppercase;">Expected Monetary Value (EMV)</h3>
       <span style="font-family:var(--mono); font-size:0.68rem; color:var(--accent);">EMV</span>
     </header>
     <div style="display:grid; grid-template-columns:300px minmax(0,1fr); gap:1.8rem; margin-top:1.1rem;">
@@ -101,7 +101,7 @@
           <span style="display:block; font-family:var(--mono); font-size:0.64rem; font-weight:500; text-transform:uppercase; letter-spacing:0.11em; color:var(--ink3);">Expected monetary value</span>
           <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:1.5rem; font-weight:500; line-height:1.1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:var(--bad);">&minus;18,000</span>
           <span style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; height:7px; margin:0.25rem 0 0.1rem; padding:2px; background:var(--sheet); border:1px solid var(--rule); border-radius:2px; box-shadow:var(--sunkshadow);">
-            <span style="background:var(--bad);"></span><span></span><span></span>
+            <i style="border-radius:1px; background:var(--bad);"></i><i style="border-radius:1px; background:var(--rule2);"></i><i style="border-radius:1px; background:var(--rule2);"></i>
           </span>
           <span style="display:block; margin-top:0.35rem; font-size:0.72rem; line-height:1.45; color:var(--ink2);">A response costing less than 18,000 is worth funding.</span>
         </div>
@@ -135,7 +135,7 @@ class Component extends DCLogic {
       emptyFields: [
         { label: 'Probability (%)', placeholder: 'e.g. 30',
           meaning: 'How likely the risk is to occur, as a percentage.' },
-        { label: 'Impact', placeholder: 'e.g. −60000',
+        { label: 'Impact', placeholder: 'e.g. -50000',
           meaning: 'What it costs if it does. Negative for a threat, positive for an opportunity.' }
       ],
       filledFields: [

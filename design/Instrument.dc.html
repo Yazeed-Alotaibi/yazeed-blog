@@ -46,7 +46,7 @@
     <nav style="display:flex; flex-direction:column;">
       <sc-for list="{{cats}}" as="cat" hint-placeholder-count="14">
         <div style="display:flex; align-items:baseline; gap:0.65rem; padding:0.55rem 0.7rem; border-left:2px solid {{cat.edge}}; background:{{cat.bg}}; color:{{cat.fg}}; font-size:0.85rem;">
-          <span style="font-family:var(--mono); font-size:0.7rem; font-variant-numeric:tabular-nums; color:var(--ink3);">{{cat.no}}</span>
+          <span style="font-family:var(--mono); font-size:0.66rem; font-variant-numeric:tabular-nums; color:{{cat.num}};">{{cat.no}}</span>
           <span>{{cat.name}}</span>
         </div>
       </sc-for>
@@ -57,7 +57,7 @@
     </div>
   </aside>
 
-  <main style="padding:0 4rem 4rem; max-width:1240px;">
+  <main style="padding:0 4rem 5rem; max-width:1240px;">
 
     <!-- Masthead carries a working instrument: the desk demonstrates itself
          before it describes itself. -->
@@ -105,20 +105,25 @@ SPI = EV &divide; PV     SV = EV &minus; PV</code>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; padding:1.1rem 1rem;">
           <sc-for list="{{gauges}}" as="g" hint-placeholder-count="2">
             <div style="text-align:center;">
-              <svg viewBox="0 0 200 130" width="100%" role="img" aria-hidden="true">
-                <path d="M 26 100 A 74 74 0 0 1 100 26" fill="none" stroke="{{g.leftStroke}}" stroke-width="9"></path>
-                <path d="M 100 26 A 74 74 0 0 1 174 100" fill="none" stroke="{{g.rightStroke}}" stroke-width="9"></path>
-                <line x1="100" y1="22" x2="100" y2="34" stroke="{{c.ink}}" stroke-width="2"></line>
-                <text x="100" y="16" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="{{c.ink3}}">1.00</text>
-                <text x="24" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="{{c.ink3}}">0.70</text>
-                <text x="176" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="{{c.ink3}}">1.30</text>
-                <line x1="100" y1="100" x2="{{g.nx}}" y2="{{g.ny}}" stroke="{{c.ink}}" stroke-width="3" stroke-linecap="round"></line>
+              <!-- Three graduated zones, as on the desk: below 0.95 is
+                   unfavourable, 0.95–1.00 is watch, 1.00 up is favourable. -->
+              <svg viewBox="-6 0 212 130" width="100%" role="img" aria-label="{{g.alt}}">
+                <path d="{{g.arcBad}}" fill="none" stroke="{{c.bad}}" stroke-width="7" opacity="0.32"></path>
+                <path d="{{g.arcWarn}}" fill="none" stroke="{{c.warn}}" stroke-width="7" opacity="0.32"></path>
+                <path d="{{g.arcGood}}" fill="none" stroke="{{c.good}}" stroke-width="7" opacity="0.32"></path>
+                <sc-for list="{{ticks}}" as="t" hint-placeholder-count="7">
+                  <line x1="{{t.x1}}" y1="{{t.y1}}" x2="{{t.x2}}" y2="{{t.y2}}" stroke="{{t.stroke}}" stroke-width="{{t.w}}"></line>
+                </sc-for>
+                <text x="100" y="14" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">1.00</text>
+                <text x="20" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">0.70</text>
+                <text x="180" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">1.30</text>
+                <line x1="100" y1="100" x2="{{g.nx}}" y2="{{g.ny}}" stroke="{{c.ink}}" stroke-width="2.4" stroke-linecap="round"></line>
                 <circle cx="100" cy="100" r="5" fill="{{c.ink}}"></circle>
               </svg>
               <span style="display:block; margin-top:0.2rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.13em; text-transform:uppercase; color:var(--ink3);">{{g.label}}</span>
-              <span style="display:block; margin-top:0.25rem; font-family:var(--mono); font-size:1.9rem; font-weight:500; line-height:1; font-variant-numeric:tabular-nums; color:{{g.tone}};">{{g.value}}</span>
+              <span style="display:block; margin-top:0.25rem; font-family:var(--mono); font-size:2rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; color:{{g.tone}};">{{g.value}}</span>
               <!-- The verdict is a word, so it survives greyscale. -->
-              <span style="display:inline-block; margin-top:0.5rem; padding:0.25rem 0.5rem; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:{{g.tone}}; border:1px solid {{g.tone}}; border-radius:2px;">{{g.verdict}}</span>
+              <span style="display:inline-block; margin-top:0.5rem; padding:0.25rem 0.5rem; font-family:var(--mono); font-size:0.62rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:{{g.tone}}; border:1px solid {{g.tone}}; border-radius:2px;">{{g.verdict}}</span>
               <span style="display:block; margin-top:0.5rem; font-size:0.78rem; line-height:1.4; color:var(--ink2);">{{g.meaning}}</span>
             </div>
           </sc-for>
@@ -157,8 +162,8 @@ CPI = EV &divide; AC          SPI = EV &divide; PV</code>
 class Component extends DCLogic {
   renderVals() {
     var c = {
-      ink: '#15181a', ink3: '#585c5e',
-      good: '#1f6b4f', bad: '#a32c22', rule: '#c6c4b9'
+      ink: '#15181a', ink3: '#585c5e', rule: '#c6c4b9', rule2: '#87867d',
+      good: '#1f6b4f', warn: '#7d5703', bad: '#a32c22'
     };
 
     var names = [
@@ -174,27 +179,56 @@ class Component extends DCLogic {
         no: (i + 1 < 10 ? '0' : '') + (i + 1),
         name: name,
         edge: on ? '#3b3690' : 'transparent',
-        bg: on ? '#e2e1f1' : 'transparent',
-        fg: on ? '#15181a' : '#43474a'
+        bg: on ? '#e6e4db' : 'transparent',
+        fg: on ? '#15181a' : '#43474a',
+        num: on ? '#3b3690' : '#585c5e'
       };
     });
 
-    // Needle geometry: 0.70 sits at 180°, 1.30 at 0°, on a radius of 74.
-    var LO = 0.70, HI = 1.30, R = 74;
-    function gauge(label, value, verdict, tone, meaning) {
-      var t = (value - LO) / (HI - LO);
+    // Geometry: 0.70 sits at 180°, 1.30 at 0°, on a radius of 74.
+    var LO = 0.70, HI = 1.30, R = 74, CX = 100, CY = 100;
+    function ang(v) {
+      var t = (v - LO) / (HI - LO);
       t = t < 0 ? 0 : (t > 1 ? 1 : t);
-      var a = (180 - t * 180) * Math.PI / 180;
+      return (180 - t * 180) * Math.PI / 180;
+    }
+    function pt(v, r) {
+      var a = ang(v);
+      return [CX + r * Math.cos(a), CY - r * Math.sin(a)];
+    }
+    function arc(from, to) {
+      var p = pt(from, R), q = pt(to, R);
+      return 'M ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) +
+             ' A ' + R + ' ' + R + ' 0 0 1 ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+    }
+
+    // Seven graduations; the 1.00 mark is the one being read against.
+    var ticks = [];
+    for (var v = 0.70; v <= 1.301; v += 0.10) {
+      var major = Math.abs(v - 1) < 0.001;
+      var inner = pt(v, R - (major ? 13 : 9)), outer = pt(v, R + 5);
+      ticks.push({
+        x1: inner[0].toFixed(1), y1: inner[1].toFixed(1),
+        x2: outer[0].toFixed(1), y2: outer[1].toFixed(1),
+        stroke: major ? c.ink : c.rule2,
+        w: major ? '2' : '1'
+      });
+    }
+
+    function gauge(label, value, verdict, tone, meaning, alt) {
+      var n = pt(value, R * 0.86);
       return {
         label: label,
         value: value.toFixed(2),
         verdict: verdict,
         tone: tone,
         meaning: meaning,
-        nx: (100 + R * 0.86 * Math.cos(a)).toFixed(1),
-        ny: (100 - R * 0.86 * Math.sin(a)).toFixed(1),
-        leftStroke: '#cdb3b0',
-        rightStroke: '#b3c8bd'
+        alt: alt,
+        nx: n[0].toFixed(1),
+        ny: n[1].toFixed(1),
+        arcBad: arc(LO, 0.95),
+        arcWarn: arc(0.95, 1.00),
+        arcGood: arc(1.00, HI)
       };
     }
 
@@ -210,11 +244,14 @@ class Component extends DCLogic {
         { label: 'AC spent', value: '96,000' },
         { label: 'PV planned', value: '120,000' }
       ],
+      ticks: ticks,
       gauges: [
         gauge('CPI · cost', 1.13, 'Under budget', c.good,
-              'Each unit spent is buying 1.13 of planned work.'),
+              'Each unit spent is buying 1.13 of planned work.',
+              'Cost performance index, plotted against 1.00'),
         gauge('SPI · schedule', 0.90, 'Behind', c.bad,
-              'Only 90% of the scheduled work is done.')
+              'Only 90% of the scheduled work is done.',
+              'Schedule performance index, plotted against 1.00')
       ]
     };
   }
