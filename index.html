@@ -1088,6 +1088,19 @@ main {
 }
 @media (min-width: 62em) {
   .hero { grid-template-columns: 1fr 1fr; gap: 3.2rem; align-items: start; }
+
+  /* The instrument is a tall dense panel and the text beside it is short, so
+     the column heights cannot match — roughly 420px has to go somewhere. Left
+     alone it pools under the text as a hole. Pinning the credentials, figures
+     and call to action to the bottom instead puts that space in the middle,
+     where it reads as measure rather than as a truncated column, and lands
+     both columns on the same baseline. The headline keeps the top. */
+  /* Descendant selectors, not bare class ones: the base .creds and .hero-jump
+     rules are declared further down this stylesheet and would otherwise win on
+     source order. */
+  .hero-col-a { display: flex; flex-direction: column; height: 100%; }
+  .hero-col-a .creds { margin-top: auto; }
+  .hero-col-a .hero-jump { margin-top: 1.4rem; }
 }
 
 h1 {
