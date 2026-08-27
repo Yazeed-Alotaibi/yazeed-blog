@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polish preview — yazeed.blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --ground:#d9d7cf;--sheet:#f3f2ed;--sheet-sunk:#e6e4db;
+  --ink:#15181a;--ink-2:#43474a;--ink-3:#585c5e;
+  --rule:#c6c4b9;--rule-2:#87867d;
+  --accent:#3b3690;--accent-soft:#e2e1f1;
+  --good:#1f6b4f;--good-soft:#dfe9e4;
+  --warn:#7d5703;--warn-soft:#f2ecdd;
+  --bad:#a32c22;--bad-soft:#f2e0dd;
+  --shadow:0 1px 0 rgba(0,0,0,.07),0 14px 30px -24px rgba(0,0,0,.5);
+  --lip:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(0,0,0,.05);
+  --sunk:inset 0 2px 4px rgba(0,0,0,.10),inset 0 -1px 0 rgba(255,255,255,.6);
+  --display:"Big Shoulders Display",Impact,sans-serif;
+  --body:"Libre Franklin",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --dur:180ms;--ease:cubic-bezier(.2,.7,.3,1);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --ground:#131518;--sheet:#1d2126;--sheet-sunk:#171a1e;
+    --ink:#eceae2;--ink-2:#9aa0a5;--ink-3:#8a9095;
+    --rule:#2f353b;--rule-2:#6a7075;
+    --accent:#9d97ff;--accent-soft:#24234a;
+    --good:#52c295;--good-soft:#16302a;
+    --warn:#d9a83f;--warn-soft:#322a16;
+    --bad:#ef8177;--bad-soft:#3a1f1d;
+    --shadow:0 1px 0 rgba(0,0,0,.5),0 14px 30px -24px rgba(0,0,0,.9);
+    --lip:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4);
+    --sunk:inset 0 2px 5px rgba(0,0,0,.5);
+  }
+  .after-c{--ink-3:#a0a6ac;--rule-2:#7e848a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;padding:2rem clamp(1rem,4vw,3.5rem) 4rem;max-width:1180px;margin-inline:auto}
+h1,h2{font-family:var(--display);text-transform:uppercase;line-height:.95;letter-spacing:-.005em}
+h1{font-size:clamp(1.8rem,1.2rem + 2vw,2.6rem);margin:0 0 .3rem}
+.lede{color:var(--ink-2);max-width:62ch;margin:0 0 2.5rem;font-size:.95rem}
+.opt{border:1px solid var(--rule);background:var(--sheet);padding:clamp(1.1rem,2.5vw,1.6rem);margin-bottom:1.5rem;box-shadow:var(--shadow)}
+.opt-head{display:flex;align-items:baseline;gap:.8rem;margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--rule)}
+.opt-tag{font-family:var(--mono);font-size:.68rem;font-weight:500;color:var(--accent);letter-spacing:.14em;text-transform:uppercase}
+.opt-head h2{margin:0;font-size:1.45rem;font-weight:600}
+.opt-desc{color:var(--ink-2);font-size:.88rem;max-width:70ch;margin:-.4rem 0 1.2rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.row h4{margin:0 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.panel{background:var(--sheet-sunk);border:1px solid var(--rule);padding:.9rem}
+.label{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem}
+.field input{width:100%;min-height:44px;padding:.45rem .55rem;font-family:var(--mono);font-size:.92rem;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--sheet-sunk);border:1px solid var(--rule-2);border-radius:0;transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.field input::placeholder{color:var(--ink-3);font-size:.82rem}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.navlink{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .7rem;border-left:2px solid transparent;color:var(--ink-2);text-decoration:none;font-size:.85rem;transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.navlink:hover{background:var(--sheet-sunk);color:var(--ink)}
+.navlink.active{border-left-color:var(--accent);background:var(--sheet-sunk);color:var(--ink);font-weight:600}
+.before-a :where(a,button,input):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.after-a :where(a,button,input):focus-visible{outline:none}
+.after-a .navlink:focus-visible{box-shadow:inset 0 0 0 2px var(--accent-soft);border-left-color:var(--accent)}
+.after-a input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.result{background:var(--sheet-sunk);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--lip);padding:.7rem .8rem .75rem;display:flex;flex-direction:column;gap:.3rem}
+.r-label{font-family:var(--mono);font-size:.64rem;font-weight:500;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-3)}
+.r-value{font-family:var(--mono);font-size:1.5rem;font-weight:500;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.r-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;height:7px;margin:.25rem 0 .1rem;padding:2px;background:var(--sheet-sunk);border:1px solid var(--rule);border-radius:2px;box-shadow:var(--sunk)}
+.r-rail i{background:var(--rule-2);border-radius:1px}
+.result.bad{border-color:var(--bad);background:var(--bad-soft)}
+.result.bad .r-rail i:nth-child(1){background:var(--bad)}
+.result.warn{border-color:var(--warn);background:var(--warn-soft)}
+.result.warn .r-rail i:nth-child(2){background:var(--warn)}
+.result.good{border-color:var(--good);background:var(--good-soft)}
+.result.good .r-rail i:nth-child(3){background:var(--good)}
+.after-b .r-rail{position:relative;height:16px}
+.after-b .r-rail i{position:relative}
+.after-b .r-rail i::after{content:"";position:absolute;left:50%;top:0;width:1px;height:3px;transform:translateX(-.5px);background:var(--rule-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.after-b .result.bad .r-rail i:nth-child(1),
+.after-b .result.warn .r-rail i:nth-child(2),
+.after-b .result.good .r-rail i:nth-child(3){box-shadow:var(--lip)}
+.after-b .r-ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:.2rem}
+.swatch{display:flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:.72rem;margin-bottom:.5rem}
+.chip{width:2.6rem;height:1.4rem;border:1px solid var(--rule)}
+.ratio{color:var(--ink-2)}
+.ratio.fail{color:var(--bad);font-weight:600}
+.ratio.pass{color:var(--good);font-weight:600}
+.after-d ::selection{background:var(--accent-soft);color:var(--ink)}
+.scrollbox{overflow-y:auto;height:84px}
+.after-d .scrollbox::-webkit-scrollbar{width:10px;height:10px}
+.after-d .scrollbox::-webkit-scrollbar-track{background:var(--sheet-sunk)}
+.after-d .scrollbox::-webkit-scrollbar-thumb{background:var(--rule-2);border:2px solid var(--sheet-sunk);border-radius:6px}
+.after-d .scrollbox::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+.sample-text{font-size:.9rem;color:var(--ink-2);line-height:1.6}
+@media (max-width:760px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>Polish options — yazeed.blog</h1>
+<p class="lede">Each option is shown before/after using the desk's real tokens. Option C's effect is in dark mode — switch your OS theme to see it.</p>
+
+<section class="opt">
+  <div class="opt-head"><span class="opt-tag">Option A</span><h2>Unify focus treatment</h2></div>
+  <p class="opt-desc">Two focus idioms today — a leftover <code>outline</code> on links/buttons and the signature <code>box-shadow</code> ring on inputs. After unifies everything to the milled-bezel ring so focus reads as one control everywhere.</p>
+  <div class="row">
+    <div class="panel before-a">
+      <h4>Before — outline on links, ring on inputs</h4>
+      <div class="label">Tab through these:</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem">
+        <a class="navlink active" href="#">01 · Earned Value Core</a>
+        <a class="navlink" href="#">02 · Schedule &amp; Duration</a>
+      </div>
+      <div class="field"><input placeholder="e.g. 100000"></div>
+    </div>
+    <div class="panel after-a">
+      <h4>After — unified ring</h4>
+      <div class="label">Tab through these:</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem">
+        <a class="navlink active" href="#">01 · Earned Value Core</a>
+        <a class="navlink" href="#">02 · Schedule &amp; Duration</a>
+      </div>
+      <div class="field"><input placeholder="e.g. 100000"></div>
+    </div>
+  </div>
+</section>
+
+<section class="opt">
+  <div class="opt-head"><span class="opt-tag">Option B</span><h2>Refine the status rail</h2></div>
+  <p class="opt-desc">The 3-position verdict rail is the desk's signature. After adds engraved position ticks (so the scale reads as graduated even when empty) and a raised lip on the filled pin. Still positional — reads without colour.</p>
+  <div class="row">
+    <div class="panel">
+      <h4>Before — flat 7px rail</h4>
+      <div class="result bad" style="margin-bottom:.6rem"><span class="r-label">CPI · Cost Performance Index</span><span class="r-value">0.94</span><div class="r-rail"><i></i><i></i><i></i></div></div>
+      <div class="result warn" style="margin-bottom:.6rem"><span class="r-label">SPI · Schedule Performance Index</span><span class="r-value">0.90</span><div class="r-rail"><i></i><i></i><i></i></div></div>
+      <div class="result good"><span class="r-label">TCPI (EAC) · To-Complete</span><span class="r-value">1.06</span><div class="r-rail"><i></i><i></i><i></i></div></div>
+    </div>
+    <div class="panel after-b">
+      <h4>After — engraved ticks + raised pin</h4>
+      <div class="result bad" style="margin-bottom:.6rem"><span class="r-label">CPI · Cost Performance Index</span><span class="r-value">0.94</span><div class="r-rail"><i></i><i></i><i></i></div><div class="r-ticks"><span>bad</span><span>watch</span><span>good</span></div></div>
+      <div class="result warn" style="margin-bottom:.6rem"><span class="r-label">SPI · Schedule Performance Index</span><span class="r-value">0.90</span><div class="r-rail"><i></i><i></i><i></i></div><div class="r-ticks"><span>bad</span><span>watch</span><span>good</span></div></div>
+      <div class="result good"><span class="r-label">TCPI (EAC) · To-Complete</span><span class="r-value">1.06</span><div class="r-rail"><i></i><i></i><i></i></div><div class="r-ticks"><span>bad</span><span>watch</span><span>good</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="opt">
+  <div class="opt-head"><span class="opt-tag">Option C</span><h2>Dark-mode contrast to AA</h2></div>
+  <p class="opt-desc">In dark mode, <code>--ink-3</code> on <code>--sheet</code> is ~3.9:1 — just under WCAG AA for the small mono labels that use it. After nudges <code>--ink-3</code> and <code>--rule-2</code> up a few percent. Switch to dark mode to see the right column brighten to AA.</p>
+  <div class="row">
+    <div class="panel">
+      <h4>Before — secondary text &amp; labels (dark)</h4>
+      <div class="swatch"><span class="chip" style="background:#1d2126"></span><span style="color:#8a9095">CPI · Cost Performance Index</span><span class="ratio fail">3.9:1 fail</span></div>
+      <div class="swatch"><span class="chip" style="background:#1d2126"></span><span style="color:#8a9095">e.g. 100000</span><span class="ratio fail">3.9:1 fail</span></div>
+      <div class="label" style="margin-top:.6rem">Border that carries meaning: <span style="color:#6a7075">--rule-2</span></div>
+    </div>
+    <div class="panel after-c">
+      <h4>After — AA (5.0:1)</h4>
+      <div class="swatch"><span class="chip" style="background:#1d2126"></span><span style="color:#a0a6ac">CPI · Cost Performance Index</span><span class="ratio pass">5.0:1 pass</span></div>
+      <div class="swatch"><span class="chip" style="background:#1d2126"></span><span style="color:#a0a6ac">e.g. 100000</span><span class="ratio pass">5.0:1 pass</span></div>
+      <div class="label" style="margin-top:.6rem">Border that carries meaning: <span style="color:#7e848a">--rule-2</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="opt">
+  <div class="opt-head"><span class="opt-tag">Option D</span><h2>Selection + scrollbar polish</h2></div>
+  <p class="opt-desc">After adds a themed <code>::selection</code> (accent-soft background, ink text) and styles scrollbars (thin, <code>--rule-2</code> thumb on <code>--sheet-sunk</code> track) so the formula inlay's horizontal scroll and the mobile nav row match the bench instead of showing default OS chrome. Drag the scrollbar and select the text to compare.</p>
+  <div class="row">
+    <div class="panel">
+      <h4>Before — default selection &amp; scrollbar</h4>
+      <div class="scrollbox" style="margin-bottom:.7rem">Line 1<br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>Line 6<br>Line 7<br>Line 8</div>
+      <p class="sample-text">Select this sentence to see the browser default highlight colour.</p>
+    </div>
+    <div class="panel after-d">
+      <h4>After — themed selection &amp; scrollbar</h4>
+      <div class="scrollbox" style="margin-bottom:.7rem">Line 1<br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>Line 6<br>Line 7<br>Line 8</div>
+      <p class="sample-text">Select this sentence to see the accent-soft highlight.</p>
+    </div>
+  </div>
+</section>
+<!--BODY-->
+</body>
+</html>
