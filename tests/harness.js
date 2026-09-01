@@ -58,6 +58,7 @@ function loadPage(file) {
       throw new Error('Failed evaluating ' + file + ' script block ' + i + ': ' + e.message);
     }
   });
+  VM.registerFunctions(realm, sandbox);
 
   return {
     sandbox: sandbox,
@@ -65,7 +66,7 @@ function loadPage(file) {
     blocks: blocks,
     loaded: loaded,
     cloneData: realm.cloneData,
-    isRealmFunction: realm.isRealmFunction
+    trustedFunctions: realm.trustedFunctions
   };
 }
 

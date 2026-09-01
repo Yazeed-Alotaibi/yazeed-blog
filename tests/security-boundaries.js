@@ -64,9 +64,12 @@ function run(result, root) {
       }]);
 
     var hostFunctionRejected = false;
+    var spoofedFormatter = function () {};
+    Object.setPrototypeOf(spoofedFormatter,
+      Object.getPrototypeOf(vmPage.sandbox.vmFormatter));
     try {
       H.invoke(vmPage, vmPage.sandbox.vmRendererProbe,
-        [{ series: [{ points: [[1, 2]] }], formatter: function () {} }]);
+        [{ series: [{ points: [[1, 2]] }], formatter: spoofedFormatter }]);
     } catch (error) {
       hostFunctionRejected = /host functions/.test(error.message);
     }
@@ -85,6 +88,58 @@ function run(result, root) {
     }
     result('VM host callback target', hostTargetRejected,
       'host callback target was accepted');
+
+    var spoofedTargetCalled = false;
+    var spoofedTarget = function () {
+      spoofedTargetCalled = true;
+      return false;
+    };
+    Object.setPrototypeOf(spoofedTarget,
+      Object.getPrototypeOf(vmPage.sandbox.vmComputeProbe));
+    var spoofedTargetRejected = false;
+    try {
+      H.invoke(vmPage, spoofedTarget, [{}]);
+    } catch (error) {
+      spoofedTargetRejected = /originate in the page VM/.test(error.message);
+    }
+    result('VM prototype-spoofed callback target',
+      spoofedTargetRejected && spoofedTargetCalled === false,
+      'prototype-spoofed host target was accepted or called');
+
+    var targetTrapCalled = false;
+    var proxiedTarget = new Proxy(vmPage.sandbox.vmComputeProbe, {
+      apply: function () {
+        targetTrapCalled = true;
+        return false;
+      }
+    });
+    var proxiedTargetRejected = false;
+    try {
+      H.invoke(vmPage, proxiedTarget, [{}]);
+    } catch (error) {
+      proxiedTargetRejected = /originate in the page VM/.test(error.message);
+    }
+    result('VM proxied callback target',
+      proxiedTargetRejected && targetTrapCalled === false,
+      'host proxy target was accepted or its apply trap ran');
+
+    var formatterTrapCalled = false;
+    var proxiedFormatter = new Proxy(vmPage.sandbox.vmFormatter, {
+      apply: function () {
+        formatterTrapCalled = true;
+        return 1;
+      }
+    });
+    var proxiedFormatterRejected = false;
+    try {
+      H.invoke(vmPage, vmPage.sandbox.vmRendererProbe,
+        [{ series: [{ points: [[1, 2]] }], formatter: proxiedFormatter }]);
+    } catch (error) {
+      proxiedFormatterRejected = /proxies/.test(error.message);
+    }
+    result('VM nested proxied function',
+      proxiedFormatterRejected && formatterTrapCalled === false,
+      'host proxy data was accepted or its apply trap ran');
 
     var cyclicRejected = false;
     var cyclic = {};

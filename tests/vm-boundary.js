@@ -1,6 +1,7 @@
 'use strict';
 
 var vm = require('vm');
+var types = require('util').types;
 
 function createRealm() {
   var sandbox = Object.create(null);
@@ -14,13 +15,6 @@ function createRealm() {
     'this.setTimeout = function () { return 0; };',
     'this.clearTimeout = function () {};'
   ].join('\n'), sandbox, { filename: 'test-harness-bootstrap.js' });
-  var isRealmFunction = vm.runInContext([
-    '(function (RealmFunction) {',
-    '  return function (value) {',
-    '    return typeof value === "function" && value instanceof RealmFunction;',
-    '  };',
-    '}(Function))'
-  ].join('\n'), sandbox, { filename: 'test-harness-function-origin.js' });
   var cloneData = vm.runInContext([
     '(function () {',
     '  var arrayIsArray = Array.isArray;',
@@ -57,7 +51,7 @@ function createRealm() {
   return {
     sandbox: sandbox,
     cloneData: cloneData,
-    isRealmFunction: isRealmFunction
+    trustedFunctions: new WeakSet()
   };
 }
 
@@ -65,25 +59,72 @@ function evaluate(realm, source, filename) {
   return vm.runInContext(source, realm.sandbox, { filename: filename });
 }
 
+function registerFunctions(realm, value, seen) {
+  var i;
+  var keys;
+  if (value === null ||
+      (typeof value !== 'object' && typeof value !== 'function')) return;
+  if (types.isProxy(value)) throw new TypeError('Page data cannot expose proxies');
+  seen = seen || new WeakSet();
+  if (seen.has(value)) return;
+  seen.add(value);
+  if (typeof value === 'function') {
+    realm.trustedFunctions.add(value);
+    return;
+  }
+  keys = Object.keys(value);
+  for (i = 0; i < keys.length; i += 1) {
+    registerFunctions(realm, value[keys[i]], seen);
+  }
+}
+
+function validateData(page, value, seen) {
+  var i;
+  var keys;
+  if (value === null ||
+      (typeof value !== 'object' && typeof value !== 'function')) return;
+  if (types.isProxy(value)) {
+    throw new TypeError('Cannot pass proxies into page callbacks');
+  }
+  seen = seen || new WeakSet();
+  if (seen.has(value)) return;
+  seen.add(value);
+  if (typeof value === 'function') {
+    if (!page.trustedFunctions.has(value)) {
+      throw new TypeError('Cannot pass host functions into page callbacks');
+    }
+    return;
+  }
+  keys = Object.keys(value);
+  for (i = 0; i < keys.length; i += 1) {
+    validateData(page, value[keys[i]], seen);
+  }
+}
+
 function invoke(page, fn, args) {
+  var output;
   var safeArgs = [];
   var i;
   if (!page || typeof page.cloneData !== 'function' ||
-      typeof page.isRealmFunction !== 'function') {
+      !page.trustedFunctions || typeof page.trustedFunctions.has !== 'function') {
     throw new TypeError('Page was not created by loadPage()');
   }
   if (typeof fn !== 'function') throw new TypeError('Page callback is not a function');
-  if (!Reflect.apply(page.isRealmFunction, undefined, [fn])) {
+  if (types.isProxy(fn) || !page.trustedFunctions.has(fn)) {
     throw new TypeError('Page callback must originate in the page VM');
   }
   for (i = 0; i < (args || []).length; i += 1) {
+    validateData(page, args[i]);
     safeArgs.push(Reflect.apply(page.cloneData, undefined, [args[i]]));
   }
-  return Reflect.apply(fn, undefined, safeArgs);
+  output = Reflect.apply(fn, undefined, safeArgs);
+  registerFunctions(page, output);
+  return output;
 }
 
 module.exports = {
   createRealm: createRealm,
   evaluate: evaluate,
+  registerFunctions: registerFunctions,
   invoke: invoke
 };

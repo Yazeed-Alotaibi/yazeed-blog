@@ -12,8 +12,9 @@ content.
   console/timer shims inside the VM realm, and disables dynamic string code
   generation. Every calculator/chart callback receives a VM-realm data clone,
   and page-owned arrays are traversed without receiving host callbacks.
-- `tests/vm-boundary.js` rejects host-origin callback targets, host functions
-  nested in data, and cyclic callback input with deliberate boundary errors.
+- `tests/vm-boundary.js` registers VM functions in a host-held weak set and
+  rejects host, prototype-spoofed, or proxied targets, nested host functions,
+  proxies, and cyclic callback input with deliberate boundary errors.
 - `tests/security-boundaries.js` keeps every callback surface and real-path
   containment scenario independently named in the integrity pressure gate.
 - `tests/edge-cases.js` replaces 24 rotating sweeps with named input classes:
@@ -79,14 +80,14 @@ Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
 Earned Schedule vectors: 0/0 passed
-All tests: 2056/2056 passed in 77.5ms
+All tests: 2056/2056 passed in 81.0ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2056/2056 passed in 90.6ms
+All tests: 2056/2056 passed in 91.0ms
 index.html reads: 1
 ```
 
@@ -135,13 +136,16 @@ VM renderer nested data: caught
 VM nested host function: caught
 VM overridden array method: caught
 VM host callback target: caught
+VM prototype-spoofed callback target: caught
+VM proxied callback target: caught
+VM nested proxied function: caught
 VM cyclic callback data: caught
 external harness page: caught
 symlinked external harness page: caught
 synthetic Earned Schedule vectors: caught
 future chart integration: caught
 non-finite chart summary: caught
-Integrity smoke: 22/22 caught
+Integrity smoke: 25/25 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -162,7 +166,7 @@ Tests paragraph with wording equivalent to:
 > mutants must be killed.
 
 Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, or Lane A/D integration seams; all twenty-two pressure probes must be
+contracts, or Lane A/D integration seams; all twenty-five pressure probes must be
 caught.
 
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
