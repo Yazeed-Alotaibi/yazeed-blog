@@ -9,7 +9,9 @@ var suites = [
   require('./stylesheet'),
   require('./redirects'),
   require('./counts'),
-  require('./earned-schedule')
+  require('./earned-schedule'),
+  require('./prerender'),
+  require('./export')
 ];
 
 function run(pageFile, options) {

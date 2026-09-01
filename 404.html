@@ -5,10 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reading not found — yazeed.blog</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/big-shoulders-display-700.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/libre-franklin-var.woff2">
   <style>
+    /* ── self-hosted webfonts ──────────────────────────────────────────────────
+       These were a render-blocking stylesheet from Google. Same files, downloaded
+       into fonts/ and committed, so the page now makes no third-party request at
+       all — the footer's "nothing is sent anywhere" covers the fonts too. It also
+       removes the serial hop this page used to wait on: connect to googleapis,
+       fetch and parse CSS, only then connect to gstatic before a font byte moves.
+
+       The unicode-range is Google's own latin subset, kept verbatim. It is what
+       lets a character these files have no glyph for — Σ, σ, √, ≈, →, the box
+       rules — fall through to the system stack, exactly as it does today.
+
+       Big Shoulders and IBM Plex Mono are static instances, one file per weight.
+       Libre Franklin is the variable font: one 29KB file serves 400, 500 and 600
+       where three static cuts would cost 47KB. Weights the site never sets are
+       deliberately absent, so a <strong> in body copy still resolves to 600. */
+
+    @font-face {
+      font-family: 'Big Shoulders Display';
+      font-style: normal;
+      font-weight: 600;
+      font-display: swap;
+      src: url('fonts/big-shoulders-display-600.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'Big Shoulders Display';
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url('fonts/big-shoulders-display-700.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'Libre Franklin';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/libre-franklin-var.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'Libre Franklin';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url('fonts/libre-franklin-var.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'Libre Franklin';
+      font-style: normal;
+      font-weight: 600;
+      font-display: swap;
+      src: url('fonts/libre-franklin-var.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/ibm-plex-mono-400.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url('fonts/ibm-plex-mono-500.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal;
+      font-weight: 600;
+      font-display: swap;
+      src: url('fonts/ibm-plex-mono-600.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
     :root {
       color-scheme: light;
 

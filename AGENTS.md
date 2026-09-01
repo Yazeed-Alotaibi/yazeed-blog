@@ -7,19 +7,46 @@ into a second one.
 
 ## What this project is
 
-A static site. **One** self-contained HTML file at the repository root, served
+A static site. Self-contained HTML files at the repository root, served
 directly with no build step:
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 33 calculators · 99 metrics rendered from a `PM_DATA` object |
+| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 34 calculators · 103 metrics rendered from a `PM_DATA` object. Also the whole `.xlsx` writer; see **Exporting to Excel** |
+| `404.html` | The branded not-found page — bench styling copied inline (not shared), an instrument at rest reading "READING NOT FOUND," and links back to the desk. Apache serves it via `ErrorDocument 404` in `.htaccess` |
 | `og.png` | The 1200×630 card shown when a link to the site is shared. The one image the site ships |
+
+`robots.txt` and `sitemap.xml` complete the deploy surface — a crawler policy
+and a single-URL sitemap for the canonical homepage. Both are edited by hand,
+same as everything else here.
+
+`fonts/` holds the six woff2 files the pages use, plus the OFL licence they
+ship under. They were a render-blocking stylesheet from Google until the site
+took them in-house; see **No third-party requests** below for why that matters
+more than the bytes.
+
+`tools/prerender.js` is the one piece of generated content in the repository.
+It renders `PM_DATA` to static markup and writes it into `index.html` between
+`<!-- prerender:start -->` and `<!-- prerender:end -->`. Run it — and commit the
+result — after any change to a calculator's name, prose, formula, inputs or
+outputs. `tests/prerender.js` fails the suite if you forget.
 
 `og.png` is a rendered artifact, not a hand-drawn one: `design/og-card.source.html`
 is the page it comes from, and that page's dial geometry is copied from the hero
 instrument, so the card shows a real reading. Re-render it by screenshotting that
-file at 1200×630 — and re-render it whenever the figures on it (14 · 33 · 99) stop
-being true. Nothing automates this; the PNG is committed.
+file at 1200×630 — and re-render it whenever the figures on it (14 · 34 · 103)
+stop being true. Nothing automates this; the PNG is committed.
+
+One trap if you do re-render it: everything under `design/` still pulls its
+webfonts from Google, because those pages are not deployed and nobody moved
+them. The shipped pages no longer do. Point the source page at `../fonts/`
+before screenshotting, or the card will be set in whatever Google serves that
+day rather than in the faces the site actually uses.
+
+`tests/counts.js` is the tripwire for exactly that drift: it derives the three
+figures from `PM_DATA` and checks them against the hero copy, the `<title>`,
+the meta description, the JSON-LD and `og:image:alt`. It cannot see inside the
+PNG, so a stale card is still the one thing you have to catch by looking.
 
 Note it does not weaken the self-contained rule below. The *page* never requests
 it — only a crawler unfurling a shared link does.
@@ -38,10 +65,15 @@ These are not preferences. Breaking one breaks the site's premise.
 
 - **No build step.** No bundler, no transpiler, no framework. A file you open
   in a browser is the shipped artifact.
-- **No dependencies.** No npm packages, no CDN scripts. The only external
-  request any page makes is the Google Fonts stylesheet.
+- **No dependencies.** No npm packages, no CDN scripts.
+- **No third-party requests.** Neither page contacts any origin but its own —
+  the fonts were the last one and now ship from `fonts/`. The footers promise
+  "nothing is sent anywhere"; that promise is now literally true, and adding a
+  CDN script, a hosted font or an embed would break it. Same-origin assets are
+  fine.
 - **Self-contained pages.** CSS in a `<style>` block, JavaScript in a `<script>`
-  block, both inline in the page that uses them. Pages do not share files.
+  block, both inline in the page that uses them. Pages do not share files —
+  `fonts/` is the one shared directory, and it holds no code.
 - **Client-side only.** Every calculation runs in the visitor's browser. No
   backend, no analytics, no telemetry. The footers promise "nothing is sent
   anywhere" — that promise is load-bearing.
@@ -72,16 +104,72 @@ graduated scales, tabular figures.
 - **Depth is `--lip` and `--sunk`**, never an ad-hoc shadow. A lip catches the
   light on a raised panel; a recess swallows it on a sunken one.
 - **Minimum 44px touch targets** on anything interactive.
-- **Respect `prefers-reduced-motion`.** All three pages already do.
+- **Respect `prefers-reduced-motion`.** `index.html` and `404.html` both do.
 
 Copy the custom properties and font stack from `index.html` when adding a page —
 consistency across the bench is the point.
 
+## Exporting to Excel
+
+Every card carries an **Excel** button beside *Copy link*. It writes a real
+`.xlsx` — parameters, results with their verdict sentences, the formula, the
+how-to, and each chart as a data table beside a **native, editable Excel
+chart** drawn from those cells.
+
+There is no library. An `.xlsx` is a ZIP of XML parts, and three inline
+modules build one:
+
+| Module | Where | What it does |
+|---|---|---|
+| `PM_XLSX` | its own `<script>`, before `PM_CHARTS` | A ZIP writer (CRC32, stored entries) and the SpreadsheetML/DrawingML — worksheet, styles, chart, drawing |
+| `PM_CHARTS.exportData` | inside the charts module | Turns a plot spec into **raw numbers** and names the Excel chart type that carries it |
+| `PM_EXPORT` | its own `<script>`, after `PM_CHARTS` | Lays out the sheet and points each chart's series at the cells holding its numbers |
+
+`PM_EXPORT` is a pure function of the card, its values and its results — the
+download itself is `saveWorkbook` in the desk script, because the test harness
+skips any block that touches `document`. Keep it that way: the layout is only
+testable headless while it stays DOM-free.
+
+**Element order in those XML parts is not cosmetic.** The OOXML schemas are
+sequences, and Excel answers an out-of-order child with "we found a problem
+with some content" rather than with the chart. Move something only against
+ECMA-376, not against what looks tidy.
+
+Chart kinds map to Excel like this — `bars`, `distribution`, `rangeplot` and
+`quadrant` become column charts, `curve` a scatter with lines, `windows` a
+stacked bar whose first segment is invisible (which is what makes it a float
+diagram). **`meter` and `matrix` deliberately export no chart.** A gauge reads
+one value against threshold bands and a risk matrix reads a cell position;
+drawn as bars they would silently become magnitude comparisons. Those sheets
+carry the figures and a sentence saying why there is no plot. Adding a fake
+chart there would be a regression, not a feature.
+
+A new chart kind that `exportData` does not know about is caught by
+`tests/export.js`, not discovered by a reader with a blank sheet.
+
 ## Tests
 
-`node tests/baseline.js`, `tests/edge-cases.js`, `tests/charts.js`. They run on
-plain node with no dependencies, and they cover the arithmetic: formula results
-against known values, division and overflow guards, and the chart builders.
+`node tests/run.js` is the complete dependency-free gate. It loads `index.html`
+once and runs nine suites against that single parse: the formula baseline,
+deliberate edge classes, chart specs, stylesheet integrity, redirect integrity,
+published-count drift, guarded Earned Schedule vectors (which skip until a card
+with `id: 'earned-schedule'` exists, then activate themselves), prerender
+freshness, and spreadsheet export. Each suite file (`tests/baseline.js`,
+`edge-cases.js`, `charts.js`, `stylesheet.js`, `redirects.js`, `counts.js`,
+`earned-schedule.js`, `prerender.js`, `export.js`) is still directly runnable on
+its own for debugging — it re-parses the page itself when run standalone.
+
+`tests/baseline.json` records every calculator's output for one set of example
+inputs, so a refactor has to prove it changed nothing. `node tests/baseline.js
+--write` regenerates it. Regenerating is not a way to make a failure go away:
+read the diff first and satisfy yourself each changed number is right, because
+a wrong value committed here becomes the thing everything else is measured
+against.
+
+Run `node tests/mutation-smoke.js` after changing the test harness or a
+calculator formula: it copies `index.html`, flips one operator in three
+different formulas, and asserts the suite fails all three. A mutation it can't
+kill means the coverage regressed.
 
 **They do not render anything.** The builders are pure functions returning spec
 objects, and that is where the coverage stops — nothing mounts a chart in a
@@ -94,6 +182,18 @@ green throughout.
 So a green run is not evidence that a chart draws. Open the page and look at it.
 Adding a browser to the test suite would mean adding a dependency, which the
 hard constraints above rule out — the manual check is the deliberate trade.
+
+**The same gap applies to the export, one layer further out.** `tests/export.js`
+checks the ZIP, the parts, the CRCs, that every plotted value is a number rather
+than a formatted string, and that every chart's series reference resolves back
+to the cells it claims to plot — but nothing here opens a workbook. A file can
+satisfy all of it and still make Excel offer to repair it, because schema order
+is not something these assertions can see.
+
+When you change the XML, open the result. The workbooks that shipped this
+feature were checked against LibreOffice Calc and `openpyxl` (with warnings
+raised as errors) — both installable in a scratch directory, neither a
+dependency of this repository. Export a card, open it, look at the chart.
 
 ### Look at it in a foreground tab
 
@@ -174,9 +274,16 @@ git push origin main
 
 Hostinger serves yazeed.blog (`server: hcdn`, not GitHub Pages — the
 `github.io` URL returns "Site not found") and is connected to this repository,
-so it redeploys itself on a push to main. The deployed artifact is `index.html`
-plus `og.png`, `.htaccess` and the two redirect stubs described below. There is
-deliberately no CI here: no workflow, no build, no `CNAME`.
+so it redeploys itself on a push to main. The deployed artifact is `index.html`,
+`404.html`, `og.png`, `robots.txt`, `sitemap.xml`, `fonts/`, `.htaccess` and the
+two redirect stubs described below. `tests/`, `tools/`, `docs/` and `design/`
+are repository furniture and are not served. There is deliberately no CI here:
+no workflow, no build, no `CNAME`.
+
+`fonts/` has no cache headers of its own yet. The files are immutable — their
+names carry the weight — so they are a natural fit for a long `Cache-Control`,
+which would need a new `<IfModule mod_headers.c>` block in `.htaccess`, guarded
+the same way the rewrites are.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
 on the origin, and it answers 301 for the three addresses that are not the
@@ -195,6 +302,13 @@ awk '/^[[:space:]]*#/ {next}
      /<\/IfModule>/ {d=0}
      /Rewrite(Rule|Cond|Engine)/ {print (d ? "  inside  " : "OUTSIDE! ") $0}' .htaccess
 ```
+
+`.htaccess` also carries one line the guard above does not cover on purpose:
+`ErrorDocument 404 /404.html`, appended after and outside the `<IfModule>`
+block. `ErrorDocument` is core Apache, not `mod_rewrite` — unlike a bare
+`RewriteRule` it cannot 500 a host that lacks the module, so it needs no guard.
+`tests/redirects.js` checks the rewrite rules; it does not check this line,
+since there is no Apache in the test environment to serve a 404 against.
 
 The two stub HTML files are kept on purpose even though the 301s mean nothing
 ever reaches them. If mod_rewrite disappears, the guard switches the redirects

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Earned Value Formulas Explained — CPI, SPI, EAC, PERT &amp; 33 PM Calculators</title>
-  <meta name="description" content="Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance, each read back in plain English. Plus 33 PM calculators, free.">
+  <title>Earned Value Explained — CPI, SPI, EAC + 34 PM Calculators</title>
+  <meta name="description" content="Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance, each read back in plain English. Plus 34 PM calculators, free.">
   <!-- www and the apex both answer 200 with identical content, so name the one
        Google should index. Without this the two compete as duplicates. -->
   <link rel="canonical" href="https://yazeed.blog/">
@@ -24,17 +24,109 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yazeed.blog/">
   <meta property="og:site_name" content="Calculation Desk">
-  <meta property="og:title" content="Earned Value Formulas Explained — CPI, SPI, EAC &amp; 33 PM Calculators">
-  <meta property="og:description" content="Earned value computed live and read back in plain English, plus 33 project-management calculators across 14 domains. Free, nothing leaves your browser.">
+  <meta property="og:title" content="Earned Value Formulas Explained — CPI, SPI, EAC &amp; 34 PM Calculators">
+  <meta property="og:description" content="Earned value computed live and read back in plain English, plus 34 project-management calculators across 14 domains. Free, nothing leaves your browser.">
   <meta property="og:image" content="https://yazeed.blog/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Earned value, explained — a cost performance index gauge reading 1.13, under budget, beside the count of 14 domains, 33 calculators and 99 metrics.">
+  <meta property="og:image:alt" content="Earned value, explained — a cost performance index gauge reading 1.13, under budget, beside the count of 14 domains, 34 calculators and 103 metrics.">
+  <meta property="og:locale" content="en_US">
+  <!-- X falls back to the og:* tags for title, description and image, but not
+       for image alt — that one has no fallback, so a screen-reader user on a
+       shared link gets nothing unless it is stated here too. -->
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="twitter:image:alt" content="Earned value, explained — a cost performance index gauge reading 1.13, under budget, beside the count of 14 domains, 34 calculators and 103 metrics.">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/big-shoulders-display-700.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/libre-franklin-var.woff2">
   <style>
+/* ── self-hosted webfonts ──────────────────────────────────────────────────
+   These were a render-blocking stylesheet from Google. Same files, downloaded
+   into fonts/ and committed, so the page now makes no third-party request at
+   all — the footer's "nothing is sent anywhere" covers the fonts too. It also
+   removes the serial hop this page used to wait on: connect to googleapis,
+   fetch and parse CSS, only then connect to gstatic before a font byte moves.
+
+   The unicode-range is Google's own latin subset, kept verbatim. It is what
+   lets a character these files have no glyph for — Σ, σ, √, ≈, →, the box
+   rules — fall through to the system stack, exactly as it does today.
+
+   Big Shoulders and IBM Plex Mono are static instances, one file per weight.
+   Libre Franklin is the variable font: one 29KB file serves 400, 500 and 600
+   where three static cuts would cost 47KB. Weights the site never sets are
+   deliberately absent, so a <strong> in body copy still resolves to 600. */
+
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/big-shoulders-display-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/big-shoulders-display-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Franklin';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/libre-franklin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Franklin';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/libre-franklin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Franklin';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/libre-franklin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/ibm-plex-mono-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/ibm-plex-mono-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/ibm-plex-mono-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* PM Calculation Desk — bench instrument.
    Direction: a bench of calibrated instruments. Light mode is the instrument
    under daylight — putty enamel body, off-white dial faces, engraved
@@ -358,9 +450,13 @@ main {
   color: var(--ink-2);
 }
 
-#hero-stats {
+/* The tally above the desk, and the search's answer. It reports what is on
+   the bench, then what a query narrowed it to — the only confirmation that
+   filtering worked, since the alternative is cards silently vanishing. It is
+   a live region, so that confirmation is spoken as well as seen. */
+#desk-stats {
   display: inline-block;
-  margin-top: 1.5rem;
+  margin: 0 0 1.4rem;
   padding: 0.45rem 0.85rem;
   border: 1px solid var(--rule-2);
   background: var(--sheet);
@@ -369,6 +465,54 @@ main {
   letter-spacing: 0.02em;
   color: var(--ink-2);
 }
+
+#desk-stats:empty { display: none; }
+
+/* --------------------------------------------------- prerendered desk */
+/* Styling for readers a browser normally spares this: the static mirror is
+   cleared during parse, so nobody running JavaScript ever sees these rules.
+   They exist for the visitor with scripting off, who would otherwise get
+   seven thousand words of unstyled prose. Crawlers ignore all of it. */
+.prerender { padding-top: var(--space-section); }
+
+.prerender-lede,
+.prerender-citation,
+.prerender-eg,
+.prerender-tagline {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+}
+
+.prerender-toc { columns: 2 16rem; margin: 0 0 2rem; padding-left: 1.1rem; }
+.prerender-toc a { color: var(--ink-2); }
+
+.prerender-category {
+  padding-top: 2.4rem;
+  margin-top: 2.4rem;
+  border-top: 1px solid var(--rule);
+}
+
+.prerender-card {
+  margin-top: 1.8rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+
+.prerender-formula {
+  overflow-x: auto;
+  padding: 0.8rem 1rem;
+  background: var(--engrave);
+  color: var(--engrave-ink);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.prerender-params dt { margin-top: 0.7rem; font-weight: 600; }
+.prerender-params dd { margin: 0.2rem 0 0; color: var(--ink-2); }
 
 /* ---------------------------------------------------------- category */
 .category { padding-top: var(--space-section); }
@@ -406,6 +550,27 @@ main {
   color: var(--ink-2);
   font-size: 0.9rem;
 }
+
+.cat-citation {
+  display: block;
+  margin-top: 0.65rem;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.cat-citation a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  vertical-align: middle;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cat-citation a:hover { color: var(--ink); }
 
 /* --------------------------------------------------------------- card */
 .calc-card {
@@ -774,6 +939,7 @@ main {
 @media (max-width: 920px) {
   /* minmax(0,…) so pre-formatted formula lines can't widen the page */
   body { grid-template-columns: minmax(0, 1fr); }
+
 
   .sidebar {
     position: static;
@@ -1147,7 +1313,11 @@ main {
 /* The desk in one line: its scale, then the way into it. Replaces the old
    cross-page manifest — the calculators are on this same page now. */
 .hero-jump { margin-top: 2rem; padding-top: 1.15rem; border-top: 1px solid var(--rule); }
-.hero-figures { display: flex; gap: 2.2rem; }
+/* Three figures on one line until they no longer fit. Without the wrap their
+   combined min-content width sets a floor under the hero column, and below
+   about 340px that floor is wider than the screen — the whole page then
+   scrolls sideways to accommodate three numbers. */
+.hero-figures { display: flex; flex-wrap: wrap; gap: 1.1rem 2.2rem; }
 .hero-fig-num {
   font-family: var(--mono); font-size: 1.55rem; font-weight: 600;
   font-variant-numeric: tabular-nums; line-height: 1;
@@ -1208,16 +1378,22 @@ main {
   .hero { grid-template-columns: 1fr 1fr; gap: 3.2rem; align-items: start; }
 
   /* The instrument is a tall dense panel and the text beside it is short, so
-     the column heights cannot match — roughly 420px has to go somewhere. Left
-     alone it pools under the text as a hole. Pinning the credentials, figures
-     and call to action to the bottom instead puts that space in the middle,
-     where it reads as measure rather than as a truncated column, and lands
-     both columns on the same baseline. The headline keeps the top. */
+     roughly 420px of height has to go somewhere. This used to push the
+     credentials and figures to the bottom of the column, which aligned the two
+     baselines but cost more than it bought: measured at 1440×900 it opened a
+     412px hole in the middle of the first screen and dropped 14 · 34 · 103 —
+     the proof the hero exists to offer — below the fold.
+
+     So the gap is bounded instead of greedy. The figures follow the lede at a
+     generous but finite distance, landing above the fold, and the leftover
+     height falls at the foot of the column where the instrument beside it
+     carries the eye. A short column reads as a short column; a hole in the
+     middle of the opening screen reads as a mistake. */
   /* Descendant selectors, not bare class ones: the base .creds and .hero-jump
      rules are declared further down this stylesheet and would otherwise win on
      source order. */
-  .hero-col-a { display: flex; flex-direction: column; height: 100%; }
-  .hero-col-a .creds { margin-top: auto; }
+  .hero-col-a { display: flex; flex-direction: column; }
+  .hero-col-a .creds { margin-top: clamp(1.6rem, 5vh, 3rem); }
   .hero-col-a .hero-jump { margin-top: 1.4rem; }
 }
 
@@ -1329,6 +1505,26 @@ a.preview-item:hover { padding-inline-start: .5rem; color: var(--accent); }
   gap: 1px;
   background: var(--rule);
 }
+/* Below about 350px the instrument sets a floor wider than the screen — its
+   header row, its two side-by-side gauges and their padding cannot all fit,
+   and the whole document then scrolls sideways, which is the one thing a
+   reflow at 320px must never do. Give the panel permission to stack. */
+@media (max-width: 22em) {
+  main { padding-inline: .55rem; }
+  .instrument-head { flex-wrap: wrap; gap: .5rem; padding: .7rem .8rem; }
+  .strip { padding: .7rem .8rem; }
+  .instrument-out { grid-template-columns: 1fr; }
+  .instrument-fields { grid-template-columns: 1fr 1fr; }
+  .gauge { padding: .8rem .5rem 1rem; }
+  /* A grid item refuses to go narrower than its content unless told to, and a
+     number input's intrinsic width is wider than a third of this screen. */
+  .hero > *, .ifield, .gauge, .variance { min-width: 0; }
+  /* The display face is condensed, so a long heading word only threatens the
+     line box when the webfont has not arrived. Break it rather than let one
+     word decide the width of the document. */
+  #hero-h { overflow-wrap: anywhere; }
+}
+
 .gauge { background: var(--panel); padding: 1rem .8rem 1.15rem; text-align: center; }
 .gauge svg { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto .1rem; }
 
@@ -1610,10 +1806,48 @@ h2 {
     "@type": "WebApplication",
     "name": "Calculation Desk",
     "url": "https://yazeed.blog/",
-    "description": "Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance — plus 33 project-management calculators across 14 domains. Free, client-side only.",
+    "description": "Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance — plus 34 project-management calculators across 14 domains. Free, client-side only.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires JavaScript",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "featureList": [
+      "Earned value core & forecasting",
+      "Earned Schedule",
+      "Time forecasting (SPI-based)",
+      "Burn rate & runway",
+      "Three-point estimate (PERT)",
+      "Path uncertainty roll-up",
+      "Learning curve",
+      "Float (slack)",
+      "Crash cost slope",
+      "Full-time equivalents (FTE)",
+      "Utilization",
+      "Loaded labor cost",
+      "Communication channels",
+      "Expected Monetary Value (EMV)",
+      "Qualitative risk score",
+      "Contingency reserve roll-up",
+      "Decision tree — compare two options",
+      "DPMO & sigma level",
+      "Control limits (±3σ)",
+      "Process capability (Cp / Cpk)",
+      "Cost of Quality (CoQ)",
+      "Return on Investment (ROI)",
+      "NPV · IRR · Payback",
+      "Present & Future Value",
+      "Break-even point",
+      "Straight-line depreciation",
+      "Weighted scoring model",
+      "Point of Total Assumption (PTA)",
+      "FPIF final fee & price",
+      "CPIF final fee & price",
+      "Velocity & release forecast",
+      "Sprint capacity",
+      "Say/do ratio",
+      "Little’s Law & flow efficiency"
+    ],
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": {
       "@type": "Person",
@@ -1677,7 +1911,7 @@ h2 {
           <h1 id="hero-h">Earned value, <span>explained</span>.</h1>
           <p class="hero-lede">
             CPI, SPI, EAC, ETC and variance &mdash; computed live, then read back in plain
-            English. Plus 33 calculators across 14 domains: critical path, risk,
+            English. Plus 34 calculators across 14 domains: critical path, risk,
             procurement, agile forecasting.
           </p>
           <ul class="creds">
@@ -1695,11 +1929,11 @@ h2 {
                 <span class="hero-fig-lab">Domains</span>
               </div>
               <div>
-                <span class="hero-fig-num">33</span>
+                <span class="hero-fig-num">34</span>
                 <span class="hero-fig-lab">Calculators</span>
               </div>
               <div>
-                <span class="hero-fig-num">99</span>
+                <span class="hero-fig-num">103</span>
                 <span class="hero-fig-lab">Metrics</span>
               </div>
             </div>
@@ -1778,12 +2012,1265 @@ h2 {
             </div>
 
             <p class="instrument-foot">
-              Four of 99 metrics on the
+              Four of 103 metrics on the
               <a href="#calc-sections">desk below</a>.
             </p>
           </figure>
         </div>
       </section>
+
+    <p id="desk-stats" role="status"></p>
+
+    <!-- The desk, twice. The block between these markers is a static text
+         mirror of every calculator, generated by tools/prerender.js and
+         committed, because a fetcher that does not run JavaScript would
+         otherwise see 428 words of hero copy and none of the 34 calculators.
+         A browser throws it away and builds the real instruments in its
+         place. tests/prerender.js fails the suite if it drifts from PM_DATA. -->
+    <div id="calc-sections">
+      <!-- prerender:start -->
+      <div class="prerender" id="prerender-desk">
+      <p class="prerender-lede">A text index of the 14 domains, 34 calculators and 103 metrics on this page. Every figure computes in your browser; open the page with JavaScript enabled for the working instruments.</p>
+      <ol class="prerender-toc">
+      <li><a href="#prerender-cat-evm">01 — Earned Value Management</a></li>
+      <li><a href="#prerender-cat-burn">02 — Budget &amp; Burn Rate</a></li>
+      <li><a href="#prerender-cat-estimation">03 — Estimation</a></li>
+      <li><a href="#prerender-cat-schedule">04 — Schedule &amp; Critical Path</a></li>
+      <li><a href="#prerender-cat-compression">05 — Schedule Compression</a></li>
+      <li><a href="#prerender-cat-resources">06 — Resources &amp; Team</a></li>
+      <li><a href="#prerender-cat-comms">07 — Communication</a></li>
+      <li><a href="#prerender-cat-risk">08 — Risk</a></li>
+      <li><a href="#prerender-cat-decision">09 — Decision Analysis</a></li>
+      <li><a href="#prerender-cat-quality">10 — Quality &amp; Six Sigma</a></li>
+      <li><a href="#prerender-cat-financial">11 — Project Selection &amp; Finance</a></li>
+      <li><a href="#prerender-cat-procurement">12 — Procurement &amp; Contracts</a></li>
+      <li><a href="#prerender-cat-agile">13 — Agile Forecasting</a></li>
+      <li><a href="#prerender-cat-flow">14 — Lean &amp; Flow</a></li>
+      </ol>
+      <section class="prerender-category" id="prerender-cat-evm">
+      <h2>01 — Earned Value Management</h2>
+      <p class="prerender-blurb">One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.</p>
+      <p class="prerender-citation">EVM — PMI Practice Standard; Lipke, “Schedule is Different.”</p>
+      <article class="prerender-card" id="prerender-calc-earned-value">
+      <h3>01.1 — Earned value core &amp; forecasting</h3>
+      <p class="prerender-tagline">CV · SV · CPI · SPI · EAC · ETC · VAC · TCPI</p>
+      <p class="prerender-about">Enter the four base measures below and every earned-value metric updates live. The performance metrics describe project health today; the forecasting metrics project that health forward to completion. All monetary figures share whatever currency you enter.</p>
+      <pre class="prerender-formula"><code>CV  = EV − AC        SV  = EV − PV
+CPI = EV ÷ AC        SPI = EV ÷ PV
+EAC = BAC ÷ CPI      ETC = EAC − AC
+VAC = BAC − EAC
+TCPI = (BAC − EV) ÷ (BAC − AC)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>BAC — Budget at Completion</dt>
+      <dd>The total approved budget for all project work. The baseline everything else is measured against.</dd>
+      <dd class="prerender-eg">e.g. 100000</dd>
+      <dt>PV — Planned Value</dt>
+      <dd>The budgeted cost of the work that was scheduled to be done by now (also called BCWS).</dd>
+      <dd class="prerender-eg">e.g. 50000</dd>
+      <dt>EV — Earned Value</dt>
+      <dd>The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).</dd>
+      <dd class="prerender-eg">e.g. 45000</dd>
+      <dt>AC — Actual Cost</dt>
+      <dd>What the completed work really cost, regardless of what was budgeted (also called ACWP).</dd>
+      <dd class="prerender-eg">e.g. 60000</dd>
+      <dt>EAC — management forecast (optional)</dt>
+      <dd>A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.</dd>
+      <dd class="prerender-eg">e.g. 125000</dd>
+      </dl>
+      <h4>Results</h4>
+      <h5>Performance today</h5>
+      <dl class="prerender-results">
+      <dt>Cost Variance (CV)</dt>
+      <dd>Budget health in currency: value earned minus money spent.</dd>
+      <dt>Schedule Variance (SV)</dt>
+      <dd>Schedule health expressed in currency: work done minus work planned.</dd>
+      <dt>Cost Performance Index (CPI)</dt>
+      <dd>Cost efficiency: value earned per unit of money spent.</dd>
+      <dt>Schedule Performance Index (SPI)</dt>
+      <dd>Schedule efficiency: rate of progress versus the plan.</dd>
+      <dt>Cost–Schedule Index (CSI)</dt>
+      <dd>CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.</dd>
+      <dt>% Complete</dt>
+      <dd>Share of the total scope actually finished: EV ÷ BAC.</dd>
+      <dt>% Spent</dt>
+      <dd>Share of the total budget already consumed: AC ÷ BAC.</dd>
+      </dl>
+      <h5>Forecasting completion</h5>
+      <dl class="prerender-results">
+      <dt>EAC — typical variance</dt>
+      <dd>BAC ÷ CPI. Forecast final cost assuming today’s cost efficiency continues — the default assumption.</dd>
+      <dt>EAC — atypical variance</dt>
+      <dd>AC + (BAC − EV). Use when the variance was a one-off and the remaining work will go to plan.</dd>
+      <dt>EAC — cost &amp; schedule</dt>
+      <dd>AC + (BAC − EV) ÷ (CPI × SPI). Use when schedule pressure is also driving cost (e.g. a hard deadline).</dd>
+      <dt>ETC — Estimate to Complete</dt>
+      <dd>EAC − AC (using the typical-variance EAC). Money still needed to finish the remaining work.</dd>
+      <dt>VAC — Variance at Completion</dt>
+      <dd>BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.</dd>
+      <dt>TCPI — to hit BAC</dt>
+      <dd>(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.</dd>
+      <dt>TCPI — to hit EAC</dt>
+      <dd>(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Cost position</dt>
+      <dd>What was planned, what was earned, what it cost — against the budget line.</dd>
+      <dt>CPI–SPI quadrant</dt>
+      <dd>Cost efficiency against schedule efficiency, crossed at 1.00.</dd>
+      <dt>TCPI required efficiency</dt>
+      <dd>The cost performance the remaining work must sustain to still hit BAC.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-earned-schedule">
+      <h3>01.2 — Earned Schedule</h3>
+      <p class="prerender-tagline">ES · SV(t) · SPI(t) · IEAC(t)</p>
+      <p class="prerender-about">SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.</p>
+      <pre class="prerender-formula"><code>ES = PD × (EV ÷ BAC)
+SV(t) = ES − AT
+SPI(t) = ES ÷ AT
+IEAC(t) = PD ÷ SPI(t)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>BAC — Budget at Completion</dt>
+      <dd>Total approved budget for the complete scope. Currency; must be greater than 0.</dd>
+      <dd class="prerender-eg">e.g. 200000</dd>
+      <dt>PD — Planned duration</dt>
+      <dd>Baseline duration from start to planned finish. Periods; use a positive value.</dd>
+      <dd class="prerender-eg">e.g. 12</dd>
+      <dt>AT — Actual time</dt>
+      <dd>Time elapsed at the status date. Periods; must be greater than 0 for SPI(t).</dd>
+      <dd class="prerender-eg">e.g. 8</dd>
+      <dt>EV — Earned Value</dt>
+      <dd>Budgeted value of the work actually complete. Same currency as BAC; zero is valid.</dd>
+      <dd class="prerender-eg">e.g. 120000</dd>
+      </dl>
+      <h4>Results</h4>
+      <h5>Earned time</h5>
+      <dl class="prerender-results">
+      <dt>Earned Schedule (ES)</dt>
+      <dd>The baseline time equivalent of the EV entered.</dd>
+      <dt>Schedule Variance (SV(t))</dt>
+      <dd>The time difference at the status date. Negative means late.</dd>
+      <dt>Schedule Performance Index (SPI(t))</dt>
+      <dd>Time efficiency, with 1.00 as the plan line.</dd>
+      </dl>
+      <h5>Forecasting completion</h5>
+      <dl class="prerender-results">
+      <dt>Independent Estimate at Completion (IEAC(t))</dt>
+      <dd>A duration forecast under the same efficiency and linear-PV assumption; it is not a promise and it is not a calendar finish date.</dd>
+      </dl>
+      <h4>How to use it</h4>
+      <ol class="prerender-howto">
+      <li>Enter BAC and PD from the approved baseline, then enter EV and AT from the same status date.</li>
+      <li>Read SV(t) for the time gap and SPI(t) for the direction and efficiency of travel. Check that the linear-PV assumption is reasonable for this project.</li>
+      <li>Use IEAC(t) as a trend to test recovery options; reconcile it to the time-phased schedule before committing to a finish date.</li>
+      </ol>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Earned time position</dt>
+      <dd>The time the completed work earned against actual time and plan.</dd>
+      <dt>SPI(t) time efficiency</dt>
+      <dd>Earned schedule per period of actual time, crossed at 1.00.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-time-forecast">
+      <h3>01.3 — Time forecasting (SPI-based)</h3>
+      <p class="prerender-tagline">Planned duration ÷ SPI</p>
+      <p class="prerender-about">Cost gets EAC; schedule gets this. Dividing the planned duration by the schedule performance index projects when the project will actually finish if the current pace continues. It is an approximation — SPI drifts back toward 1.0 late in a project as planned value tops out, so trust it early and mid-project and re-check often.</p>
+      <pre class="prerender-formula"><code>Forecast duration = Planned duration ÷ SPI
+SPI = EV ÷ PV</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Planned duration</dt>
+      <dd>The baseline total duration, in any time unit — the forecast comes back in the same unit.</dd>
+      <dd class="prerender-eg">e.g. 12</dd>
+      <dt>EV — Earned Value</dt>
+      <dd>Budgeted cost of the work actually completed to date.</dd>
+      <dd class="prerender-eg">e.g. 45000</dd>
+      <dt>PV — Planned Value</dt>
+      <dd>Budgeted cost of the work scheduled to be done by now.</dd>
+      <dd class="prerender-eg">e.g. 50000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>SPI</dt>
+      <dd>Pace versus plan — the engine of the forecast.</dd>
+      <dt>Forecast duration</dt>
+      <dd>Expected total duration if the current pace holds.</dd>
+      <dt>Projected slip</dt>
+      <dd>Forecast minus plan — the schedule overrun taking shape.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Planned vs forecast duration</dt>
+      <dd>Where the project lands if today’s pace holds — not a certainty, a trend.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-burn">
+      <h2>02 — Budget &amp; Burn Rate</h2>
+      <p class="prerender-blurb">The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.</p>
+      <p class="prerender-citation">Budget &amp; burn — PMI PMBOK Guide, Cost Management.</p>
+      <article class="prerender-card" id="prerender-calc-burn-rate">
+      <h3>02.1 — Burn rate &amp; runway</h3>
+      <p class="prerender-tagline">Spend pace · runway · budget used</p>
+      <p class="prerender-about">Divide what you have spent by how long you have been spending it and you get the burn rate — the project’s cash velocity. Runway converts the remaining budget into time at that pace. Use any period unit (months, sprints); the runway comes back in the same unit.</p>
+      <pre class="prerender-formula"><code>Burn rate = Spent ÷ Periods elapsed
+Runway = (Budget − Spent) ÷ Burn rate</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Total budget</dt>
+      <dd>Approved funds for the whole project.</dd>
+      <dd class="prerender-eg">e.g. 120000</dd>
+      <dt>Spent to date</dt>
+      <dd>Actual cost so far — same as AC in earned value.</dd>
+      <dd class="prerender-eg">e.g. 45000</dd>
+      <dt>Periods elapsed</dt>
+      <dd>How many months / sprints of spending produced that cost.</dd>
+      <dd class="prerender-eg">e.g. 3</dd>
+      <dt>Planned periods remaining (optional)</dt>
+      <dd>How much longer the plan says the work will take — to test whether the money outlives the work.</dd>
+      <dd class="prerender-eg">e.g. 6</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Burn rate</dt>
+      <dd>Average spend per period — the pace at which the budget is being consumed.</dd>
+      <dt>Budget remaining</dt>
+      <dd>Funds left before the budget is exhausted.</dd>
+      <dt>Runway (periods)</dt>
+      <dd>How many more periods the remaining budget lasts at the current burn rate.</dd>
+      <dt>% of budget used</dt>
+      <dd>Share of total funds already consumed.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Runway vs plan</dt>
+      <dd>Whether the remaining money outlasts the remaining work.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-estimation">
+      <h2>03 — Estimation</h2>
+      <p class="prerender-blurb">Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.</p>
+      <p class="prerender-citation">Estimation — PMI Practice Standard for Project Estimating.</p>
+      <article class="prerender-card" id="prerender-calc-three-point">
+      <h3>03.1 — Three-point estimate (PERT)</h3>
+      <p class="prerender-tagline">Triangular · Beta · σ · confidence ranges</p>
+      <p class="prerender-about">Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.</p>
+      <pre class="prerender-formula"><code>Triangular = (O + M + P) ÷ 3
+PERT (beta) = (O + 4M + P) ÷ 6
+σ = (P − O) ÷ 6        Variance = σ²</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>O — Optimistic</dt>
+      <dd>Best-case estimate: everything goes right. Roughly the 1-in-100 lucky outcome.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      <dt>M — Most Likely</dt>
+      <dd>The realistic estimate you would give under normal conditions.</dd>
+      <dd class="prerender-eg">e.g. 6</dd>
+      <dt>P — Pessimistic</dt>
+      <dd>Worst-case estimate: known risks materialise. Roughly the 1-in-100 unlucky outcome.</dd>
+      <dd class="prerender-eg">e.g. 12</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Triangular average</dt>
+      <dd>Simple mean of the three points — use when you have no reason to trust M more.</dd>
+      <dt>PERT (beta) estimate</dt>
+      <dd>Weighted mean, 4× on Most Likely — the standard exam and planning answer.</dd>
+      <dt>Standard deviation (σ)</dt>
+      <dd>How spread out the outcome could be. A wide O–P gap means low confidence.</dd>
+      <dt>Variance (σ²)</dt>
+      <dd>σ squared. Variances (not σ) are what you add up along a path to get path-level uncertainty.</dd>
+      <dt>68% confidence (±1σ)</dt>
+      <dd>Roughly two times in three, the real result lands inside this range.</dd>
+      <dt>95% confidence (±2σ)</dt>
+      <dd>The range usually quoted when someone asks for a commitment.</dd>
+      <dt>99.7% confidence (±3σ)</dt>
+      <dd>Near-certainty bounds — use for hard external deadlines.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Three-point distribution</dt>
+      <dd>The shape of the estimate, the PERT expected value, and the 68% band around it.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-path-sigma">
+      <h3>03.2 — Path uncertainty roll-up</h3>
+      <p class="prerender-tagline">σ(path) = √(Σ σ²)</p>
+      <p class="prerender-about">Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk. That diversification assumes the activities are <strong>INDEPENDENT</strong>. Correlated risks — one team, one supplier, one weather window — break the assumption, and the true path σ is then larger than this. It also covers a single path, not the merge bias where parallel paths converge.</p>
+      <pre class="prerender-formula"><code>σ(path) = √(σ₁² + σ₂² + … + σₙ²)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Activity σ values (comma-separated)</dt>
+      <dd>The standard deviation of each activity on the path, from the three-point calculator above.</dd>
+      <dd class="prerender-eg">e.g. 1.33, 0.5, 2</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Path σ</dt>
+      <dd>The combined uncertainty of the whole chain — use it for path-level confidence ranges.</dd>
+      <dt>Naive sum of σ’s</dt>
+      <dd>What you would get by simply adding the uncertainties — shown for contrast.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Roll-up vs naive sum</dt>
+      <dd>Why adding standard deviations overstates a path’s real uncertainty.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-learning-curve">
+      <h3>03.3 — Learning curve</h3>
+      <p class="prerender-tagline">T(n) = T₁ × n^(log rate ÷ log 2)</p>
+      <p class="prerender-about">Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.</p>
+      <pre class="prerender-formula"><code>Time for unit n = T₁ × n^(log(rate ÷ 100) ÷ log 2)
+rate is the learning rate as entered, in percent: 80 means 0.8</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>T₁ — first unit time (or cost)</dt>
+      <dd>How long the first repetition took — the anchor of the curve.</dd>
+      <dd class="prerender-eg">e.g. 100</dd>
+      <dt>Learning rate (%)</dt>
+      <dd>Per-doubling retention: 80 means each doubling takes 80% of the previous. Typical: 70–90%; 100 = no learning.</dd>
+      <dd class="prerender-eg">e.g. 80</dd>
+      <dt>Unit number (n)</dt>
+      <dd>Which repetition you want the estimate for.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Time for unit n</dt>
+      <dd>Predicted effort for that repetition.</dd>
+      <dt>Improvement vs unit 1</dt>
+      <dd>How much faster unit n is than the first attempt.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Learning curve</dt>
+      <dd>Per-unit time against a flat no-learning baseline, with the selected unit marked.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-schedule">
+      <h2>04 — Schedule &amp; Critical Path</h2>
+      <p class="prerender-blurb">The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.</p>
+      <p class="prerender-citation">Schedule — PMI Practice Standard for Scheduling.</p>
+      <article class="prerender-card" id="prerender-calc-float">
+      <h3>04.1 — Float (slack)</h3>
+      <p class="prerender-tagline">Total float · free float · critical path test</p>
+      <p class="prerender-about">Total float is how long an activity can slip without delaying the project finish. Free float is how long it can slip without delaying its immediate successor. Zero total float means the activity is on the critical path. Enter the dates from your forward/backward pass — either day numbers or durations, as long as they are consistent (this calculator uses the continuous convention where EF = ES + duration).</p>
+      <pre class="prerender-formula"><code>Total Float = LS − ES = LF − EF
+Free Float = ES(successor) − EF</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>ES — Early Start</dt>
+      <dd>The soonest the activity can start, from the forward pass.</dd>
+      <dd class="prerender-eg">e.g. 5</dd>
+      <dt>EF — Early Finish</dt>
+      <dd>The soonest it can finish: ES + duration.</dd>
+      <dd class="prerender-eg">e.g. 9</dd>
+      <dt>LS — Late Start</dt>
+      <dd>The latest it can start without delaying the project, from the backward pass.</dd>
+      <dd class="prerender-eg">e.g. 8</dd>
+      <dt>LF — Late Finish</dt>
+      <dd>The latest it can finish without delaying the project.</dd>
+      <dd class="prerender-eg">e.g. 12</dd>
+      <dt>Successor ES (optional)</dt>
+      <dd>Early start of the next activity — only needed for free float.</dd>
+      <dd class="prerender-eg">e.g. 11</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Total float</dt>
+      <dd>Slip allowance before the project end date moves: LS − ES.</dd>
+      <dt>Cross-check (LF − EF)</dt>
+      <dd>Should equal LS − ES; a mismatch means a pass was computed inconsistently.</dd>
+      <dt>Free float</dt>
+      <dd>Slip allowance before the next activity is disturbed: successor ES − EF.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Early vs late window</dt>
+      <dd>How much room the activity has before it becomes critical.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-compression">
+      <h2>05 — Schedule Compression</h2>
+      <p class="prerender-blurb">When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.</p>
+      <p class="prerender-citation">Compression — PMI PMBOK Guide, Schedule Compression.</p>
+      <article class="prerender-card" id="prerender-calc-crash">
+      <h3>05.1 — Crash cost slope</h3>
+      <p class="prerender-tagline">(Crash cost − Normal cost) ÷ time saved</p>
+      <p class="prerender-about">Most activities can be sped up — more people, overtime, premium suppliers — but only so far and at a price. The cost slope is the price of each time unit saved. To compress rationally: crash only critical-path activities, cheapest slope first, and stop when the slope costs more than the deadline is worth. Run this once per candidate activity and compare.</p>
+      <pre class="prerender-formula"><code>Cost slope = (Crash cost − Normal cost) ÷ (Normal duration − Crash duration)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Normal cost</dt>
+      <dd>Cost of the activity at its normal, efficient pace.</dd>
+      <dd class="prerender-eg">e.g. 10000</dd>
+      <dt>Crash cost</dt>
+      <dd>Cost at the fastest possible pace — overtime, extra staff, expediting fees included.</dd>
+      <dd class="prerender-eg">e.g. 16000</dd>
+      <dt>Normal duration</dt>
+      <dd>Duration at the normal pace (any time unit).</dd>
+      <dd class="prerender-eg">e.g. 10</dd>
+      <dt>Crash duration</dt>
+      <dd>The shortest duration physically achievable — beyond it, money buys nothing.</dd>
+      <dd class="prerender-eg">e.g. 8</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Cost slope</dt>
+      <dd>Extra cost per time unit saved on this activity.</dd>
+      <dt>Maximum time saved</dt>
+      <dd>The most this activity can be shortened: normal minus crash duration.</dd>
+      <dt>Full crash premium</dt>
+      <dd>Total extra cost of buying all the available time.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Normal vs crash</dt>
+      <dd>The cost slope drawn as a line — its gradient is the price of each time unit saved.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-resources">
+      <h2>06 — Resources &amp; Team</h2>
+      <p class="prerender-blurb">Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.</p>
+      <p class="prerender-citation">Resources — PMI PMBOK Guide, Resource Management.</p>
+      <article class="prerender-card" id="prerender-calc-fte">
+      <h3>06.1 — Full-time equivalents (FTE)</h3>
+      <p class="prerender-tagline">Effort ÷ capacity</p>
+      <p class="prerender-about">FTE converts a pile of estimated effort into how many full-time people the work actually needs within a given window. One FTE is one person fully allocated. Use productive hours per period, not contract hours — meetings, support and admin eat 15–30% before project work starts.</p>
+      <pre class="prerender-formula"><code>FTE = Effort hours ÷ (Productive hours per period × Periods)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Total effort (hours)</dt>
+      <dd>Estimated person-hours of work to deliver in the window.</dd>
+      <dd class="prerender-eg">e.g. 2080</dd>
+      <dt>Productive hours / person / period</dt>
+      <dd>Hours one person can really spend on this work each period — e.g. 130 of a 160-hour month after overhead.</dd>
+      <dd class="prerender-eg">e.g. 130</dd>
+      <dt>Periods in the window</dt>
+      <dd>How many periods (months, sprints) the work is spread across.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>FTE required</dt>
+      <dd>Full-time people the work demands over the window.</dd>
+      <dt>Headcount (rounded up)</dt>
+      <dd>Whole people to staff if nobody can split across projects cleanly.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-utilization">
+      <h3>06.2 — Utilization</h3>
+      <p class="prerender-tagline">Allocated ÷ available</p>
+      <p class="prerender-about">The share of a person’s available time already committed. Sustained utilization near 100% removes all slack: queues form, small surprises cascade, and cycle times explode (the queueing math behind this lives in Lean &amp; Flow). Plan people like you plan servers — with headroom.</p>
+      <pre class="prerender-formula"><code>Utilization % = Allocated hours ÷ Available hours × 100</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Allocated hours</dt>
+      <dd>Hours of committed work in the period across all assignments.</dd>
+      <dd class="prerender-eg">e.g. 150</dd>
+      <dt>Available hours</dt>
+      <dd>Hours the person actually has in the period.</dd>
+      <dd class="prerender-eg">e.g. 160</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Utilization</dt>
+      <dd>Commitment level for the period.</dd>
+      <dt>Uncommitted hours</dt>
+      <dd>Hours left for the work nobody predicted.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Commitment level</dt>
+      <dd>Where utilization sits against the point delays start to amplify.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-labor-cost">
+      <h3>06.3 — Loaded labor cost</h3>
+      <p class="prerender-tagline">Rate × (1 + overhead)</p>
+      <p class="prerender-about">A person’s cost to the project is never just their pay rate. The loaded (burdened) rate adds employer overhead — benefits, payroll taxes, equipment, facilities, licences — typically 25–50% on top. Budgets built on bare rates systematically understate cost and get discovered at the worst possible time.</p>
+      <pre class="prerender-formula"><code>Loaded cost = Hours × Rate × (1 + Overhead %)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Effort (hours)</dt>
+      <dd>Person-hours of work being costed.</dd>
+      <dd class="prerender-eg">e.g. 400</dd>
+      <dt>Base rate (per hour)</dt>
+      <dd>The bare pay or contract rate before burden.</dd>
+      <dd class="prerender-eg">e.g. 60</dd>
+      <dt>Overhead / burden (%)</dt>
+      <dd>Employer add-ons as a percentage of the base rate — ask finance; 25–50% is typical for employees.</dd>
+      <dd class="prerender-eg">e.g. 35</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Base cost</dt>
+      <dd>Hours × bare rate — the number that looks deceptively affordable.</dd>
+      <dt>Loaded cost</dt>
+      <dd>The true cost to the organisation, burden included.</dd>
+      <dt>Loaded hourly rate</dt>
+      <dd>The per-hour figure to use in every estimate.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-comms">
+      <h2>07 — Communication</h2>
+      <p class="prerender-blurb">Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.</p>
+      <p class="prerender-citation">Communication — PMI PMBOK Guide, Communications Management.</p>
+      <article class="prerender-card" id="prerender-calc-channels">
+      <h3>07.1 — Communication channels</h3>
+      <p class="prerender-tagline">n(n−1) ÷ 2</p>
+      <p class="prerender-about">Every pair of people on a project is a potential communication path that can carry — or garble — information. This count is used to justify communication plans, meeting structures and why large stakeholder groups need formal channels. Count everyone who communicates about the project, including yourself and the sponsor.</p>
+      <pre class="prerender-formula"><code>Channels = n × (n − 1) ÷ 2</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>n — People now</dt>
+      <dd>Current number of people communicating on the project (team + stakeholders + you).</dd>
+      <dd class="prerender-eg">e.g. 10</dd>
+      <dt>People after change (optional)</dt>
+      <dd>Headcount after adding or removing members — to see how many channels the change creates.</dd>
+      <dd class="prerender-eg">e.g. 15</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Channels now</dt>
+      <dd>One-to-one paths that currently exist.</dd>
+      <dt>Channels after change</dt>
+      <dd>Paths at the new headcount.</dd>
+      <dt>Channels added</dt>
+      <dd>New paths the headcount change creates — the hidden coordination cost.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Channel growth</dt>
+      <dd>Why one more person on a large team costs more coordination than on a small one.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-risk">
+      <h2>08 — Risk</h2>
+      <p class="prerender-blurb">Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.</p>
+      <p class="prerender-citation">Risk — PMI Risk Management in Portfolios, Programs, and Projects.</p>
+      <article class="prerender-card" id="prerender-calc-emv">
+      <h3>08.1 — Expected Monetary Value (EMV)</h3>
+      <p class="prerender-tagline">Probability × impact</p>
+      <p class="prerender-about">EMV is the probability-weighted value of an uncertain event — what the risk is “worth” on average if you could run the project many times. Enter threats with a negative impact and opportunities with a positive one. Summing the EMV of every identified risk gives the contingency reserve; EMV is also the math behind decision-tree analysis.</p>
+      <pre class="prerender-formula"><code>EMV = Probability × Impact</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Probability (%)</dt>
+      <dd>Likelihood the risk event actually occurs, from qualitative analysis or data. 0–100.</dd>
+      <dd class="prerender-eg">e.g. 30</dd>
+      <dt>Impact</dt>
+      <dd>Full monetary consequence if it occurs. Negative for threats (costs), positive for opportunities (gains).</dd>
+      <dd class="prerender-eg">e.g. -50000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Expected Monetary Value</dt>
+      <dd>The amount to carry in the contingency reserve for this single risk.</dd>
+      <dt>Impact if it happens</dt>
+      <dd>Reminder: EMV is an average — if the event fires you feel the full impact, not the EMV.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>EMV against full exposure</dt>
+      <dd>The average outcome versus what actually happens if the event fires.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-risk-score">
+      <h3>08.2 — Qualitative risk score</h3>
+      <p class="prerender-tagline">Probability × impact, on a 1–5 scale</p>
+      <p class="prerender-about">Before risks are worth quantifying in money, they are ranked qualitatively: rate probability and impact on an agreed 1–5 scale and multiply. The product places each risk in the probability–impact matrix and decides how much attention it gets. The scales are ordinal — a 4 is not “twice” a 2 — so use the score to rank, not to budget.</p>
+      <pre class="prerender-formula"><code>Risk score = Probability (1–5) × Impact (1–5)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Probability rating (1–5)</dt>
+      <dd>1 = rare, 3 = possible, 5 = almost certain — per your organisation’s definitions.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      <dt>Impact rating (1–5)</dt>
+      <dd>1 = negligible, 3 = moderate, 5 = severe effect on objectives.</dd>
+      <dd class="prerender-eg">e.g. 3</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Risk score</dt>
+      <dd>Position in the 25-cell probability–impact matrix.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Probability–impact matrix</dt>
+      <dd>Where this risk sits in the standard 5×5 grid.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-contingency">
+      <h3>08.3 — Contingency reserve roll-up</h3>
+      <p class="prerender-tagline">Σ EMV across the risk register</p>
+      <p class="prerender-about">Sum the expected monetary value of every identified risk and you get the contingency reserve — the funded buffer for known-unknowns, owned by the project manager. Enter matching lists: one probability and one impact per risk, threats negative, opportunities positive. (Unknown-unknowns are covered separately by management reserve, which sits outside the baseline.)</p>
+      <pre class="prerender-formula"><code>Contingency reserve = − Σ (Probabilityᵢ × Impactᵢ)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Probabilities % (comma-separated)</dt>
+      <dd>Likelihood of each risk, in register order — e.g. 30, 10, 50.</dd>
+      <dd class="prerender-eg">e.g. 30, 10, 50</dd>
+      <dt>Impacts (same order)</dt>
+      <dd>Monetary consequence of each risk: threats negative, opportunities positive.</dd>
+      <dd class="prerender-eg">e.g. -50000, -20000, 10000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Net EMV of the register</dt>
+      <dd>Probability-weighted sum of all risks — usually negative when threats dominate.</dd>
+      <dt>Suggested contingency reserve</dt>
+      <dd>The buffer to add to the cost baseline (zero if net EMV is positive).</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Register contribution</dt>
+      <dd>Which risks drive the reserve — each risk’s own EMV, side by side.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-decision">
+      <h2>09 — Decision Analysis</h2>
+      <p class="prerender-blurb">Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.</p>
+      <p class="prerender-citation">Decision — PMI PMBOK Guide, Decision Analysis.</p>
+      <article class="prerender-card" id="prerender-calc-decision-tree">
+      <h3>09.1 — Decision tree — compare two options</h3>
+      <p class="prerender-tagline">EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)</p>
+      <p class="prerender-about">Each option is a branch: pay its cost, then chance decides between a success payoff and a failure payoff. The branch with the higher expected monetary value wins — on average. Classic uses: build vs buy, prototype vs commit, upgrade vs replace. Remember EMV is a long-run average; for one-shot, bet-the-company decisions, weigh the worst case too.</p>
+      <pre class="prerender-formula"><code>EMV(option) = − Cost
+             + P(success) × Payoff(success)
+             + (1 − P) × Payoff(failure)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Option A — cost</dt>
+      <dd>Upfront cost of choosing branch A.</dd>
+      <dd class="prerender-eg">e.g. 40000</dd>
+      <dt>Option A — P(success) %</dt>
+      <dd>Probability branch A succeeds.</dd>
+      <dd class="prerender-eg">e.g. 60</dd>
+      <dt>Option A — payoff if success</dt>
+      <dd>Value delivered when A succeeds.</dd>
+      <dd class="prerender-eg">e.g. 100000</dd>
+      <dt>Option A — payoff if failure</dt>
+      <dd>Value (often 0, sometimes negative) when A fails.</dd>
+      <dd class="prerender-eg">e.g. 0</dd>
+      <dt>Option B — cost</dt>
+      <dd>Upfront cost of choosing branch B.</dd>
+      <dd class="prerender-eg">e.g. 10000</dd>
+      <dt>Option B — P(success) %</dt>
+      <dd>Probability branch B succeeds.</dd>
+      <dd class="prerender-eg">e.g. 30</dd>
+      <dt>Option B — payoff if success</dt>
+      <dd>Value delivered when B succeeds.</dd>
+      <dd class="prerender-eg">e.g. 60000</dd>
+      <dt>Option B — payoff if failure</dt>
+      <dd>Value when B fails.</dd>
+      <dd class="prerender-eg">e.g. 0</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>EMV — Option A</dt>
+      <dd>Expected value of branch A after its cost.</dd>
+      <dt>EMV — Option B</dt>
+      <dd>Expected value of branch B after its cost.</dd>
+      <dt>Better option</dt>
+      <dd>The branch with the higher expected value, and by how much.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Expected value comparison</dt>
+      <dd>Which branch wins on average, and how wide a bet each one is.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-quality">
+      <h2>10 — Quality &amp; Six Sigma</h2>
+      <p class="prerender-blurb">Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?</p>
+      <p class="prerender-citation">Quality — ASQ Quality Resources and Six Sigma guidance.</p>
+      <article class="prerender-card" id="prerender-calc-dpmo">
+      <h3>10.1 — DPMO &amp; sigma level</h3>
+      <p class="prerender-tagline">Defects per million opportunities</p>
+      <p class="prerender-about">DPMO normalizes defect counts by how many chances there were to fail, so processes of different complexity can be compared fairly. The sigma level restates DPMO on the Six Sigma scale (with the conventional 1.5σ shift): 3σ ≈ 66,800 defects per million, 4σ ≈ 6,210, 6σ ≈ 3.4.</p>
+      <pre class="prerender-formula"><code>DPMO = Defects × 1,000,000 ÷ (Units × Opportunities per unit)
+Sigma level ≈ 0.8406 + √(29.37 − 2.221 × ln DPMO)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Defects found</dt>
+      <dd>Total defects observed in the sample.</dd>
+      <dd class="prerender-eg">e.g. 25</dd>
+      <dt>Units inspected</dt>
+      <dd>How many items, transactions or deliverables were checked.</dd>
+      <dd class="prerender-eg">e.g. 1000</dd>
+      <dt>Opportunities per unit</dt>
+      <dd>Distinct ways each unit could be defective — fields on a form, joints on an assembly.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>DPMO</dt>
+      <dd>Defects expected per million opportunities at this rate.</dd>
+      <dt>Process yield</dt>
+      <dd>Share of opportunities that pass defect-free.</dd>
+      <dt>Sigma level</dt>
+      <dd>The process capability on the Six Sigma scale, 1.5σ shift included.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Sigma level</dt>
+      <dd>Process performance on the Six Sigma scale.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-control">
+      <h3>10.2 — Control limits (±3σ)</h3>
+      <p class="prerender-tagline">UCL · LCL · warning zone</p>
+      <p class="prerender-about">A control chart flags when a process leaves its normal noise band. The limits sit three standard deviations either side of the historical mean: a point outside them — or seven consecutive points on one side of the mean (the rule of seven) — signals the process is out of control and needs investigation, not tampering.</p>
+      <pre class="prerender-formula"><code>UCL = Mean + 3σ        LCL = Mean − 3σ</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Process mean</dt>
+      <dd>The long-run average of the measurement, from historical data.</dd>
+      <dd class="prerender-eg">e.g. 50</dd>
+      <dt>Process σ</dt>
+      <dd>Standard deviation of the measurement under normal conditions.</dd>
+      <dd class="prerender-eg">e.g. 2</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Upper control limit</dt>
+      <dd>Mean + 3σ — the ceiling of normal variation.</dd>
+      <dt>Lower control limit</dt>
+      <dd>Mean − 3σ — the floor of normal variation.</dd>
+      <dt>Warning zone (±2σ)</dt>
+      <dd>Inner band where points are legal but worth watching.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Control band</dt>
+      <dd>The mean, the ±2σ warning zone, and the ±3σ control limits on one axis.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-cpk">
+      <h3>10.3 — Process capability (Cp / Cpk)</h3>
+      <p class="prerender-tagline">Can the process meet the spec?</p>
+      <p class="prerender-about">Control limits describe what the process does; specification limits describe what the customer needs. Capability indices compare the two. Cp asks whether the spec window is wide enough for the process spread (ignoring centering); Cpk penalises a process that drifts off-centre. The common acceptance bar is Cpk ≥ 1.33.</p>
+      <pre class="prerender-formula"><code>Cp  = (USL − LSL) ÷ 6σ
+Cpk = min(USL − Mean, Mean − LSL) ÷ 3σ</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>USL — upper spec limit</dt>
+      <dd>The highest value the customer or requirement accepts.</dd>
+      <dd class="prerender-eg">e.g. 10</dd>
+      <dt>LSL — lower spec limit</dt>
+      <dd>The lowest acceptable value.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      <dt>Process mean</dt>
+      <dd>Where the process actually centres, from measurement data.</dd>
+      <dd class="prerender-eg">e.g. 6</dd>
+      <dt>Process σ</dt>
+      <dd>Standard deviation of the process output.</dd>
+      <dd class="prerender-eg">e.g. 0.5</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Cp — potential capability</dt>
+      <dd>Spec width versus process spread, assuming perfect centering.</dd>
+      <dt>Cpk — actual capability</dt>
+      <dd>Capability including how far off-centre the process runs.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Spec window vs process spread</dt>
+      <dd>Whether the ±3σ process spread fits inside the customer’s spec limits, and how centred it is.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-coq">
+      <h3>10.4 — Cost of Quality (CoQ)</h3>
+      <p class="prerender-tagline">Conformance vs failure spend</p>
+      <p class="prerender-about">Everything quality costs, split into money spent on purpose and money lost to failure. Conformance costs are investments: prevention (training, standards, design reviews) and appraisal (testing, inspections, audits). Non-conformance costs are the bill for defects: internal failures (rework, scrap) and external ones (warranty, support, reputation). Mature organisations deliberately shift spend from the failure side to the prevention side.</p>
+      <pre class="prerender-formula"><code>Conformance = Prevention + Appraisal
+Non-conformance = Internal failures + External failures
+CoQ = Conformance + Non-conformance</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Prevention costs</dt>
+      <dd>Spent stopping defects from happening: training, standards, quality planning.</dd>
+      <dd class="prerender-eg">e.g. 20000</dd>
+      <dt>Appraisal costs</dt>
+      <dd>Spent finding defects early: testing, inspection, audits.</dd>
+      <dd class="prerender-eg">e.g. 30000</dd>
+      <dt>Internal failure costs</dt>
+      <dd>Defects caught before the customer: rework, scrap, retesting.</dd>
+      <dd class="prerender-eg">e.g. 40000</dd>
+      <dt>External failure costs</dt>
+      <dd>Defects that reached the customer: warranty, incident response, lost business.</dd>
+      <dd class="prerender-eg">e.g. 25000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Cost of conformance</dt>
+      <dd>The deliberate investment in quality.</dd>
+      <dt>Cost of non-conformance</dt>
+      <dd>The price of failure, internal and external.</dd>
+      <dt>Total cost of quality</dt>
+      <dd>Everything quality costs, both sides combined.</dd>
+      <dt>Failure share of CoQ</dt>
+      <dd>What portion of quality spend is failure rather than investment.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Conformance vs failure spend</dt>
+      <dd>Where quality money goes — investment against the cost of failure.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-financial">
+      <h2>11 — Project Selection &amp; Finance</h2>
+      <p class="prerender-blurb">The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.</p>
+      <p class="prerender-citation">Finance — PMI PMBOK Guide, Project Finance and Benefits.</p>
+      <article class="prerender-card" id="prerender-calc-roi">
+      <h3>11.1 — Return on Investment (ROI)</h3>
+      <p class="prerender-tagline">(Benefit − Cost) ÷ Cost</p>
+      <p class="prerender-about">The simplest project-selection measure: how much you get back per unit invested, ignoring timing. Good for quick comparisons; misleading for long projects because it ignores when the money arrives — use NPV for that.</p>
+      <pre class="prerender-formula"><code>ROI % = (Benefit − Cost) ÷ Cost × 100</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Total cost</dt>
+      <dd>Everything invested in the project: build, licences, labour, run costs over the horizon you are measuring.</dd>
+      <dd class="prerender-eg">e.g. 200000</dd>
+      <dt>Total benefit</dt>
+      <dd>Total value returned over the same horizon: revenue, savings, avoided costs.</dd>
+      <dd class="prerender-eg">e.g. 260000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>ROI</dt>
+      <dd>Percentage return over the whole horizon (not per year).</dd>
+      <dt>Net benefit</dt>
+      <dd>Absolute value created: benefit minus cost.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-npv">
+      <h3>11.2 — NPV · IRR · Payback</h3>
+      <p class="prerender-tagline">Discounted cash-flow appraisal</p>
+      <p class="prerender-about">The rigorous way to value a project: every future cash flow is discounted back to today because money later is worth less than money now. NPV is the value created in today’s money; IRR is the discount rate at which the project merely breaks even; payback tells you how long capital is at risk. When choosing between projects, pick the higher NPV.</p>
+      <pre class="prerender-formula"><code>NPV = −Investment + Σ  CFₜ ÷ (1 + r)ᵗ
+IRR: the r where NPV = 0
+Payback: periods until cumulative cash flow ≥ 0</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Discount rate (%)</dt>
+      <dd>Cost of capital or required return per period — the hurdle the project must beat.</dd>
+      <dd class="prerender-eg">e.g. 10</dd>
+      <dt>Initial investment</dt>
+      <dd>Cash out at period 0, entered as a positive number.</dd>
+      <dd class="prerender-eg">e.g. 1000</dd>
+      <dt>Cash flows (comma-separated)</dt>
+      <dd>Net cash in (or out, negative) for each following period, in order: period 1, 2, 3…</dd>
+      <dd class="prerender-eg">e.g. 500, 500, 500</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Net Present Value</dt>
+      <dd>Value created in today’s money after paying back capital and the required return.</dd>
+      <dt>Internal Rate of Return</dt>
+      <dd>The project’s intrinsic return per period. Compare it to the discount rate. Reliable only for conventional flows — one outlay followed by inflows. If the signs change more than once, IRR can have several answers or none, and NPV is the measure to trust.</dd>
+      <dt>Benefit–Cost Ratio</dt>
+      <dd>Present value of the future net cash flows per unit invested — net, so a negative period nets off rather than counting as a benefit. Above 1 means benefits outweigh costs.</dd>
+      <dt>Payback period</dt>
+      <dd>Periods until the undiscounted cash recovers the investment — a measure of capital risk, not profitability.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Cumulative cash flow</dt>
+      <dd>Discounted against undiscounted — where the project actually breaks even.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-tvm">
+      <h3>11.3 — Present &amp; Future Value</h3>
+      <p class="prerender-tagline">FV = PV(1 + r)ⁿ</p>
+      <p class="prerender-about">The time-value-of-money primitive behind NPV. Future value answers “what will this be worth after n periods of compounding?”; present value answers the reverse: “what is a promised future amount worth today?”. Both outputs are computed from the single amount you enter.</p>
+      <pre class="prerender-formula"><code>FV = Amount × (1 + r)ⁿ
+PV = Amount ÷ (1 + r)ⁿ</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Amount</dt>
+      <dd>The sum of money to move through time.</dd>
+      <dd class="prerender-eg">e.g. 10000</dd>
+      <dt>Rate per period (%)</dt>
+      <dd>Interest or discount rate for each compounding period.</dd>
+      <dd class="prerender-eg">e.g. 8</dd>
+      <dt>Periods (n)</dt>
+      <dd>Number of compounding periods — years if the rate is annual.</dd>
+      <dd class="prerender-eg">e.g. 5</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Future value</dt>
+      <dd>What the amount grows to if invested today at the given rate.</dd>
+      <dt>Present value</dt>
+      <dd>What a payment of that amount, received n periods from now, is worth today.</dd>
+      <dt>Doubling time (Rule of 72)</dt>
+      <dd>72 ÷ rate: the mental-math shortcut for how many periods money takes to double.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-breakeven">
+      <h3>11.4 — Break-even point</h3>
+      <p class="prerender-tagline">Fixed costs ÷ contribution margin</p>
+      <p class="prerender-about">How many units (or billable hours, or subscriptions) you must sell before the venture stops losing money. The denominator — price minus variable cost — is the contribution margin: what each unit contributes toward covering fixed costs.</p>
+      <pre class="prerender-formula"><code>Break-even units = Fixed costs ÷ (Price − Variable cost per unit)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Fixed costs</dt>
+      <dd>Costs that exist regardless of volume: rent, salaries, licences, the project build itself.</dd>
+      <dd class="prerender-eg">e.g. 50000</dd>
+      <dt>Price per unit</dt>
+      <dd>Revenue received for each unit sold.</dd>
+      <dd class="prerender-eg">e.g. 25</dd>
+      <dt>Variable cost per unit</dt>
+      <dd>Cost incurred for each additional unit: materials, transaction fees, support.</dd>
+      <dd class="prerender-eg">e.g. 15</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Break-even units</dt>
+      <dd>Volume at which total revenue equals total cost.</dd>
+      <dt>Break-even revenue</dt>
+      <dd>The revenue level at that volume.</dd>
+      <dt>Contribution margin / unit</dt>
+      <dd>Price − variable cost: what each sale contributes to fixed costs.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Revenue vs cost</dt>
+      <dd>Where the revenue line crosses total cost.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-depreciation">
+      <h3>11.5 — Straight-line depreciation</h3>
+      <p class="prerender-tagline">(Cost − Salvage) ÷ Useful life</p>
+      <p class="prerender-about">Spreads an asset’s cost evenly across its useful life — the depreciation method assumed in PMP exam questions and the simplest for business cases that must account for capital assets.</p>
+      <pre class="prerender-formula"><code>Annual depreciation = (Cost − Salvage value) ÷ Useful life</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Purchase cost</dt>
+      <dd>What the asset costs to acquire and put into service.</dd>
+      <dd class="prerender-eg">e.g. 120000</dd>
+      <dt>Salvage value</dt>
+      <dd>Expected resale or scrap value at the end of its useful life.</dd>
+      <dd class="prerender-eg">e.g. 20000</dd>
+      <dt>Useful life (years)</dt>
+      <dd>How many years the asset will be productive.</dd>
+      <dd class="prerender-eg">e.g. 5</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Depreciation per year</dt>
+      <dd>The expense recognised each year of the asset’s life.</dd>
+      <dt>Depreciation rate</dt>
+      <dd>Share of the depreciable base expensed each year: 1 ÷ life.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-scoring">
+      <h3>11.6 — Weighted scoring model</h3>
+      <p class="prerender-tagline">Σ (weight × score)</p>
+      <p class="prerender-about">The standard way to compare options against several criteria at once: weight each criterion by importance, score the option against each, and sum weight × score. Run it once per option and compare the totals. Its real value is political — the weights force stakeholders to argue about priorities before the decision, not after it.</p>
+      <pre class="prerender-formula"><code>Weighted score = Σ (weightᵢ × scoreᵢ) ÷ Σ weightᵢ</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Criteria weights (comma-separated)</dt>
+      <dd>Importance of each criterion, any scale — e.g. strategic fit 5, cost 3, risk 2.</dd>
+      <dd class="prerender-eg">e.g. 5, 3, 2</dd>
+      <dt>Option scores (same order)</dt>
+      <dd>How this option rates on each criterion, on your scoring scale (say 1–10), in the same order as the weights.</dd>
+      <dd class="prerender-eg">e.g. 8, 6, 9</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Weighted score</dt>
+      <dd>The option’s weighted average on your scoring scale — directly comparable across options.</dd>
+      <dt>Raw weighted total</dt>
+      <dd>The unnormalized Σ weight × score, as many textbooks present it.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Weighted contribution</dt>
+      <dd>Each criterion’s share of the total score — the weights, made visible.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-procurement">
+      <h2>12 — Procurement &amp; Contracts</h2>
+      <p class="prerender-blurb">The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.</p>
+      <p class="prerender-citation">Procurement — PMI PMBOK Guide, Procurement Management.</p>
+      <article class="prerender-card" id="prerender-calc-pta">
+      <h3>12.1 — Point of Total Assumption (PTA)</h3>
+      <p class="prerender-tagline">Where the seller starts paying for overruns</p>
+      <p class="prerender-about">In a Fixed-Price-Incentive-Fee contract, cost overruns are shared according to the buyer/seller ratio only up to the ceiling price. The PTA is the actual-cost level at which the buyer’s share of the overrun has consumed the room up to the ceiling; beyond it, every additional dollar of cost comes out of the seller’s fee. Sellers manage hard to stay below it.</p>
+      <pre class="prerender-formula"><code>PTA = (Ceiling price − Target price) ÷ Buyer share + Target cost</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Ceiling price</dt>
+      <dd>The maximum the buyer will ever pay, regardless of cost.</dd>
+      <dd class="prerender-eg">e.g. 180000</dd>
+      <dt>Target price</dt>
+      <dd>Target cost + target fee: what both parties expect the buyer to pay.</dd>
+      <dd class="prerender-eg">e.g. 165000</dd>
+      <dt>Target cost</dt>
+      <dd>The cost both parties negotiated as the expected outcome.</dd>
+      <dd class="prerender-eg">e.g. 150000</dd>
+      <dt>Buyer share (%)</dt>
+      <dd>Buyer’s portion of the share ratio. An “80/20 split” means the buyer covers 80% of overruns — enter 80.</dd>
+      <dd class="prerender-eg">e.g. 80</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Point of Total Assumption</dt>
+      <dd>The actual cost at which the seller assumes all further overrun.</dd>
+      <dt>Overrun absorbed before PTA</dt>
+      <dd>How much the cost can overrun target before the PTA is reached.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Shared-risk band</dt>
+      <dd>Target cost, the point of total assumption, and the ceiling on one cost axis.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-fpif">
+      <h3>12.2 — FPIF final fee &amp; price</h3>
+      <p class="prerender-tagline">Settling an incentive contract</p>
+      <p class="prerender-about">When the work is done, the incentive formula converts the cost outcome into the seller’s final fee: the seller keeps its share of any saving and gives up its share of any overrun. If a ceiling price is set, the buyer never pays more than it.</p>
+      <pre class="prerender-formula"><code>Final fee = Target fee + (Target cost − Actual cost) × Seller share
+If the ceiling binds: Final fee = Ceiling price − Actual cost
+Final price = min(Actual cost + Final fee, Ceiling price)</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Target cost</dt>
+      <dd>Negotiated expected cost of the work.</dd>
+      <dd class="prerender-eg">e.g. 150000</dd>
+      <dt>Target fee</dt>
+      <dd>Profit the seller earns if actual cost exactly equals target cost.</dd>
+      <dd class="prerender-eg">e.g. 15000</dd>
+      <dt>Actual cost</dt>
+      <dd>What the work really cost the seller.</dd>
+      <dd class="prerender-eg">e.g. 140000</dd>
+      <dt>Seller share (%)</dt>
+      <dd>Seller’s portion of the ratio. In an 80/20 split, enter 20.</dd>
+      <dd class="prerender-eg">e.g. 20</dd>
+      <dt>Ceiling price (optional)</dt>
+      <dd>Contract maximum — caps what the buyer pays.</dd>
+      <dd class="prerender-eg">e.g. 180000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Final fee</dt>
+      <dd>Seller’s profit after applying the incentive share. Once the ceiling binds, the fee erodes dollar for dollar with the overrun and can go negative.</dd>
+      <dt>Final price (buyer pays)</dt>
+      <dd>Actual cost plus final fee, capped at the ceiling if one is set.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Final price vs actual cost</dt>
+      <dd>The slope changes at the PTA and flattens at the ceiling — that bend is where seller risk changes.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-cpif">
+      <h3>12.3 — CPIF final fee &amp; price</h3>
+      <p class="prerender-tagline">Cost-plus with a bounded incentive</p>
+      <p class="prerender-about">In a Cost-Plus-Incentive-Fee contract the buyer reimburses all allowable costs, but the seller’s fee moves with performance: it grows when the seller beats the target cost and shrinks on overruns, always clamped between a negotiated minimum and maximum fee. Unlike FPIF there is no ceiling price — cost risk stays mostly with the buyer, which is why CPIF suits work too uncertain to fix-price.</p>
+      <pre class="prerender-formula"><code>Fee = Target fee + (Target cost − Actual cost) × Seller share
+Final fee = clamp(Fee, Min fee, Max fee)
+Final price = Actual cost + Final fee</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Target cost</dt>
+      <dd>Negotiated expected cost of the work.</dd>
+      <dd class="prerender-eg">e.g. 100000</dd>
+      <dt>Target fee</dt>
+      <dd>Fee the seller earns if cost lands exactly on target.</dd>
+      <dd class="prerender-eg">e.g. 10000</dd>
+      <dt>Actual cost</dt>
+      <dd>What the work really cost — fully reimbursed by the buyer.</dd>
+      <dd class="prerender-eg">e.g. 90000</dd>
+      <dt>Seller share (%)</dt>
+      <dd>Seller’s portion of the share ratio. In an 80/20 split, enter 20.</dd>
+      <dd class="prerender-eg">e.g. 20</dd>
+      <dt>Minimum fee (optional)</dt>
+      <dd>Fee floor — the least the seller can earn however badly cost overruns.</dd>
+      <dd class="prerender-eg">e.g. 4000</dd>
+      <dt>Maximum fee (optional)</dt>
+      <dd>Fee ceiling — the most the seller can earn however well it performs.</dd>
+      <dd class="prerender-eg">e.g. 15000</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Final fee</dt>
+      <dd>Incentive-adjusted fee, clamped to the min/max band if provided.</dd>
+      <dt>Final price (buyer pays)</dt>
+      <dd>Reimbursed actual cost plus the final fee — no ceiling in CPIF.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Seller fee vs actual cost</dt>
+      <dd>The fee moves with performance, then clamps flat at the negotiated floor and ceiling.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-agile">
+      <h2>13 — Agile Forecasting</h2>
+      <p class="prerender-blurb">Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.</p>
+      <p class="prerender-citation">Agile — Scrum Guide (2020): scrumguides.org/scrum-guide.html</p>
+      <article class="prerender-card" id="prerender-calc-velocity">
+      <h3>13.1 — Velocity &amp; release forecast</h3>
+      <p class="prerender-tagline">Backlog ÷ velocity</p>
+      <p class="prerender-about">Velocity is the average number of story points a team completes per sprint, measured from finished sprints only (yesterday’s weather). Dividing the remaining backlog by velocity gives the most honest forecast available: how many sprints of work remain at the current, demonstrated pace.</p>
+      <pre class="prerender-formula"><code>Velocity = Points completed ÷ Sprints completed
+Sprints remaining = ⌈ Remaining backlog ÷ Velocity ⌉</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Points completed</dt>
+      <dd>Total story points fully done (meeting the Definition of Done) across the measured sprints.</dd>
+      <dd class="prerender-eg">e.g. 120</dd>
+      <dt>Sprints completed</dt>
+      <dd>Number of finished sprints those points came from — use at least 3 for a stable average.</dd>
+      <dd class="prerender-eg">e.g. 4</dd>
+      <dt>Remaining backlog (points)</dt>
+      <dd>Estimated points left in the release or project scope.</dd>
+      <dd class="prerender-eg">e.g. 200</dd>
+      <dt>Sprint length (weeks, optional)</dt>
+      <dd>Length of one sprint — converts the forecast into calendar time.</dd>
+      <dd class="prerender-eg">e.g. 2</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Velocity</dt>
+      <dd>Demonstrated delivery rate in points per sprint.</dd>
+      <dt>Sprints remaining</dt>
+      <dd>Whole sprints needed to clear the backlog at current velocity.</dd>
+      <dt>Calendar time remaining</dt>
+      <dd>Sprints remaining × sprint length.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Backlog burndown forecast</dt>
+      <dd>The remaining backlog burning down at the team’s demonstrated velocity.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-capacity">
+      <h3>13.2 — Sprint capacity</h3>
+      <p class="prerender-tagline">People × days × hours × focus</p>
+      <p class="prerender-about">Capacity planning in hours, for sprint-level task commitment. Start from raw availability, then apply a focus factor — the share of the day genuinely available for sprint work after ceremonies, support duty, e-mail and context switching. Teams that skip the focus factor systematically over-commit. Use capacity for task hours; use velocity (above) for story points — they answer different questions.</p>
+      <pre class="prerender-formula"><code>Capacity = Members × Days × Hours per day × Focus factor</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Team members</dt>
+      <dd>People doing sprint work — count partial allocations as fractions (0.5 for half-time).</dd>
+      <dd class="prerender-eg">e.g. 5</dd>
+      <dt>Working days in sprint</dt>
+      <dd>Sprint length minus holidays and planned leave.</dd>
+      <dd class="prerender-eg">e.g. 9</dd>
+      <dt>Hours per day</dt>
+      <dd>Nominal working hours per person per day.</dd>
+      <dd class="prerender-eg">e.g. 8</dd>
+      <dt>Focus factor (%)</dt>
+      <dd>Share of the day truly available for sprint work — 60–70% is realistic for most teams.</dd>
+      <dd class="prerender-eg">e.g. 65</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Raw hours</dt>
+      <dd>Theoretical availability before reality intervenes.</dd>
+      <dt>Plannable capacity (hours)</dt>
+      <dd>What the team can actually commit to after the focus factor.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Raw vs plannable capacity</dt>
+      <dd>The focus factor is the gap — committing to raw hours is how sprints fail.</dd>
+      </dl>
+      </article>
+      <article class="prerender-card" id="prerender-calc-say-do">
+      <h3>13.3 — Say/do ratio</h3>
+      <p class="prerender-tagline">Delivered ÷ committed</p>
+      <p class="prerender-about">The simplest measure of forecast reliability: of what the team committed to at sprint planning, how much was actually delivered? Track it over several sprints. A team that consistently delivers what it says — even if it says less — is worth more to planning than a fast team nobody can predict.</p>
+      <pre class="prerender-formula"><code>Say/do % = Points delivered ÷ Points committed × 100</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>Points committed</dt>
+      <dd>Story points the team signed up for at sprint planning.</dd>
+      <dd class="prerender-eg">e.g. 34</dd>
+      <dt>Points delivered</dt>
+      <dd>Points fully done (per the Definition of Done) by sprint end.</dd>
+      <dd class="prerender-eg">e.g. 29</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Say/do ratio</dt>
+      <dd>Forecast reliability for this sprint.</dd>
+      <dt>Commitment gap (points)</dt>
+      <dd>Delivered minus committed — negative means work rolled over.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>Forecast reliability</dt>
+      <dd>Where the say/do ratio sits against the reliable band.</dd>
+      </dl>
+      </article>
+      </section>
+      <section class="prerender-category" id="prerender-cat-flow">
+      <h2>14 — Lean &amp; Flow</h2>
+      <p class="prerender-blurb">Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.</p>
+      <p class="prerender-citation">Flow — Little (1961), “A Proof for L = λW”: doi.org/10.1287/opre.9.3.383</p>
+      <article class="prerender-card" id="prerender-calc-littles-law">
+      <h3>14.1 — Little’s Law &amp; flow efficiency</h3>
+      <p class="prerender-tagline">Cycle time = WIP ÷ throughput</p>
+      <p class="prerender-about">Given any two of work-in-progress, throughput and cycle time, Little’s Law fixes the third. It is the mathematical case for WIP limits: with throughput unchanged, every extra item you start adds directly to how long everything takes. Flow efficiency then reveals how much of that cycle time is actual work versus waiting in queues.</p>
+      <pre class="prerender-formula"><code>Cycle time = WIP ÷ Throughput
+Flow efficiency % = Active work time ÷ Cycle time × 100</code></pre>
+      <h4>Parameters</h4>
+      <dl class="prerender-params">
+      <dt>WIP — work in progress</dt>
+      <dd>Items currently started and unfinished on the board.</dd>
+      <dd class="prerender-eg">e.g. 12</dd>
+      <dt>Throughput (items / period)</dt>
+      <dd>Items finished per period — pick days or weeks and stay consistent.</dd>
+      <dd class="prerender-eg">e.g. 3</dd>
+      <dt>Active work per item (optional)</dt>
+      <dd>Hands-on time an item actually receives, in the same period units — for flow efficiency.</dd>
+      <dd class="prerender-eg">e.g. 0.5</dd>
+      </dl>
+      <h4>Results</h4>
+      <dl class="prerender-results">
+      <dt>Average cycle time</dt>
+      <dd>How long a newly started item takes to finish, in your chosen periods.</dd>
+      <dt>Flow efficiency</dt>
+      <dd>Share of the cycle time that is real work rather than waiting.</dd>
+      </dl>
+      <h4>Charts</h4>
+      <dl class="prerender-charts">
+      <dt>WIP vs cycle time</dt>
+      <dd>The linear relationship behind WIP limits — at fixed throughput, cycle time tracks WIP directly.</dd>
+      </dl>
+      </article>
+      </section>
+      </div>
+      <!-- prerender:end -->
+    </div>
+
+    <p class="no-results" id="no-results" hidden>
+      <strong>Nothing matches that.</strong>
+      Try a metric (CPI, EAC), a technique (PERT, float), or a domain (risk, quality).
+    </p>
 
       <section class="bench" id="about" aria-labelledby="about-h">
         <div class="section-head">
@@ -1862,14 +3349,6 @@ h2 {
           </div>
         </div>
       </section>
-
-
-    <div id="calc-sections"></div>
-
-    <p class="no-results" id="no-results" hidden>
-      <strong>Nothing matches that.</strong>
-      Try a metric (CPI, EAC), a technique (PERT, float), or a domain (risk, quality).
-    </p>
 
     <footer class="page-foot">
       Built as a study and working reference. Values compute locally in your
@@ -1954,6 +3433,7 @@ var PM_DATA = (function () {
       id: 'evm',
       name: 'Earned Value Management',
       blurb: 'One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.',
+      citation: 'EVM — PMI Practice Standard; Lipke, “Schedule is Different.”',
       cards: [
         {
           id: 'earned-value',
@@ -1971,7 +3451,8 @@ var PM_DATA = (function () {
             { key: 'bac', label: 'BAC — Budget at Completion', meaning: 'The total approved budget for all project work. The baseline everything else is measured against.', placeholder: 'e.g. 100000' },
             { key: 'pv', label: 'PV — Planned Value', meaning: 'The budgeted cost of the work that was scheduled to be done by now (also called BCWS).', placeholder: 'e.g. 50000' },
             { key: 'ev', label: 'EV — Earned Value', meaning: 'The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).', placeholder: 'e.g. 45000' },
-            { key: 'ac', label: 'AC — Actual Cost', meaning: 'What the completed work really cost, regardless of what was budgeted (also called ACWP).', placeholder: 'e.g. 60000' }
+            { key: 'ac', label: 'AC — Actual Cost', meaning: 'What the completed work really cost, regardless of what was budgeted (also called ACWP).', placeholder: 'e.g. 60000' },
+            { key: 'eacMgmt', label: 'EAC — management forecast (optional)', meaning: 'A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.', placeholder: 'e.g. 125000' }
           ],
           outputs: [
             {
@@ -1979,7 +3460,7 @@ var PM_DATA = (function () {
               key: 'cv', label: 'Cost Variance (CV)', format: 'money',
               meaning: 'Budget health in currency: value earned minus money spent.',
               compute: function (v) { return ok(v.ev, v.ac) ? v.ev - v.ac : null; },
-              interpret: function (x) { return x > 0 ? good('Under budget so far.') : x < 0 ? bad('Over budget by this amount.') : info('Exactly on budget.'); }
+              interpret: function (x) { return x > 0 ? good('The work performed cost less than its budgeted value.') : x < 0 ? bad('The work performed cost more than its budgeted value, by this amount.') : info('The work performed cost exactly its budgeted value.'); }
             },
             {
               group: 'Performance today',
@@ -2007,7 +3488,7 @@ var PM_DATA = (function () {
               key: 'csi', label: 'Cost–Schedule Index (CSI)', format: 'ratio',
               meaning: 'CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.',
               compute: function (v) { return ok(v.ev, v.pv, v.ac) && v.ac !== 0 && v.pv !== 0 ? (v.ev / v.ac) * (v.ev / v.pv) : null; },
-              interpret: function (x) { return x >= 1 ? good('Healthy overall.') : x >= 0.9 ? warn('Slipping — watch closely.') : bad('Recovery is statistically unlikely without intervention.'); }
+              interpret: function (x) { return x >= 1 ? good('Healthy overall.') : x >= 0.9 ? warn('Slipping — watch closely.') : bad('Past roughly 20% complete, recovery from here is rare without intervention. Early in a project this reading is still noisy.'); }
             },
             {
               group: 'Performance today',
@@ -2057,7 +3538,7 @@ var PM_DATA = (function () {
             {
               group: 'Forecasting completion',
               key: 'vac', label: 'VAC — Variance at Completion', format: 'money',
-              meaning: 'BAC − EAC. The over- or under-run expected on the day the project finishes.',
+              meaning: 'BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.',
               compute: function (v) { return ok(v.bac, v.ev, v.ac) && v.ev !== 0 ? v.bac - v.bac / (v.ev / v.ac) : null; },
               interpret: function (x) { return x >= 0 ? good('Expected to finish under or on budget.') : bad('Expected to finish over budget by this amount.'); }
             },
@@ -2066,18 +3547,35 @@ var PM_DATA = (function () {
               key: 'tcpiBac', label: 'TCPI — to hit BAC', format: 'ratio',
               meaning: '(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.',
               compute: function (v) { return ok(v.bac, v.ev, v.ac) && (v.bac - v.ac) !== 0 ? (v.bac - v.ev) / (v.bac - v.ac) : null; },
-              interpret: function (x) { return x <= 1 ? good('Achievable — no extra efficiency needed.') : x <= 1.1 ? warn('A stretch: remaining work must run ' + f2((x - 1) * 100) + '% more efficiently.') : bad('Likely unrealistic — consider re-baselining to an EAC.'); }
+              /* Once AC reaches BAC the original budget is spent with work still
+                 outstanding, so (BAC − AC) turns negative and the ratio stops
+                 meaning anything — a negative TCPI is not an easy target, it is
+                 an unreachable one. Judge that case before the tiers. */
+              interpret: function (x, v) { return v.ac >= v.bac || x <= 0 ? bad('Actual cost has already reached the budget, so landing on BAC is no longer possible. Re-baseline and read TCPI against an EAC instead.') : x <= 1 ? good('Achievable — no extra efficiency needed.') : x <= 1.1 ? warn('A stretch: remaining work must run ' + f2((x - 1) * 100) + '% more efficiently.') : bad('Likely unrealistic — consider re-baselining to an EAC.'); }
             },
             {
               group: 'Forecasting completion',
               key: 'tcpiEac', label: 'TCPI — to hit EAC', format: 'ratio',
-              meaning: '(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit the new forecast instead of the original budget.',
+              meaning: '(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.',
+              /* Read against BAC ÷ CPI, (BAC−EV)/(EAC−AC) cancels to EV/AC — the
+                 same CPI already shown two rows up, dressed as a second opinion.
+                 A management EAC is the number this test is actually for, so use
+                 it when given and say so plainly when it is not. */
               compute: function (v) {
                 if (!ok(v.bac, v.ev, v.ac) || v.ev === 0) return null;
-                var eac = v.bac / (v.ev / v.ac);
+                var eac = ok(v.eacMgmt) ? v.eacMgmt : v.bac / (v.ev / v.ac);
                 return (eac - v.ac) !== 0 ? (v.bac - v.ev) / (eac - v.ac) : null;
               },
-              interpret: function (x) { return x <= 1 ? good('The revised target is achievable at current efficiency.') : warn('Even the revised target demands improvement.'); }
+              interpret: function (x, v) {
+                if (!ok(v.eacMgmt)) {
+                  return info('This equals CPI by construction — the forecast it is measured against was derived from CPI. Enter a management EAC above to make it a real test.');
+                }
+                return x <= 1
+                  ? good('Achievable — the forecast holds at current efficiency.')
+                  : x <= 1.1
+                    ? warn('A stretch: the forecast needs remaining work run ' + f2((x - 1) * 100) + '% more efficiently.')
+                    : bad('The forecast is unrealistic at this efficiency — it needs re-setting, not more optimism.');
+              }
             }
           ],
           charts: [
@@ -2155,6 +3653,119 @@ var PM_DATA = (function () {
           ]
         },
         {
+          id: 'earned-schedule',
+          name: 'Earned Schedule',
+          tagline: 'ES · SV(t) · SPI(t) · IEAC(t)',
+          about: 'SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.',
+          formula: [
+            'ES = PD × (EV ÷ BAC)',
+            'SV(t) = ES − AT',
+            'SPI(t) = ES ÷ AT',
+            'IEAC(t) = PD ÷ SPI(t)'
+          ],
+          howto: [
+            'Enter BAC and PD from the approved baseline, then enter EV and AT from the same status date.',
+            'Read SV(t) for the time gap and SPI(t) for the direction and efficiency of travel. Check that the linear-PV assumption is reasonable for this project.',
+            'Use IEAC(t) as a trend to test recovery options; reconcile it to the time-phased schedule before committing to a finish date.'
+          ],
+          inputs: [
+            { key: 'bac', label: 'BAC — Budget at Completion', meaning: 'Total approved budget for the complete scope. Currency; must be greater than 0.', placeholder: 'e.g. 200000' },
+            { key: 'pd', label: 'PD — Planned duration', meaning: 'Baseline duration from start to planned finish. Periods; use a positive value.', placeholder: 'e.g. 12' },
+            { key: 'at', label: 'AT — Actual time', meaning: 'Time elapsed at the status date. Periods; must be greater than 0 for SPI(t).', placeholder: 'e.g. 8' },
+            { key: 'ev', label: 'EV — Earned Value', meaning: 'Budgeted value of the work actually complete. Same currency as BAC; zero is valid.', placeholder: 'e.g. 120000' }
+          ],
+          outputs: [
+            {
+              group: 'Earned time',
+              key: 'es', label: 'Earned Schedule (ES)', format: 'num',
+              meaning: 'The baseline time equivalent of the EV entered.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0
+                  ? v.pd * (v.ev / v.bac) : null;
+              }
+            },
+            {
+              group: 'Earned time',
+              key: 'svt', label: 'Schedule Variance (SV(t))', format: 'num',
+              meaning: 'The time difference at the status date. Negative means late.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0
+                  ? v.pd * (v.ev / v.bac) - v.at : null;
+              }
+            },
+            {
+              group: 'Earned time',
+              key: 'spit', label: 'Schedule Performance Index (SPI(t))', format: 'ratio',
+              meaning: 'Time efficiency, with 1.00 as the plan line.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0 && v.at > 0
+                  ? (v.pd * (v.ev / v.bac)) / v.at : null;
+              },
+              interpret: function (x) {
+                return x > 1
+                  ? good('Ahead of the time baseline. The completed work represents more planned time than the project has consumed.')
+                  : x === 1
+                    ? info('On the time baseline. Earned schedule and actual time match.')
+                    : bad('Behind the time baseline. The completed work represents fewer planned periods than have elapsed.');
+              }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'ieac', label: 'Independent Estimate at Completion (IEAC(t))', format: 'num',
+              meaning: 'A duration forecast under the same efficiency and linear-PV assumption; it is not a promise and it is not a calendar finish date.',
+              compute: function (v) {
+                if (!ok(v.bac, v.pd, v.at, v.ev) || v.bac <= 0 || v.pd <= 0 || v.at <= 0) return null;
+                var spit = (v.pd * (v.ev / v.bac)) / v.at;
+                return spit > 0 ? v.pd / spit : null;
+              }
+            }
+          ],
+          charts: [
+            {
+              title: 'Earned time position',
+              purpose: 'The time the completed work earned against actual time and plan.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (!ok(r.es, v.at)) return null;
+                var relation = r.svt > 0 ? 'ahead of' : r.svt < 0 ? 'behind' : 'on';
+                return {
+                  series: [
+                    { label: 'ES', sub: 'earned', value: r.es, tone: r.svt >= 0 ? 'good' : 'bad' },
+                    { label: 'AT', sub: 'actual', value: v.at, tone: 'accent' }
+                  ],
+                  refValue: v.pd,
+                  refLabel: 'PD',
+                  catHead: 'Time (periods)',
+                  summary: 'Earned schedule is ' + f2(r.es) + ' periods against ' + f2(v.at) +
+                    ' actual, ' + relation + ' the time baseline.'
+                };
+              }
+            },
+            {
+              title: 'SPI(t) time efficiency',
+              purpose: 'Earned schedule per period of actual time, crossed at 1.00.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (!ok(r.spit)) return null;
+                return {
+                  value: r.spit,
+                  min: 0,
+                  max: 1.5,
+                  target: 1,
+                  targetLabel: 'on plan',
+                  zones: [
+                    { from: 0, to: 0.9, tone: 'bad', label: 'behind' },
+                    { from: 0.9, to: 1, tone: 'warn', label: 'watch' },
+                    { from: 1, to: 1.5, tone: 'good', label: 'ahead' }
+                  ],
+                  label: 'SPI(t)',
+                  summary: 'SPI(t) is ' + f2(r.spit) + '. Under the linear-PV assumption, use it as a trend, not a committed finish date.'
+                };
+              }
+            }
+          ]
+        },
+        {
           id: 'time-forecast',
           name: 'Time forecasting (SPI-based)',
           tagline: 'Planned duration ÷ SPI',
@@ -2214,6 +3825,7 @@ var PM_DATA = (function () {
       id: 'burn',
       name: 'Budget & Burn Rate',
       blurb: 'The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.',
+      citation: 'Budget & burn — PMI PMBOK Guide, Cost Management.',
       cards: [
         {
           id: 'burn-rate',
@@ -2258,7 +3870,7 @@ var PM_DATA = (function () {
               key: 'pctUsed', label: '% of budget used', format: 'pct',
               meaning: 'Share of total funds already consumed.',
               compute: function (v) { return ok(v.budget, v.spent) && v.budget !== 0 ? (v.spent / v.budget) * 100 : null; },
-              interpret: function (x) { return x > 100 ? bad('Over budget.') : warn('Meaningful only next to % of work complete — see Earned Value.'); }
+              interpret: function (x) { return x > 100 ? bad('Over budget.') : info('Meaningful only next to % of work complete — see Earned Value.'); }
             }
           ],
           charts: [
@@ -2289,12 +3901,13 @@ var PM_DATA = (function () {
       id: 'estimation',
       name: 'Estimation',
       blurb: 'Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.',
+      citation: 'Estimation — PMI Practice Standard for Project Estimating.',
       cards: [
         {
           id: 'three-point',
           name: 'Three-point estimate (PERT)',
           tagline: 'Triangular · Beta · σ · confidence ranges',
-          about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike.',
+          about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.',
           formula: [
             'Triangular = (O + M + P) ÷ 3',
             'PERT (beta) = (O + 4M + P) ÷ 6',
@@ -2383,7 +3996,7 @@ var PM_DATA = (function () {
           id: 'path-sigma',
           name: 'Path uncertainty roll-up',
           tagline: 'σ(path) = √(Σ σ²)',
-          about: 'Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk.',
+          about: 'Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk. That diversification assumes the activities are <strong>INDEPENDENT</strong>. Correlated risks — one team, one supplier, one weather window — break the assumption, and the true path σ is then larger than this. It also covers a single path, not the merge bias where parallel paths converge.',
           formula: ['σ(path) = √(σ₁² + σ₂² + … + σₙ²)'],
           inputs: [
             { key: 'sigmas', label: 'Activity σ values (comma-separated)', meaning: 'The standard deviation of each activity on the path, from the three-point calculator above.', placeholder: 'e.g. 1.33, 0.5, 2', type: 'text' }
@@ -2448,7 +4061,7 @@ var PM_DATA = (function () {
           name: 'Learning curve',
           tagline: 'T(n) = T₁ × n^(log rate ÷ log 2)',
           about: 'Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.',
-          formula: ['Time for unit n = T₁ × n^(log(rate) ÷ log 2)'],
+          formula: ['Time for unit n = T₁ × n^(log(rate ÷ 100) ÷ log 2)', 'rate is the learning rate as entered, in percent: 80 means 0.8'],
           inputs: [
             { key: 't1', label: 'T₁ — first unit time (or cost)', meaning: 'How long the first repetition took — the anchor of the curve.', placeholder: 'e.g. 100' },
             { key: 'rate', label: 'Learning rate (%)', meaning: 'Per-doubling retention: 80 means each doubling takes 80% of the previous. Typical: 70–90%; 100 = no learning.', placeholder: 'e.g. 80' },
@@ -2502,6 +4115,7 @@ var PM_DATA = (function () {
       id: 'schedule',
       name: 'Schedule & Critical Path',
       blurb: 'The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.',
+      citation: 'Schedule — PMI Practice Standard for Scheduling.',
       cards: [
         {
           id: 'float',
@@ -2571,6 +4185,7 @@ var PM_DATA = (function () {
       id: 'compression',
       name: 'Schedule Compression',
       blurb: 'When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.',
+      citation: 'Compression — PMI PMBOK Guide, Schedule Compression.',
       cards: [
         {
           id: 'crash',
@@ -2636,6 +4251,7 @@ var PM_DATA = (function () {
       id: 'resources',
       name: 'Resources & Team',
       blurb: 'Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.',
+      citation: 'Resources — PMI PMBOK Guide, Resource Management.',
       cards: [
         {
           id: 'fte',
@@ -2750,6 +4366,7 @@ var PM_DATA = (function () {
       id: 'comms',
       name: 'Communication',
       blurb: 'Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.',
+      citation: 'Communication — PMI PMBOK Guide, Communications Management.',
       cards: [
         {
           id: 'channels',
@@ -2812,6 +4429,7 @@ var PM_DATA = (function () {
       id: 'risk',
       name: 'Risk',
       blurb: 'Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.',
+      citation: 'Risk — PMI Risk Management in Portfolios, Programs, and Projects.',
       cards: [
         {
           id: 'emv',
@@ -2959,6 +4577,7 @@ var PM_DATA = (function () {
       id: 'decision',
       name: 'Decision Analysis',
       blurb: 'Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.',
+      citation: 'Decision — PMI PMBOK Guide, Decision Analysis.',
       cards: [
         {
           id: 'decision-tree',
@@ -3035,6 +4654,7 @@ var PM_DATA = (function () {
       id: 'quality',
       name: 'Quality & Six Sigma',
       blurb: 'Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?',
+      citation: 'Quality — ASQ Quality Resources and Six Sigma guidance.',
       cards: [
         {
           id: 'dpmo',
@@ -3288,6 +4908,7 @@ var PM_DATA = (function () {
       id: 'financial',
       name: 'Project Selection & Finance',
       blurb: 'The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.',
+      citation: 'Finance — PMI PMBOK Guide, Project Finance and Benefits.',
       cards: [
         {
           id: 'roi',
@@ -3341,7 +4962,7 @@ var PM_DATA = (function () {
             },
             {
               key: 'irr', label: 'Internal Rate of Return', format: 'pct',
-              meaning: 'The project’s intrinsic return per period. Compare it to the discount rate.',
+              meaning: 'The project’s intrinsic return per period. Compare it to the discount rate. Reliable only for conventional flows — one outlay followed by inflows. If the signs change more than once, IRR can have several answers or none, and NPV is the measure to trust.',
               compute: function (v) {
                 var flows = parseFlows(v.flows);
                 return ok(v.inv) && flows ? irrOf(v.inv, flows) : null;
@@ -3350,7 +4971,7 @@ var PM_DATA = (function () {
             },
             {
               key: 'bcr', label: 'Benefit–Cost Ratio', format: 'ratio',
-              meaning: 'Present value of inflows per unit invested. Above 1 means benefits outweigh costs.',
+              meaning: 'Present value of the future net cash flows per unit invested — net, so a negative period nets off rather than counting as a benefit. Above 1 means benefits outweigh costs.',
               compute: function (v) {
                 var flows = parseFlows(v.flows);
                 if (!ok(v.rate, v.inv) || !flows || v.inv === 0) return null;
@@ -3603,6 +5224,7 @@ var PM_DATA = (function () {
       id: 'procurement',
       name: 'Procurement & Contracts',
       blurb: 'The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.',
+      citation: 'Procurement — PMI PMBOK Guide, Procurement Management.',
       cards: [
         {
           id: 'pta',
@@ -3662,6 +5284,7 @@ var PM_DATA = (function () {
           about: 'When the work is done, the incentive formula converts the cost outcome into the seller’s final fee: the seller keeps its share of any saving and gives up its share of any overrun. If a ceiling price is set, the buyer never pays more than it.',
           formula: [
             'Final fee = Target fee + (Target cost − Actual cost) × Seller share',
+            'If the ceiling binds: Final fee = Ceiling price − Actual cost',
             'Final price = min(Actual cost + Final fee, Ceiling price)'
           ],
           inputs: [
@@ -3674,9 +5297,17 @@ var PM_DATA = (function () {
           outputs: [
             {
               key: 'finalFee', label: 'Final fee', format: 'money',
-              meaning: 'Seller’s profit after applying the incentive share.',
-              compute: function (v) { return ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare) ? v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100) : null; },
-              interpret: function (x, v) { return ok(v.targetFee) ? (x > v.targetFee ? good('Seller beat target cost and earns an incentive bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.')) : null; }
+              meaning: 'Seller’s profit after applying the incentive share. Once the ceiling binds, the fee erodes dollar for dollar with the overrun and can go negative.',
+              /* The share formula alone keeps paying a fee past the ceiling, which
+                 contradicts the capped price sitting next to it: the buyer stops at
+                 the ceiling, so beyond that point every further dollar of cost comes
+                 straight out of the seller. Settle the fee at Ceiling − Actual cost. */
+              compute: function (v) {
+                if (!ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare)) return null;
+                var fee = v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100);
+                return ok(v.ceiling) ? Math.min(fee, v.ceiling - v.actualCost) : fee;
+              },
+              interpret: function (x, v) { return !ok(v.targetFee) ? null : x < 0 ? bad('Past the ceiling the fee is gone and now negative — the seller is funding the overrun out of its own pocket.') : x > v.targetFee ? good('Seller beat target cost and earns an incentive bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.'); }
             },
             {
               key: 'finalPrice', label: 'Final price (buyer pays)', format: 'money',
@@ -3804,6 +5435,7 @@ var PM_DATA = (function () {
       id: 'agile',
       name: 'Agile Forecasting',
       blurb: 'Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.',
+      citation: 'Agile — Scrum Guide (2020): scrumguides.org/scrum-guide.html',
       cards: [
         {
           id: 'velocity',
@@ -3968,6 +5600,7 @@ var PM_DATA = (function () {
       id: 'flow',
       name: 'Lean & Flow',
       blurb: 'Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.',
+      citation: 'Flow — Little (1961), “A Proof for L = λW”: doi.org/10.1287/opre.9.3.383',
       cards: [
         {
           id: 'littles-law',
@@ -4032,11 +5665,874 @@ var EXAMPLES = {
   'calc-earned-value': {
     values: { bac: 200000, pv: 120000, ev: 108000, ac: 96000 },
     note: 'Six months in: efficient spend, behind schedule.'
+  },
+  'calc-earned-schedule': {
+    values: { bac: 200000, pd: 12, at: 8, ev: 120000 }
+  },
+  'calc-time-forecast': {
+    values: { plannedDur: 12, ev: 80000, pv: 100000 },
+    note: 'Progress is 80% of plan, pointing to a three-period slip.'
+  },
+  'calc-burn-rate': {
+    values: { budget: 120000, spent: 45000, elapsed: 3, planLeft: 6 },
+    note: 'The remaining budget buys five periods at the current burn.'
+  },
+  'calc-three-point': {
+    values: { o: 4, m: 6, p: 12 },
+    note: 'The wide pessimistic case makes the estimate worth protecting.'
+  },
+  'calc-path-sigma': {
+    values: { sigmas: '1.33, 0.5, 2' },
+    note: 'Three activity uncertainties roll up to less than their sum.'
+  },
+  'calc-learning-curve': {
+    values: { t1: 100, rate: 80, n: 4 },
+    note: 'By unit four, learning cuts effort by 36 percent.'
+  },
+  'calc-float': {
+    values: { es: 5, ef: 9, ls: 8, lf: 12, succEs: 11 },
+    note: 'Three periods of total float leave two periods free before the successor.'
+  },
+  'calc-crash': {
+    values: { normalCost: 10000, crashCost: 16000, normalDur: 10, crashDur: 8 },
+    note: 'Buying two periods of compression costs 6,000 in total.'
+  },
+  'calc-fte': {
+    values: { effort: 2080, hoursPer: 130, periods: 4 },
+    note: 'The work needs four full-time equivalents across the window.'
+  },
+  'calc-utilization': {
+    values: { allocated: 150, available: 160 },
+    note: 'A 93.75 percent allocation leaves only ten hours uncommitted.'
+  },
+  'calc-labor-cost': {
+    values: { hours: 400, rate: 60, overhead: 35 },
+    note: 'A 35 percent burden turns a 24,000 base into 32,400 loaded.'
+  },
+  'calc-channels': {
+    values: { n: 10, n2: 15 },
+    note: 'Adding five people creates 60 additional communication channels.'
+  },
+  'calc-emv': {
+    values: { p: 30, impact: -50000 },
+    note: 'A 30 percent threat with a 50,000 impact carries 15,000 EMV.'
+  },
+  'calc-risk-score': {
+    values: { p: 4, i: 3 },
+    note: 'A likely, moderate-impact risk scores 12 and needs a watchlist owner.'
+  },
+  'calc-contingency': {
+    values: { probs: '30, 10, 50', impacts: '-50000, -20000, 10000' },
+    note: 'Threats outweigh the opportunity, suggesting a 12,000 reserve.'
+  },
+  'calc-decision-tree': {
+    values: {
+      costA: 40000, pA: 60, winA: 100000, loseA: 0,
+      costB: 10000, pB: 30, winB: 60000, loseB: 0
+    },
+    note: 'Option A has the higher expected value despite its larger entry cost.'
+  },
+  'calc-dpmo': {
+    values: { defects: 25, units: 1000, opps: 4 },
+    note: 'Twenty-five defects across 4,000 opportunities gives 6,250 DPMO.'
+  },
+  'calc-control': {
+    values: { mean: 50, sigma: 2 },
+    note: 'Normal variation spans 44 to 56, with a 46 to 54 warning zone.'
+  },
+  'calc-cpk': {
+    values: { usl: 10, lsl: 4, mean: 6, sigma: 0.5 },
+    note: 'The process is centred in the six-unit specification window.'
+  },
+  'calc-coq': {
+    values: { prevention: 20000, appraisal: 30000, internal: 40000, external: 25000 },
+    note: 'Failure costs are 56.52 percent of the 115,000 quality total.'
+  },
+  'calc-roi': {
+    values: { cost: 200000, benefit: 260000 },
+    note: 'A 60,000 net benefit is a 30 percent return on the investment.'
+  },
+  'calc-npv': {
+    values: { rate: 10, inv: 1000, flows: '500, 500, 500' },
+    note: 'Three 500 inflows clear the 10 percent hurdle and repay in period two.'
+  },
+  'calc-tvm': {
+    values: { amount: 10000, rate: 8, n: 5 },
+    note: 'At eight percent, 10,000 grows to about 14,693 over five periods.'
+  },
+  'calc-breakeven': {
+    values: { fixed: 50000, price: 25, varCost: 15 },
+    note: 'A ten-unit contribution margin requires 5,000 units to break even.'
+  },
+  'calc-depreciation': {
+    values: { cost: 120000, salvage: 20000, life: 5 },
+    note: 'The asset depreciates by 20,000 per year over five years.'
+  },
+  'calc-scoring': {
+    values: { weights: '5, 3, 2', scores: '8, 6, 9' },
+    note: 'The weighted score is 7.6 on the original ten-point scale.'
+  },
+  'calc-pta': {
+    values: { ceiling: 180000, targetPrice: 165000, targetCost: 150000, buyerShare: 80 },
+    note: 'The 80 percent share puts point of total assumption at 168,750.'
+  },
+  'calc-fpif': {
+    values: { targetCost: 150000, targetFee: 15000, actualCost: 140000, sellerShare: 20, ceiling: 180000 },
+    note: 'Cost savings increase the seller fee to 17,000 under the 20 percent share.'
+  },
+  'calc-cpif': {
+    values: { targetCost: 100000, targetFee: 10000, actualCost: 90000, sellerShare: 20, minFee: 4000, maxFee: 15000 },
+    note: 'The final 12,000 fee stays inside the agreed minimum and maximum.'
+  },
+  'calc-velocity': {
+    values: { points: 120, sprints: 4, backlog: 200, weeks: 2 },
+    note: 'Four sprints of history forecast seven sprints, or 14 weeks, remaining.'
+  },
+  'calc-capacity': {
+    values: { members: 5, days: 9, hoursPerDay: 8, focus: 65 },
+    note: 'A 65 percent focus factor turns 360 raw hours into 234 plannable hours.'
+  },
+  'calc-say-do': {
+    values: { committed: 34, delivered: 29 },
+    note: 'The team delivered 85.29 percent of its commitment.'
+  },
+  'calc-littles-law': {
+    values: { wip: 12, throughput: 3, workTime: 0.5 },
+    note: 'Twelve items at three per period means four periods of cycle time.'
   }
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
+  </script>
+  <script>
+/* ══ PM_XLSX ═══════════════════════════════════════════════════════════
+   Writes a real .xlsx in the browser, with no library.
+
+   An .xlsx is a ZIP holding a handful of XML files. Both halves are here:
+   a minimal ZIP writer, and just enough SpreadsheetML and DrawingML to
+   carry a formatted sheet and a live, editable chart.
+
+   The ZIP is written with compression method 0 — "stored", the bytes as
+   they are. DEFLATE would need another two hundred lines to save a few
+   kilobytes on a file that leaves in a download, and every reader that
+   opens an .xlsx at all opens a stored one.
+
+   Element order in these XML parts is not cosmetic. The schemas are
+   sequences, and Excel answers an out-of-order child with "we found a
+   problem with some content" rather than with the chart. Anything moved
+   here must be moved against ECMA-376, not against what looks tidy. */
+
+var PM_XLSX = (function () {
+  'use strict';
+
+  /* ── bytes ─────────────────────────────────────────────────────── */
+
+  var crcTable = null;
+  function crc32(bytes) {
+    var i, k, c;
+    if (!crcTable) {
+      crcTable = [];
+      for (i = 0; i < 256; i++) {
+        c = i;
+        for (k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        crcTable[i] = c >>> 0;
+      }
+    }
+    c = 0xffffffff;
+    for (i = 0; i < bytes.length; i++) {
+      c = crcTable[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+    }
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  /* TextEncoder is not on the ES5 floor this file is written to, so the
+     UTF-8 is done by hand. Surrogate pairs are joined before encoding —
+     an emoji in a card name would otherwise arrive as two broken halves. */
+  function utf8(str) {
+    var out = [], i, c, next;
+    for (i = 0; i < str.length; i++) {
+      c = str.charCodeAt(i);
+      if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+        next = str.charCodeAt(i + 1);
+        if (next >= 0xdc00 && next <= 0xdfff) {
+          c = 0x10000 + ((c - 0xd800) << 10) + (next - 0xdc00);
+          i++;
+        }
+      }
+      if (c < 0x80) {
+        out.push(c);
+      } else if (c < 0x800) {
+        out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      } else if (c < 0x10000) {
+        out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      } else {
+        out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63),
+          0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      }
+    }
+    return new Uint8Array(out);
+  }
+
+  function pushU16(arr, n) { arr.push(n & 0xff, (n >>> 8) & 0xff); }
+  function pushU32(arr, n) {
+    arr.push(n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff);
+  }
+  function pushBytes(arr, bytes) {
+    for (var i = 0; i < bytes.length; i++) arr.push(bytes[i]);
+  }
+
+  /* ── zip ───────────────────────────────────────────────────────── */
+
+  function dosStamp(date) {
+    var y = date.getFullYear();
+    /* The DOS epoch starts in 1980 and there is no room to say otherwise. */
+    if (y < 1980) y = 1980;
+    return {
+      time: (date.getHours() << 11) | (date.getMinutes() << 5) |
+        (Math.floor(date.getSeconds() / 2)),
+      date: ((y - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()
+    };
+  }
+
+  /* files: [{ name: 'xl/workbook.xml', text: '<?xml …' }] */
+  function zip(files, now) {
+    var stamp = dosStamp(now || new Date());
+    var out = [], central = [], offset = 0, i;
+
+    for (i = 0; i < files.length; i++) {
+      var nameBytes = utf8(files[i].name);
+      var body = utf8(files[i].text);
+      var crc = crc32(body);
+
+      /* Local file header. Bit 11 of the flags declares the name UTF-8,
+         which matters for nothing here but costs nothing and is correct. */
+      pushU32(out, 0x04034b50);
+      pushU16(out, 20);
+      pushU16(out, 0x0800);
+      pushU16(out, 0);
+      pushU16(out, stamp.time);
+      pushU16(out, stamp.date);
+      pushU32(out, crc);
+      pushU32(out, body.length);
+      pushU32(out, body.length);
+      pushU16(out, nameBytes.length);
+      pushU16(out, 0);
+      pushBytes(out, nameBytes);
+      pushBytes(out, body);
+
+      pushU32(central, 0x02014b50);
+      pushU16(central, 20);
+      pushU16(central, 20);
+      pushU16(central, 0x0800);
+      pushU16(central, 0);
+      pushU16(central, stamp.time);
+      pushU16(central, stamp.date);
+      pushU32(central, crc);
+      pushU32(central, body.length);
+      pushU32(central, body.length);
+      pushU16(central, nameBytes.length);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU32(central, 0);
+      pushU32(central, offset);
+      pushBytes(central, nameBytes);
+
+      offset += 30 + nameBytes.length + body.length;
+    }
+
+    var cdSize = central.length;
+    pushBytes(out, central);
+    pushU32(out, 0x06054b50);
+    pushU16(out, 0);
+    pushU16(out, 0);
+    pushU16(out, files.length);
+    pushU16(out, files.length);
+    pushU32(out, cdSize);
+    pushU32(out, offset);
+    pushU16(out, 0);
+
+    return new Uint8Array(out);
+  }
+
+  /* ── xml ───────────────────────────────────────────────────────── */
+
+  var HEAD = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      /* XML 1.0 has no way to spell a control character, and Excel rejects
+         the file rather than skipping one. Drop them. */
+      .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
+  }
+
+  /* A1, B1 … Z1, AA1. Column index is zero-based. */
+  function colName(index) {
+    var name = '';
+    var n = index;
+    do {
+      name = String.fromCharCode(65 + (n % 26)) + name;
+      n = Math.floor(n / 26) - 1;
+    } while (n >= 0);
+    return name;
+  }
+
+  function cellRef(col, row) { return colName(col) + (row + 1); }
+
+  /* Sheet names cannot hold : \ / ? * [ ] and cap at 31 characters. Excel
+     refuses to open a workbook that breaks either rule. */
+  function safeSheetName(name) {
+    var s = String(name || 'Sheet1').replace(/[:\\\/?*\[\]]/g, ' ').trim();
+    if (s.length > 31) s = s.slice(0, 31).trim();
+    return s || 'Sheet1';
+  }
+
+  function absRange(sheet, col, rowStart, rowEnd) {
+    var q = "'" + String(sheet).replace(/'/g, "''") + "'";
+    return q + '!$' + colName(col) + '$' + (rowStart + 1) +
+      ':$' + colName(col) + '$' + (rowEnd + 1);
+  }
+
+  function absCell(sheet, col, row) {
+    var q = "'" + String(sheet).replace(/'/g, "''") + "'";
+    return q + '!$' + colName(col) + '$' + (row + 1);
+  }
+
+  /* ── styles ────────────────────────────────────────────────────── */
+
+  /* Style indexes, referenced by the sheet builder as S.title, S.money … */
+  var S = {
+    base: 0, title: 1, subtitle: 2, section: 3, head: 4, label: 5,
+    money: 6, pct: 7, ratio: 8, int: 9, num: 10, wrap: 11, note: 12,
+    headNum: 13
+  };
+
+  function stylesXml() {
+    return HEAD +
+      '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+        '<numFmts count="5">' +
+          '<numFmt numFmtId="164" formatCode="#,##0.00"/>' +
+          /* Values reach here already on a 0–100 scale, so the percent sign
+             is quoted text rather than Excel's % format, which would
+             multiply by a hundred a second time. */
+          '<numFmt numFmtId="165" formatCode="0.0&quot;%&quot;"/>' +
+          '<numFmt numFmtId="166" formatCode="0.00"/>' +
+          '<numFmt numFmtId="167" formatCode="#,##0"/>' +
+          '<numFmt numFmtId="168" formatCode="#,##0.##"/>' +
+        '</numFmts>' +
+        '<fonts count="5">' +
+          '<font><sz val="11"/><name val="Calibri"/></font>' +
+          '<font><b/><sz val="15"/><name val="Calibri"/></font>' +
+          '<font><sz val="10"/><color rgb="FF6B6B6B"/><name val="Calibri"/></font>' +
+          '<font><b/><sz val="11"/><name val="Calibri"/></font>' +
+          '<font><i/><sz val="10"/><color rgb="FF6B6B6B"/><name val="Calibri"/></font>' +
+        '</fonts>' +
+        /* Excel expects fill 0 to be none and fill 1 to be gray125; it
+           rewrites the file if they are missing. */
+        '<fills count="3">' +
+          '<fill><patternFill patternType="none"/></fill>' +
+          '<fill><patternFill patternType="gray125"/></fill>' +
+          '<fill><patternFill patternType="solid">' +
+            '<fgColor rgb="FFEFEDE8"/><bgColor indexed="64"/></patternFill></fill>' +
+        '</fills>' +
+        '<borders count="2">' +
+          '<border><left/><right/><top/><bottom/><diagonal/></border>' +
+          '<border><left/><right/><top/>' +
+            '<bottom style="thin"><color rgb="FF9A968E"/></bottom><diagonal/></border>' +
+        '</borders>' +
+        '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+        '<cellXfs count="14">' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+          '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+          '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+          '<xf numFmtId="0" fontId="3" fillId="2" borderId="1" xfId="0"' +
+            ' applyFont="1" applyFill="1" applyBorder="1"/>' +
+          '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0"' +
+            ' applyFont="1" applyBorder="1"/>' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"' +
+            ' applyAlignment="1"><alignment vertical="top" wrapText="0"/></xf>' +
+          '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="166" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="168" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"' +
+            ' applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+          '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0"' +
+            ' applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+          '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0"' +
+            ' applyFont="1" applyBorder="1" applyAlignment="1">' +
+            '<alignment horizontal="right"/></xf>' +
+        '</cellXfs>' +
+        '<cellStyles count="1">' +
+          '<cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
+        '<dxfs count="0"/>' +
+        '<tableStyles count="0" defaultTableStyle="TableStyleMedium2"/>' +
+      '</styleSheet>';
+  }
+
+  /* Maps a calculator's output format onto one of the styles above. */
+  function styleForFormat(format) {
+    switch (format) {
+      case 'money': return S.money;
+      case 'pct': return S.pct;
+      case 'ratio': return S.ratio;
+      case 'int': return S.int;
+      case 'text': return S.base;
+      default: return S.num;
+    }
+  }
+
+  /* ── worksheet ─────────────────────────────────────────────────── */
+
+  /* A cell is null, a number, a string, or { v, s } to carry a style. */
+  function cellXml(col, row, cell) {
+    var value = cell, style = 0;
+    if (cell && typeof cell === 'object') { value = cell.v; style = cell.s || 0; }
+    if (value === null || value === undefined || value === '') {
+      return style ? '<c r="' + cellRef(col, row) + '" s="' + style + '"/>' : '';
+    }
+    var attrs = ' r="' + cellRef(col, row) + '"' + (style ? ' s="' + style + '"' : '');
+    if (typeof value === 'number' && isFinite(value)) {
+      return '<c' + attrs + '><v>' + numText(value) + '</v></c>';
+    }
+    /* Inline strings keep the whole workbook to one part per sheet; a
+       shared string table would buy deduplication this file never needs. */
+    return '<c' + attrs + ' t="inlineStr"><is><t xml:space="preserve">' +
+      esc(value) + '</t></is></c>';
+  }
+
+  /* Excel stores numbers as decimal text. Exponential notation is legal
+     but reads badly in the XML and some parsers are fussier than the
+     spec, so keep ordinary magnitudes in plain form. */
+  function numText(n) {
+    if (n === Math.floor(n) && Math.abs(n) < 1e15) return String(n);
+    var s = String(n);
+    if (s.indexOf('e') === -1 && s.indexOf('E') === -1) return s;
+    return n.toFixed(10).replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  function sheetXml(sheet) {
+    var rows = sheet.rows || [];
+    var maxCol = 0, i, j, body = '';
+
+    for (i = 0; i < rows.length; i++) {
+      var row = rows[i] || [];
+      if (row.length > maxCol) maxCol = row.length;
+      var cells = '';
+      for (j = 0; j < row.length; j++) cells += cellXml(j, i, row[j]);
+      if (cells) body += '<row r="' + (i + 1) + '">' + cells + '</row>';
+    }
+    if (maxCol < 1) maxCol = 1;
+
+    var cols = '';
+    if (sheet.cols && sheet.cols.length) {
+      cols = '<cols>';
+      for (i = 0; i < sheet.cols.length; i++) {
+        cols += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' +
+          sheet.cols[i] + '" customWidth="1"/>';
+      }
+      cols += '</cols>';
+    }
+
+    /* CT_Worksheet is a sequence: dimension, sheetViews, sheetFormatPr,
+       cols, sheetData, then much later pageMargins and drawing. */
+    return HEAD +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' +
+      ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<dimension ref="A1:' + cellRef(maxCol - 1, Math.max(0, rows.length - 1)) + '"/>' +
+        '<sheetViews><sheetView workbookViewId="0" showGridLines="0"' +
+          ' tabSelected="1"/></sheetViews>' +
+        '<sheetFormatPr defaultRowHeight="15"/>' +
+        cols +
+        '<sheetData>' + body + '</sheetData>' +
+        '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75"' +
+          ' header="0.3" footer="0.3"/>' +
+        (sheet.charts && sheet.charts.length ? '<drawing r:id="rId1"/>' : '') +
+      '</worksheet>';
+  }
+
+  /* ── chart ─────────────────────────────────────────────────────── */
+
+  /* Line colours, in the order series are added. Kept deliberately close
+     to the desk's own ink: graphite first, indigo second. */
+  var SERIES_INK = ['3C3B38', '3B4CA8', '8A6A2F', '5B7A5B', '8A3F3F', '55606B'];
+
+  function numCache(values, formatCode) {
+    var pts = '', i;
+    for (i = 0; i < values.length; i++) {
+      if (typeof values[i] === 'number' && isFinite(values[i])) {
+        pts += '<c:pt idx="' + i + '"><c:v>' + numText(values[i]) + '</c:v></c:pt>';
+      }
+    }
+    return '<c:formatCode>' + (formatCode || 'General') + '</c:formatCode>' +
+      '<c:ptCount val="' + values.length + '"/>' + pts;
+  }
+
+  function strCache(values) {
+    var pts = '', i;
+    for (i = 0; i < values.length; i++) {
+      pts += '<c:pt idx="' + i + '"><c:v>' + esc(values[i]) + '</c:v></c:pt>';
+    }
+    return '<c:ptCount val="' + values.length + '"/>' + pts;
+  }
+
+  function numRef(tag, ref, values, formatCode) {
+    return '<c:' + tag + '><c:numRef><c:f>' + esc(ref) + '</c:f>' +
+      '<c:numCache>' + numCache(values, formatCode) + '</c:numCache>' +
+      '</c:numRef></c:' + tag + '>';
+  }
+
+  function seriesTitle(ref, name) {
+    return '<c:tx><c:strRef><c:f>' + esc(ref) + '</c:f><c:strCache>' +
+      strCache([name]) + '</c:strCache></c:strRef></c:tx>';
+  }
+
+  function linePr(hex, dash) {
+    return '<c:spPr><a:ln w="22225" cap="rnd"><a:solidFill>' +
+      '<a:srgbClr val="' + hex + '"/></a:solidFill>' +
+      (dash ? '<a:prstDash val="' + dash + '"/>' : '<a:prstDash val="solid"/>') +
+      '<a:round/></a:ln><a:effectLst/></c:spPr>';
+  }
+
+  function fillPr(hex) {
+    return '<c:spPr><a:solidFill><a:srgbClr val="' + hex + '"/></a:solidFill>' +
+      '<a:ln><a:noFill/></a:ln></c:spPr>';
+  }
+
+  function chartTitle(text) {
+    if (!text) return '<c:autoTitleDeleted val="1"/>';
+    return '<c:title><c:tx><c:rich>' +
+      '<a:bodyPr rot="0" spcFirstLastPara="1" vertOverflow="ellipsis" vert="horz" wrap="square" anchor="ctr" anchorCtr="1"/>' +
+      '<a:lstStyle/><a:p><a:pPr><a:defRPr sz="1100" b="1"/></a:pPr>' +
+      '<a:r><a:rPr lang="en-US" sz="1100" b="1"/><a:t>' + esc(text) + '</a:t></a:r>' +
+      '</a:p></c:rich></c:tx><c:overlay val="0"/></c:title>' +
+      '<c:autoTitleDeleted val="0"/>';
+  }
+
+  function axisTitle(text, rotated) {
+    if (!text) return '';
+    return '<c:title><c:tx><c:rich>' +
+      '<a:bodyPr' + (rotated ? ' rot="-5400000" vert="horz"' : ' rot="0" vert="horz"') + '/>' +
+      '<a:lstStyle/><a:p><a:pPr><a:defRPr sz="900" b="0"/></a:pPr>' +
+      '<a:r><a:rPr lang="en-US" sz="900" b="0"/><a:t>' + esc(text) + '</a:t></a:r>' +
+      '</a:p></c:rich></c:tx><c:overlay val="0"/></c:title>';
+  }
+
+  /* CT_CatAx and CT_ValAx are sequences too: axId, scaling, delete, axPos,
+     majorGridlines, title, numFmt, tickMarks, tickLblPos, spPr, txPr,
+     crossAx, crosses, then the axis-specific tail. */
+  function valAx(id, crossId, title, gridlines, formatCode) {
+    return '<c:valAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="l"/>' +
+      (gridlines ? '<c:majorGridlines/>' : '') +
+      axisTitle(title, true) +
+      '<c:numFmt formatCode="' + (formatCode || 'General') + '" sourceLinked="0"/>' +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:crossBetween val="between"/></c:valAx>';
+  }
+
+  function valAxBottom(id, crossId, title, formatCode) {
+    return '<c:valAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="b"/>' +
+      axisTitle(title, false) +
+      '<c:numFmt formatCode="' + (formatCode || 'General') + '" sourceLinked="0"/>' +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:crossBetween val="midCat"/></c:valAx>';
+  }
+
+  function catAx(id, crossId, title) {
+    return '<c:catAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="b"/>' +
+      axisTitle(title, false) +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/>' +
+      '<c:noMultiLvlLbl val="0"/></c:catAx>';
+  }
+
+  /* def:
+       { type: 'col' | 'bar' | 'stacked' | 'scatter',
+         title, xTitle, yTitle, valFormat,
+         cats: { ref, values },                    // categories, or x for scatter
+         series: [ { name, nameRef, ref, values, dash, noFill }] } */
+  function chartXml(def) {
+    var AX_A = 111111111, AX_B = 222222222;
+    var plot = '', i;
+
+    if (def.type === 'scatter') {
+      var sers = '';
+      for (i = 0; i < def.series.length; i++) {
+        var s = def.series[i];
+        /* Series usually share one x column, but not always: a flat
+           baseline drawn across a sampled curve has its own two points.
+           A scatter series carries its own xVal, so let it. */
+        var xRef = s.xRef || def.cats.ref;
+        var xValues = s.xValues || def.cats.values;
+        sers += '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/>' +
+          seriesTitle(s.nameRef, s.name) +
+          linePr(SERIES_INK[i % SERIES_INK.length], s.dash) +
+          '<c:marker><c:symbol val="none"/></c:marker>' +
+          numRef('xVal', xRef, xValues, 'General') +
+          numRef('yVal', s.ref, s.values, def.valFormat) +
+          '<c:smooth val="0"/></c:ser>';
+      }
+      plot = '<c:scatterChart><c:scatterStyle val="lineMarker"/>' +
+        '<c:varyColors val="0"/>' + sers +
+        '<c:axId val="' + AX_A + '"/><c:axId val="' + AX_B + '"/></c:scatterChart>' +
+        valAxBottom(AX_A, AX_B, def.xTitle, 'General') +
+        valAx(AX_B, AX_A, def.yTitle, true, def.valFormat);
+    } else {
+      var bars = '';
+      for (i = 0; i < def.series.length; i++) {
+        var b = def.series[i];
+        bars += '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/>' +
+          seriesTitle(b.nameRef, b.name) +
+          (b.noFill
+            ? '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>'
+            : fillPr(SERIES_INK[i % SERIES_INK.length])) +
+          '<c:invertIfNegative val="0"/>' +
+          '<c:cat><c:strRef><c:f>' + esc(def.cats.ref) + '</c:f><c:strCache>' +
+            strCache(def.cats.values) + '</c:strCache></c:strRef></c:cat>' +
+          numRef('val', b.ref, b.values, def.valFormat) +
+          '</c:ser>';
+      }
+      plot = '<c:barChart><c:barDir val="' + (def.type === 'bar' ? 'bar' : 'col') + '"/>' +
+        '<c:grouping val="' + (def.type === 'stacked' ? 'stacked' : 'clustered') + '"/>' +
+        '<c:varyColors val="0"/>' + bars +
+        '<c:gapWidth val="' + (def.type === 'stacked' ? '40' : '80') + '"/>' +
+        (def.type === 'stacked' ? '<c:overlap val="100"/>' : '<c:overlap val="-20"/>') +
+        '<c:axId val="' + AX_A + '"/><c:axId val="' + AX_B + '"/></c:barChart>' +
+        catAx(AX_A, AX_B, def.xTitle) +
+        valAx(AX_B, AX_A, def.yTitle, true, def.valFormat);
+    }
+
+    /* One series needs no key to tell it apart from the others. */
+    var wantLegend = def.series.filter(function (s) { return !s.noFill; }).length > 1;
+
+    return HEAD +
+      '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"' +
+      ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"' +
+      ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<c:roundedCorners val="0"/>' +
+        '<c:chart>' +
+          chartTitle(def.title) +
+          '<c:plotArea><c:layout/>' + plot + '<c:spPr><a:noFill/>' +
+            '<a:ln><a:noFill/></a:ln></c:spPr></c:plotArea>' +
+          (wantLegend
+            ? '<c:legend><c:legendPos val="b"/><c:overlay val="0"/></c:legend>'
+            : '') +
+          '<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/>' +
+        '</c:chart>' +
+        '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>' +
+      '</c:chartSpace>';
+  }
+
+  function drawingXml(charts) {
+    var body = '', i;
+    for (i = 0; i < charts.length; i++) {
+      var a = charts[i].anchor;
+      body += '<xdr:twoCellAnchor>' +
+        '<xdr:from><xdr:col>' + a.col + '</xdr:col><xdr:colOff>0</xdr:colOff>' +
+          '<xdr:row>' + a.row + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>' +
+        '<xdr:to><xdr:col>' + a.colEnd + '</xdr:col><xdr:colOff>0</xdr:colOff>' +
+          '<xdr:row>' + a.rowEnd + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>' +
+        '<xdr:graphicFrame macro="">' +
+          '<xdr:nvGraphicFramePr>' +
+            '<xdr:cNvPr id="' + (i + 2) + '" name="Chart ' + (i + 1) + '"/>' +
+            '<xdr:cNvGraphicFramePr/>' +
+          '</xdr:nvGraphicFramePr>' +
+          '<xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm>' +
+          '<a:graphic><a:graphicData' +
+            ' uri="http://schemas.openxmlformats.org/drawingml/2006/chart">' +
+            '<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"' +
+            ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"' +
+            ' r:id="rId' + (i + 1) + '"/>' +
+          '</a:graphicData></a:graphic>' +
+        '</xdr:graphicFrame>' +
+        '<xdr:clientData/></xdr:twoCellAnchor>';
+    }
+    return HEAD +
+      '<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"' +
+      ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' + body + '</xdr:wsDr>';
+  }
+
+  /* ── package ───────────────────────────────────────────────────── */
+
+  /* sheet: { name, rows, cols, charts: [ { anchor, …chart def } ] }
+     Returns the .xlsx as a Uint8Array. */
+  function build(sheet, meta) {
+    var charts = sheet.charts || [];
+    var name = safeSheetName(sheet.name);
+    var files = [];
+    var i;
+
+    var overrides = '';
+    for (i = 0; i < charts.length; i++) {
+      overrides += '<Override PartName="/xl/charts/chart' + (i + 1) + '.xml"' +
+        ' ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>';
+    }
+
+    files.push({
+      name: '[Content_Types].xml',
+      text: HEAD +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+          '<Default Extension="rels"' +
+            ' ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+          '<Default Extension="xml" ContentType="application/xml"/>' +
+          '<Override PartName="/xl/workbook.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+          '<Override PartName="/xl/worksheets/sheet1.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+          '<Override PartName="/xl/styles.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+          (charts.length
+            ? '<Override PartName="/xl/drawings/drawing1.xml"' +
+              ' ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>'
+            : '') +
+          overrides +
+          '<Override PartName="/docProps/core.xml"' +
+            ' ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>' +
+          '<Override PartName="/docProps/app.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>' +
+        '</Types>'
+    });
+
+    files.push({
+      name: '_rels/.rels',
+      text: HEAD +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+          '<Relationship Id="rId1"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"' +
+            ' Target="xl/workbook.xml"/>' +
+          '<Relationship Id="rId2"' +
+            ' Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"' +
+            ' Target="docProps/core.xml"/>' +
+          '<Relationship Id="rId3"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"' +
+            ' Target="docProps/app.xml"/>' +
+        '</Relationships>'
+    });
+
+    var stamp = ((meta && meta.date) || new Date()).toISOString().replace(/\.\d+Z$/, 'Z');
+    files.push({
+      name: 'docProps/core.xml',
+      text: HEAD +
+        '<cp:coreProperties' +
+        ' xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"' +
+        ' xmlns:dc="http://purl.org/dc/elements/1.1/"' +
+        ' xmlns:dcterms="http://purl.org/dc/terms/"' +
+        ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+          '<dc:title>' + esc((meta && meta.title) || name) + '</dc:title>' +
+          '<dc:creator>yazeed.blog</dc:creator>' +
+          '<cp:lastModifiedBy>yazeed.blog</cp:lastModifiedBy>' +
+          '<dcterms:created xsi:type="dcterms:W3CDTF">' + stamp + '</dcterms:created>' +
+          '<dcterms:modified xsi:type="dcterms:W3CDTF">' + stamp + '</dcterms:modified>' +
+        '</cp:coreProperties>'
+    });
+
+    files.push({
+      name: 'docProps/app.xml',
+      text: HEAD +
+        '<Properties' +
+        ' xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"' +
+        ' xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">' +
+          '<Application>yazeed.blog</Application>' +
+          '<Company></Company>' +
+        '</Properties>'
+    });
+
+    files.push({
+      name: 'xl/workbook.xml',
+      text: HEAD +
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' +
+        ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+          '<workbookPr/>' +
+          '<sheets><sheet name="' + esc(name) + '" sheetId="1" r:id="rId1"/></sheets>' +
+        '</workbook>'
+    });
+
+    files.push({
+      name: 'xl/_rels/workbook.xml.rels',
+      text: HEAD +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+          '<Relationship Id="rId1"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' +
+            ' Target="worksheets/sheet1.xml"/>' +
+          '<Relationship Id="rId2"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"' +
+            ' Target="styles.xml"/>' +
+        '</Relationships>'
+    });
+
+    files.push({ name: 'xl/styles.xml', text: stylesXml() });
+    files.push({ name: 'xl/worksheets/sheet1.xml', text: sheetXml(sheet) });
+
+    if (charts.length) {
+      files.push({
+        name: 'xl/worksheets/_rels/sheet1.xml.rels',
+        text: HEAD +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+            '<Relationship Id="rId1"' +
+              ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"' +
+              ' Target="../drawings/drawing1.xml"/>' +
+          '</Relationships>'
+      });
+
+      files.push({ name: 'xl/drawings/drawing1.xml', text: drawingXml(charts) });
+
+      var drawRels = '';
+      for (i = 0; i < charts.length; i++) {
+        drawRels += '<Relationship Id="rId' + (i + 1) + '"' +
+          ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"' +
+          ' Target="../charts/chart' + (i + 1) + '.xml"/>';
+      }
+      files.push({
+        name: 'xl/drawings/_rels/drawing1.xml.rels',
+        text: HEAD +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+            drawRels + '</Relationships>'
+      });
+
+      for (i = 0; i < charts.length; i++) {
+        files.push({
+          name: 'xl/charts/chart' + (i + 1) + '.xml',
+          text: chartXml(charts[i])
+        });
+      }
+    }
+
+    return zip(files, (meta && meta.date) || new Date());
+  }
+
+  return {
+    build: build,
+    zip: zip,
+    crc32: crc32,
+    utf8: utf8,
+    colName: colName,
+    cellRef: cellRef,
+    absRange: absRange,
+    absCell: absCell,
+    safeSheetName: safeSheetName,
+    styleForFormat: styleForFormat,
+    styles: S
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_XLSX;
   </script>
   <script>
 /* PM Calculation Desk — instrument plotting.
@@ -4791,17 +7287,511 @@ var PM_CHARTS = (function () {
     };
   };
 
+  /* ── export ────────────────────────────────────────────────────── */
+
+  /* A spreadsheet needs the numbers a chart was drawn from, not the strings
+     it was labelled with. The `table` each renderer returns is formatted for
+     reading — "1.2M" and "12,000.00" — and neither plots nor sums. This
+     walks the same specs the renderers walk and hands back raw values, plus
+     the Excel chart type that carries each kind without flattering it.
+
+     `chart: null` is a real answer, not a gap. A gauge reads one value
+     against threshold bands and a probability–impact grid reads a cell
+     position; drawing either as a bar chart would silently convert a
+     threshold reading into a magnitude comparison, which is the kind of
+     wrong that survives review because it looks like a chart. Those kinds
+     export their data and state why there is no plot. */
+
+  /* Excel redraws every point, so a 2,000-point curve costs the reader
+     2,000 rows to scroll past for a line they cannot tell from a 60-point
+     one. Sample, but never drop the last point — a curve that stops short
+     of its final x reads as a shorter project, not a sampled one. */
+  function sampled(points, cap) {
+    var stride = Math.max(1, Math.ceil(points.length / cap));
+    var out = [], i;
+    for (i = 0; i < points.length; i += stride) out.push(points[i]);
+    if (points.length && out[out.length - 1] !== points[points.length - 1]) {
+      out.push(points[points.length - 1]);
+    }
+    return out;
+  }
+
+  function sharesX(series) {
+    var base = series[0].points, i, j;
+    for (i = 1; i < series.length; i++) {
+      if (series[i].points.length !== base.length) return false;
+      for (j = 0; j < base.length; j++) {
+        if (series[i].points[j][0] !== base[j][0]) return false;
+      }
+    }
+    return true;
+  }
+
+  function num(x) { return typeof x === 'number' && isFinite(x) ? x : null; }
+
+  /* Returns:
+       { chart, reason, xTitle, yTitle, head, rows, chartRows, catCol,
+         seriesCols, noFillCols, xCols }
+     `chartRows` is how many leading rows the plot covers — trailing rows
+     (a standard deviation, a band, a note) belong in the table but not in
+     the series. */
+  function exportData(kind, spec) {
+    var head, rows, i;
+
+    if (kind === 'bars') {
+      var bs = (spec.series || []).filter(function (s) { return isFinite(s.value); });
+      if (!bs.length) return null;
+      head = [spec.catHead || 'Measure', spec.valHead || 'Value'];
+      rows = bs.map(function (s) {
+        return [s.label + (s.sub ? ' (' + s.sub + ')' : ''), num(s.value)];
+      });
+      /* The reference is a line on the desk and a column here. Same
+         comparison, and Excel has no cheap way to draw the line. */
+      if (isFinite(spec.refValue)) {
+        rows.push([(spec.refLabel || 'Reference') + ' (reference)', num(spec.refValue)]);
+      }
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: spec.valHead || ''
+      };
+    }
+
+    if (kind === 'curve') {
+      var cs = (spec.series || []).filter(function (s) { return s.points && s.points.length > 1; });
+      if (!cs.length) return null;
+      var xLabel = spec.xLabel || 'x';
+
+      if (sharesX(cs)) {
+        var keep = [], stride = Math.max(1, Math.ceil(cs[0].points.length / 60));
+        for (i = 0; i < cs[0].points.length; i += stride) keep.push(i);
+        if (keep[keep.length - 1] !== cs[0].points.length - 1) keep.push(cs[0].points.length - 1);
+        head = [xLabel].concat(cs.map(function (s) { return s.label; }));
+        rows = keep.map(function (idx) {
+          var row = [num(cs[0].points[idx][0])];
+          for (var s = 0; s < cs.length; s++) {
+            row.push(cs[s].points[idx] ? num(cs[s].points[idx][1]) : null);
+          }
+          return row;
+        });
+        return {
+          chart: 'scatter', head: head, rows: rows, chartRows: rows.length,
+          catCol: 0,
+          seriesCols: cs.map(function (s, n) { return n + 1; }),
+          dashes: cs.map(function (s) { return s.style === 'dashed' ? 'dash' : null; }),
+          xTitle: xLabel, yTitle: spec.yLabel || ''
+        };
+      }
+
+      /* Series on different x grids get their own pair of columns — a flat
+         baseline spanning two points must not be resampled onto a curve's
+         grid, which is exactly how it would end up two units long. */
+      var cols = [], longest = 0;
+      head = [];
+      var seriesCols = [], xCols = [], dashes = [];
+      for (i = 0; i < cs.length; i++) {
+        var p = sampled(cs[i].points, 60);
+        head.push(xLabel + ' — ' + cs[i].label, cs[i].label);
+        cols.push(p.map(function (pt) { return num(pt[0]); }));
+        cols.push(p.map(function (pt) { return num(pt[1]); }));
+        xCols.push(i * 2);
+        seriesCols.push(i * 2 + 1);
+        dashes.push(cs[i].style === 'dashed' ? 'dash' : null);
+        if (p.length > longest) longest = p.length;
+      }
+      rows = [];
+      for (i = 0; i < longest; i++) {
+        rows.push(cols.map(function (c) { return i < c.length ? c[i] : null; }));
+      }
+      return {
+        chart: 'scatter', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: seriesCols, xCols: xCols, dashes: dashes,
+        xTitle: xLabel, yTitle: spec.yLabel || ''
+      };
+    }
+
+    if (kind === 'distribution') {
+      if (!isFinite(spec.o) || !isFinite(spec.m) || !isFinite(spec.p) || !isFinite(spec.e)) return null;
+      head = ['Point', 'Value'];
+      rows = [
+        ['Optimistic (O)', num(spec.o)],
+        ['Most likely (M)', num(spec.m)],
+        ['Pessimistic (P)', num(spec.p)],
+        ['PERT estimate (E)', num(spec.e)]
+      ];
+      var chartRows = rows.length;
+      if (isFinite(spec.sd)) {
+        rows.push(['Standard deviation (sigma)', num(spec.sd)]);
+        rows.push(['68% range — low', num(spec.e - spec.sd)]);
+        rows.push(['68% range — high', num(spec.e + spec.sd)]);
+      }
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: chartRows,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'rangeplot') {
+      var marks = (spec.marks || []).filter(function (m) { return isFinite(m.at); });
+      var bands = (spec.bands || []).filter(function (b) { return isFinite(b.from) && isFinite(b.to); });
+      if (!marks.length && !bands.length) return null;
+      head = ['Point', 'Value'];
+      rows = marks.map(function (m) { return [m.label, num(m.at)]; });
+      var markCount = rows.length;
+      bands.forEach(function (b) {
+        rows.push([(b.label || 'Band') + ' — from', num(b.from)]);
+        rows.push([(b.label || 'Band') + ' — to', num(b.to)]);
+      });
+      return {
+        chart: markCount ? 'col' : null,
+        reason: markCount ? '' : 'This plot is a range with no marked points.',
+        head: head, rows: rows, chartRows: markCount,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'quadrant') {
+      if (!isFinite(spec.x) || !isFinite(spec.y)) return null;
+      var rx = isFinite(spec.refX) ? spec.refX : 1;
+      var ry = isFinite(spec.refY) ? spec.refY : 1;
+      head = ['Axis', 'Reading', 'Reference'];
+      rows = [
+        [spec.xLabel || 'x', num(spec.x), num(rx)],
+        [spec.yLabel || 'y', num(spec.y), num(ry)]
+      ];
+      /* Two clustered columns rather than a scatter: a single plotted point
+         against crossed reference lines is a picture Excel cannot draw, and
+         reading against reference is the whole point of the quadrant. */
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: [1, 2], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'windows') {
+      var ws = (spec.rows || []).filter(function (r) { return isFinite(r.from) && isFinite(r.to); });
+      if (!ws.length) return null;
+      head = ['Window', 'Start', 'Span', 'Finish'];
+      rows = ws.map(function (r) {
+        return [r.label, num(r.from), num(Math.abs(r.to - r.from)), num(r.to)];
+      });
+      var winRows = rows.length;
+      (spec.marks || []).forEach(function (m) {
+        if (isFinite(m.at)) rows.push([m.label || 'Mark', num(m.at), null, null]);
+      });
+      /* A stacked bar with an invisible first segment is the float diagram:
+         the offset holds the bar away from zero, the span is the window.
+         It only works while the offsets are positive. */
+      var negative = ws.some(function (r) { return r.from < 0; });
+      return {
+        chart: 'stacked', head: head, rows: rows, chartRows: winRows,
+        catCol: 0,
+        seriesCols: negative ? [1, 3] : [1, 2],
+        noFillCols: negative ? [] : [1],
+        stackedFallback: negative,
+        xTitle: '', yTitle: 'Time'
+      };
+    }
+
+    if (kind === 'meter') {
+      var zones = (spec.zones || []).filter(function (z) { return isFinite(z.from) && isFinite(z.to); });
+      head = ['Band', 'From', 'To'];
+      rows = zones.map(function (z) { return [z.label || 'Band', num(z.from), num(z.to)]; });
+      rows.push([(spec.label || 'Reading') + ' (this reading)', num(spec.value), null]);
+      return {
+        chart: null,
+        reason: 'A gauge reads one value against threshold bands. Drawn as a bar ' +
+          'chart it would read as a magnitude comparison instead, so the bands ' +
+          'and the reading are given as figures.',
+        head: head, rows: rows, chartRows: 0
+      };
+    }
+
+    if (kind === 'matrix') {
+      if (!isFinite(spec.p) || !isFinite(spec.i)) return null;
+      var score = spec.p * spec.i;
+      head = ['Probability', 'Impact', 'Score', 'Band'];
+      rows = [[num(spec.p), num(spec.i), num(score),
+        score >= 15 ? 'High' : score >= 8 ? 'Moderate' : 'Low']];
+      return {
+        chart: null,
+        reason: 'This plot is a position on a probability–impact grid, not a ' +
+          'quantity. The coordinates and the resulting band are given as figures.',
+        head: head, rows: rows, chartRows: 0
+      };
+    }
+
+    return null;
+  }
+
   return {
     renderers: R,
     esc: esc,
     short: short,
     full: full,
     trim: trim,
-    ticks: ticks
+    ticks: ticks,
+    exportData: exportData
   };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_CHARTS;
+  </script>
+  <script>
+/* ══ PM_EXPORT ═════════════════════════════════════════════════════════
+   Lays a calculator out as a spreadsheet: what was entered, what came out,
+   what each reading means, and every chart as data beside a live Excel
+   chart drawn from that data.
+
+   `sheetFor` is a pure function of the card, the values and the results —
+   no DOM, no download — so the whole layout is testable without a browser.
+   The parts that touch the page are the two functions below it. */
+
+var PM_EXPORT = (function () {
+  'use strict';
+
+  var S = PM_XLSX.styles;
+
+  /* Prose in PM_DATA is authored as HTML — a card's `about` carries
+     <strong> and the odd entity. A spreadsheet cell wants the sentence. */
+  var NAMED = {
+    amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
+    nbsp: ' ', middot: '·', mdash: '—', ndash: '–', reg: '®'
+  };
+
+  function plain(html) {
+    return String(html == null ? '' : html)
+      .replace(/<[^>]*>/g, '')
+      .replace(/&#(\d+);/g, function (m, code) {
+        return String.fromCharCode(Number(code));
+      })
+      .replace(/&([a-zA-Z][a-zA-Z0-9]*);/g, function (m, name) {
+        var key = name.toLowerCase();
+        return Object.prototype.hasOwnProperty.call(NAMED, key) ? NAMED[key] : m;
+      })
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /* Column layout. A is the label column and stays wide; C carries the
+     verdict sentences and stays wider still. Charts are anchored well to
+     the right of anything the tables use. */
+  var COLS = [44, 17, 54, 17, 17, 17, 17];
+  var CHART_COL = 8;          /* anchor column — I, clear of the tables */
+  var CHART_W = 9;            /* columns wide */
+  var CHART_H = 17;           /* rows tall */
+
+  function styleFor(format) { return PM_XLSX.styleForFormat(format); }
+
+  /* card:    a PM_DATA card
+     values:  { inputKey: number|string }
+     results: { outputKey: number|string|null }
+     charts:  [ { def, spec } ] — the chart definitions with their live specs
+     Returns a sheet ready for PM_XLSX.build. */
+  function sheetFor(card, values, results, charts, now) {
+    var sheetName = PM_XLSX.safeSheetName(card.name);
+    var rows = [];
+    var chartDefs = [];
+    var chartFloor = 0;
+
+    function add(row) { rows.push(row || []); return rows.length - 1; }
+    function blank() { add([]); }
+    function section(text) { return add([{ v: text, s: S.section }, { v: '', s: S.section }]); }
+    function note(text) { return add([{ v: text, s: S.note }]); }
+
+    add([{ v: card.name, s: S.title }]);
+    add([{ v: plain(card.tagline), s: S.subtitle }]);
+    if (card.about) note(plain(card.about));
+    blank();
+    add([{ v: 'Exported from yazeed.blog · ' + ymd(now), s: S.note }]);
+    blank();
+
+    if (card.formula && card.formula.length) {
+      section('FORMULA');
+      /* Formula lines are padded with spaces so that two formulas sit in
+         columns under a monospace font. Collapsing that to one space loses
+         the pairing, so split the line and let the sheet's own columns do
+         the aligning instead.
+
+         The threshold is four because the padding and the separator are
+         different sizes: a run of two spaces aligns an operator inside one
+         formula ("CV  = EV − AC"), while six or more divides one formula
+         from the next. tests/export.js holds that gap open. */
+      card.formula.forEach(function (line) {
+        add(String(line).replace(/<[^>]*>/g, '').split(/\s{4,}/)
+          .map(function (piece) { return plain(piece); })
+          .filter(function (piece) { return piece !== ''; }));
+      });
+      blank();
+    }
+
+    section('PARAMETERS');
+    add([{ v: 'Parameter', s: S.head }, { v: 'Value', s: S.headNum },
+      { v: 'What it means', s: S.head }]);
+    card.inputs.forEach(function (inp) {
+      var raw = values[inp.key];
+      var cell = (typeof raw === 'number' && isFinite(raw)) ? { v: raw, s: S.num }
+        : { v: raw === undefined || raw === null || raw !== raw ? '' : String(raw), s: S.base };
+      add([plain(inp.label), cell, { v: plain(inp.meaning), s: S.wrap }]);
+    });
+    blank();
+
+    section('RESULTS');
+    add([{ v: 'Result', s: S.head }, { v: 'Value', s: S.headNum },
+      { v: 'Reading', s: S.head }]);
+    card.outputs.forEach(function (out) {
+      var val = results[out.key];
+      var has = val !== null && val !== undefined && !(typeof val === 'number' && !isFinite(val));
+      var verdict = null;
+      if (has && out.interpret) {
+        try { verdict = out.interpret(val, values); } catch (e) { verdict = null; }
+      }
+      var cell = has
+        ? (typeof val === 'number' ? { v: val, s: styleFor(out.format) } : { v: String(val), s: S.base })
+        : { v: '—', s: S.base };
+      add([plain(out.label), cell, { v: verdict ? plain(verdict.text) : '', s: S.wrap }]);
+    });
+    blank();
+
+    if (card.howto && card.howto.length) {
+      section('HOW TO USE IT');
+      card.howto.forEach(function (step, n) {
+        add([{ v: (n + 1) + '. ' + plain(step), s: S.wrap }]);
+      });
+      blank();
+    }
+
+    (charts || []).forEach(function (entry) {
+      var data = null;
+      try {
+        data = entry.spec ? PM_CHARTS.exportData(entry.def.kind, entry.spec) : null;
+      } catch (e) {
+        data = null;
+      }
+
+      section(plain(entry.def.title));
+      if (entry.def.purpose) note(plain(entry.def.purpose));
+
+      if (!data) {
+        note(entry.spec
+          ? 'These parameters cannot be plotted.'
+          : 'Not plotted — this chart needs parameters that are not filled in.');
+        blank();
+        return;
+      }
+
+      if (entry.spec.summary) note(plain(entry.spec.summary));
+      if (data.reason) note(data.reason);
+
+      var headRow = add(data.head.map(function (h, n) {
+        return { v: h, s: n === 0 ? S.head : S.headNum };
+      }));
+      var first = rows.length;
+      data.rows.forEach(function (r) {
+        add(r.map(function (cell, n) {
+          if (typeof cell === 'number') return { v: cell, s: S.num };
+          return { v: cell === null || cell === undefined ? '' : String(cell), s: n === 0 ? S.base : S.base };
+        }));
+      });
+      var last = rows.length - 1;
+
+      if (data.chart && data.chartRows > 0) {
+        var lastPlotted = first + data.chartRows - 1;
+        var anchorRow = Math.max(headRow - 1, chartFloor);
+        chartFloor = anchorRow + CHART_H + 1;
+
+        var cats = data.chart === 'scatter'
+          ? {
+            ref: PM_XLSX.absRange(sheetName, data.catCol, first, lastPlotted),
+            values: column(data.rows, data.catCol, data.chartRows)
+          }
+          : {
+            ref: PM_XLSX.absRange(sheetName, data.catCol, first, lastPlotted),
+            values: column(data.rows, data.catCol, data.chartRows).map(function (c) {
+              return c === null || c === undefined ? '' : String(c);
+            })
+          };
+
+        var series = data.seriesCols.map(function (col, n) {
+          var s = {
+            name: data.head[col],
+            nameRef: PM_XLSX.absCell(sheetName, col, headRow),
+            ref: PM_XLSX.absRange(sheetName, col, first, lastPlotted),
+            values: column(data.rows, col, data.chartRows),
+            dash: data.dashes ? data.dashes[n] : null,
+            noFill: !!(data.noFillCols && data.noFillCols.indexOf(col) !== -1)
+          };
+          /* Series on their own x grid carry their own x column. */
+          if (data.xCols && data.xCols[n] !== undefined) {
+            s.xRef = PM_XLSX.absRange(sheetName, data.xCols[n], first, lastPlotted);
+            s.xValues = column(data.rows, data.xCols[n], data.chartRows);
+          }
+          return s;
+        });
+
+        chartDefs.push({
+          type: data.chart === 'stacked' && data.stackedFallback ? 'col' : data.chart,
+          title: plain(entry.def.title),
+          xTitle: data.xTitle || '',
+          yTitle: data.yTitle || '',
+          valFormat: '#,##0.##',
+          anchor: {
+            col: CHART_COL, row: anchorRow,
+            colEnd: CHART_COL + CHART_W, rowEnd: anchorRow + CHART_H
+          },
+          cats: cats,
+          series: series
+        });
+      }
+
+      blank();
+    });
+
+    add([{ v: 'Calculated in the browser at yazeed.blog — nothing was uploaded.', s: S.note }]);
+
+    return {
+      name: sheetName,
+      rows: rows,
+      cols: COLS,
+      charts: chartDefs
+    };
+  }
+
+  function column(rows, index, limit) {
+    var out = [], i;
+    for (i = 0; i < rows.length && i < limit; i++) {
+      var cell = rows[i][index];
+      out.push(cell === undefined ? null : cell);
+    }
+    return out;
+  }
+
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function ymd(now) {
+    var d = now || new Date();
+    return d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate());
+  }
+
+  function slug(name) {
+    return String(name).toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'calculator';
+  }
+
+  function filenameFor(card, now) {
+    return slug(card.name) + '-' + ymd(now) + '.xlsx';
+  }
+
+  /* Handing the bytes to the browser needs a document, so that half lives
+     with the rest of the page code. Everything here is a pure function of
+     the card and its numbers, which is what makes it testable headless. */
+
+  return {
+    sheetFor: sheetFor,
+    filenameFor: filenameFor,
+    plain: plain
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_EXPORT;
   </script>
   <script>
 /* PM Calculation Desk — chart mounting and lifecycle.
@@ -4997,7 +7987,7 @@ var PM_CHART_MOUNT = (function () {
   }
 
   /* One resize pass for the whole sheet, rather than an observer per chart:
-     33 independent ResizeObservers is how a page starts dropping frames. */
+     independent ResizeObservers are how a page starts dropping frames. */
   var all = [];
   var resizeTimer = null;
   function onResize() {
@@ -5040,7 +8030,7 @@ var PM_CHART_MOUNT = (function () {
   var sectionsEl = document.getElementById('calc-sections');
   var navEl = document.getElementById('cat-nav');
   var searchEl = document.getElementById('search');
-  var statsEl = document.getElementById('hero-stats');
+  var statsEl = document.getElementById('desk-stats');
 
   /* ------------------------------------------------------- formatting */
   function formatValue(val, format) {
@@ -5125,13 +8115,65 @@ var PM_CHART_MOUNT = (function () {
     copyFallback(text, done);
   }
 
-  function confirmCopy(button) {
-    if (button.copyTimer) clearTimeout(button.copyTimer);
-    button.textContent = 'Copied';
-    button.copyTimer = setTimeout(function () {
-      button.textContent = 'Copy link';
-      button.copyTimer = null;
-    }, 1500);
+  /* A card action reports back on its own face and then forgets. The
+     buttons carry aria-live, so the swap is the announcement too. */
+  function flash(button, text, restore) {
+    if (button.flashTimer) clearTimeout(button.flashTimer);
+    button.textContent = text;
+    button.flashTimer = setTimeout(function () {
+      button.textContent = restore;
+      button.flashTimer = null;
+    }, 1600);
+  }
+
+  function confirmCopy(button) { flash(button, 'Copied', 'Copy link'); }
+
+  /* The bytes are assembled in the page and handed to the browser's own
+     download. There is no request here, and nowhere for one to go. */
+  function saveWorkbook(bytes, filename) {
+    var blob = new Blob([bytes], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    if (navigator.msSaveBlob) { navigator.msSaveBlob(blob, filename); return; }
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.position = 'fixed';
+    link.style.left = '-9999px';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  /* Builds the workbook from what is on the card right now. */
+  function exportCard(card, el, button) {
+    var v = readValues(card, el);
+    var entered = card.inputs.some(function (inp) {
+      var raw = v[inp.key];
+      return typeof raw === 'number' ? isFinite(raw) : String(raw || '').trim() !== '';
+    });
+    if (!entered) { flash(button, 'Enter values first', 'Excel'); return; }
+
+    var results = computeResults(card, v);
+    var charts = (card.charts || []).map(function (def) {
+      var spec = null;
+      /* A chart that cannot build is not a failed export — it is a chart
+         with nothing to say about these values, and the sheet says so. */
+      try { spec = def.build(v, results); } catch (e) { spec = null; }
+      return { def: def, spec: spec };
+    });
+
+    try {
+      var now = new Date();
+      var sheet = PM_EXPORT.sheetFor(card, v, results, charts, now);
+      saveWorkbook(PM_XLSX.build(sheet, { title: card.name, date: now }),
+        PM_EXPORT.filenameFor(card, now));
+      flash(button, 'Downloaded', 'Excel');
+    } catch (e) {
+      flash(button, 'Export failed', 'Excel');
+    }
   }
 
   function inputEvent() {
@@ -5358,6 +8400,7 @@ var PM_CHART_MOUNT = (function () {
        family rather than only the cards that happen to say the word. */
     var searchText = (categoryName + ' ' + card.name + ' ' + card.tagline + ' ' +
       card.about + ' ' + card.formula.join(' ') + ' ' +
+      (card.howto ? card.howto.join(' ') + ' ' : '') +
       card.outputs.map(function (o) { return o.label; }).join(' ')).toLowerCase();
 
     var el = document.createElement('article');
@@ -5373,6 +8416,7 @@ var PM_CHART_MOUNT = (function () {
         '<div class="card-actions">' +
           (example ? '<button class="card-action example-toggle" type="button">Example</button>' : '') +
           '<button class="card-action copy-link" type="button" aria-live="polite">Copy link</button>' +
+          '<button class="card-action export-xlsx" type="button" aria-live="polite">Excel</button>' +
         '</div>' +
       '</header>' +
       '<p class="about">' + card.about + '</p>' +
@@ -5383,6 +8427,15 @@ var PM_CHART_MOUNT = (function () {
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
       '</div>' +
+      (card.howto ?
+        '<div class="howto card-howto">' +
+          '<p class="label">How to use it</p>' +
+          '<ol class="howto-steps">' +
+            card.howto.map(function (step) {
+              return '<li><span class="howto-text">' + step + '</span></li>';
+            }).join('') +
+          '</ol>' +
+        '</div>' : '') +
       /* Results appear silently: a sighted reader watches the numbers land,
          a screen-reader user gets nothing. role="status" is atomic and
          polite by default, so each announcement replaces the last rather
@@ -5424,6 +8477,10 @@ var PM_CHART_MOUNT = (function () {
       copyText(stateUrl(card, el), function () { confirmCopy(button); });
     });
 
+    el.querySelector('.export-xlsx').addEventListener('click', function (event) {
+      exportCard(card, el, event.currentTarget);
+    });
+
     el.addEventListener('input', function () { computeCard(card, el); });
     return el;
   }
@@ -5438,19 +8495,28 @@ var PM_CHART_MOUNT = (function () {
     return v;
   }
 
+  /* Every output a card produces, keyed the same way PM_DATA keys it — the
+     one map a chart builder is allowed to read instead of re-deriving a
+     formula. Kept separate from the display so the exporter can ask for the
+     numbers without a card on screen to paint them onto. */
+  function computeResults(card, v) {
+    var results = {};
+    card.outputs.forEach(function (out) {
+      var val = null;
+      try { val = out.compute(v); } catch (e) { val = null; }
+      results[out.key] = val;
+    });
+    return results;
+  }
+
   function computeCard(card, el) {
     var v = readValues(card, el);
-    /* Every output the card just computed, keyed the same way PM_DATA keys
-       it — the one map a chart builder is allowed to read instead of
-       re-deriving a formula. */
-    var results = {};
+    var results = computeResults(card, v);
     card.outputs.forEach(function (out) {
       var chip = el.querySelector('.result[data-out="' + out.key + '"]');
       var valueEl = chip.querySelector('.r-value');
       var verdictEl = chip.querySelector('.r-verdict');
-      var val = null;
-      try { val = out.compute(v); } catch (e) { val = null; }
-      results[out.key] = val;
+      var val = results[out.key];
 
       valueEl.textContent = formatValue(val, out.format);
       chip.classList.remove('good', 'warn', 'bad', 'info');
@@ -5527,6 +8593,30 @@ var PM_CHART_MOUNT = (function () {
   /* --------------------------------------------------------- sections */
   var totalCards = 0, totalOutputs = 0;
 
+  /* The citation pack is plain text by default. These are the only two
+     canonical URL strings allowed to become links in a domain footer. */
+  var citationLinks = {
+    'scrumguides.org/scrum-guide.html': '<a href="https://scrumguides.org/scrum-guide.html" rel="noopener" target="_blank">scrumguides.org/scrum-guide.html</a>',
+    'doi.org/10.1287/opre.9.3.383': '<a href="https://doi.org/10.1287/opre.9.3.383" rel="noopener" target="_blank">doi.org/10.1287/opre.9.3.383</a>'
+  };
+
+  function renderCitation(citation) {
+    var keys = Object.keys(citationLinks);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var position = citation.indexOf(key);
+      if (position === -1) continue;
+      return citation.slice(0, position) + citationLinks[key] +
+        citation.slice(position + key.length);
+    }
+    return citation;
+  }
+
+  /* The container ships with a static text mirror of the desk inside it, for
+     fetchers that never run this script. A browser does, so throw it away
+     before building the real instruments over the top. */
+  sectionsEl.innerHTML = '';
+
   DATA.categories.forEach(function (cat, i) {
     var section = document.createElement('section');
     section.className = 'category';
@@ -5536,7 +8626,8 @@ var PM_CHART_MOUNT = (function () {
       '<header class="cat-head">' +
         '<span class="cat-num">' + String(i + 1).padStart(2, '0') + '</span>' +
         '<div><h2 id="cat-h-' + cat.id + '">' + cat.name + '</h2>' +
-        '<p class="cat-blurb">' + cat.blurb + '</p></div>' +
+        '<p class="cat-blurb">' + cat.blurb + '</p>' +
+        '<small class="cat-citation">' + renderCitation(cat.citation) + '</small></div>' +
       '</header>';
 
     cat.cards.forEach(function (card, j) {

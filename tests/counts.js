@@ -42,7 +42,10 @@ function run(page) {
   var figures = {};
   var heroMatch;
 
+  var cardNames = [];
+
   H.eachCard(data, function (card) {
+    cardNames.push(card.name);
     calculators += 1;
     metrics += card.outputs.length;
   });
@@ -77,6 +80,14 @@ function run(page) {
   H.check('JSON-LD description states calculators and domains',
     jsonLd && hasCount(jsonLd.description || '', calculators, 'calculators') &&
     hasCount(jsonLd.description || '', domains, 'domains'));
+
+  /* featureList names every calculator, so it is a second copy of PM_DATA in
+     the head and rots the same way the counts do. Judge it against the real
+     card names, in order. */
+  H.deep('JSON-LD featureList matches PM_DATA card names',
+    (jsonLd && jsonLd.featureList) || null, cardNames);
+  H.check('JSON-LD declares language and free access',
+    !!jsonLd && jsonLd.inLanguage === 'en' && jsonLd.isAccessibleForFree === true);
 
   H.suite('visible counts');
   H.deep('hero figures match PM_DATA', figures, {
