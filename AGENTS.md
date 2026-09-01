@@ -20,11 +20,28 @@ directly with no build step:
 and a single-URL sitemap for the canonical homepage. Both are edited by hand,
 same as everything else here.
 
+`fonts/` holds the six woff2 files the pages use, plus the OFL licence they
+ship under. They were a render-blocking stylesheet from Google until the site
+took them in-house; see **No third-party requests** below for why that matters
+more than the bytes.
+
+`tools/prerender.js` is the one piece of generated content in the repository.
+It renders `PM_DATA` to static markup and writes it into `index.html` between
+`<!-- prerender:start -->` and `<!-- prerender:end -->`. Run it — and commit the
+result — after any change to a calculator's name, prose, formula, inputs or
+outputs. `tests/prerender.js` fails the suite if you forget.
+
 `og.png` is a rendered artifact, not a hand-drawn one: `design/og-card.source.html`
 is the page it comes from, and that page's dial geometry is copied from the hero
 instrument, so the card shows a real reading. Re-render it by screenshotting that
 file at 1200×630 — and re-render it whenever the figures on it (14 · 34 · 103)
 stop being true. Nothing automates this; the PNG is committed.
+
+One trap if you do re-render it: everything under `design/` still pulls its
+webfonts from Google, because those pages are not deployed and nobody moved
+them. The shipped pages no longer do. Point the source page at `../fonts/`
+before screenshotting, or the card will be set in whatever Google serves that
+day rather than in the faces the site actually uses.
 
 `tests/counts.js` is the tripwire for exactly that drift: it derives the three
 figures from `PM_DATA` and checks them against the hero copy, the `<title>`,
@@ -48,10 +65,15 @@ These are not preferences. Breaking one breaks the site's premise.
 
 - **No build step.** No bundler, no transpiler, no framework. A file you open
   in a browser is the shipped artifact.
-- **No dependencies.** No npm packages, no CDN scripts. The only external
-  request any page makes is the Google Fonts stylesheet.
+- **No dependencies.** No npm packages, no CDN scripts.
+- **No third-party requests.** Neither page contacts any origin but its own —
+  the fonts were the last one and now ship from `fonts/`. The footers promise
+  "nothing is sent anywhere"; that promise is now literally true, and adding a
+  CDN script, a hosted font or an embed would break it. Same-origin assets are
+  fine.
 - **Self-contained pages.** CSS in a `<style>` block, JavaScript in a `<script>`
-  block, both inline in the page that uses them. Pages do not share files.
+  block, both inline in the page that uses them. Pages do not share files —
+  `fonts/` is the one shared directory, and it holds no code.
 - **Client-side only.** Every calculation runs in the visitor's browser. No
   backend, no analytics, no telemetry. The footers promise "nothing is sent
   anywhere" — that promise is load-bearing.
@@ -90,13 +112,21 @@ consistency across the bench is the point.
 ## Tests
 
 `node tests/run.js` is the complete dependency-free gate. It loads `index.html`
-once and runs seven suites against that single parse: the formula baseline,
+once and runs eight suites against that single parse: the formula baseline,
 deliberate edge classes, chart specs, stylesheet integrity, redirect integrity,
-published-count drift, and guarded Earned Schedule vectors (the last skips
-until a card with `id: 'earned-schedule'` exists, then activates itself). Each
-suite file (`tests/baseline.js`, `edge-cases.js`, `charts.js`, `stylesheet.js`,
-`redirects.js`, `counts.js`, `earned-schedule.js`) is still directly runnable
-on its own for debugging — it re-parses the page itself when run standalone.
+published-count drift, guarded Earned Schedule vectors (which skip until a card
+with `id: 'earned-schedule'` exists, then activate themselves), and prerender
+freshness. Each suite file (`tests/baseline.js`, `edge-cases.js`, `charts.js`,
+`stylesheet.js`, `redirects.js`, `counts.js`, `earned-schedule.js`,
+`prerender.js`) is still directly runnable on its own for debugging — it
+re-parses the page itself when run standalone.
+
+`tests/baseline.json` records every calculator's output for one set of example
+inputs, so a refactor has to prove it changed nothing. `node tests/baseline.js
+--write` regenerates it. Regenerating is not a way to make a failure go away:
+read the diff first and satisfy yourself each changed number is right, because
+a wrong value committed here becomes the thing everything else is measured
+against.
 
 Run `node tests/mutation-smoke.js` after changing the test harness or a
 calculator formula: it copies `index.html`, flips one operator in three
@@ -195,9 +225,15 @@ git push origin main
 Hostinger serves yazeed.blog (`server: hcdn`, not GitHub Pages — the
 `github.io` URL returns "Site not found") and is connected to this repository,
 so it redeploys itself on a push to main. The deployed artifact is `index.html`,
-`404.html`, `og.png`, `robots.txt`, `sitemap.xml`, `.htaccess` and the two
-redirect stubs described below. There is deliberately no CI here: no workflow,
-no build, no `CNAME`.
+`404.html`, `og.png`, `robots.txt`, `sitemap.xml`, `fonts/`, `.htaccess` and the
+two redirect stubs described below. `tests/`, `tools/`, `docs/` and `design/`
+are repository furniture and are not served. There is deliberately no CI here:
+no workflow, no build, no `CNAME`.
+
+`fonts/` has no cache headers of its own yet. The files are immutable — their
+names carry the weight — so they are a natural fit for a long `Cache-Control`,
+which would need a new `<IfModule mod_headers.c>` block in `.htaccess`, guarded
+the same way the rewrites are.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
 on the origin, and it answers 301 for the three addresses that are not the
