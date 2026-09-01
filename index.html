@@ -5290,9 +5290,15 @@ var PM_CHART_MOUNT = (function () {
       if (equals < 1) return;
       var key = decoded(pair.slice(0, equals));
       var raw = decoded(pair.slice(equals + 1));
-      var value = raw === null ? NaN : parseFloat(raw);
-      if (!key || !allowed[key] || !isFinite(value)) return;
-      allowed[key].value = String(value);
+      if (!key || !allowed[key] || raw === null) return;
+      if (allowed[key].dataset.type === 'text') {
+        if (!raw.trim()) return;
+        allowed[key].value = raw;
+      } else {
+        var value = parseFloat(raw);
+        if (!isFinite(value)) return;
+        allowed[key].value = String(value);
+      }
       if (changed.indexOf(allowed[key]) === -1) changed.push(allowed[key]);
     });
 
