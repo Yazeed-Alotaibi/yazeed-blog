@@ -1,5 +1,11 @@
 # Codex work order — parallel session with Claude Code
 
+> **Superseded 2026-09-01** by `docs/parallel-plan.md` (the four-lane operation).
+> Its §2 ownership table and §3 test assignment no longer apply — Lane B of the
+> plan absorbs the tests, and the "expected failure on main" note is stale (the
+> unclosed `@media` was fixed on main in `d118909`, so that assertion must PASS).
+> Kept for the reasoning in §1, which still governs.
+
 Hand this file to Codex. It describes what Codex may touch while Claude Code is
 working the same repository, and the one task assigned to it.
 
