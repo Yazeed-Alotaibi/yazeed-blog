@@ -477,6 +477,33 @@ main {
   left: -9999px;
 }
 
+.restore-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  box-shadow: var(--lip);
+  background: var(--sheet);
+}
+
+.restore-strip p {
+  flex: 1 1 18rem;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.88rem;
+}
+
+.restore-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
 .card-num {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -5103,6 +5130,127 @@ var PM_CHART_MOUNT = (function () {
     return event;
   }
 
+  var STORAGE_KEY = 'desk.readings.v1';
+  var saveTimer = null;
+
+  function collectReadings() {
+    var saved = {};
+    document.querySelectorAll('.calc-card').forEach(function (cardEl) {
+      var values = {};
+      cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
+        if (node.value.trim()) values[node.dataset.key] = node.value;
+      });
+      if (Object.keys(values).length) saved[cardEl.id] = values;
+    });
+    return saved;
+  }
+
+  function saveReadings() {
+    var saved = collectReadings();
+    try {
+      if (Object.keys(saved).length) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) {}
+  }
+
+  function scheduleReadingsSave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      saveTimer = null;
+      saveReadings();
+    }, 500);
+  }
+
+  function readSavedReadings() {
+    var raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+    if (!raw) return null;
+    try {
+      var saved = JSON.parse(raw);
+      return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : null;
+    } catch (e) { return null; }
+  }
+
+  function clearSavedReadings() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  }
+
+  function inputForKey(cardEl, key) {
+    var found = null;
+    cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
+      if (node.dataset.key === key) found = node;
+    });
+    return found;
+  }
+
+  function savedHasValues(saved) {
+    return Object.keys(saved).some(function (cardId) {
+      var cardEl = document.getElementById(cardId);
+      var values = saved[cardId];
+      if (!cardEl || !cardEl.classList.contains('calc-card') ||
+          !values || typeof values !== 'object' || Array.isArray(values)) return false;
+      return Object.keys(values).some(function (key) {
+        var node = inputForKey(cardEl, key);
+        var value = values[key];
+        return !!node && (typeof value === 'string' || typeof value === 'number') &&
+          String(value).trim() !== '';
+      });
+    });
+  }
+
+  function applySavedReadings(saved) {
+    var changed = [];
+    Object.keys(saved).forEach(function (cardId) {
+      var cardEl = document.getElementById(cardId);
+      var values = saved[cardId];
+      if (!cardEl || !cardEl.classList.contains('calc-card') ||
+          !values || typeof values !== 'object' || Array.isArray(values)) return;
+      Object.keys(values).forEach(function (key) {
+        var node = inputForKey(cardEl, key);
+        var value = values[key];
+        if (!node || (typeof value !== 'string' && typeof value !== 'number')) return;
+        if (node.type === 'number' && !isFinite(parseFloat(value))) return;
+        node.value = String(value);
+        if (node.value.trim()) changed.push(node);
+      });
+    });
+    changed.forEach(function (node) { node.dispatchEvent(inputEvent()); });
+  }
+
+  function dismissRestore(strip) {
+    if (strip.parentNode) strip.parentNode.removeChild(strip);
+  }
+
+  function offerSavedReadings(stateHashPresent) {
+    if (stateHashPresent) return;
+    var saved = readSavedReadings();
+    if (!saved || !savedHasValues(saved)) return;
+
+    var strip = document.createElement('div');
+    strip.className = 'restore-strip';
+    strip.setAttribute('role', 'region');
+    strip.setAttribute('aria-label', 'Saved readings');
+    strip.innerHTML =
+      '<p>Readings from your last visit are on the desk.</p>' +
+      '<div class="restore-actions">' +
+        '<button class="card-action restore-readings" type="button">Restore</button>' +
+        '<button class="card-action discard-readings" type="button">Discard</button>' +
+      '</div>';
+    sectionsEl.parentNode.insertBefore(strip, sectionsEl);
+
+    strip.querySelector('.restore-readings').addEventListener('click', function () {
+      applySavedReadings(saved);
+      dismissRestore(strip);
+    });
+    strip.querySelector('.discard-readings').addEventListener('click', function () {
+      clearSavedReadings();
+      dismissRestore(strip);
+    });
+  }
+
   function decoded(value) {
     try { return decodeURIComponent(value.replace(/\+/g, ' ')); }
     catch (e) { return null; }
@@ -5341,7 +5489,9 @@ var PM_CHART_MOUNT = (function () {
     navEl.appendChild(link);
   });
 
-  restoreStateHash();
+  sectionsEl.addEventListener('input', scheduleReadingsSave);
+  var stateHashPresent = restoreStateHash();
+  offerSavedReadings(stateHashPresent);
 
   if (statsEl) {
     statsEl.textContent = DATA.categories.length + ' domains · ' +
