@@ -22,6 +22,48 @@ the content pack shape:
 cards=33, examples=33, citations=14, failures=0
 ```
 
+The final execution check is preserved at
+`docs/content/verify-examples.js`. It loads the shipped page through
+`tests/harness.js` `loadPage`, reads `examples.json`, and invokes every real
+card `compute()` function. Final transcript:
+
+```text
+OK earned-value (14 outputs)
+OK time-forecast (3 outputs)
+OK burn-rate (4 outputs)
+OK three-point (7 outputs)
+OK path-sigma (2 outputs)
+OK learning-curve (2 outputs)
+OK float (3 outputs)
+OK crash (3 outputs)
+OK fte (2 outputs)
+OK utilization (2 outputs)
+OK labor-cost (3 outputs)
+OK channels (3 outputs)
+OK emv (2 outputs)
+OK risk-score (1 outputs)
+OK contingency (2 outputs)
+OK decision-tree (3 outputs)
+OK dpmo (3 outputs)
+OK control (3 outputs)
+OK cpk (2 outputs)
+OK coq (4 outputs)
+OK roi (2 outputs)
+OK npv (4 outputs)
+OK tvm (3 outputs)
+OK breakeven (3 outputs)
+OK depreciation (2 outputs)
+OK scoring (2 outputs)
+OK pta (2 outputs)
+OK fpif (2 outputs)
+OK cpif (2 outputs)
+OK velocity (3 outputs)
+OK capacity (2 outputs)
+OK say-do (2 outputs)
+OK littles-law (2 outputs)
+Checked 33 example sets; no null, NaN, or Infinity outputs.
+```
+
 It also confirmed every example output is finite or a non-null text result,
 every chart with a builder returns a plot spec, all input keys are present,
 all notes are ≤90 characters, the examples have no extra IDs, and the spec
