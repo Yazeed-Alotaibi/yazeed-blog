@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Earned Value Formulas Explained — CPI, SPI, EAC, PERT &amp; 34 PM Calculators</title>
+  <title>Earned Value Explained — CPI, SPI, EAC + 34 PM Calculators</title>
   <meta name="description" content="Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance, each read back in plain English. Plus 34 PM calculators, free.">
   <!-- www and the apex both answer 200 with identical content, so name the one
        Google should index. Without this the two compete as duplicates. -->
@@ -358,9 +358,13 @@ main {
   color: var(--ink-2);
 }
 
-#hero-stats {
+/* The tally above the desk, and the search's answer. It reports what is on
+   the bench, then what a query narrowed it to — the only confirmation that
+   filtering worked, since the alternative is cards silently vanishing. It is
+   a live region, so that confirmation is spoken as well as seen. */
+#desk-stats {
   display: inline-block;
-  margin-top: 1.5rem;
+  margin: 0 0 1.4rem;
   padding: 0.45rem 0.85rem;
   border: 1px solid var(--rule-2);
   background: var(--sheet);
@@ -369,6 +373,8 @@ main {
   letter-spacing: 0.02em;
   color: var(--ink-2);
 }
+
+#desk-stats:empty { display: none; }
 
 /* ---------------------------------------------------------- category */
 .category { padding-top: var(--space-section); }
@@ -1168,7 +1174,11 @@ main {
 /* The desk in one line: its scale, then the way into it. Replaces the old
    cross-page manifest — the calculators are on this same page now. */
 .hero-jump { margin-top: 2rem; padding-top: 1.15rem; border-top: 1px solid var(--rule); }
-.hero-figures { display: flex; gap: 2.2rem; }
+/* Three figures on one line until they no longer fit. Without the wrap their
+   combined min-content width sets a floor under the hero column, and below
+   about 340px that floor is wider than the screen — the whole page then
+   scrolls sideways to accommodate three numbers. */
+.hero-figures { display: flex; flex-wrap: wrap; gap: 1.1rem 2.2rem; }
 .hero-fig-num {
   font-family: var(--mono); font-size: 1.55rem; font-weight: 600;
   font-variant-numeric: tabular-nums; line-height: 1;
@@ -1350,6 +1360,26 @@ a.preview-item:hover { padding-inline-start: .5rem; color: var(--accent); }
   gap: 1px;
   background: var(--rule);
 }
+/* Below about 350px the instrument sets a floor wider than the screen — its
+   header row, its two side-by-side gauges and their padding cannot all fit,
+   and the whole document then scrolls sideways, which is the one thing a
+   reflow at 320px must never do. Give the panel permission to stack. */
+@media (max-width: 22em) {
+  main { padding-inline: .55rem; }
+  .instrument-head { flex-wrap: wrap; gap: .5rem; padding: .7rem .8rem; }
+  .strip { padding: .7rem .8rem; }
+  .instrument-out { grid-template-columns: 1fr; }
+  .instrument-fields { grid-template-columns: 1fr 1fr; }
+  .gauge { padding: .8rem .5rem 1rem; }
+  /* A grid item refuses to go narrower than its content unless told to, and a
+     number input's intrinsic width is wider than a third of this screen. */
+  .hero > *, .ifield, .gauge, .variance { min-width: 0; }
+  /* The display face is condensed, so a long heading word only threatens the
+     line box when the webfont has not arrived. Break it rather than let one
+     word decide the width of the document. */
+  #hero-h { overflow-wrap: anywhere; }
+}
+
 .gauge { background: var(--panel); padding: 1rem .8rem 1.15rem; text-align: center; }
 .gauge svg { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto .1rem; }
 
@@ -1884,6 +1914,8 @@ h2 {
         </div>
       </section>
 
+
+    <p id="desk-stats" role="status"></p>
 
     <div id="calc-sections"></div>
 
@@ -5335,7 +5367,7 @@ var PM_CHART_MOUNT = (function () {
   var sectionsEl = document.getElementById('calc-sections');
   var navEl = document.getElementById('cat-nav');
   var searchEl = document.getElementById('search');
-  var statsEl = document.getElementById('hero-stats');
+  var statsEl = document.getElementById('desk-stats');
 
   /* ------------------------------------------------------- formatting */
   function formatValue(val, format) {
