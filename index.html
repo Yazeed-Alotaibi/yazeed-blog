@@ -765,6 +765,25 @@ main {
 
   #cat-nav a.active { border-color: var(--accent); }
 
+  /* Fourteen pills in a row that scrolls sideways, with nothing at the edge
+     to say so. A mask fades whichever side still has pills past it — masking
+     rather than an overlaid gradient because the pills carry their own
+     background and a gradient behind them would never be seen. The classes
+     are toggled from the scroll position, so the fade never claims there is
+     more to see when the row is already at its end. */
+  #cat-nav.can-scroll-r {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.2rem), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 2.2rem), transparent);
+  }
+  #cat-nav.can-scroll-l {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 2.2rem), transparent);
+            mask-image: linear-gradient(to left, #000 calc(100% - 2.2rem), transparent);
+  }
+  #cat-nav.can-scroll-l.can-scroll-r {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 2.2rem, #000 calc(100% - 2.2rem), transparent);
+            mask-image: linear-gradient(to right, transparent, #000 2.2rem, #000 calc(100% - 2.2rem), transparent);
+  }
+
   .search-hint,
   .sidebar footer { display: none; }
 
@@ -1403,6 +1422,100 @@ h2 {
   font-size: .84rem; color: var(--ink-2);
 }
 .plate-foot b { display: block; color: var(--ink); font-weight: 600; margin-bottom: .1rem; }
+
+/* ── print ────────────────────────────────────────────────────────────────
+   A filled calculator should leave the bench as a worksheet: the reading,
+   the formula it came from, and the caveat — on paper, with the instrument
+   housing left behind. Screen chrome goes, and the sheet prints in ink the
+   printer will not fight. */
+@media print {
+  @page { margin: 15mm; }
+
+  :root { color-scheme: light; }
+
+  body {
+    display: block;
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+  }
+
+  /* What prints is the bench, not the shopfront. Wayfinding is a screen
+     affordance — on paper there is nowhere to go — and the headline, the
+     lede and the bio are all addressed to someone deciding whether to use
+     the site, which is not the person holding the printout. The hero
+     instrument goes with them: it is a demonstration, and the desk carries
+     the same calculation in full. */
+  .sidebar, .skip, .hero, .bench, .no-results,
+  .chart-data > summary, .search { display: none !important; }
+
+  main { padding: 0; }
+
+  /* Something has to say what the sheet is once the masthead above it is
+     gone, and paper has no address bar. */
+  main::before {
+    content: "Calculation Desk · yazeed.blog";
+    display: block;
+    margin-bottom: 1.4rem;
+    padding-bottom: .5rem;
+    border-bottom: 1.5px solid #000;
+    font-family: var(--mono);
+    font-size: 8pt;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  /* The reading is what is being printed; the housing is not. */
+  .calc-card, .plate, .instrument, .chart {
+    box-shadow: none;
+    border: 1px solid #999;
+    background: #fff;
+  }
+
+  /* A calculator split down the middle of its results is not a worksheet. */
+  .calc-card, .chart, .cat-head, .result { break-inside: avoid; }
+  .category { break-before: page; }
+  .category:first-child { break-before: auto; }
+
+  /* The etched inlay is a dark slab that would print as a wall of toner and
+     hide the formula inside it. Same lines, inverted for paper. */
+  .formula, .strip {
+    background: #fff;
+    border: 1px solid #999;
+    box-shadow: none;
+  }
+  .formula code, .strip code { color: #000; }
+
+  /* Verdicts are already words (never colour alone), so they survive a
+     greyscale printer without help — but keep them dark enough to read. */
+  .r-verdict, .v-value, .g-value { color: #000 !important; }
+
+  /* Nothing to plot and nothing to say: an empty frame wastes a third of a
+     page apiece across 30 charts. */
+  .chart.is-empty { display: none; }
+  /* A drawer the reader left open prints its table; a closed one does not,
+     exactly as on screen. */
+  .chart-data[open] { display: block; }
+
+  /* Print what the reader actually filled in. `:has()` reads the live input
+     state, so a desk with one worked calculator prints that calculator —
+     not all thirty-three. An untouched page still prints whole, which is the
+     right answer for a blank reference sheet, and a browser without `:has()`
+     drops these two rules and falls back to exactly that. */
+  #calc-sections:has(.inputs input:not(:placeholder-shown))
+    .calc-card:not(:has(.inputs input:not(:placeholder-shown))) { display: none; }
+  #calc-sections:has(.inputs input:not(:placeholder-shown))
+    .category:not(:has(.inputs input:not(:placeholder-shown))) { display: none; }
+
+  /* Paper has no address bar, so the sheet has to say where it came from. */
+  .page-foot .credit::after {
+    display: block;
+    margin-top: .3rem;
+    content: "yazeed.blog";
+  }
+
+  a { color: #000; text-decoration: none; }
+}
 
   </style>
 
@@ -4925,7 +5038,12 @@ var PM_CHART_MOUNT = (function () {
       '<div class="io">' +
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
-      '</div>';
+      '</div>' +
+      /* Results appear silently: a sighted reader watches the numbers land,
+         a screen-reader user gets nothing. role="status" is atomic and
+         polite by default, so each announcement replaces the last rather
+         than queueing behind it. It must exist before it has text. */
+      '<p class="sr-only card-status" role="status"></p>';
 
     /* Charts are optional per card — only a genuine relationship between
        inputs, results and a decision earns one. Mounted lazily; each
@@ -4989,6 +5107,57 @@ var PM_CHART_MOUNT = (function () {
     if (card.chartInstances) {
       card.chartInstances.forEach(function (inst) { inst.update(v, results); });
     }
+
+    announce(card, el, results);
+  }
+
+  /* Verdict strings already end in a full stop; output labels never do. One
+     terminator either way, so the reading does not come out "budget..". */
+  function sentence(text) {
+    return /[.!?]$/.test(text) ? text : text + '.';
+  }
+
+  /* Read the results back in words, once typing stops.
+
+     The delay is half the design: announcing on every keystroke talks over
+     the reader in the middle of the number they are still entering, and "1",
+     "10", "100", "1,000" is four interruptions to say one figure. Waiting for
+     a pause says it once.
+
+     The cap is the other half. Earned value alone computes fourteen outputs,
+     and reciting all of them is some forty seconds of speech the reader
+     cannot skip — worse than saying nothing. The results are ordinary text
+     sitting in the document, so they can be read at will by navigating; what
+     the reader cannot discover by navigating is that the numbers changed at
+     all. So this names the first few and counts the rest: notification, not
+     recitation. */
+  var ANNOUNCE_LIMIT = 3;
+
+  function announce(card, el, results) {
+    if (card.statusTimer) clearTimeout(card.statusTimer);
+    card.statusTimer = setTimeout(function () {
+      card.statusTimer = null;
+      var status = el.querySelector('.card-status');
+      if (!status) return;
+
+      /* Only outputs that actually computed — a card reciting six em-dashes
+         is noise, not a reading. */
+      var read = [];
+      card.outputs.forEach(function (out) {
+        var val = results[out.key];
+        if (val === null || val === undefined) return;
+        var chip = el.querySelector('.result[data-out="' + out.key + '"]');
+        var verdict = chip.querySelector('.r-verdict');
+        read.push(sentence(out.label + ' ' + formatValue(val, out.format) +
+          (verdict.hidden ? '' : ', ' + verdict.textContent)));
+      });
+
+      if (!read.length) { status.textContent = ''; return; }
+
+      var rest = read.length - ANNOUNCE_LIMIT;
+      status.textContent = read.slice(0, ANNOUNCE_LIMIT).join(' ') +
+        (rest > 0 ? ' And ' + rest + ' more result' + (rest === 1 ? '' : 's') + ' below.' : '');
+    }, 700);
   }
 
   /* --------------------------------------------------------- sections */
@@ -5091,6 +5260,19 @@ var PM_CHART_MOUNT = (function () {
     }, { rootMargin: '-20% 0px -70% 0px' });
     document.querySelectorAll('.category').forEach(function (s) { observer.observe(s); });
   }
+
+  /* ------------------------------------------- domain row scroll hints */
+  /* Which edges of the category row still have pills past them. The CSS
+     fades only the sides these classes name; on the desktop layout the row
+     is a stacked column that never overflows, so both stay off by itself. */
+  function syncNavEdges() {
+    var max = navEl.scrollWidth - navEl.clientWidth;
+    navEl.classList.toggle('can-scroll-l', navEl.scrollLeft > 4);
+    navEl.classList.toggle('can-scroll-r', navEl.scrollLeft < max - 4);
+  }
+  navEl.addEventListener('scroll', syncNavEdges, { passive: true });
+  window.addEventListener('resize', syncNavEdges);
+  syncNavEdges();
 })();
 
   </script>
