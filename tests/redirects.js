@@ -1,0 +1,73 @@
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+var H = require('./harness');
+
+var TITLE = 'Redirect integrity';
+var STUBS = ['pm-calculation-desk.html', 'wbs-estimation-toolkit.html'];
+
+function refreshTarget(html) {
+  var tags = html.match(/<meta\b[^>]*>/gi) || [];
+  var target = null;
+  tags.forEach(function (tag) {
+    if (!/http-equiv\s*=\s*["']refresh["']/i.test(tag)) return;
+    var content = /content\s*=\s*["'][^"']*?url\s*=\s*([^"'\s;>]+)[^"']*["']/i.exec(tag);
+    if (content) target = content[1];
+  });
+  return target;
+}
+
+function rewriteTargets(text) {
+  var targets = {};
+  text.split(/\r?\n/).forEach(function (line) {
+    var match = /^\s*RewriteRule\s+\^([^$]+)\$\s+(\S+)/i.exec(line);
+    if (!match) return;
+    targets[match[1].replace(/\\\./g, '.')] = match[2];
+  });
+  return targets;
+}
+
+function run(page, options) {
+  var root = options && options.root ? options.root : path.join(__dirname, '..');
+  var htaccess = fs.readFileSync(path.join(root, '.htaccess'), 'utf8');
+  var moduleStack = [];
+  var outside = [];
+
+  htaccess.split(/\r?\n/).forEach(function (line) {
+    var opening = /^\s*<IfModule\s+([^>]+)>/i.exec(line);
+    if (opening) {
+      moduleStack.push(/mod_rewrite\.c/i.test(opening[1]));
+      return;
+    }
+    if (/^\s*<\/IfModule>/i.test(line)) {
+      moduleStack.pop();
+      return;
+    }
+    if (/^\s*Rewrite(?:Rule|Cond|Engine)\b/i.test(line) &&
+        moduleStack.indexOf(true) === -1) {
+      outside.push(line.trim());
+    }
+  });
+
+  H.suite('rewrite guard');
+  H.check('every Rewrite directive is guarded by mod_rewrite', outside.length === 0,
+    'outside guard: ' + outside.join(' | '));
+
+  var targets = rewriteTargets(htaccess);
+  H.suite('stub destinations');
+  STUBS.forEach(function (stub) {
+    var html = fs.readFileSync(path.join(root, stub), 'utf8');
+    H.eq(stub + ' refresh matches its RewriteRule',
+      refreshTarget(html), targets[stub],
+      'refresh=' + refreshTarget(html) + ', rewrite=' + targets[stub]);
+  });
+}
+
+module.exports = { title: TITLE, run: run };
+
+if (require.main === module) {
+  H.reset();
+  run(null);
+  H.report(TITLE);
+}
