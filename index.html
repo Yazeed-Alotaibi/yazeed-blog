@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Earned Value Formulas Explained — CPI, SPI, EAC, PERT &amp; 33 PM Calculators</title>
-  <meta name="description" content="Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance, each read back in plain English. Plus 33 PM calculators, free.">
+  <title>Earned Value Formulas Explained — CPI, SPI, EAC, PERT &amp; 34 PM Calculators</title>
+  <meta name="description" content="Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance, each read back in plain English. Plus 34 PM calculators, free.">
   <!-- www and the apex both answer 200 with identical content, so name the one
        Google should index. Without this the two compete as duplicates. -->
   <link rel="canonical" href="https://yazeed.blog/">
@@ -24,12 +24,12 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yazeed.blog/">
   <meta property="og:site_name" content="Calculation Desk">
-  <meta property="og:title" content="Earned Value Formulas Explained — CPI, SPI, EAC &amp; 33 PM Calculators">
-  <meta property="og:description" content="Earned value computed live and read back in plain English, plus 33 project-management calculators across 14 domains. Free, nothing leaves your browser.">
+  <meta property="og:title" content="Earned Value Formulas Explained — CPI, SPI, EAC &amp; 34 PM Calculators">
+  <meta property="og:description" content="Earned value computed live and read back in plain English, plus 34 project-management calculators across 14 domains. Free, nothing leaves your browser.">
   <meta property="og:image" content="https://yazeed.blog/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Earned value, explained — a cost performance index gauge reading 1.13, under budget, beside the count of 14 domains, 33 calculators and 99 metrics.">
+  <meta property="og:image:alt" content="Earned value, explained — a cost performance index gauge reading 1.13, under budget, beside the count of 14 domains, 34 calculators and 103 metrics.">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1610,7 +1610,7 @@ h2 {
     "@type": "WebApplication",
     "name": "Calculation Desk",
     "url": "https://yazeed.blog/",
-    "description": "Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance — plus 33 project-management calculators across 14 domains. Free, client-side only.",
+    "description": "Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance — plus 34 project-management calculators across 14 domains. Free, client-side only.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires JavaScript",
@@ -1677,7 +1677,7 @@ h2 {
           <h1 id="hero-h">Earned value, <span>explained</span>.</h1>
           <p class="hero-lede">
             CPI, SPI, EAC, ETC and variance &mdash; computed live, then read back in plain
-            English. Plus 33 calculators across 14 domains: critical path, risk,
+            English. Plus 34 calculators across 14 domains: critical path, risk,
             procurement, agile forecasting.
           </p>
           <ul class="creds">
@@ -1695,11 +1695,11 @@ h2 {
                 <span class="hero-fig-lab">Domains</span>
               </div>
               <div>
-                <span class="hero-fig-num">33</span>
+                <span class="hero-fig-num">34</span>
                 <span class="hero-fig-lab">Calculators</span>
               </div>
               <div>
-                <span class="hero-fig-num">99</span>
+                <span class="hero-fig-num">103</span>
                 <span class="hero-fig-lab">Metrics</span>
               </div>
             </div>
@@ -1778,7 +1778,7 @@ h2 {
             </div>
 
             <p class="instrument-foot">
-              Four of 99 metrics on the
+              Four of 103 metrics on the
               <a href="#calc-sections">desk below</a>.
             </p>
           </figure>
@@ -2149,6 +2149,119 @@ var PM_DATA = (function () {
                   label: 'TCPI', scaleLabel: 'Efficiency required on remaining work',
                   summary: 'Remaining work must run at ' + f2(r.tcpiBac) + ' efficiency to land on the original budget' +
                     (typeof r.cpi === 'number' ? ', versus ' + f2(r.cpi) + ' achieved to date.' : '.')
+                };
+              }
+            }
+          ]
+        },
+        {
+          id: 'earned-schedule',
+          name: 'Earned Schedule',
+          tagline: 'ES · SV(t) · SPI(t) · IEAC(t)',
+          about: 'SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.',
+          formula: [
+            'ES = PD × (EV ÷ BAC)',
+            'SV(t) = ES − AT',
+            'SPI(t) = ES ÷ AT',
+            'IEAC(t) = PD ÷ SPI(t)'
+          ],
+          howto: [
+            'Enter BAC and PD from the approved baseline, then enter EV and AT from the same status date.',
+            'Read SV(t) for the time gap and SPI(t) for the direction and efficiency of travel. Check that the linear-PV assumption is reasonable for this project.',
+            'Use IEAC(t) as a trend to test recovery options; reconcile it to the time-phased schedule before committing to a finish date.'
+          ],
+          inputs: [
+            { key: 'bac', label: 'BAC — Budget at Completion', meaning: 'Total approved budget for the complete scope. Currency; must be greater than 0.', placeholder: 'e.g. 200000' },
+            { key: 'pd', label: 'PD — Planned duration', meaning: 'Baseline duration from start to planned finish. Periods; use a positive value.', placeholder: 'e.g. 12' },
+            { key: 'at', label: 'AT — Actual time', meaning: 'Time elapsed at the status date. Periods; must be greater than 0 for SPI(t).', placeholder: 'e.g. 8' },
+            { key: 'ev', label: 'EV — Earned Value', meaning: 'Budgeted value of the work actually complete. Same currency as BAC; zero is valid.', placeholder: 'e.g. 120000' }
+          ],
+          outputs: [
+            {
+              group: 'Earned time',
+              key: 'es', label: 'Earned Schedule (ES)', format: 'num',
+              meaning: 'The baseline time equivalent of the EV entered.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0
+                  ? v.pd * (v.ev / v.bac) : null;
+              }
+            },
+            {
+              group: 'Earned time',
+              key: 'svt', label: 'Schedule Variance (SV(t))', format: 'num',
+              meaning: 'The time difference at the status date. Negative means late.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0
+                  ? v.pd * (v.ev / v.bac) - v.at : null;
+              }
+            },
+            {
+              group: 'Earned time',
+              key: 'spit', label: 'Schedule Performance Index (SPI(t))', format: 'ratio',
+              meaning: 'Time efficiency, with 1.00 as the plan line.',
+              compute: function (v) {
+                return ok(v.bac, v.pd, v.at, v.ev) && v.bac > 0 && v.pd > 0 && v.at > 0
+                  ? (v.pd * (v.ev / v.bac)) / v.at : null;
+              },
+              interpret: function (x) {
+                return x > 1
+                  ? good('Ahead of the time baseline. The completed work represents more planned time than the project has consumed.')
+                  : x === 1
+                    ? info('On the time baseline. Earned schedule and actual time match.')
+                    : bad('Behind the time baseline. The completed work represents fewer planned periods than have elapsed.');
+              }
+            },
+            {
+              group: 'Forecasting completion',
+              key: 'ieac', label: 'Independent Estimate at Completion (IEAC(t))', format: 'num',
+              meaning: 'A duration forecast under the same efficiency and linear-PV assumption; it is not a promise and it is not a calendar finish date.',
+              compute: function (v) {
+                if (!ok(v.bac, v.pd, v.at, v.ev) || v.bac <= 0 || v.pd <= 0 || v.at <= 0) return null;
+                var spit = (v.pd * (v.ev / v.bac)) / v.at;
+                return spit > 0 ? v.pd / spit : null;
+              }
+            }
+          ],
+          charts: [
+            {
+              title: 'Earned time position',
+              purpose: 'The time the completed work earned against actual time and plan.',
+              kind: 'bars',
+              build: function (v, r) {
+                if (!ok(r.es, v.at)) return null;
+                var relation = r.svt > 0 ? 'ahead of' : r.svt < 0 ? 'behind' : 'on';
+                return {
+                  series: [
+                    { label: 'ES', sub: 'earned', value: r.es, tone: r.svt >= 0 ? 'good' : 'bad' },
+                    { label: 'AT', sub: 'actual', value: v.at, tone: 'accent' }
+                  ],
+                  refValue: v.pd,
+                  refLabel: 'PD',
+                  catHead: 'Time (periods)',
+                  summary: 'Earned schedule is ' + f2(r.es) + ' periods against ' + f2(v.at) +
+                    ' actual, ' + relation + ' the time baseline.'
+                };
+              }
+            },
+            {
+              title: 'SPI(t) time efficiency',
+              purpose: 'Earned schedule per period of actual time, crossed at 1.00.',
+              kind: 'meter',
+              build: function (v, r) {
+                if (!ok(r.spit)) return null;
+                return {
+                  value: r.spit,
+                  min: 0,
+                  max: 1.5,
+                  target: 1,
+                  targetLabel: 'on plan',
+                  zones: [
+                    { from: 0, to: 0.9, tone: 'bad', label: 'behind' },
+                    { from: 0.9, to: 1, tone: 'warn', label: 'watch' },
+                    { from: 1, to: 1.5, tone: 'good', label: 'ahead' }
+                  ],
+                  label: 'SPI(t)',
+                  summary: 'SPI(t) is ' + f2(r.spit) + '. Under the linear-PV assumption, use it as a trend, not a committed finish date.'
                 };
               }
             }
@@ -4033,6 +4146,9 @@ var EXAMPLES = {
     values: { bac: 200000, pv: 120000, ev: 108000, ac: 96000 },
     note: 'Six months in: efficient spend, behind schedule.'
   },
+  'calc-earned-schedule': {
+    values: { bac: 200000, pd: 12, at: 8, ev: 120000 }
+  },
   'calc-time-forecast': {
     values: { plannedDur: 12, ev: 80000, pv: 100000 },
     note: 'Progress is 80% of plan, pointing to a three-period slip.'
@@ -5128,7 +5244,7 @@ var PM_CHART_MOUNT = (function () {
   }
 
   /* One resize pass for the whole sheet, rather than an observer per chart:
-     33 independent ResizeObservers is how a page starts dropping frames. */
+     independent ResizeObservers are how a page starts dropping frames. */
   var all = [];
   var resizeTimer = null;
   function onResize() {
@@ -5489,6 +5605,7 @@ var PM_CHART_MOUNT = (function () {
        family rather than only the cards that happen to say the word. */
     var searchText = (categoryName + ' ' + card.name + ' ' + card.tagline + ' ' +
       card.about + ' ' + card.formula.join(' ') + ' ' +
+      (card.howto ? card.howto.join(' ') + ' ' : '') +
       card.outputs.map(function (o) { return o.label; }).join(' ')).toLowerCase();
 
     var el = document.createElement('article');
@@ -5514,6 +5631,15 @@ var PM_CHART_MOUNT = (function () {
         '<div class="inputs"><h4>Parameters</h4>' + card.inputs.map(inputField).join('') + '</div>' +
         '<div class="outputs"><h4>Results</h4>' + resultsHtml + '</div>' +
       '</div>' +
+      (card.howto ?
+        '<div class="howto card-howto">' +
+          '<p class="label">How to use it</p>' +
+          '<ol class="howto-steps">' +
+            card.howto.map(function (step) {
+              return '<li><span class="howto-text">' + step + '</span></li>';
+            }).join('') +
+          '</ol>' +
+        '</div>' : '') +
       /* Results appear silently: a sighted reader watches the numbers land,
          a screen-reader user gets nothing. role="status" is atomic and
          polite by default, so each announcement replaces the last rather
