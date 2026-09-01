@@ -13,6 +13,16 @@ directly with no build step:
 | File | What it is |
 |---|---|
 | `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 33 calculators · 99 metrics rendered from a `PM_DATA` object |
+| `og.png` | The 1200×630 card shown when a link to the site is shared. The one image the site ships |
+
+`og.png` is a rendered artifact, not a hand-drawn one: `design/og-card.source.html`
+is the page it comes from, and that page's dial geometry is copied from the hero
+instrument, so the card shows a real reading. Re-render it by screenshotting that
+file at 1200×630 — and re-render it whenever the figures on it (14 · 33 · 99) stop
+being true. Nothing automates this; the PNG is committed.
+
+Note it does not weaken the self-contained rule below. The *page* never requests
+it — only a crawler unfurling a shared link does.
 
 It was three files until the Calculation Desk was merged into `index.html` and
 `pm-calculation-desk.html` / `wbs-estimation-toolkit.html` were deleted. Both
@@ -165,7 +175,7 @@ git push origin main
 Hostinger serves yazeed.blog (`server: hcdn`, not GitHub Pages — the
 `github.io` URL returns "Site not found") and is connected to this repository,
 so it redeploys itself on a push to main. The deployed artifact is `index.html`
-plus `.htaccess` and the two redirect stubs described below. There is
+plus `og.png`, `.htaccess` and the two redirect stubs described below. There is
 deliberately no CI here: no workflow, no build, no `CNAME`.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
