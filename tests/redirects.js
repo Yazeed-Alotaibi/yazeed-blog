@@ -6,6 +6,7 @@ var H = require('./harness');
 
 var TITLE = 'Redirect integrity';
 var STUBS = ['pm-calculation-desk.html', 'wbs-estimation-toolkit.html'];
+var FURNITURE = ['docs', 'design', 'tests', 'tools', 'content', 'AGENTS', '^\\.'];
 
 function refreshTarget(html) {
   var tags = html.match(/<meta\b[^>]*>/gi) || [];
@@ -65,6 +66,15 @@ function run(page, options) {
   H.suite('header guard');
   H.check('every Header directive is guarded by mod_headers', headerOutside.length === 0,
     'outside guard: ' + headerOutside.join(' | '));
+
+  var denied = htaccess.split(/\r?\n/).filter(function (line) {
+    return /^\s*RewriteRule\s+\^.*\[R=404,L\]/.test(line);
+  }).join('\n');
+  H.suite('furniture');
+  FURNITURE.forEach(function (name) {
+    H.check(name + ' is answered 404', denied.indexOf(name) !== -1,
+      'no [R=404,L] RewriteRule mentions ' + name);
+  });
 
   var targets = rewriteTargets(htaccess);
   H.suite('stub destinations');

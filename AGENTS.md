@@ -321,13 +321,16 @@ so it redeploys itself on a push to main. The deployed artifact is `index.html`,
 every committed root `*.html` page, `404.html`, `og.png`, `robots.txt`,
 `sitemap.xml`, `fonts/`, `.htaccess` and the two redirect stubs described
 below. `tests/`, `tools/`, `content/`, `docs/` and `design/` are repository
-furniture and are not served. There is deliberately no CI here: no workflow,
+furniture: Hostinger deploys them with everything else, but `.htaccess`
+answers 404 for those paths, for `AGENTS.md`, `CLAUDE.md` and
+`skills-lock.json`, and for any dot-path other than `.well-known/`. There is deliberately no CI here: no workflow,
 no build, no `CNAME`.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
 on the origin, and it answers 301 for the three addresses that are not the
 canonical one: `www.yazeed.blog`, and the two retired tool pages
-`pm-calculation-desk.html` and `wbs-estimation-toolkit.html`.
+`pm-calculation-desk.html` and `wbs-estimation-toolkit.html`. It also
+answers 404 for the repository-furniture paths listed above.
 
 Module guards are the safety model — not one block for everything:
 
