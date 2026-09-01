@@ -935,6 +935,7 @@ main {
   /* minmax(0,…) so pre-formatted formula lines can't widen the page */
   body { grid-template-columns: minmax(0, 1fr); }
 
+
   .sidebar {
     position: static;
     height: auto;
@@ -1372,16 +1373,22 @@ main {
   .hero { grid-template-columns: 1fr 1fr; gap: 3.2rem; align-items: start; }
 
   /* The instrument is a tall dense panel and the text beside it is short, so
-     the column heights cannot match — roughly 420px has to go somewhere. Left
-     alone it pools under the text as a hole. Pinning the credentials, figures
-     and call to action to the bottom instead puts that space in the middle,
-     where it reads as measure rather than as a truncated column, and lands
-     both columns on the same baseline. The headline keeps the top. */
+     roughly 420px of height has to go somewhere. This used to push the
+     credentials and figures to the bottom of the column, which aligned the two
+     baselines but cost more than it bought: measured at 1440×900 it opened a
+     412px hole in the middle of the first screen and dropped 14 · 34 · 103 —
+     the proof the hero exists to offer — below the fold.
+
+     So the gap is bounded instead of greedy. The figures follow the lede at a
+     generous but finite distance, landing above the fold, and the leftover
+     height falls at the foot of the column where the instrument beside it
+     carries the eye. A short column reads as a short column; a hole in the
+     middle of the opening screen reads as a mistake. */
   /* Descendant selectors, not bare class ones: the base .creds and .hero-jump
      rules are declared further down this stylesheet and would otherwise win on
      source order. */
-  .hero-col-a { display: flex; flex-direction: column; height: 100%; }
-  .hero-col-a .creds { margin-top: auto; }
+  .hero-col-a { display: flex; flex-direction: column; }
+  .hero-col-a .creds { margin-top: clamp(1.6rem, 5vh, 3rem); }
   .hero-col-a .hero-jump { margin-top: 1.4rem; }
 }
 
@@ -1968,85 +1975,6 @@ h2 {
           </figure>
         </div>
       </section>
-
-      <section class="bench" id="about" aria-labelledby="about-h">
-        <div class="section-head">
-          <div>
-            <h2 id="about-h">At the bench</h2>
-            <span class="section-sub">Who builds these.</span>
-          </div>
-          <span class="sheet-no">About</span>
-        </div>
-
-        <div class="bench-grid">
-          <div class="bio">
-            <p>
-              I'm <b>Yazeed Alotaibi</b> — a Project Engineer chasing AI applications in
-              project management, and never quite putting the instruments down.
-            </p>
-            <p>
-              The work has run from <b>mining</b> to <b>aviation</b> to <b>government</b>:
-              multibillion-riyal RFP packages and cost estimates at Ma'aden, a PMO
-              framework and stage-gate system built from nothing at Riyadh Airports,
-              portfolio governance and leadership reporting and EPM software control at
-              ELM, and portfolio project controls in addition to implementing AI
-              applications in an EPMO at ZATCA.
-            </p>
-            <p>
-              These tools exist because the arithmetic on this bench is the arithmetic I
-              actually use. A CPI of 0.87 is not a number to be reported — it is a
-              sentence about the project, and most software stops just before saying it.
-              Everything here says it.
-            </p>
-            <p class="bio-contact">
-              Based in Riyadh, Saudi Arabia. Reachable on
-              <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
-              or by <a href="mailto:yaz.otb.sa@gmail.com">email</a>.
-            </p>
-          </div>
-
-          <div class="plate">
-            <div class="plate-head">
-              <span class="label">Certifications</span>
-              <span class="sheet-no">7 held</span>
-            </div>
-            <ul class="cert-list">
-              <li class="cert-row">
-                <span class="cert-name">Project Management Professional · PMP</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">PRINCE2&reg; Practitioner</span>
-                <span class="cert-by">AXELOS</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Risk Management Professional · PMI-RMP</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified KPI Professional · C-KPI</span>
-                <span class="cert-by">KPI Institute</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified Associate in Project Management · CAPM</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified Six Sigma Green Belt · CSSGB</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">OSHA 30 Hours · General Industry</span>
-                <span class="cert-by">IASP</span>
-              </li>
-            </ul>
-            <p class="plate-foot">
-              <b>BSc Mechanical Engineering</b>
-              Prince Sattam Bin Abdulaziz University, 2022
-            </p>
-          </div>
-        </div>
-      </section>
-
 
     <p id="desk-stats" role="status"></p>
 
@@ -3296,6 +3224,84 @@ Flow efficiency % = Active work time ÷ Cycle time × 100</code></pre>
       <strong>Nothing matches that.</strong>
       Try a metric (CPI, EAC), a technique (PERT, float), or a domain (risk, quality).
     </p>
+
+      <section class="bench" id="about" aria-labelledby="about-h">
+        <div class="section-head">
+          <div>
+            <h2 id="about-h">At the bench</h2>
+            <span class="section-sub">Who builds these.</span>
+          </div>
+          <span class="sheet-no">About</span>
+        </div>
+
+        <div class="bench-grid">
+          <div class="bio">
+            <p>
+              I'm <b>Yazeed Alotaibi</b> — a Project Engineer chasing AI applications in
+              project management, and never quite putting the instruments down.
+            </p>
+            <p>
+              The work has run from <b>mining</b> to <b>aviation</b> to <b>government</b>:
+              multibillion-riyal RFP packages and cost estimates at Ma'aden, a PMO
+              framework and stage-gate system built from nothing at Riyadh Airports,
+              portfolio governance and leadership reporting and EPM software control at
+              ELM, and portfolio project controls in addition to implementing AI
+              applications in an EPMO at ZATCA.
+            </p>
+            <p>
+              These tools exist because the arithmetic on this bench is the arithmetic I
+              actually use. A CPI of 0.87 is not a number to be reported — it is a
+              sentence about the project, and most software stops just before saying it.
+              Everything here says it.
+            </p>
+            <p class="bio-contact">
+              Based in Riyadh, Saudi Arabia. Reachable on
+              <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
+              or by <a href="mailto:yaz.otb.sa@gmail.com">email</a>.
+            </p>
+          </div>
+
+          <div class="plate">
+            <div class="plate-head">
+              <span class="label">Certifications</span>
+              <span class="sheet-no">7 held</span>
+            </div>
+            <ul class="cert-list">
+              <li class="cert-row">
+                <span class="cert-name">Project Management Professional · PMP</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">PRINCE2&reg; Practitioner</span>
+                <span class="cert-by">AXELOS</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Risk Management Professional · PMI-RMP</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified KPI Professional · C-KPI</span>
+                <span class="cert-by">KPI Institute</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified Associate in Project Management · CAPM</span>
+                <span class="cert-by">PMI</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">Certified Six Sigma Green Belt · CSSGB</span>
+              </li>
+              <li class="cert-row">
+                <span class="cert-name">OSHA 30 Hours · General Industry</span>
+                <span class="cert-by">IASP</span>
+              </li>
+            </ul>
+            <p class="plate-foot">
+              <b>BSc Mechanical Engineering</b>
+              Prince Sattam Bin Abdulaziz University, 2022
+            </p>
+          </div>
+        </div>
+      </section>
 
     <footer class="page-foot">
       Built as a study and working reference. Values compute locally in your
