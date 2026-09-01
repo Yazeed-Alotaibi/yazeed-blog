@@ -5585,11 +5585,14 @@ var PM_CHART_MOUNT = (function () {
     /* "/" jumps to search from anywhere; Escape clears and returns the page. */
     document.addEventListener('keydown', function (e) {
       var tag = (e.target.tagName || '').toLowerCase();
-      if (e.key === '/' && tag !== 'input' && tag !== 'textarea') {
+      var plainSlash = e.key === '/' && !e.altKey && !e.ctrlKey &&
+        !e.metaKey && !e.shiftKey;
+      if (plainSlash && tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
         e.preventDefault();
         searchEl.focus();
         searchEl.select();
-      } else if (e.key === 'Escape' && e.target === searchEl && searchEl.value) {
+      } else if (e.key === 'Escape' && e.target === searchEl) {
+        e.preventDefault();
         searchEl.value = '';
         searchEl.dispatchEvent(new Event('input'));
       }
