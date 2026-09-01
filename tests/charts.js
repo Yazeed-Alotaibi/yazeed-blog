@@ -19,8 +19,11 @@ function computeResults(card, v) {
 }
 
 function plain(value) {
+  var copy;
   if (value === undefined) return undefined;
-  return JSON.parse(JSON.stringify(value));
+  copy = JSON.parse(JSON.stringify(value));
+  if (copy && typeof copy === 'object') delete copy.summary;
+  return copy;
 }
 
 function pointBoundaries(spec) {
