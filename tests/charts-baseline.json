@@ -1,0 +1,1471 @@
+{
+  "evm/earned-value :: Cost position": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "PV",
+          "sub": "planned",
+          "value": 50000,
+          "tone": "neutral"
+        },
+        {
+          "label": "EV",
+          "sub": "earned",
+          "value": 45000,
+          "tone": "accent"
+        },
+        {
+          "label": "AC",
+          "sub": "spent",
+          "value": 60000,
+          "tone": "bad"
+        },
+        {
+          "label": "EAC",
+          "sub": "forecast",
+          "value": 133333.33333333334,
+          "tone": "bad",
+          "hatch": true
+        }
+      ],
+      "refValue": 100000,
+      "refLabel": "BAC",
+      "catHead": "Measure",
+      "summary": "Earned 45,000 of value for 60,000 spent, against 50,000 planned by now. At today’s efficiency the project lands at 133,333.33 against a 100,000 budget."
+    }
+  },
+  "evm/earned-value :: CPI–SPI quadrant": {
+    "kind": "quadrant",
+    "spec": {
+      "x": 0.75,
+      "y": 0.9,
+      "refX": 1,
+      "refY": 1,
+      "xLabel": "CPI — cost",
+      "yLabel": "SPI — schedule",
+      "goodLabel": "on budget, on plan",
+      "badLabel": "over budget, behind plan",
+      "tone": "bad",
+      "summary": "CPI 0.75 and SPI 0.9 place the project in the unfavourable quadrant — behind on both cost and schedule."
+    }
+  },
+  "evm/earned-value :: TCPI required efficiency": {
+    "kind": "meter",
+    "spec": {
+      "value": 1.375,
+      "min": 0.6,
+      "max": 1.6,
+      "target": 1,
+      "targetLabel": "current CPI target",
+      "zones": [
+        {
+          "from": 0.6,
+          "to": 1,
+          "tone": "good",
+          "label": "achievable"
+        },
+        {
+          "from": 1,
+          "to": 1.1,
+          "tone": "warn",
+          "label": "a stretch"
+        },
+        {
+          "from": 1.1,
+          "to": 1.6,
+          "tone": "bad",
+          "label": "unrealistic"
+        }
+      ],
+      "label": "TCPI",
+      "scaleLabel": "Efficiency required on remaining work",
+      "summary": "Remaining work must run at 1.38 efficiency to land on the original budget, versus 0.75 achieved to date."
+    }
+  },
+  "evm/time-forecast :: Planned vs forecast duration": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "Planned",
+          "value": 12,
+          "tone": "neutral"
+        },
+        {
+          "label": "Forecast",
+          "value": 13.333333333333332,
+          "tone": "bad",
+          "hatch": true
+        }
+      ],
+      "catHead": "Duration",
+      "summary": "At the current pace (SPI 0.9), the project is trending toward 13.33 time units against a plan of 12 — an approximation that firms up as the project progresses, not a committed date."
+    }
+  },
+  "burn/burn-rate :: Runway vs plan": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "Runway",
+          "sub": "at current burn",
+          "value": 5,
+          "tone": "bad"
+        },
+        {
+          "label": "Plan",
+          "sub": "periods remaining",
+          "value": 6,
+          "tone": "neutral"
+        }
+      ],
+      "catHead": "Periods",
+      "summary": "At the current burn rate the budget lasts 5 more period(s), against 6 period(s) of planned work remaining."
+    }
+  },
+  "estimation/three-point :: Three-point distribution": {
+    "kind": "distribution",
+    "spec": {
+      "o": 4,
+      "m": 6,
+      "p": 12,
+      "e": 6.666666666666667,
+      "sd": 1.3333333333333333,
+      "clipId": "dist-three-point"
+    }
+  },
+  "estimation/path-sigma :: Roll-up vs naive sum": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "σ1",
+          "value": 1.33,
+          "tone": "neutral"
+        },
+        {
+          "label": "σ2",
+          "value": 0.5,
+          "tone": "neutral"
+        },
+        {
+          "label": "σ3",
+          "value": 2,
+          "tone": "neutral"
+        },
+        {
+          "label": "Path σ",
+          "sub": "rolled up",
+          "value": 2.4533446557709744,
+          "tone": "good"
+        },
+        {
+          "label": "Naive sum",
+          "sub": "if added",
+          "value": 3.83,
+          "tone": "warn",
+          "hatch": true
+        }
+      ],
+      "catHead": "Uncertainty",
+      "summary": "The path’s real uncertainty rolls up to σ = 2.45 — simply summing the activity σ’s would overstate it at 3.83."
+    }
+  },
+  "estimation/learning-curve :: Learning curve": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "80% learning curve",
+          "points": [
+            [
+              1,
+              100
+            ],
+            [
+              2,
+              80
+            ],
+            [
+              3,
+              70.21037027785601
+            ],
+            [
+              4,
+              64
+            ],
+            [
+              5,
+              59.563734361278065
+            ],
+            [
+              6,
+              56.168296222284816
+            ],
+            [
+              7,
+              53.448952465612365
+            ],
+            [
+              8,
+              51.2
+            ]
+          ],
+          "tone": "accent",
+          "style": "solid"
+        },
+        {
+          "label": "No learning (flat)",
+          "points": [
+            [
+              1,
+              100
+            ],
+            [
+              8,
+              100
+            ]
+          ],
+          "tone": "neutral",
+          "style": "dashed"
+        }
+      ],
+      "markers": [
+        {
+          "x": 4,
+          "y": 64,
+          "label": "unit 4",
+          "tone": "accent"
+        }
+      ],
+      "xLabel": "Unit number",
+      "yLabel": "Time (or cost) per unit",
+      "zeroBase": true,
+      "summary": "Unit 4 takes 64 at an 80% learning rate, against 100 with no learning at all."
+    }
+  },
+  "schedule/float :: Early vs late window": {
+    "kind": "windows",
+    "spec": {
+      "rows": [
+        {
+          "label": "Early (ES→EF)",
+          "from": 5,
+          "to": 9,
+          "tone": "accent"
+        },
+        {
+          "label": "Late (LS→LF)",
+          "from": 8,
+          "to": 12,
+          "tone": "neutral",
+          "hatch": true,
+          "note": "3 float"
+        }
+      ],
+      "marks": [
+        {
+          "at": 11,
+          "label": "successor ES"
+        }
+      ],
+      "summary": "The late window trails the early one by 3 — the total float available before this activity delays the finish."
+    }
+  },
+  "compression/crash :: Normal vs crash": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Cost vs duration",
+          "points": [
+            [
+              8,
+              16000
+            ],
+            [
+              10,
+              10000
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 10,
+          "y": 10000,
+          "label": "normal",
+          "tone": "neutral"
+        },
+        {
+          "x": 8,
+          "y": 16000,
+          "label": "crash",
+          "tone": "accent"
+        }
+      ],
+      "xLabel": "Duration",
+      "yLabel": "Cost",
+      "summary": "Compressing from 10 to 8 costs 3,000 per time unit saved — applies to this activity only, and only while it stays on the critical path."
+    }
+  },
+  "resources/utilization :: Commitment level": {
+    "kind": "meter",
+    "spec": {
+      "value": 93.75,
+      "min": 0,
+      "max": 120,
+      "target": 85,
+      "targetLabel": "~85% threshold",
+      "zones": [
+        {
+          "from": 0,
+          "to": 85,
+          "tone": "good",
+          "label": "healthy margin"
+        },
+        {
+          "from": 85,
+          "to": 100,
+          "tone": "warn",
+          "label": "thin"
+        },
+        {
+          "from": 100,
+          "to": 120,
+          "tone": "bad",
+          "label": "over-allocated"
+        }
+      ],
+      "label": "Utilization",
+      "summary": "Committed to 93.75% of available hours, in the thin margin above 85%."
+    }
+  },
+  "comms/channels :: Channel growth": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "n(n−1)/2",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              5,
+              10
+            ],
+            [
+              6,
+              15
+            ],
+            [
+              7,
+              21
+            ],
+            [
+              8,
+              28
+            ],
+            [
+              9,
+              36
+            ],
+            [
+              10,
+              45
+            ],
+            [
+              11,
+              55
+            ],
+            [
+              12,
+              66
+            ],
+            [
+              13,
+              78
+            ],
+            [
+              14,
+              91
+            ],
+            [
+              15,
+              105
+            ],
+            [
+              16,
+              120
+            ],
+            [
+              17,
+              136
+            ],
+            [
+              18,
+              153
+            ],
+            [
+              19,
+              171
+            ],
+            [
+              20,
+              190
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 10,
+          "y": 45,
+          "label": "now (10)",
+          "tone": "accent"
+        },
+        {
+          "x": 15,
+          "y": 105,
+          "label": "after (15)",
+          "tone": "warn"
+        }
+      ],
+      "xLabel": "People",
+      "yLabel": "Communication channels",
+      "zeroBase": true,
+      "summary": "10 people create 45 channels; 15 would create 105 — the curve steepens as the team grows."
+    }
+  },
+  "risk/emv :: EMV against full exposure": {
+    "kind": "rangeplot",
+    "spec": {
+      "bands": [
+        {
+          "from": -50000,
+          "to": 0,
+          "tone": "bad",
+          "label": "full impact range",
+          "hatch": true
+        }
+      ],
+      "marks": [
+        {
+          "at": 0,
+          "label": "no event"
+        },
+        {
+          "at": -15000,
+          "label": "EMV",
+          "strong": true
+        },
+        {
+          "at": -50000,
+          "label": "if it fires"
+        }
+      ],
+      "summary": "EMV is -15,000, the probability-weighted average — but if the event actually fires, the effect is the full -50,000, not the average."
+    }
+  },
+  "risk/risk-score :: Probability–impact matrix": {
+    "kind": "matrix",
+    "spec": {
+      "p": 4,
+      "i": 3,
+      "size": 5
+    }
+  },
+  "risk/contingency :: Register contribution": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "R1",
+          "value": -15000,
+          "tone": "bad"
+        },
+        {
+          "label": "R2",
+          "value": -2000,
+          "tone": "bad"
+        },
+        {
+          "label": "R3",
+          "value": 5000,
+          "tone": "good"
+        }
+      ],
+      "catHead": "Risk",
+      "summary": "Net EMV across the register is -12,000; suggested reserve 12,000."
+    }
+  },
+  "decision/decision-tree :: Expected value comparison": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "A",
+          "sub": "EMV",
+          "value": 20000,
+          "tone": "good"
+        },
+        {
+          "label": "B",
+          "sub": "EMV",
+          "value": 8000,
+          "tone": "neutral"
+        }
+      ],
+      "refValue": 0,
+      "refLabel": "break-even",
+      "catHead": "Option",
+      "summary": "Option A has an expected value of 20,000, option B 8,000 — the higher figure wins on average, but EMV alone does not show which option is the wider bet."
+    }
+  },
+  "quality/dpmo :: Sigma level": {
+    "kind": "meter",
+    "spec": {
+      "value": 3.9961842714774196,
+      "min": 1.5,
+      "max": 6.5,
+      "zones": [
+        {
+          "from": 1.5,
+          "to": 3,
+          "tone": "bad",
+          "label": "redesign needed"
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "tone": "warn",
+          "label": "industry average"
+        },
+        {
+          "from": 4,
+          "to": 6.5,
+          "tone": "good",
+          "label": "world class"
+        }
+      ],
+      "label": "Sigma level",
+      "summary": "The process runs at 4σ, against 25 defects observed in 1,000 units."
+    }
+  },
+  "quality/control :: Control band": {
+    "kind": "rangeplot",
+    "spec": {
+      "bands": [
+        {
+          "from": 46,
+          "to": 54,
+          "tone": "good",
+          "label": "warning zone (±2σ)"
+        },
+        {
+          "from": 44,
+          "to": 46,
+          "tone": "warn",
+          "label": "LCL–2σ",
+          "hatch": true
+        },
+        {
+          "from": 54,
+          "to": 56,
+          "tone": "warn",
+          "label": "2σ–UCL",
+          "hatch": true
+        }
+      ],
+      "marks": [
+        {
+          "at": 44,
+          "label": "LCL"
+        },
+        {
+          "at": 50,
+          "label": "mean",
+          "strong": true
+        },
+        {
+          "at": 56,
+          "label": "UCL"
+        }
+      ],
+      "summary": "Normal variation runs from 44 to 56; a point outside that band is a signal, not noise."
+    }
+  },
+  "quality/cpk :: Spec window vs process spread": {
+    "kind": "rangeplot",
+    "spec": {
+      "bands": [
+        {
+          "from": 4,
+          "to": 10,
+          "tone": "accent",
+          "label": "specification (LSL–USL)"
+        },
+        {
+          "from": 4.5,
+          "to": 7.5,
+          "tone": "good",
+          "label": "process spread (±3σ)",
+          "hatch": true
+        }
+      ],
+      "marks": [
+        {
+          "at": 6,
+          "label": "process mean",
+          "strong": true
+        }
+      ],
+      "summary": "Cp 2, Cpk 1.33 — the process spread sits comfortably inside the spec."
+    }
+  },
+  "quality/coq :: Conformance vs failure spend": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "Prevention",
+          "value": 20000,
+          "tone": "good"
+        },
+        {
+          "label": "Appraisal",
+          "value": 30000,
+          "tone": "good"
+        },
+        {
+          "label": "Internal fail",
+          "value": 40000,
+          "tone": "bad",
+          "hatch": true
+        },
+        {
+          "label": "External fail",
+          "value": 25000,
+          "tone": "bad",
+          "hatch": true
+        }
+      ],
+      "catHead": "Category",
+      "summary": "Failure costs are 56.52% of total quality spend of 115,000."
+    }
+  },
+  "financial/npv :: Cumulative cash flow": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Undiscounted",
+          "points": [
+            [
+              0,
+              -1000
+            ],
+            [
+              1,
+              -500
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              500
+            ]
+          ],
+          "tone": "neutral",
+          "style": "dashed"
+        },
+        {
+          "label": "Discounted",
+          "points": [
+            [
+              0,
+              -1000
+            ],
+            [
+              1,
+              -545.4545454545455
+            ],
+            [
+              2,
+              -132.23140495867779
+            ],
+            [
+              3,
+              243.42599549211099
+            ]
+          ],
+          "tone": "accent",
+          "style": "solid"
+        }
+      ],
+      "markers": [
+        {
+          "x": 2,
+          "y": 0,
+          "label": "payback",
+          "tone": "accent"
+        }
+      ],
+      "refY": 0,
+      "refLabel": "break-even",
+      "xLabel": "Period",
+      "yLabel": "Cumulative cash flow",
+      "zeroBase": true,
+      "summary": "Discounted cumulative cash flow ends at 243.43 in today’s money; undiscounted capital is recovered at 2 periods."
+    }
+  },
+  "financial/breakeven :: Revenue vs cost": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Revenue",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              10000,
+              250000
+            ]
+          ],
+          "tone": "good"
+        },
+        {
+          "label": "Total cost",
+          "points": [
+            [
+              0,
+              50000
+            ],
+            [
+              10000,
+              200000
+            ]
+          ],
+          "tone": "neutral",
+          "style": "dashed"
+        }
+      ],
+      "markers": [
+        {
+          "x": 5000,
+          "y": 125000,
+          "label": "break-even",
+          "tone": "accent"
+        }
+      ],
+      "xLabel": "Units",
+      "yLabel": "Amount",
+      "zeroBase": true,
+      "summary": "Revenue overtakes total cost at 5,000 units (125,000 of revenue)."
+    }
+  },
+  "financial/scoring :: Weighted contribution": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "C1",
+          "sub": "w5",
+          "value": 40,
+          "tone": "accent"
+        },
+        {
+          "label": "C2",
+          "sub": "w3",
+          "value": 18,
+          "tone": "accent"
+        },
+        {
+          "label": "C3",
+          "sub": "w2",
+          "value": 18,
+          "tone": "accent"
+        }
+      ],
+      "catHead": "Criterion",
+      "summary": "Weighted total 76 (weighted average 7.6 on the original scoring scale)."
+    }
+  },
+  "procurement/pta :: Shared-risk band": {
+    "kind": "rangeplot",
+    "spec": {
+      "bands": [
+        {
+          "from": 150000,
+          "to": 168750,
+          "tone": "good",
+          "label": "shared per 80/20"
+        },
+        {
+          "from": 168750,
+          "to": 180000,
+          "tone": "bad",
+          "label": "seller alone",
+          "hatch": true
+        }
+      ],
+      "marks": [
+        {
+          "at": 150000,
+          "label": "target cost"
+        },
+        {
+          "at": 168750,
+          "label": "PTA",
+          "strong": true
+        },
+        {
+          "at": 180000,
+          "label": "ceiling"
+        }
+      ],
+      "summary": "Costs are shared 80/20 up to 168,750; every dollar above that comes out of the seller’s fee alone, up to the 180,000 ceiling."
+    }
+  },
+  "procurement/fpif :: Final price vs actual cost": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Final price",
+          "points": [
+            [
+              98000,
+              123400
+            ],
+            [
+              100725,
+              125580
+            ],
+            [
+              103450,
+              127760
+            ],
+            [
+              106175,
+              129940
+            ],
+            [
+              108900,
+              132120
+            ],
+            [
+              111625,
+              134300
+            ],
+            [
+              114350,
+              136480
+            ],
+            [
+              117075,
+              138660
+            ],
+            [
+              119800,
+              140840
+            ],
+            [
+              122525,
+              143020
+            ],
+            [
+              125250,
+              145200
+            ],
+            [
+              127975,
+              147380
+            ],
+            [
+              130699.99999999999,
+              149560
+            ],
+            [
+              133425,
+              151740
+            ],
+            [
+              136150,
+              153920
+            ],
+            [
+              138875,
+              156100
+            ],
+            [
+              141600,
+              158280
+            ],
+            [
+              144325,
+              160460
+            ],
+            [
+              147050,
+              162640
+            ],
+            [
+              149775,
+              164820
+            ],
+            [
+              152500,
+              167000
+            ],
+            [
+              155225,
+              169180
+            ],
+            [
+              157950,
+              171360
+            ],
+            [
+              160674.99999999997,
+              173539.99999999997
+            ],
+            [
+              163399.99999999997,
+              175719.99999999997
+            ],
+            [
+              166125,
+              177900
+            ],
+            [
+              168850,
+              180000
+            ],
+            [
+              171575,
+              180000
+            ],
+            [
+              174299.99999999997,
+              180000
+            ],
+            [
+              177024.99999999997,
+              180000
+            ],
+            [
+              179749.99999999997,
+              180000
+            ],
+            [
+              182475,
+              180000
+            ],
+            [
+              185200,
+              180000
+            ],
+            [
+              187924.99999999997,
+              180000
+            ],
+            [
+              190649.99999999997,
+              180000
+            ],
+            [
+              193374.99999999997,
+              180000
+            ],
+            [
+              196099.99999999997,
+              180000
+            ],
+            [
+              198824.99999999997,
+              180000
+            ],
+            [
+              201549.99999999997,
+              180000
+            ],
+            [
+              204274.99999999997,
+              180000
+            ],
+            [
+              206999.99999999997,
+              180000
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 140000,
+          "y": 157000,
+          "label": "entered cost",
+          "tone": "accent"
+        }
+      ],
+      "refY": 180000,
+      "refLabel": "ceiling",
+      "xLabel": "Actual cost",
+      "yLabel": "Final price",
+      "summary": "Seller share 20% of the delta from target cost. At the entered actual cost of 140,000, the buyer pays 157,000."
+    }
+  },
+  "procurement/cpif :: Seller fee vs actual cost": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Seller fee",
+          "points": [
+            [
+              54000,
+              15000
+            ],
+            [
+              56650,
+              15000
+            ],
+            [
+              59300,
+              15000
+            ],
+            [
+              61950,
+              15000
+            ],
+            [
+              64600,
+              15000
+            ],
+            [
+              67250,
+              15000
+            ],
+            [
+              69900,
+              15000
+            ],
+            [
+              72550,
+              15000
+            ],
+            [
+              75200,
+              14960
+            ],
+            [
+              77850,
+              14430
+            ],
+            [
+              80500,
+              13900
+            ],
+            [
+              83150,
+              13370
+            ],
+            [
+              85800,
+              12840
+            ],
+            [
+              88450,
+              12310
+            ],
+            [
+              91100,
+              11780
+            ],
+            [
+              93750,
+              11250
+            ],
+            [
+              96400,
+              10720
+            ],
+            [
+              99050,
+              10190
+            ],
+            [
+              101700,
+              9660
+            ],
+            [
+              104350,
+              9130
+            ],
+            [
+              107000,
+              8600
+            ],
+            [
+              109650,
+              8070
+            ],
+            [
+              112300,
+              7540
+            ],
+            [
+              114950,
+              7010
+            ],
+            [
+              117600,
+              6480
+            ],
+            [
+              120250,
+              5950
+            ],
+            [
+              122900,
+              5420
+            ],
+            [
+              125550,
+              4890
+            ],
+            [
+              128200,
+              4360
+            ],
+            [
+              130850,
+              4000
+            ],
+            [
+              133500,
+              4000
+            ],
+            [
+              136150,
+              4000
+            ],
+            [
+              138800,
+              4000
+            ],
+            [
+              141450,
+              4000
+            ],
+            [
+              144100,
+              4000
+            ],
+            [
+              146750,
+              4000
+            ],
+            [
+              149400,
+              4000
+            ],
+            [
+              152050,
+              4000
+            ],
+            [
+              154700,
+              4000
+            ],
+            [
+              157350,
+              4000
+            ],
+            [
+              160000,
+              4000
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 90000,
+          "y": 12000,
+          "label": "entered cost",
+          "tone": "accent"
+        }
+      ],
+      "refY": 10000,
+      "refLabel": "target fee",
+      "xLabel": "Actual cost",
+      "yLabel": "Fee",
+      "summary": "Seller share 20% of the delta from target cost, clamped between the negotiated fee floor and ceiling. At the entered actual cost, the fee is 12,000."
+    }
+  },
+  "agile/velocity :: Backlog burndown forecast": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Remaining backlog",
+          "points": [
+            [
+              0,
+              200
+            ],
+            [
+              1,
+              170
+            ],
+            [
+              2,
+              140
+            ],
+            [
+              3,
+              110
+            ],
+            [
+              4,
+              80
+            ],
+            [
+              5,
+              50
+            ],
+            [
+              6,
+              20
+            ],
+            [
+              7,
+              0
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 7,
+          "y": 0,
+          "label": "done",
+          "tone": "good"
+        }
+      ],
+      "refY": 0,
+      "xLabel": "Sprint",
+      "yLabel": "Backlog (points)",
+      "zeroBase": true,
+      "summary": "At a velocity of 30 points/sprint, 200 remaining points clear in 7 sprints — a forecast, not a commitment."
+    }
+  },
+  "agile/capacity :: Raw vs plannable capacity": {
+    "kind": "bars",
+    "spec": {
+      "series": [
+        {
+          "label": "Raw hours",
+          "value": 360,
+          "tone": "warn",
+          "hatch": true
+        },
+        {
+          "label": "Plannable",
+          "value": 234,
+          "tone": "good"
+        }
+      ],
+      "catHead": "Hours",
+      "summary": "Of 360 raw hours, only 234 are realistically plannable at a 65% focus factor."
+    }
+  },
+  "agile/say-do :: Forecast reliability": {
+    "kind": "meter",
+    "spec": {
+      "value": 85.29411764705883,
+      "min": 40,
+      "max": 160,
+      "target": 100,
+      "targetLabel": "100%",
+      "zones": [
+        {
+          "from": 40,
+          "to": 85,
+          "tone": "warn",
+          "label": "over-committing"
+        },
+        {
+          "from": 85,
+          "to": 110,
+          "tone": "good",
+          "label": "reliable"
+        },
+        {
+          "from": 110,
+          "to": 160,
+          "tone": "warn",
+          "label": "possibly sandbagged"
+        }
+      ],
+      "label": "Say/do",
+      "summary": "Delivered 85.29% of what was committed — inside the reliable band."
+    }
+  },
+  "flow/littles-law :: WIP vs cycle time": {
+    "kind": "curve",
+    "spec": {
+      "series": [
+        {
+          "label": "Cycle time",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0.3333333333333333
+            ],
+            [
+              2,
+              0.6666666666666666
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1.3333333333333333
+            ],
+            [
+              5,
+              1.6666666666666667
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              7,
+              2.3333333333333335
+            ],
+            [
+              8,
+              2.6666666666666665
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              10,
+              3.3333333333333335
+            ],
+            [
+              11,
+              3.6666666666666665
+            ],
+            [
+              12,
+              4
+            ],
+            [
+              13,
+              4.333333333333333
+            ],
+            [
+              14,
+              4.666666666666667
+            ],
+            [
+              15,
+              5
+            ],
+            [
+              16,
+              5.333333333333333
+            ],
+            [
+              17,
+              5.666666666666667
+            ],
+            [
+              18,
+              6
+            ],
+            [
+              19,
+              6.333333333333333
+            ],
+            [
+              20,
+              6.666666666666667
+            ],
+            [
+              21,
+              7
+            ],
+            [
+              22,
+              7.333333333333333
+            ],
+            [
+              23,
+              7.666666666666667
+            ],
+            [
+              24,
+              8
+            ]
+          ],
+          "tone": "accent"
+        }
+      ],
+      "markers": [
+        {
+          "x": 12,
+          "y": 4,
+          "label": "current WIP",
+          "tone": "accent"
+        }
+      ],
+      "xLabel": "Work in progress",
+      "yLabel": "Cycle time",
+      "zeroBase": true,
+      "summary": "At a throughput of 3 items/period, 12 items in progress means a cycle time of 4 — halving WIP halves cycle time without anyone working faster."
+    }
+  }
+}

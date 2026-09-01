@@ -1,139 +1,196 @@
 /* Chart builder tests.
 
-   Every builder is exercised against: (1) the card's own worked example,
-   where a chart is expected to appear and its numbers must trace back to
-   the card's own computed results, never a re-derived figure; and (2) the
-   full edge-case sweep, where a builder must never throw and must return
-   either a well-formed spec object or null — nothing in between. */
+   Worked examples are compared to exact characterized specs. Point-series
+   boundaries are checked explicitly, and a deliberate edge-class pass keeps
+   every builder and renderer on the no-throw/no-NaN contract. */
 
 'use strict';
 
 var H = require('./harness');
-
-var page = H.loadPage('index.html');
-var DATA = page.sandbox.PM_DATA;
-var CHARTS = page.sandbox.PM_CHARTS;
-
-if (!CHARTS) {
-  console.error('PM_CHARTS did not load — check the chart engine <script> block evaluates headless.');
-  process.exit(1);
-}
+var BASELINE = require('./charts-baseline.json');
+var TITLE = 'Chart builders';
 
 function computeResults(card, v) {
   var r = {};
   card.outputs.forEach(function (out) {
-    var val;
-    try { val = out.compute(v); } catch (e) { val = null; }
-    r[out.key] = val;
+    try { r[out.key] = out.compute(v); } catch (e) { r[out.key] = null; }
   });
   return r;
 }
 
-H.suite('chart builders — worked example');
+function plain(value) {
+  if (value === undefined) return undefined;
+  return JSON.parse(JSON.stringify(value));
+}
 
-var chartedCards = 0, totalCharts = 0, producedOnExample = 0;
+function pointBoundaries(spec) {
+  var boundaries = [];
+  if (!spec || !spec.series) return null;
 
-H.eachCard(DATA, function (card, cat) {
-  if (!card.charts || !card.charts.length) return;
-  chartedCards += 1;
-  var v = H.exampleValues(card);
-  var r = computeResults(card, v);
-
-  card.charts.forEach(function (def) {
-    totalCharts += 1;
-    var id = cat.id + '/' + card.id + ' :: ' + def.title;
-
-    H.check(id + ' has a purpose sentence', typeof def.purpose === 'string' && def.purpose.length > 0);
-    H.check(id + ' has a known renderer', typeof CHARTS.renderers[def.kind] === 'function',
-      'kind=' + def.kind);
-
-    var spec, threw = false, msg = '';
-    try { spec = def.build(v, r); } catch (e) { threw = true; msg = e.message; }
-    H.check(id + ' build() never throws on the worked example', !threw, msg);
-    if (threw) return;
-
-    /* The worked example is the card's own placeholders — every card's
-       author considered these representative, so a chart with real inputs
-       to plot should produce a spec, not fall back to the empty state. */
-    if (spec !== null) {
-      producedOnExample += 1;
-      var renderer = CHARTS.renderers[def.kind];
-      var out;
-      try { out = renderer(spec, 360); } catch (e) { out = null; H.check(id + ' renders at 360px without throwing', false, e.message); }
-      if (out) {
-        H.check(id + ' renderer returns svg', typeof out.svg === 'string' && out.svg.indexOf('<svg') === 0);
-        H.check(id + ' renderer returns a summary', typeof out.summary === 'string');
-        H.check(id + ' renderer returns a data table', out.table && Array.isArray(out.table.head) && Array.isArray(out.table.rows));
-      }
-      /* Widescreen too — the same spec must survive very different widths. */
-      var outWide;
-      try { outWide = renderer(spec, 900); } catch (e) { outWide = null; H.check(id + ' renders at 900px without throwing', false, e.message); }
-      if (outWide) H.check(id + ' renders at 900px', typeof outWide.svg === 'string');
-    } else {
-      H.check(id + ' returns null on its own worked example (chart may be conditional)', true);
-    }
+  spec.series.forEach(function (series) {
+    var xs;
+    var ys;
+    if (!series.points || !series.points.length) return;
+    xs = series.points.map(function (point) { return point[0]; });
+    ys = series.points.map(function (point) { return point[1]; });
+    boundaries.push({
+      label: series.label,
+      first: series.points[0],
+      last: series.points[series.points.length - 1],
+      minX: Math.min.apply(Math, xs),
+      maxX: Math.max.apply(Math, xs),
+      minY: Math.min.apply(Math, ys),
+      maxY: Math.max.apply(Math, ys)
+    });
   });
-});
 
-console.log('  (' + chartedCards + ' cards carry charts, ' + totalCharts + ' chart definitions, ' +
-  producedOnExample + ' produced a plot on their worked example)');
+  return boundaries.length ? boundaries : null;
+}
 
-H.suite('chart builders — edge-case sweep');
+function renderAt(id, renderer, spec, width) {
+  var out;
+  var problem = '';
+  try {
+    out = renderer(spec, width);
+  } catch (e) {
+    problem = 'threw: ' + e.message;
+  }
+  if (!problem && (!out ||
+      typeof out.svg !== 'string' || out.svg.indexOf('<svg') !== 0 ||
+      typeof out.summary !== 'string' ||
+      !out.table || !Array.isArray(out.table.head) || !Array.isArray(out.table.rows))) {
+    problem = 'renderer returned a malformed result';
+  }
+  if (!problem && (out.svg.indexOf('NaN') !== -1 || out.svg.indexOf('Infinity') !== -1)) {
+    problem = 'renderer emitted a non-finite SVG coordinate';
+  }
+  H.check(id + ' renders at ' + width + 'px', !problem, problem);
+}
 
-var SWEEPS = 20;
+function edgeValues(card, numberValue, textValue) {
+  var v = {};
+  card.inputs.forEach(function (inp) {
+    v[inp.key] = inp.type === 'text' ? textValue : numberValue;
+  });
+  return v;
+}
 
-H.eachCard(DATA, function (card, cat) {
-  if (!card.charts || !card.charts.length) return;
+function verifyEdge(id, def, renderer, v, label, card) {
+  var spec;
+  var out;
+  var problem = '';
+  var results = computeResults(card, v);
 
-  for (var s = 0; s < SWEEPS; s++) {
-    var v = H.inputSweeps(card, s);
-    var r = computeResults(card, v);
+  try { spec = def.build(v, results); } catch (e) { problem = 'build threw: ' + e.message; }
+  if (!problem && spec !== null && spec !== undefined && typeof spec !== 'object') {
+    problem = 'build returned ' + JSON.stringify(spec);
+  }
+  if (!problem && spec !== null && spec !== undefined) {
+    try { out = renderer(spec, 360); } catch (e) { problem = 'renderer threw: ' + e.message; }
+    if (!problem && out && typeof out.svg === 'string' &&
+        (out.svg.indexOf('NaN') !== -1 || out.svg.indexOf('Infinity') !== -1)) {
+      problem = 'renderer emitted a non-finite SVG coordinate';
+    }
+  }
+
+  H.check(id + ' handles ' + label, !problem,
+    'inputs ' + JSON.stringify(v) + ' -> ' + problem);
+}
+
+function run(page) {
+  var data = page.sandbox.PM_DATA;
+  var charts = page.sandbox.PM_CHARTS;
+  var seen = {};
+
+  H.suite('worked-example specs');
+  H.eachCard(data, function (card, cat) {
+    if (!card.charts || !card.charts.length) return;
+    var v = H.exampleValues(card);
+    var results = computeResults(card, v);
 
     card.charts.forEach(function (def) {
-      var id = cat.id + '/' + card.id + ' :: ' + def.title + ' (sweep ' + s + ')';
-      var spec, threw = false, msg = '';
-      try { spec = def.build(v, r); } catch (e) { threw = true; msg = e.message; }
-      H.check(id + ' build() never throws', !threw, 'inputs ' + JSON.stringify(v) + ' → ' + msg);
-      if (threw) return;
+      var id = cat.id + '/' + card.id + ' :: ' + def.title;
+      var expected = BASELINE[id];
+      var renderer = charts && charts.renderers[def.kind];
+      var spec;
+      var problem = '';
+      seen[id] = true;
 
-      H.check(id + ' returns null or an object', spec === null || (typeof spec === 'object' && spec !== undefined),
-        'got ' + JSON.stringify(spec));
+      H.check(id + ' metadata resolves a renderer',
+        typeof def.purpose === 'string' && def.purpose.length > 0 &&
+        typeof renderer === 'function',
+        'kind=' + def.kind);
 
-      if (spec !== null && spec !== undefined) {
-        var renderer = CHARTS.renderers[def.kind];
-        var out, rThrew = false, rMsg = '';
-        try { out = renderer(spec, 360); } catch (e) { rThrew = true; rMsg = e.message; }
-        H.check(id + ' renderer never throws on this spec', !rThrew,
-          'spec ' + JSON.stringify(spec) + ' → ' + rMsg);
-        if (!rThrew && out) {
-          /* No NaN/Infinity should ever reach the SVG string — that would
-             draw a broken instrument instead of refusing to draw at all. */
-          H.check(id + ' svg contains no NaN', out.svg.indexOf('NaN') === -1, 'svg contained NaN');
-          H.check(id + ' svg contains no Infinity', out.svg.indexOf('Infinity') === -1, 'svg contained Infinity');
-        }
+      try { spec = def.build(v, results); } catch (e) { problem = e.message; }
+      H.deep(id + ' matches its worked-example spec',
+        problem ? { threw: problem } : plain(spec),
+        expected ? expected.spec : { missing: id });
+
+      if (!problem && expected) {
+        H.deep(id + ' keeps point-series boundaries',
+          pointBoundaries(plain(spec)),
+          pointBoundaries(expected.spec));
+      }
+
+      if (!problem && spec !== null && spec !== undefined && typeof renderer === 'function') {
+        renderAt(id, renderer, spec, 360);
+        renderAt(id, renderer, spec, 900);
       }
     });
-  }
-});
-
-/* Empty-input state: every chart must return null (its documented empty
-   state), never throw, when nothing has been typed. */
-H.suite('chart builders — empty input');
-
-H.eachCard(DATA, function (card, cat) {
-  if (!card.charts || !card.charts.length) return;
-  var v = {};
-  card.inputs.forEach(function (inp) { v[inp.key] = inp.type === 'text' ? '' : NaN; });
-  var r = computeResults(card, v);
-
-  card.charts.forEach(function (def) {
-    var id = cat.id + '/' + card.id + ' :: ' + def.title;
-    var spec, threw = false, msg = '';
-    try { spec = def.build(v, r); } catch (e) { threw = true; msg = e.message; }
-    H.check(id + ' build() never throws on empty input', !threw, msg);
-    H.check(id + ' returns null on empty input', spec === null || spec === undefined,
-      'got ' + JSON.stringify(spec) + ' from all-blank inputs');
   });
-});
 
-H.report('Chart builders');
+  Object.keys(BASELINE).forEach(function (id) {
+    H.check(id + ' still exists', !!seen[id], 'chart disappeared from PM_DATA');
+  });
+
+  H.suite('edge-class specs');
+  H.eachCard(data, function (card, cat) {
+    if (!card.charts || !card.charts.length) return;
+    var cases = [
+      ['all inputs zero', edgeValues(card, 0, '0')],
+      ['all numeric inputs negative', edgeValues(card, -1, '-1,-1')],
+      ['huge inputs', edgeValues(card, 1e15, '1e15,1e15')],
+      ['tiny inputs', edgeValues(card, 1e-9, '1e-9,1e-9')],
+      ['malformed inputs', edgeValues(card, 'abc', 'abc')]
+    ];
+
+    card.charts.forEach(function (def) {
+      var id = cat.id + '/' + card.id + ' :: ' + def.title;
+      var renderer = charts.renderers[def.kind];
+      cases.forEach(function (testCase) {
+        verifyEdge(id, def, renderer, testCase[1], testCase[0], card);
+      });
+    });
+  });
+
+  H.suite('empty-input specs');
+  H.eachCard(data, function (card, cat) {
+    if (!card.charts || !card.charts.length) return;
+    var v = edgeValues(card, NaN, '');
+    var results = computeResults(card, v);
+
+    card.charts.forEach(function (def) {
+      var id = cat.id + '/' + card.id + ' :: ' + def.title;
+      var spec;
+      var problem = '';
+      try { spec = def.build(v, results); } catch (e) { problem = 'threw: ' + e.message; }
+      if (!problem && spec !== null && spec !== undefined) {
+        problem = 'returned ' + JSON.stringify(spec);
+      }
+      H.check(id + ' returns the empty spec', !problem, problem);
+    });
+  });
+}
+
+module.exports = { title: TITLE, run: run };
+
+if (require.main === module) {
+  H.reset();
+  var page = H.loadPage('index.html');
+  if (!page.sandbox.PM_CHARTS) {
+    console.error('PM_CHARTS did not load from index.html');
+    process.exit(1);
+  }
+  run(page);
+  H.report(TITLE);
+}

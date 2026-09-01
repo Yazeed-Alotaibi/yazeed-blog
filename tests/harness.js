@@ -10,6 +10,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var util = require('util');
 var vm = require('vm');
 
 var ROOT = path.join(__dirname, '..');
@@ -17,7 +18,8 @@ var ROOT = path.join(__dirname, '..');
 /* Pull the <script> blocks out of a page and evaluate them in one shared
    sandbox, in document order, exactly as a browser would. */
 function loadPage(file) {
-  var html = fs.readFileSync(path.join(ROOT, file), 'utf8');
+  var pagePath = path.isAbsolute(file) ? file : path.join(ROOT, file);
+  var html = fs.readFileSync(pagePath, 'utf8');
   var blocks = [];
   /* Skip external scripts and non-executable ones (type="application/ld+json"
      structured data is markup for crawlers, not code) — a browser would not
@@ -69,11 +71,21 @@ function loadPage(file) {
 var passed = 0;
 var failures = [];
 var currentSuite = '';
+var suiteCounts = {};
 
-function suite(name) { currentSuite = name; }
+function suite(name) {
+  currentSuite = name;
+  if (!suiteCounts[name]) suiteCounts[name] = { passed: 0, total: 0 };
+}
 
 function check(label, condition, detail) {
-  if (condition) { passed += 1; return true; }
+  if (!suiteCounts[currentSuite]) suiteCounts[currentSuite] = { passed: 0, total: 0 };
+  suiteCounts[currentSuite].total += 1;
+  if (condition) {
+    passed += 1;
+    suiteCounts[currentSuite].passed += 1;
+    return true;
+  }
   failures.push({ suite: currentSuite, label: label, detail: detail || '' });
   return false;
 }
@@ -91,6 +103,34 @@ function near(label, actual, expected, tol) {
     Math.abs(actual - expected) <= tol * Math.max(1, Math.abs(expected));
   return check(label, okNum,
     'expected ≈' + expected + ', got ' + JSON.stringify(actual));
+}
+
+function deep(label, actual, expected, detail) {
+  return check(label, util.isDeepStrictEqual(actual, expected),
+    detail || ('expected ' + JSON.stringify(expected) + ', got ' + JSON.stringify(actual)));
+}
+
+function stats() {
+  var suites = {};
+  Object.keys(suiteCounts).forEach(function (name) {
+    suites[name] = {
+      passed: suiteCounts[name].passed,
+      total: suiteCounts[name].total
+    };
+  });
+  return {
+    passed: passed,
+    total: passed + failures.length,
+    failures: failures.slice(),
+    suites: suites
+  };
+}
+
+function reset() {
+  passed = 0;
+  failures = [];
+  currentSuite = '';
+  suiteCounts = {};
 }
 
 function report(title) {
@@ -165,7 +205,10 @@ module.exports = {
   check: check,
   eq: eq,
   near: near,
+  deep: deep,
   report: report,
+  stats: stats,
+  reset: reset,
   EDGE_NUMBERS: EDGE_NUMBERS,
   EDGE_TEXT: EDGE_TEXT,
   inputSweeps: inputSweeps,
