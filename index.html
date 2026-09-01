@@ -2088,7 +2088,11 @@ var PM_DATA = (function () {
               key: 'tcpiBac', label: 'TCPI — to hit BAC', format: 'ratio',
               meaning: '(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.',
               compute: function (v) { return ok(v.bac, v.ev, v.ac) && (v.bac - v.ac) !== 0 ? (v.bac - v.ev) / (v.bac - v.ac) : null; },
-              interpret: function (x) { return x <= 1 ? good('Achievable — no extra efficiency needed.') : x <= 1.1 ? warn('A stretch: remaining work must run ' + f2((x - 1) * 100) + '% more efficiently.') : bad('Likely unrealistic — consider re-baselining to an EAC.'); }
+              /* Once AC reaches BAC the original budget is spent with work still
+                 outstanding, so (BAC − AC) turns negative and the ratio stops
+                 meaning anything — a negative TCPI is not an easy target, it is
+                 an unreachable one. Judge that case before the tiers. */
+              interpret: function (x, v) { return v.ac >= v.bac || x <= 0 ? bad('Actual cost has already reached the budget, so landing on BAC is no longer possible. Re-baseline and read TCPI against an EAC instead.') : x <= 1 ? good('Achievable — no extra efficiency needed.') : x <= 1.1 ? warn('A stretch: remaining work must run ' + f2((x - 1) * 100) + '% more efficiently.') : bad('Likely unrealistic — consider re-baselining to an EAC.'); }
             },
             {
               group: 'Forecasting completion',
@@ -3808,6 +3812,7 @@ var PM_DATA = (function () {
           about: 'When the work is done, the incentive formula converts the cost outcome into the seller’s final fee: the seller keeps its share of any saving and gives up its share of any overrun. If a ceiling price is set, the buyer never pays more than it.',
           formula: [
             'Final fee = Target fee + (Target cost − Actual cost) × Seller share',
+            'If the ceiling binds: Final fee = Ceiling price − Actual cost',
             'Final price = min(Actual cost + Final fee, Ceiling price)'
           ],
           inputs: [
@@ -3820,9 +3825,17 @@ var PM_DATA = (function () {
           outputs: [
             {
               key: 'finalFee', label: 'Final fee', format: 'money',
-              meaning: 'Seller’s profit after applying the incentive share.',
-              compute: function (v) { return ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare) ? v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100) : null; },
-              interpret: function (x, v) { return ok(v.targetFee) ? (x > v.targetFee ? good('Seller beat target cost and earns an incentive bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.')) : null; }
+              meaning: 'Seller’s profit after applying the incentive share. Once the ceiling binds, the fee erodes dollar for dollar with the overrun and can go negative.',
+              /* The share formula alone keeps paying a fee past the ceiling, which
+                 contradicts the capped price sitting next to it: the buyer stops at
+                 the ceiling, so beyond that point every further dollar of cost comes
+                 straight out of the seller. Settle the fee at Ceiling − Actual cost. */
+              compute: function (v) {
+                if (!ok(v.targetCost, v.targetFee, v.actualCost, v.sellerShare)) return null;
+                var fee = v.targetFee + (v.targetCost - v.actualCost) * (v.sellerShare / 100);
+                return ok(v.ceiling) ? Math.min(fee, v.ceiling - v.actualCost) : fee;
+              },
+              interpret: function (x, v) { return !ok(v.targetFee) ? null : x < 0 ? bad('Past the ceiling the fee is gone and now negative — the seller is funding the overrun out of its own pocket.') : x > v.targetFee ? good('Seller beat target cost and earns an incentive bonus.') : x < v.targetFee ? bad('Overrun reduced the seller’s fee.') : info('Cost exactly on target.'); }
             },
             {
               key: 'finalPrice', label: 'Final price (buyer pays)', format: 'money',
