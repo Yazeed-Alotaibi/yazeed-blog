@@ -36,10 +36,12 @@ function rounded(value) {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
-function run(page) {
+function run(page, options) {
   var card = findCard(page.sandbox.PM_DATA);
   if (!card) {
-    console.log('earned-schedule: card not present, vectors skipped');
+    if (!options || !options.quiet) {
+      console.log('earned-schedule: card not present, vectors skipped');
+    }
     H.suite('guarded integration');
     H.check('Earned Schedule vectors wait for the card', true);
     return;

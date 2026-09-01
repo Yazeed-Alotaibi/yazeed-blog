@@ -4,6 +4,7 @@ var childProcess = require('child_process');
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
+var runner = require('./run');
 
 var root = path.join(__dirname, '..');
 var source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -42,26 +43,41 @@ mutations.forEach(function (mutation) {
   fs.writeFileSync(mutantPath,
     source.slice(0, first) + mutation.to + source.slice(first + mutation.from.length));
 
-  var result = childProcess.spawnSync(process.execPath,
-    [path.join(__dirname, 'run.js'), '--page', mutantPath],
-    { cwd: root, encoding: 'utf8' });
-  var output = (result.stdout || '').split(/\r?\n/).filter(function (line) {
-    return /FAILED|All tests:/.test(line);
+  var result = runner.run(mutantPath, { quiet: true });
+  var failed = result.suites.filter(function (testSuite) {
+    return testSuite.failures.length > 0;
   });
 
-  if (result.status === 0) {
+  if (result.allPassed) {
     survived += 1;
     console.log(mutation.name + ': SURVIVED');
   } else {
-    console.log(mutation.name + ': killed (exit ' + result.status + ')');
+    console.log(mutation.name + ': killed');
   }
-  output.slice(0, 2).forEach(function (line) { console.log('  ' + line.trim()); });
+  failed.slice(0, 2).forEach(function (testSuite) {
+    console.log('  ' + testSuite.title + ': ' + testSuite.passed + '/' +
+      testSuite.total + ' passed, ' + testSuite.failures.length + ' FAILED');
+  });
   fs.rmSync(temp, { recursive: true, force: true });
 });
 
+var hostileTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-runner-security-'));
+var hostilePage = path.join(hostileTemp, 'index.html');
+fs.writeFileSync(hostilePage,
+  '<script>console.log("UNTRUSTED_PAGE_EXECUTED:"+' +
+  'console.log.constructor("return process")().version)</script>');
+var cli = childProcess.spawnSync(process.execPath,
+  [path.join(__dirname, 'run.js'), '--page', hostilePage],
+  { cwd: root, encoding: 'utf8' });
+var externalPageBlocked = cli.status === 0 &&
+  (cli.stdout || '').indexOf('UNTRUSTED_PAGE_EXECUTED') === -1;
+console.log('runner external page: ' + (externalPageBlocked ? 'blocked' : 'EXECUTED'));
+if (!externalPageBlocked) survived += 1;
+fs.rmSync(hostileTemp, { recursive: true, force: true });
+
 if (survived) {
-  console.log('Mutation smoke: ' + survived + '/' + mutations.length + ' survived');
+  console.log('Mutation smoke: ' + survived + '/4 checks failed');
   process.exitCode = 1;
 } else {
-  console.log('Mutation smoke: 3/3 killed');
+  console.log('Mutation smoke: 3/3 killed; external page blocked');
 }
