@@ -4,6 +4,7 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var H = require('./harness');
+var securityBoundaries = require('./security-boundaries');
 var charts = require('./charts');
 var earnedSchedule = require('./earned-schedule');
 var redirects = require('./redirects');
@@ -110,115 +111,62 @@ redirectRoot(function (file, text) {
   }, 'pm-calculation-desk.html refresh matches its RewriteRule');
 });
 
-var vmTemp = fs.mkdtempSync(path.join(root, '.lane-b-vm-'));
-try {
-  var vmPagePath = path.join(vmTemp, 'index.html');
-  var vmProbes = [
-    'console.log.constructor("return process")()',
-    'setTimeout.constructor("return process")()',
-    'this.constructor.constructor("return process")()',
-    'Function("return process")()',
-    'module.constructor.constructor("return process")()'
-  ];
-  var vmScript = vmProbes.map(function (probe) {
-    return 'try{if(' + probe + ')window.vmEscapes.push(' +
-      JSON.stringify(probe) + ')}catch(e){}';
-  }).join('');
-  fs.writeFileSync(vmPagePath,
-    '<script>window.vmEscapes=[];' + vmScript +
-    'function canReachHost(value){try{return !!value.constructor.constructor(' +
-    '"return process")()}catch(e){return false}}' +
-    'window.vmValueProbe=function(values,results){' +
-    'return canReachHost(values)||canReachHost(results)};' +
-    'window.vmSpecProbe=function(spec){' +
-    'return canReachHost(spec)||canReachHost(spec.series)};' +
-    'window.vmListEscape=false;window.vmList=[1];' +
-    'window.vmList.forEach=function(callback){' +
-    'window.vmListEscape=canReachHost(callback)};</script>');
-  var vmPage = H.loadPage(path.relative(root, vmPagePath));
-  result('VM host escape', vmPage.sandbox.vmEscapes.length === 0,
-    'host process was reachable through: ' + vmPage.sandbox.vmEscapes.join(', '));
-  var callbackEscapes;
+securityBoundaries(result, root);
+
+function pageWithScript(install) {
+  var temp = fs.mkdtempSync(path.join(root, '.lane-b-script-'));
   try {
-    callbackEscapes = [
-      H.invoke(vmPage, vmPage.sandbox.vmValueProbe, [{ value: 1 }, { result: 2 }]),
-      H.invoke(vmPage, vmPage.sandbox.vmSpecProbe, [{ series: [] }])
-    ];
-  } catch (error) {
-    callbackEscapes = [error.message];
+    var pagePath = path.join(temp, 'index.html');
+    var script = '<script>(' + install.toString() + ')();</script>';
+    fs.writeFileSync(pagePath, page.html.replace(/<\/body>/i, script + '</body>'));
+    return H.loadPage(path.relative(root, pagePath));
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
   }
-  var hostFunctionRejected = false;
-  try {
-    H.invoke(vmPage, vmPage.sandbox.vmSpecProbe,
-      [{ series: [], formatter: function () {} }]);
-  } catch (error) {
-    hostFunctionRejected = /host functions/.test(error.message);
-  }
-  H.each(vmPage.sandbox.vmList, function () {});
-  result('VM callback host escape',
-    callbackEscapes[0] === false && callbackEscapes[1] === false &&
-      hostFunctionRejected && vmPage.sandbox.vmListEscape === false,
-    'callback results: ' + JSON.stringify(callbackEscapes) +
-      ', host function rejected: ' + hostFunctionRejected +
-      ', array callback escape: ' + vmPage.sandbox.vmListEscape);
-} finally {
-  fs.rmSync(vmTemp, { recursive: true, force: true });
 }
 
-var externalTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-external-page-'));
-try {
-  var externalPagePath = path.join(externalTemp, 'index.html');
-  fs.writeFileSync(externalPagePath, '<script>window.externalPage=true</script>');
-  try {
-    H.loadPage(externalPagePath);
-    result('external harness page', false, 'outside page was evaluated');
-  } catch (error) {
-    result('external harness page',
-      /inside the repository/.test(error.message), error.message);
-  }
-} finally {
-  fs.rmSync(externalTemp, { recursive: true, force: true });
+function addSyntheticEarnedSchedule() {
+  var cards = PM_DATA.categories[0].cards;
+  cards[cards.length] = {
+    id: 'earned-schedule',
+    inputs: [{ key: 'bac' }, { key: 'pd' }, { key: 'at' }, { key: 'ev' }],
+    outputs: [
+      {
+        key: 'es',
+        compute: function (v) {
+          return Number.isFinite(v.bac) && Number.isFinite(v.pd) &&
+            Number.isFinite(v.ev) && v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
+        }
+      },
+      {
+        key: 'svt',
+        compute: function (v) {
+          var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
+          return es === null || !Number.isFinite(v.at) ? null : es - v.at;
+        }
+      },
+      {
+        key: 'spit',
+        compute: function (v) {
+          var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
+          return es === null || !Number.isFinite(v.at) || v.at <= 0
+            ? null : es / v.at;
+        }
+      },
+      {
+        key: 'ieac',
+        compute: function (v) {
+          var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
+          var spi = es === null || !Number.isFinite(v.at) || v.at <= 0
+            ? null : es / v.at;
+          return spi === null || spi <= 0 ? null : v.pd / spi;
+        }
+      }
+    ]
+  };
 }
 
-var earnedPage = H.loadPage('index.html');
-var earnedCards = earnedPage.sandbox.PM_DATA.categories[0].cards;
-earnedCards[earnedCards.length] = {
-  id: 'earned-schedule',
-  inputs: [{ key: 'bac' }, { key: 'pd' }, { key: 'at' }, { key: 'ev' }],
-  outputs: [
-    {
-      key: 'es',
-      compute: function (v) {
-        return Number.isFinite(v.bac) && Number.isFinite(v.pd) &&
-          Number.isFinite(v.ev) && v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
-      }
-    },
-    {
-      key: 'svt',
-      compute: function (v) {
-        var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
-        return es === null || !Number.isFinite(v.at) ? null : es - v.at;
-      }
-    },
-    {
-      key: 'spit',
-      compute: function (v) {
-        var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
-        return es === null || !Number.isFinite(v.at) || v.at <= 0
-          ? null : es / v.at;
-      }
-    },
-    {
-      key: 'ieac',
-      compute: function (v) {
-        var es = v.bac > 0 ? v.pd * (v.ev / v.bac) : null;
-        var spi = es === null || !Number.isFinite(v.at) || v.at <= 0
-          ? null : es / v.at;
-        return spi === null || spi <= 0 ? null : v.pd / spi;
-      }
-    }
-  ]
-};
+var earnedPage = pageWithScript(addSyntheticEarnedSchedule);
 H.reset();
 earnedSchedule.run(earnedPage, { quiet: true });
 var earnedStats = H.stats();
@@ -231,30 +179,33 @@ H.reset();
 charts.run(controlPage);
 var controlStats = H.stats();
 
-var futurePage = H.loadPage('index.html');
-var futureCards = futurePage.sandbox.PM_DATA.categories[0].cards;
-futureCards[futureCards.length] = {
-  id: 'future-card',
-  inputs: [{ key: 'x', placeholder: '1' }],
-  outputs: [{
-    key: 'y',
-    compute: function (v) {
-      return typeof v.x === 'number' && isFinite(v.x) ? v.x : null;
-    }
-  }],
-  charts: [{
-    title: 'Future chart',
-    purpose: 'Future integration probe.',
-    kind: 'bars',
-    build: function (v, readings) {
-      return typeof readings.y === 'number' ? {
-        series: [{ label: 'Y', value: readings.y, tone: 'accent' }],
-        catHead: 'Value',
-        summary: 'Valid future chart summary.'
-      } : null;
-    }
-  }]
-};
+function addFutureChart() {
+  var cards = PM_DATA.categories[0].cards;
+  cards[cards.length] = {
+    id: 'future-card',
+    inputs: [{ key: 'x', placeholder: '1' }],
+    outputs: [{
+      key: 'y',
+      compute: function (v) {
+        return typeof v.x === 'number' && isFinite(v.x) ? v.x : null;
+      }
+    }],
+    charts: [{
+      title: 'Future chart',
+      purpose: 'Future integration probe.',
+      kind: 'bars',
+      build: function (v, readings) {
+        return typeof readings.y === 'number' ? {
+          series: [{ label: 'Y', value: readings.y, tone: 'accent' }],
+          catHead: 'Value',
+          summary: 'Valid future chart summary.'
+        } : null;
+      }
+    }]
+  };
+}
+
+var futurePage = pageWithScript(addFutureChart);
 H.reset();
 charts.run(futurePage);
 var futureStats = H.stats();
@@ -262,20 +213,24 @@ result('future chart integration',
   futureStats.total > controlStats.total && futureStats.failures.length === 0,
   JSON.stringify(futureStats.failures));
 
-var summaryPage = H.loadPage('index.html');
-var chart = summaryPage.sandbox.PM_DATA.categories[0].cards[0].charts[0];
-var build = chart.build;
-chart.build = function (v, readings) {
-  var spec = build(v, readings);
-  if (spec) spec.summary = 'NaN';
-  return spec;
-};
+function addNonFiniteSummary() {
+  var chart = PM_DATA.categories[0].cards[0].charts[0];
+  var build = chart.build;
+  chart.build = function (v, readings) {
+    var spec = build(v, readings);
+    if (spec) spec.summary = 'NaN';
+    return spec;
+  };
+}
+
+var summaryPage = pageWithScript(addNonFiniteSummary);
 H.reset();
 charts.run(summaryPage);
 var summaryStats = H.stats();
 result('non-finite chart summary',
-  summaryStats.failures.length > 0,
-  'summary mutant survived');
+  summaryStats.failures.some(function (failure) {
+    return failure.detail === 'renderer returned a malformed result';
+  }), 'summary mutant survived');
 
 console.log('Integrity smoke: ' + passed + '/' + (passed + failed) + ' caught');
 if (failed) process.exitCode = 1;

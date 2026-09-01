@@ -11,7 +11,7 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var vm = require('vm');
+var VM = require('./vm-boundary');
 
 var ROOT = path.join(__dirname, '..');
 
@@ -39,37 +39,8 @@ function loadPage(file) {
     blocks.push(m[2]);
   }
 
-  var sandbox = Object.create(null);
-  vm.createContext(sandbox, {
-    codeGeneration: { strings: false, wasm: false }
-  });
-  vm.runInContext([
-    'this.window = this;',
-    'this.console = { log: function () {}, error: function () {}, warn: function () {} };',
-    'this.module = { exports: {} };',
-    'this.setTimeout = function () { return 0; };',
-    'this.clearTimeout = function () {};'
-  ].join('\n'), sandbox, { filename: 'test-harness-bootstrap.js' });
-  var cloneData = vm.runInContext([
-    '(function () {',
-    '  var arrayIsArray = Array.isArray;',
-    '  var realmFunction = Function;',
-    '  var objectCreate = Object.create;',
-    '  var objectKeys = Object.keys;',
-    '  function clone(value) {',
-    '    var copy;',
-    '    if (typeof value === "function") {',
-    '      if (value instanceof realmFunction) return value;',
-    '      throw new TypeError("Cannot pass host functions into page callbacks");',
-    '    }',
-    '    if (value === null || typeof value !== "object") return value;',
-    '    copy = arrayIsArray(value) ? [] : objectCreate(null);',
-    '    objectKeys(value).forEach(function (key) { copy[key] = clone(value[key]); });',
-    '    return copy;',
-    '  }',
-    '  return clone;',
-    '}())'
-  ].join('\n'), sandbox, { filename: 'test-harness-clone.js' });
+  var realm = VM.createRealm();
+  var sandbox = realm.sandbox;
 
   /* Only the data/logic blocks evaluate cleanly headless; the render block
      needs a DOM. Skip what throws on a missing document and keep going —
@@ -81,7 +52,7 @@ function loadPage(file) {
       return;
     }
     try {
-      vm.runInContext(src, sandbox, { filename: file + '#block' + i });
+      VM.evaluate(realm, src, file + '#block' + i);
       loaded.push(i);
     } catch (e) {
       throw new Error('Failed evaluating ' + file + ' script block ' + i + ': ' + e.message);
@@ -93,23 +64,9 @@ function loadPage(file) {
     html: html,
     blocks: blocks,
     loaded: loaded,
-    cloneData: cloneData
+    cloneData: realm.cloneData,
+    isRealmFunction: realm.isRealmFunction
   };
-}
-
-/* Page callbacks run in the VM realm. Clone every data argument there before
-   invocation so calculator code never receives a host object constructor. */
-function invoke(page, fn, args) {
-  var safeArgs = [];
-  var i;
-  if (!page || typeof page.cloneData !== 'function') {
-    throw new TypeError('Page was not created by loadPage()');
-  }
-  if (typeof fn !== 'function') throw new TypeError('Page callback is not a function');
-  for (i = 0; i < (args || []).length; i += 1) {
-    safeArgs.push(Reflect.apply(page.cloneData, undefined, [args[i]]));
-  }
-  return Reflect.apply(fn, undefined, safeArgs);
 }
 
 /* ── assertions ─────────────────────────────────────────────────── */
@@ -268,7 +225,7 @@ function eachCard(data, fn) {
 
 module.exports = {
   loadPage: loadPage,
-  invoke: invoke,
+  invoke: VM.invoke,
   suite: suite,
   check: check,
   eq: eq,
