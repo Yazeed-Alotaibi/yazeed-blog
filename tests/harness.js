@@ -19,9 +19,18 @@ var ROOT = path.join(__dirname, '..');
 function loadPage(file) {
   var html = fs.readFileSync(path.join(ROOT, file), 'utf8');
   var blocks = [];
-  var re = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;
+  /* Skip external scripts and non-executable ones (type="application/ld+json"
+     structured data is markup for crawlers, not code) — a browser would not
+     run either, so neither may the sandbox. */
+  var re = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
   var m;
-  while ((m = re.exec(html)) !== null) blocks.push(m[1]);
+  while ((m = re.exec(html)) !== null) {
+    var attrs = m[1];
+    if (/\bsrc=/.test(attrs)) continue;
+    var type = /\btype\s*=\s*["']([^"']+)["']/.exec(attrs);
+    if (type && !/javascript|module/.test(type[1])) continue;
+    blocks.push(m[2]);
+  }
 
   var sandbox = {
     console: console,

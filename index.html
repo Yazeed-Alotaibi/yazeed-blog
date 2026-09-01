@@ -8,6 +8,23 @@
   <!-- www and the apex both answer 200 with identical content, so name the one
        Google should index. Without this the two compete as duplicates. -->
   <link rel="canonical" href="https://yazeed.blog/">
+
+  <!-- The brand mark as the tab icon, inlined so the page stays one file and
+       the browser stops asking for a favicon.ico that isn't there. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%233b3690'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='bold' text-anchor='middle' fill='%23f3f2ed'%3E%CE%A3%3C/text%3E%3C/svg%3E">
+
+  <!-- Browser chrome tinted to the enamel body, one value per scheme. -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#d9d7cf">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131518">
+
+  <!-- What a shared link says for itself. Text-only card: the page is the
+       artifact, and there is deliberately no second file to point an image at. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yazeed.blog/">
+  <meta property="og:site_name" content="Calculation Desk">
+  <meta property="og:title" content="Earned Value Formulas Explained — CPI, SPI, EAC &amp; 33 PM Calculators">
+  <meta property="og:description" content="Earned value computed live and read back in plain English, plus 33 project-management calculators across 14 domains. Free, nothing leaves your browser.">
+  <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
@@ -713,6 +730,12 @@ main {
     box-shadow: var(--shadow);
   }
 
+  /* The fixed bar floats over the page, so an anchor jump — tapping a
+     domain in the nav, or following #about — would otherwise land with the
+     section heading hidden underneath it. Offset every scroll target by the
+     bar's full height plus a breath. */
+  html { scroll-padding-top: 8.5rem; }
+
   /* Reserving the fixed bar's height happens further down this stylesheet,
      immediately after .sidebar-top's own rule defines its base margin —
      the mobile override has to follow the rule it overrides in source
@@ -1053,16 +1076,6 @@ main {
   padding: .3rem .55rem;
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
 .skip {
   position: absolute;
   left: -9999px;
@@ -1340,29 +1353,10 @@ h2 {
   padding-bottom: .2rem;
 }
 
-@media (min-width: 46em) { 
-
-
-
-
-/* ── footer ───────────────────────────────────────────────────────────── */
-
-.footer {
-  margin-top: 2rem;
-  background: var(--panel);
-  border-top: 1px solid var(--rule);
-  box-shadow: var(--lip);
-}
-.footer-inner {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 1.4rem var(--gutter);
-  display: grid;
-  gap: 1.1rem;
-}
-@media (min-width: 46em) { .footer-inner { grid-template-columns: repeat(4, 1fr); } }
-.tb-cell p { margin-top: .35rem; font-size: .82rem; color: var(--ink-2); }
-.tb-cell a { color: var(--accent); }
+/* An unclosed `@media (min-width: 46em) {` used to sit here, wrapping the old
+   landing page's dead footer rules — and, because it never closed, everything
+   below it too: on any viewport under 46em the whole bench section rendered
+   unstyled. Nothing may reopen a media query at this spot without closing it. */
 
 /* ---- The bench-keeper ---------------------------------------------------
    Who built the instruments. Prose on the left, credentials engraved on a
@@ -1411,8 +1405,34 @@ h2 {
 .plate-foot b { display: block; color: var(--ink); font-weight: 600; margin-bottom: .1rem; }
 
   </style>
+
+  <!-- Structured data: what this page is and who keeps it, stated once in the
+       vocabulary search engines actually read. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Calculation Desk",
+    "url": "https://yazeed.blog/",
+    "description": "Earned value formulas explained and computed live — CPI, SPI, EAC, ETC, TCPI and variance — plus 33 project-management calculators across 14 domains. Free, client-side only.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": {
+      "@type": "Person",
+      "name": "Yazeed Alotaibi",
+      "jobTitle": "Project Engineer",
+      "sameAs": ["https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2"]
+    }
+  }
+  </script>
 </head>
 <body>
+  <!-- First tab stop on the page. Invisible until focused (see .skip), then
+       jumps a keyboard user past the sidebar's eighteen stops straight to the
+       hero. Absolutely positioned, so the body grid never sees it. -->
+  <a class="skip" href="#content">Skip to content</a>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
@@ -1438,7 +1458,7 @@ h2 {
     <div class="sidebar-sticky">
       <div class="search">
         <label class="sr-only" for="search">Search calculators</label>
-        <input id="search" type="search" placeholder="Find a formula… e.g. CPI, float, NPV" autocomplete="off">
+        <input id="search" type="search" placeholder="Search… CPI, float, NPV" autocomplete="off">
         <span class="search-hint">Press <kbd>/</kbd> to search</span>
       </div>
 
@@ -1454,7 +1474,7 @@ h2 {
     </footer>
   </aside>
 
-  <main>
+  <main id="content" tabindex="-1">
     <section class="hero" id="main-hero" aria-labelledby="hero-h">
         <div class="hero-col-a">
           <p class="label">Free &middot; nothing leaves your browser</p>
@@ -4609,7 +4629,12 @@ var PM_CHART_MOUNT = (function () {
   function build(card, chartDef) {
     var id = 'ch' + (++uid);
     var fig = document.createElement('figure');
-    fig.className = 'chart';
+    /* Born in the resolved empty state — the same class and hidden data
+       drawer the first no-spec draw() would apply. Building 30 charts "open"
+       and collapsing them on first visibility shed ~2,500px of page height
+       mid-scroll, which yanked content upward under the reader and made
+       anchor jumps from the domain nav overshoot their section. */
+    fig.className = 'chart is-empty';
     fig.setAttribute('aria-labelledby', id + '-t');
     fig.innerHTML =
       '<figcaption class="chart-head">' +
@@ -4620,7 +4645,7 @@ var PM_CHART_MOUNT = (function () {
       '<div class="chart-plot"></div>' +
       '<p class="chart-empty">Enter the parameters to plot this.</p>' +
       '<p class="chart-summary"></p>' +
-      '<details class="chart-data">' +
+      '<details class="chart-data" hidden>' +
         '<summary>View data</summary>' +
         '<div class="chart-table-wrap"></div>' +
       '</details>';
