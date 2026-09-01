@@ -32,52 +32,56 @@ mutations.forEach(function (mutation) {
   var second = first === -1 ? -1 : source.indexOf(mutation.from, first + mutation.from.length);
   var temp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-blog-mutant-'));
   var mutantPath = path.join(temp, 'index.html');
+  try {
+    if (first === -1 || second !== -1) {
+      console.log(mutation.name + ': invalid mutation target');
+      survived += 1;
+      return;
+    }
 
-  if (first === -1 || second !== -1) {
-    console.log(mutation.name + ': invalid mutation target');
-    survived += 1;
+    fs.writeFileSync(mutantPath,
+      source.slice(0, first) + mutation.to + source.slice(first + mutation.from.length));
+
+    var result = runner.run(mutantPath, { quiet: true });
+    var failed = result.suites.filter(function (testSuite) {
+      return testSuite.failures.length > 0;
+    });
+
+    if (result.allPassed) {
+      survived += 1;
+      console.log(mutation.name + ': SURVIVED');
+    } else {
+      console.log(mutation.name + ': killed');
+    }
+    failed.slice(0, 2).forEach(function (testSuite) {
+      console.log('  ' + testSuite.title + ': ' + testSuite.passed + '/' +
+        testSuite.total + ' passed, ' + testSuite.failures.length + ' FAILED');
+    });
+  } finally {
     fs.rmSync(temp, { recursive: true, force: true });
-    return;
   }
-
-  fs.writeFileSync(mutantPath,
-    source.slice(0, first) + mutation.to + source.slice(first + mutation.from.length));
-
-  var result = runner.run(mutantPath, { quiet: true });
-  var failed = result.suites.filter(function (testSuite) {
-    return testSuite.failures.length > 0;
-  });
-
-  if (result.allPassed) {
-    survived += 1;
-    console.log(mutation.name + ': SURVIVED');
-  } else {
-    console.log(mutation.name + ': killed');
-  }
-  failed.slice(0, 2).forEach(function (testSuite) {
-    console.log('  ' + testSuite.title + ': ' + testSuite.passed + '/' +
-      testSuite.total + ' passed, ' + testSuite.failures.length + ' FAILED');
-  });
-  fs.rmSync(temp, { recursive: true, force: true });
 });
 
 var hostileTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-runner-security-'));
 var hostilePage = path.join(hostileTemp, 'index.html');
-fs.writeFileSync(hostilePage,
-  '<script>console.log("UNTRUSTED_PAGE_EXECUTED:"+' +
-  'console.log.constructor("return process")().version)</script>');
-var cli = childProcess.spawnSync(process.execPath,
-  [path.join(__dirname, 'run.js'), '--page', hostilePage],
-  { cwd: root, encoding: 'utf8' });
-var externalPageBlocked = cli.status === 0 &&
-  (cli.stdout || '').indexOf('UNTRUSTED_PAGE_EXECUTED') === -1;
-console.log('runner external page: ' + (externalPageBlocked ? 'blocked' : 'EXECUTED'));
-if (!externalPageBlocked) survived += 1;
-fs.rmSync(hostileTemp, { recursive: true, force: true });
+try {
+  fs.writeFileSync(hostilePage,
+    '<script>console.log("UNTRUSTED_PAGE_EXECUTED:"+' +
+    'console.log.constructor("return process")().version)</script>');
+  var cli = childProcess.spawnSync(process.execPath,
+    [path.join(__dirname, 'run.js'), '--page', hostilePage],
+    { cwd: root, encoding: 'utf8' });
+  var externalPageRejected = cli.status === 2 &&
+    (cli.stdout || '').indexOf('UNTRUSTED_PAGE_EXECUTED') === -1;
+  console.log('runner external page: ' + (externalPageRejected ? 'rejected' : 'EXECUTED'));
+  if (!externalPageRejected) survived += 1;
+} finally {
+  fs.rmSync(hostileTemp, { recursive: true, force: true });
+}
 
 if (survived) {
   console.log('Mutation smoke: ' + survived + '/4 checks failed');
   process.exitCode = 1;
 } else {
-  console.log('Mutation smoke: 3/3 killed; external page blocked');
+  console.log('Mutation smoke: 3/3 killed; external page rejected');
 }

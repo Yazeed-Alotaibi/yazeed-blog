@@ -59,6 +59,11 @@ function run(pageFile, options) {
 module.exports = { run: run };
 
 if (require.main === module) {
-  var result = run('index.html');
-  if (!result.allPassed) process.exitCode = 1;
+  if (process.argv.length !== 2) {
+    console.error('Usage: node tests/run.js');
+    process.exitCode = 2;
+  } else {
+    var result = run('index.html');
+    if (!result.allPassed) process.exitCode = 1;
+  }
 }
