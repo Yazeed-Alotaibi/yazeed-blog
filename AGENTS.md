@@ -7,19 +7,29 @@ into a second one.
 
 ## What this project is
 
-A static site. **One** self-contained HTML file at the repository root, served
+A static site. Self-contained HTML files at the repository root, served
 directly with no build step:
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 33 calculators · 99 metrics rendered from a `PM_DATA` object |
+| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 34 calculators · 103 metrics rendered from a `PM_DATA` object |
+| `404.html` | The branded not-found page — bench styling copied inline (not shared), an instrument at rest reading "READING NOT FOUND," and links back to the desk. Apache serves it via `ErrorDocument 404` in `.htaccess` |
 | `og.png` | The 1200×630 card shown when a link to the site is shared. The one image the site ships |
+
+`robots.txt` and `sitemap.xml` complete the deploy surface — a crawler policy
+and a single-URL sitemap for the canonical homepage. Both are edited by hand,
+same as everything else here.
 
 `og.png` is a rendered artifact, not a hand-drawn one: `design/og-card.source.html`
 is the page it comes from, and that page's dial geometry is copied from the hero
 instrument, so the card shows a real reading. Re-render it by screenshotting that
-file at 1200×630 — and re-render it whenever the figures on it (14 · 33 · 99) stop
-being true. Nothing automates this; the PNG is committed.
+file at 1200×630 — and re-render it whenever the figures on it (14 · 34 · 103)
+stop being true. Nothing automates this; the PNG is committed.
+
+`tests/counts.js` is the tripwire for exactly that drift: it derives the three
+figures from `PM_DATA` and checks them against the hero copy, the `<title>`,
+the meta description, the JSON-LD and `og:image:alt`. It cannot see inside the
+PNG, so a stale card is still the one thing you have to catch by looking.
 
 Note it does not weaken the self-contained rule below. The *page* never requests
 it — only a crawler unfurling a shared link does.
@@ -72,16 +82,26 @@ graduated scales, tabular figures.
 - **Depth is `--lip` and `--sunk`**, never an ad-hoc shadow. A lip catches the
   light on a raised panel; a recess swallows it on a sunken one.
 - **Minimum 44px touch targets** on anything interactive.
-- **Respect `prefers-reduced-motion`.** All three pages already do.
+- **Respect `prefers-reduced-motion`.** `index.html` and `404.html` both do.
 
 Copy the custom properties and font stack from `index.html` when adding a page —
 consistency across the bench is the point.
 
 ## Tests
 
-`node tests/baseline.js`, `tests/edge-cases.js`, `tests/charts.js`. They run on
-plain node with no dependencies, and they cover the arithmetic: formula results
-against known values, division and overflow guards, and the chart builders.
+`node tests/run.js` is the complete dependency-free gate. It loads `index.html`
+once and runs seven suites against that single parse: the formula baseline,
+deliberate edge classes, chart specs, stylesheet integrity, redirect integrity,
+published-count drift, and guarded Earned Schedule vectors (the last skips
+until a card with `id: 'earned-schedule'` exists, then activates itself). Each
+suite file (`tests/baseline.js`, `edge-cases.js`, `charts.js`, `stylesheet.js`,
+`redirects.js`, `counts.js`, `earned-schedule.js`) is still directly runnable
+on its own for debugging — it re-parses the page itself when run standalone.
+
+Run `node tests/mutation-smoke.js` after changing the test harness or a
+calculator formula: it copies `index.html`, flips one operator in three
+different formulas, and asserts the suite fails all three. A mutation it can't
+kill means the coverage regressed.
 
 **They do not render anything.** The builders are pure functions returning spec
 objects, and that is where the coverage stops — nothing mounts a chart in a
@@ -174,9 +194,10 @@ git push origin main
 
 Hostinger serves yazeed.blog (`server: hcdn`, not GitHub Pages — the
 `github.io` URL returns "Site not found") and is connected to this repository,
-so it redeploys itself on a push to main. The deployed artifact is `index.html`
-plus `og.png`, `.htaccess` and the two redirect stubs described below. There is
-deliberately no CI here: no workflow, no build, no `CNAME`.
+so it redeploys itself on a push to main. The deployed artifact is `index.html`,
+`404.html`, `og.png`, `robots.txt`, `sitemap.xml`, `.htaccess` and the two
+redirect stubs described below. There is deliberately no CI here: no workflow,
+no build, no `CNAME`.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
 on the origin, and it answers 301 for the three addresses that are not the
@@ -195,6 +216,13 @@ awk '/^[[:space:]]*#/ {next}
      /<\/IfModule>/ {d=0}
      /Rewrite(Rule|Cond|Engine)/ {print (d ? "  inside  " : "OUTSIDE! ") $0}' .htaccess
 ```
+
+`.htaccess` also carries one line the guard above does not cover on purpose:
+`ErrorDocument 404 /404.html`, appended after and outside the `<IfModule>`
+block. `ErrorDocument` is core Apache, not `mod_rewrite` — unlike a bare
+`RewriteRule` it cannot 500 a host that lacks the module, so it needs no guard.
+`tests/redirects.js` checks the rewrite rules; it does not check this line,
+since there is no Apache in the test environment to serve a 404 against.
 
 The two stub HTML files are kept on purpose even though the 301s mean nothing
 ever reaches them. If mod_rewrite disappears, the guard switches the redirects
