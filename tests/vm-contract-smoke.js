@@ -110,6 +110,42 @@ function run(result, page) {
     taintedReceiverRejected && page.sandbox.vmOwner.calls === receiverCalls,
     'host-tainted receiver was accepted or callback ran');
   delete page.sandbox.vmOwner.hostValue;
+
+  receiverCalls = page.sandbox.vmOwner.calls;
+  page.sandbox.vmOwner.method.hostValue = {};
+  var functionTaintedReceiverRejected = false;
+  try {
+    H.invoke(page, page.sandbox.vmOwner.method, [], page.sandbox.vmOwner);
+  } catch (error) {
+    functionTaintedReceiverRejected = /receiver must originate/.test(error.message);
+  }
+  result('VM function-tainted callback receiver',
+    functionTaintedReceiverRejected &&
+      page.sandbox.vmOwner.calls === receiverCalls,
+    'host-tainted receiver function was accepted or callback ran');
+  delete page.sandbox.vmOwner.method.hostValue;
+
+  var ownerPrototype = Object.getPrototypeOf(page.sandbox.vmOwner);
+  var constructorDescriptor = Object.getOwnPropertyDescriptor(
+    ownerPrototype, 'constructor');
+  Object.defineProperty(ownerPrototype, 'constructor', {
+    configurable: constructorDescriptor.configurable,
+    enumerable: constructorDescriptor.enumerable,
+    value: Function,
+    writable: constructorDescriptor.writable
+  });
+  receiverCalls = page.sandbox.vmOwner.calls;
+  var prototypeTaintedReceiverRejected = false;
+  try {
+    H.invoke(page, page.sandbox.vmOwner.method, [], page.sandbox.vmOwner);
+  } catch (error) {
+    prototypeTaintedReceiverRejected = /receiver must originate/.test(error.message);
+  }
+  result('VM prototype-tainted callback receiver',
+    prototypeTaintedReceiverRejected &&
+      page.sandbox.vmOwner.calls === receiverCalls,
+    'host-tainted receiver prototype was accepted or callback ran');
+  Object.defineProperty(ownerPrototype, 'constructor', constructorDescriptor);
 }
 
 module.exports = run;

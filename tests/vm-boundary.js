@@ -68,8 +68,10 @@ function evaluate(realm, source, filename) {
 }
 
 function registerFunctions(realm, value, seen) {
+  var descriptor;
   var i;
   var keys;
+  var prototype;
   if (value === null ||
       (typeof value !== 'object' && typeof value !== 'function')) return;
   if (types.isProxy(value)) throw new TypeError('Page data cannot expose proxies');
@@ -80,12 +82,18 @@ function registerFunctions(realm, value, seen) {
   realm.trustedPrototypes.set(value, Object.getPrototypeOf(value));
   if (typeof value === 'function') {
     realm.trustedFunctions.add(value);
-    return;
   }
-  keys = Object.keys(value);
+  keys = Reflect.ownKeys(value);
   for (i = 0; i < keys.length; i += 1) {
-    registerFunctions(realm, value[keys[i]], seen);
+    descriptor = Object.getOwnPropertyDescriptor(value, keys[i]);
+    if (descriptor.get) registerFunctions(realm, descriptor.get, seen);
+    if (descriptor.set) registerFunctions(realm, descriptor.set, seen);
+    if (Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+      registerFunctions(realm, descriptor.value, seen);
+    }
   }
+  prototype = Object.getPrototypeOf(value);
+  if (prototype !== null) registerFunctions(realm, prototype, seen);
 }
 
 function validateData(realm, value, seen) {
@@ -121,6 +129,7 @@ function validateReceiver(realm, value, seen) {
   var i;
   var keys;
   var nested;
+  var prototype;
   if (value === null ||
       (typeof value !== 'object' && typeof value !== 'function') ||
       types.isProxy(value) || !realm.trustedObjects.has(value) ||
@@ -128,20 +137,23 @@ function validateReceiver(realm, value, seen) {
     throw new TypeError('Page callback receiver must originate in the page VM');
   }
   seen = seen || new WeakSet();
-  if (seen.has(value) || typeof value === 'function') return;
+  if (seen.has(value)) return;
   seen.add(value);
   keys = Reflect.ownKeys(value);
   for (i = 0; i < keys.length; i += 1) {
     descriptor = Object.getOwnPropertyDescriptor(value, keys[i]);
-    if (descriptor.get || descriptor.set) {
-      throw new TypeError('Page callback receiver cannot expose accessors');
-    }
-    nested = descriptor.value;
-    if (nested !== null &&
-        (typeof nested === 'object' || typeof nested === 'function')) {
-      validateReceiver(realm, nested, seen);
+    if (descriptor.get) validateReceiver(realm, descriptor.get, seen);
+    if (descriptor.set) validateReceiver(realm, descriptor.set, seen);
+    if (Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+      nested = descriptor.value;
+      if (nested !== null &&
+          (typeof nested === 'object' || typeof nested === 'function')) {
+        validateReceiver(realm, nested, seen);
+      }
     }
   }
+  prototype = Object.getPrototypeOf(value);
+  if (prototype !== null) validateReceiver(realm, prototype, seen);
 }
 
 /* Loading and callback registration stay together so no public helper can

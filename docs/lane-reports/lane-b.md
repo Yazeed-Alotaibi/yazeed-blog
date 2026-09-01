@@ -13,8 +13,8 @@ content.
 - `tests/vm-boundary.js` owns real-path containment, VM setup, script loading,
   and an unforgeable page-identity registry. It clones callback data inside the
   VM, rejects proxy/accessor argument containers before their traps can run,
-  and preserves browser callback receivers only when their full object graph
-  still originates in that page VM.
+  and preserves browser callback receivers only when their full own-property
+  and prototype graph still originates in that page VM.
 - `tests/vm-contract-smoke.js` permanently probes private state, forged page
   identities, proxy/accessor argument lists, browser receiver semantics, and
   host-tainted receivers.
@@ -83,14 +83,14 @@ Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
 Earned Schedule vectors: 0/0 passed
-All tests: 2056/2056 passed in 82.9ms
+All tests: 2056/2056 passed in 193.9ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2056/2056 passed in 85.6ms
+All tests: 2056/2056 passed in 195.8ms
 index.html reads: 1
 ```
 
@@ -144,6 +144,8 @@ VM accessor callback data: caught
 VM callback receiver: caught
 VM host callback receiver: caught
 VM tainted callback receiver: caught
+VM function-tainted callback receiver: caught
+VM prototype-tainted callback receiver: caught
 VM nested host function: caught
 VM overridden array method: caught
 VM host callback target: caught
@@ -156,7 +158,7 @@ symlinked external harness page: caught
 synthetic Earned Schedule vectors: caught
 future chart integration: caught
 non-finite chart summary: caught
-Integrity smoke: 33/33 caught
+Integrity smoke: 35/35 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -177,7 +179,7 @@ Tests paragraph with wording equivalent to:
 > mutants must be killed.
 
 Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, callback boundary, or Lane A/D integration seams; all thirty-three
+contracts, callback boundary, or Lane A/D integration seams; all thirty-five
 pressure probes must be caught.
 
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
