@@ -460,6 +460,11 @@ module.exports = {
   MARKER_START: MARKER_START,
   MARKER_END: MARKER_END,
   generate: generate,
+  /* One card's markup on its own, for the per-calculator pages built by
+     tools/calcpage.js. Those pages hold a single calculator, so the domain
+     index and the whole-desk lede above would both be nonsense there — but
+     the card block itself is exactly the same mirror, and must stay so. */
+  cardMarkup: cardMarkup,
   generateLines: generateLines,
   apply: apply,
   isCurrent: isCurrent,

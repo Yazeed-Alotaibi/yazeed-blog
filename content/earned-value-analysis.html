@@ -1,0 +1,235 @@
+<!-- Long-form content for /earned-value-analysis.
+     Plain prose in plain HTML — edit this file directly; tools/calcpage.js
+     wraps it in the page furniture. Use h2 for sections, h3 beneath them.
+     Every number here is the same worked example the calculator opens with,
+     so a reader can follow along in the instrument above. -->
+
+<h2 id="what-it-answers">What earned value actually answers</h2>
+
+<p>Most progress reporting can be gamed by an optimist. "We're 60% done" is an
+opinion. "We've spent £96,000" is a fact about money, not about progress. Put
+them together and you still cannot say whether the project is in trouble,
+because neither number knows what the other one means.</p>
+
+<p>Earned value fixes this by insisting that progress is measured in the same
+unit as the budget. Three numbers, all in currency:</p>
+
+<ul>
+  <li><strong>Planned value (PV)</strong> — what the schedule said you should
+    have completed by today, priced at budget.</li>
+  <li><strong>Earned value (EV)</strong> — what you have <em>actually</em>
+    completed, priced at that same budget.</li>
+  <li><strong>Actual cost (AC)</strong> — what completing it really cost.</li>
+</ul>
+
+<p>The trick is that EV is priced at budget, not at what it cost. That single
+decision is what makes the comparison honest: EV against AC is a pure cost
+question, and EV against PV is a pure schedule question. Neither can hide
+inside the other.</p>
+
+<h2 id="worked-example">A worked example, all the way through</h2>
+
+<p>Take a project with a <strong>budget at completion (BAC) of 200,000</strong>.
+By today the schedule expected 120,000 of work to be finished. In fact 108,000
+of budgeted work is finished, and it cost 96,000 to do.</p>
+
+<p>Those are the four numbers in the calculator above. Here is every metric
+they produce, and what each one is telling you.</p>
+
+<h3>Step 1 — the two variances</h3>
+
+<p>Variances are subtractions, and they answer in currency.</p>
+
+<pre><code>CV = EV − AC = 108,000 − 96,000 = +12,000
+SV = EV − PV = 108,000 − 120,000 = −12,000</code></pre>
+
+<p>Positive is good, negative is bad, in both cases. So this project is
+<strong>12,000 under budget and 12,000 behind schedule</strong>. Note that the
+schedule variance is expressed in money — earned value has no time axis, which
+is a real limitation we will come back to.</p>
+
+<h3>Step 2 — the two indices</h3>
+
+<p>Indices are divisions, and they answer in efficiency. They matter more than
+the variances because they scale: a variance of 12,000 means something
+different on a 200,000 project than on a 20,000,000 one.</p>
+
+<pre><code>CPI = EV ÷ AC = 108,000 ÷ 96,000 = 1.125
+SPI = EV ÷ PV = 108,000 ÷ 120,000 = 0.90</code></pre>
+
+<p>Read them as exchange rates. <strong>CPI 1.125</strong> means every 1.00
+spent has bought 1.125 of budgeted work — you are getting good value.
+<strong>SPI 0.90</strong> means you are completing work at 90% of the planned
+rate.</p>
+
+<h3>Step 3 — the forecast</h3>
+
+<p>Now the useful part. If today's efficiency continues, what will the whole
+project cost?</p>
+
+<pre><code>EAC = BAC ÷ CPI = 200,000 ÷ 1.125 = 177,778
+ETC = EAC − AC = 177,778 − 96,000 = 81,778
+VAC = BAC − EAC = 200,000 − 177,778 = +22,222</code></pre>
+
+<p>So: expect to finish around 177,778, needing roughly 81,778 more, and to
+come in about 22,222 under the approved budget. That is a forecast you can put
+in front of a sponsor, and it is derived rather than guessed.</p>
+
+<h2 id="reading-together">Reading CPI and SPI together</h2>
+
+<p>Neither index means much alone. Together they place the project in one of
+four positions, and each position calls for a different conversation.</p>
+
+<table>
+  <thead>
+    <tr><th>Position</th><th>What it usually means</th><th>What to do</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CPI ≥ 1, SPI ≥ 1</strong></td>
+      <td>Genuinely healthy — or the baseline was soft.</td>
+      <td>Check the baseline before celebrating.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI ≥ 1, SPI &lt; 1</strong></td>
+      <td>The example above. Often understaffed rather than efficient.</td>
+      <td>Ask whether cost looks good <em>because</em> work is not happening.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI &lt; 1, SPI ≥ 1</strong></td>
+      <td>Buying the schedule with overtime, premiums or extra people.</td>
+      <td>Decide deliberately whether the schedule is worth the money.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI &lt; 1, SPI &lt; 1</strong></td>
+      <td>Over budget and late. Rarely recovers on its own.</td>
+      <td>Escalate now, not next month.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The second row is the one worth dwelling on, because it is the example above
+and it is the one most often misread. A project can look under budget purely
+because it has not yet spent money on work it has not yet done. Cost efficiency
+and slow progress frequently arrive together, and the CPI is not the good news
+it appears to be. If you take one habit from this page, take this one:
+<strong>never report CPI without SPI beside it</strong>.</p>
+
+<h2 id="which-eac">Which EAC formula to use</h2>
+
+<p>This is where most people go wrong, because there are four accepted formulas
+and they are not interchangeable. The formula encodes an assumption about the
+future, so choosing one is a forecasting judgement, not arithmetic.</p>
+
+<h3>1. Variances are typical — <code>EAC = BAC ÷ CPI</code></h3>
+<p>Assumes the rest of the project performs like the part you have done. The
+right default on a project running steadily with no known change. In the
+example: 177,778.</p>
+
+<h3>2. Variances are atypical — <code>EAC = AC + (BAC − EV)</code></h3>
+<p>Assumes the overrun so far was a one-off and everything remaining runs at
+plan. Use it when you can <em>name</em> the cause and show it is finished — a
+resolved supplier dispute, a rework cycle now closed. In the example: 188,000.
+Note it is the more pessimistic figure here, because it declines to assume
+today's favourable efficiency continues.</p>
+
+<h3>3. Cost and schedule both bite — <code>EAC = AC + (BAC − EV) ÷ (CPI × SPI)</code></h3>
+<p>Assumes remaining work is dragged by both indices. Appropriate when a hard
+end date means lateness will be bought back with money. In the example:
+186,864.</p>
+
+<h3>4. A fresh bottom-up estimate — <code>EAC = AC + new ETC</code></h3>
+<p>When the original baseline no longer describes the project, no index will
+rescue it. Re-estimate the remaining work and add it to what you have spent.
+This is the honest answer after a major scope change, and no calculator can
+produce it for you.</p>
+
+<p>The practical discipline: pick the formula <em>before</em> you look at which
+number you would prefer, and write down the assumption you are making. An EAC
+without its stated assumption is not a forecast, it is a preference.</p>
+
+<h2 id="tcpi">TCPI — the reality check</h2>
+
+<p>Every forecast above tells you where you are heading. TCPI answers a harder
+question: what efficiency would the remaining work have to sustain to still
+land on budget?</p>
+
+<pre><code>TCPI = (BAC − EV) ÷ (BAC − AC) = 92,000 ÷ 104,000 = 0.88</code></pre>
+
+<p>The rule of thumb is unforgiving and worth memorising:</p>
+
+<ul>
+  <li><strong>TCPI ≤ 1.00</strong> — achievable, no change in efficiency needed.</li>
+  <li><strong>TCPI up to about 1.10</strong> — a stretch; name the specific
+    actions that will deliver it.</li>
+  <li><strong>TCPI above 1.10</strong> — treat as unrealistic. Teams almost
+    never improve efficiency by more than 10% mid-flight without descoping.</li>
+</ul>
+
+<p>Here TCPI is 0.88, comfortably below 1.00 — this project could get
+<em>less</em> efficient and still land on budget. Compare that to the
+optimism you often hear on a project running at CPI 0.85 with a TCPI of 1.3,
+where the plan silently requires the team to become 50% more effective than
+they have managed all year.</p>
+
+<p>One trap: once <strong>AC reaches BAC</strong>, the denominator turns
+negative and TCPI stops meaning anything. A negative TCPI is not an easy
+target — it is an unreachable one. At that point the budget is spent with work
+outstanding, and the answer is to re-baseline and measure TCPI against an EAC
+instead.</p>
+
+<h2 id="spi-limits">Where SPI stops telling the truth</h2>
+
+<p>SPI has a structural flaw that every practitioner should know: <strong>it
+always returns to 1.00 at the end of a project</strong>, however late you
+finish. At completion EV equals BAC, and PV equals BAC too, because all the
+planned work has come due. SPI = BAC ÷ BAC = 1.00 — on a project delivered a
+year late.</p>
+
+<p>The distortion starts well before the end. In the last third of a project,
+PV is running out faster than EV, so SPI drifts upward regardless of real
+performance. Treat SPI as reliable in the early and middle phases, and stop
+trusting it as a schedule signal near the finish.</p>
+
+<p>The fix is <a href="/#calc-earned-schedule">earned schedule</a>, which puts
+EV back on the time axis and reports in periods rather than currency. SPI(t)
+does not collapse to 1.00, so it keeps working when SPI has stopped.</p>
+
+<h2 id="mistakes">Five mistakes that survive into real reporting</h2>
+
+<ol>
+  <li><strong>Using % spent as % complete.</strong> AC ÷ BAC is not progress —
+    it is consumption. In the example 48% of the budget is spent but 54% of the
+    work is done, and the gap is the entire point of the method.</li>
+  <li><strong>Mixing currencies and units.</strong> PV, EV, AC and BAC must all
+    be the same currency at the same baseline. A mixed-rate roll-up produces
+    indices that look precise and mean nothing.</li>
+  <li><strong>Reporting CPI alone.</strong> See the four-quadrant table above.
+    Cost efficiency without schedule context is the most common way a report
+    misleads honestly.</li>
+  <li><strong>Letting EV be an opinion.</strong> Earned value is only as sound
+    as the rule for claiming it. Fix the rule in advance — 0/100, 50/50, or
+    physical measurement — and never let it be a judgement made at
+    month end by the person being measured.</li>
+  <li><strong>Re-baselining to make the numbers look better.</strong> A
+    re-baseline resets the variances to zero. Sometimes that is right, because
+    the plan genuinely no longer describes the project. It is never right as a
+    reporting tactic, and reviewers can always see it in the history.</li>
+</ol>
+
+<h2 id="exam-vs-practice">On the exam and on a real project</h2>
+
+<p>If you are preparing for the <strong>PMP</strong>, expect to be given three
+of the four numbers and asked for a fourth, and expect at least one question
+that hinges on choosing the right EAC formula from its stated assumption. The
+arithmetic is easy; the assumption is what is being tested.</p>
+
+<p>In <strong>PRINCE2</strong> terms, earned value is a tolerance instrument.
+CV and SV tell you whether you are still inside the cost and time tolerances
+delegated to you, and the forecast tells you whether you are about to breach
+them — which is what turns a routine Highlight Report into an Exception
+Report. Used properly it is an early-warning system, not a scorecard.</p>
+
+<p>On a live project the numbers matter less than the cadence. Earned value
+calculated monthly on a twelve-month project gives you about three readings
+before it is too late to act. Calculated fortnightly, it gives you time.</p>

@@ -1,0 +1,32 @@
+{
+  "_comment": [
+    "Per-calculator page metadata. One entry per page; the card id ties it to",
+    "PM_DATA, and `content` names the prose file beside this one.",
+    "",
+    "title       — under ~60 characters, or Google truncates it in results.",
+    "description — 140-160 characters. It is the sales pitch in the result list.",
+    "h1          — the on-page heading. May differ from the title tag.",
+    "related     — card ids to link to at the foot of the page.",
+    "",
+    "Everything else about the page (the calculator, its formula, its charts)",
+    "comes from PM_DATA, so it can never drift out of step with the desk.",
+    "",
+    "URLs end in .html because that is how Apache serves the file. Extensionless URLs (/earned-value-analysis) would need one RewriteRule, guarded inside <IfModule mod_rewrite.c> like every other directive in .htaccess. Worth doing before there are many pages and links to them, not after."
+  ],
+  "pages": [
+    {
+      "card": "earned-value",
+      "slug": "earned-value-analysis",
+      "title": "Earned Value Analysis — CPI, SPI, EAC Calculator",
+      "description": "Work through earned value with real numbers: CPI, SPI, EAC, ETC, VAC and TCPI computed live, which EAC formula to use, and where SPI stops telling the truth.",
+      "h1": "Earned value analysis, worked through end to end",
+      "lede": "Enter four numbers and every earned-value metric updates live. Below the calculator: a full worked example, the four EAC formulas and when each one is right, and the mistakes that survive into real project reporting.",
+      "updated": "2026-09-01",
+      "related": [
+        "earned-schedule",
+        "time-forecast",
+        "burn-rate"
+      ]
+    }
+  ]
+}
