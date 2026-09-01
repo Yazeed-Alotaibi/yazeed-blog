@@ -32,9 +32,10 @@ content.
 
 ## Coverage manifest
 
-Baseline is `main` at `d118909`, as recorded in `docs/parallel-plan.md`.
-The after counts below are from the rebased Lane B suite with Lane D present
-and Lane A's Earned Schedule card not yet present.
+The before counts use the `d118909` baseline recorded in
+`docs/parallel-plan.md`. The after counts are from Lane B rebased onto
+`origin/main` at `f080181`; Lane D is present and Lane A's Earned Schedule card
+is not yet present.
 
 | Behavior class | Before | After | Coverage guarantee |
 | --- | ---: | ---: | --- |
@@ -48,7 +49,7 @@ and Lane A's Earned Schedule card not yet present.
 | Stylesheet integrity | 0 | 5 | Balanced braces, no dangling token, no dark-only token, palette rules with print/mask allowlists, and resolved static anchors. |
 | Redirect integrity | 0 | 3 | Every `Rewrite*` is guarded; both stubs match their rewrite destinations. |
 | Published count drift | 0 | 9 | Counts are derived from `PM_DATA` and enforced across metadata and visible hero surfaces. |
-| Earned Schedule vectors | 0 | 1 guarded / 9 active | The current skip is explicit; a synthetic card proves Lane D's seven vectors plus contract checks pass 9/9. |
+| Earned Schedule vectors | 0 | 1 guarded / 9 active | The current skip is explicit; once the card exists, the suite requires at least six vectors and checks every expected output plus the guard contract. |
 | **Total** | **10,529** | **2,057** | **80.5% fewer assertions, with new page-integrity and integration coverage added.** |
 
 Lane A adds four outputs and two charts. The deliberate class design keeps the
@@ -66,14 +67,14 @@ Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
 Earned Schedule vectors: 1/1 passed
-All tests: 2057/2057 passed in 74.1ms
+All tests: 2057/2057 passed in 74.0ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2057/2057 passed in 87.1ms
+All tests: 2057/2057 passed in 74.5ms
 index.html reads: 1
 ```
 
@@ -120,7 +121,7 @@ that Node tests do not prove browser rendering.
   the 1200×630 image after the 34/103 update remains Lane A's manual gate.
 - Earned Schedule vector JSON is parsed from
   `docs/content/earned-schedule-spec.md`; the merged Lane D schema is
-  compatible and passed the synthetic 9/9 activation check.
+  compatible and will activate automatically when Lane A's card lands.
 - Chart summary prose is intentionally not pinned. Numeric/chart data is exact,
   while summaries are checked for presence and non-finite leakage so copy can
   improve without snapshot churn.
