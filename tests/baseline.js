@@ -24,7 +24,7 @@ function collect(page) {
     var row = { _inputs: v };
     H.each(card.outputs, function (out) {
       var val;
-      try { val = H.invoke(page, out.compute, [v]); }
+      try { val = H.invoke(page, out.compute, [v], out); }
       catch (e) { val = '<<THREW: ' + e.message + '>>'; }
       row[out.key] = typeof val === 'number' ? (isFinite(val) ? val : String(val)) : val;
     });

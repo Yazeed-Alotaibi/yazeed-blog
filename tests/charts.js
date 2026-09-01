@@ -13,7 +13,7 @@ var TITLE = 'Chart builders';
 function computeResults(page, card, v) {
   var r = {};
   H.each(card.outputs, function (out) {
-    try { r[out.key] = H.invoke(page, out.compute, [v]); }
+    try { r[out.key] = H.invoke(page, out.compute, [v], out); }
     catch (e) { r[out.key] = null; }
   });
   return r;
@@ -86,7 +86,7 @@ function verifyEdge(page, id, def, renderer, v, label, card) {
   var problem = '';
   var results = computeResults(page, card, v);
 
-  try { spec = H.invoke(page, def.build, [v, results]); }
+  try { spec = H.invoke(page, def.build, [v, results], def); }
   catch (e) { problem = 'build threw: ' + e.message; }
   if (!problem && spec !== null && spec !== undefined && typeof spec !== 'object') {
     problem = 'build returned ' + JSON.stringify(spec);
@@ -133,7 +133,7 @@ function run(page) {
         typeof renderer === 'function',
         'kind=' + def.kind);
 
-      try { spec = H.invoke(page, def.build, [v, results]); }
+      try { spec = H.invoke(page, def.build, [v, results], def); }
       catch (e) { problem = e.message; }
       if (expected) {
         H.deep(id + ' matches its worked-example spec',
@@ -192,7 +192,7 @@ function run(page) {
       var id = cat.id + '/' + card.id + ' :: ' + def.title;
       var spec;
       var problem = '';
-      try { spec = H.invoke(page, def.build, [v, results]); }
+      try { spec = H.invoke(page, def.build, [v, results], def); }
       catch (e) { problem = 'threw: ' + e.message; }
       if (!problem && spec !== null && spec !== undefined) {
         problem = 'returned ' + JSON.stringify(spec);

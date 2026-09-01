@@ -8,13 +8,16 @@ content.
 
 - `tests/run.js` loads `index.html` once and passes the same page object to all
   seven suites. Every suite remains directly runnable with plain Node.
-- `tests/harness.js` resolves real paths inside the repository, creates
-  console/timer shims inside the VM realm, and disables dynamic string code
-  generation. Every calculator/chart callback receives a VM-realm data clone,
-  and page-owned arrays are traversed without receiving host callbacks.
-- `tests/vm-boundary.js` registers VM functions in a host-held weak set and
-  rejects host, prototype-spoofed, or proxied targets, nested host functions,
-  proxies, and cyclic callback input with deliberate boundary errors.
+- `tests/harness.js` keeps the assertion and page-iteration API small while
+  delegating all page loading and invocation to the private VM boundary.
+- `tests/vm-boundary.js` owns real-path containment, VM setup, script loading,
+  and an unforgeable page-identity registry. It clones callback data inside the
+  VM, rejects proxy/accessor argument containers before their traps can run,
+  and preserves browser callback receivers only when their full object graph
+  still originates in that page VM.
+- `tests/vm-contract-smoke.js` permanently probes private state, forged page
+  identities, proxy/accessor argument lists, browser receiver semantics, and
+  host-tainted receivers.
 - `tests/security-boundaries.js` keeps every callback surface and real-path
   containment scenario independently named in the integrity pressure gate.
 - `tests/edge-cases.js` replaces 24 rotating sweeps with named input classes:
@@ -80,14 +83,14 @@ Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
 Earned Schedule vectors: 0/0 passed
-All tests: 2056/2056 passed in 81.0ms
+All tests: 2056/2056 passed in 82.9ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2056/2056 passed in 91.0ms
+All tests: 2056/2056 passed in 85.6ms
 index.html reads: 1
 ```
 
@@ -133,6 +136,14 @@ VM compute callback: caught
 VM interpret callback: caught
 VM chart build callback: caught
 VM renderer nested data: caught
+VM boundary state private: caught
+VM forged page identity: caught
+VM proxied argument list: caught
+VM accessor argument list: caught
+VM accessor callback data: caught
+VM callback receiver: caught
+VM host callback receiver: caught
+VM tainted callback receiver: caught
 VM nested host function: caught
 VM overridden array method: caught
 VM host callback target: caught
@@ -145,7 +156,7 @@ symlinked external harness page: caught
 synthetic Earned Schedule vectors: caught
 future chart integration: caught
 non-finite chart summary: caught
-Integrity smoke: 25/25 caught
+Integrity smoke: 33/33 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -166,16 +177,16 @@ Tests paragraph with wording equivalent to:
 > mutants must be killed.
 
 Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, or Lane A/D integration seams; all twenty-five pressure probes must be
-caught.
+contracts, callback boundary, or Lane A/D integration seams; all thirty-three
+pressure probes must be caught.
 
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
 fixture for current worked-example chart specs. Preserve the existing warning
 that Node tests do not prove browser rendering.
 
-Add `tests/vm-boundary.js` and `tests/security-boundaries.js` to the file
-inventory as the callback-isolation implementation and its adversarial
-regression matrix.
+Add `tests/vm-boundary.js`, `tests/vm-contract-smoke.js`, and
+`tests/security-boundaries.js` to the file inventory as the callback-isolation
+implementation and its adversarial regression matrix.
 
 ## Notes for other lanes and final merge
 

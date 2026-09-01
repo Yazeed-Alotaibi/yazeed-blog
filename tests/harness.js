@@ -8,7 +8,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var path = require('path');
 var util = require('util');
 var VM = require('./vm-boundary');
@@ -18,56 +17,7 @@ var ROOT = path.join(__dirname, '..');
 /* Pull the <script> blocks out of a page and evaluate them in one shared
    sandbox, in document order, exactly as a browser would. */
 function loadPage(file) {
-  var rootPath = fs.realpathSync(ROOT);
-  var pagePath = fs.realpathSync(path.resolve(ROOT, file));
-  var relative = path.relative(rootPath, pagePath);
-  if (relative.indexOf('..' + path.sep) === 0 || path.isAbsolute(relative)) {
-    throw new Error('Test page must stay inside the repository: ' + file);
-  }
-  var html = fs.readFileSync(pagePath, 'utf8');
-  var blocks = [];
-  /* Skip external scripts and non-executable ones (type="application/ld+json"
-     structured data is markup for crawlers, not code) — a browser would not
-     run either, so neither may the sandbox. */
-  var re = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
-  var m;
-  while ((m = re.exec(html)) !== null) {
-    var attrs = m[1];
-    if (/\bsrc=/.test(attrs)) continue;
-    var type = /\btype\s*=\s*["']([^"']+)["']/.exec(attrs);
-    if (type && !/javascript|module/.test(type[1])) continue;
-    blocks.push(m[2]);
-  }
-
-  var realm = VM.createRealm();
-  var sandbox = realm.sandbox;
-
-  /* Only the data/logic blocks evaluate cleanly headless; the render block
-     needs a DOM. Skip what throws on a missing document and keep going —
-     the assertions below only ever touch the pure logic. */
-  var loaded = [];
-  blocks.forEach(function (src, i) {
-    if (/document\.getElementById|document\.createElement/.test(src) &&
-        !/^\s*\/\* PM Calculation Desk — calculator definitions/.test(src)) {
-      return;
-    }
-    try {
-      VM.evaluate(realm, src, file + '#block' + i);
-      loaded.push(i);
-    } catch (e) {
-      throw new Error('Failed evaluating ' + file + ' script block ' + i + ': ' + e.message);
-    }
-  });
-  VM.registerFunctions(realm, sandbox);
-
-  return {
-    sandbox: sandbox,
-    html: html,
-    blocks: blocks,
-    loaded: loaded,
-    cloneData: realm.cloneData,
-    trustedFunctions: realm.trustedFunctions
-  };
+  return VM.loadPage(ROOT, file);
 }
 
 /* ── assertions ─────────────────────────────────────────────────── */
@@ -154,22 +104,6 @@ function report(title) {
   return true;
 }
 
-/* ── input generators for edge-case sweeps ──────────────────────── */
-
-/* Every awkward value a real person can put in a number field, plus the ones
-   they cannot type but a pasted spreadsheet cell can. */
-var EDGE_NUMBERS = [
-  0, 1, -1, 0.5, -0.5, 100, -100,
-  1e-9, 1e9, 1e15, -1e15,
-  0.1 + 0.2,
-  NaN
-];
-
-var EDGE_TEXT = [
-  '', '   ', '0', '1,2,3', '1, 2, 3', '-1,-2', '1;2;3', '1 2 3',
-  'abc', '1,abc,3', '0,0,0', '1e9,1e9', '-0', '1.5,2.5'
-];
-
 /* Iterate VM-owned arrays from the host without handing a host callback to a
    page-overridable Array method. */
 function each(list, fn) {
@@ -189,18 +123,6 @@ function filter(list, fn) {
     if (fn(value, index)) filtered.push(value);
   });
   return filtered;
-}
-
-function inputSweeps(card, seedIndex) {
-  var v = {};
-  each(card.inputs, function (inp, i) {
-    if (inp.type === 'text') {
-      v[inp.key] = EDGE_TEXT[(seedIndex + i) % EDGE_TEXT.length];
-    } else {
-      v[inp.key] = EDGE_NUMBERS[(seedIndex + i) % EDGE_NUMBERS.length];
-    }
-  });
-  return v;
 }
 
 /* The values the card's own placeholders suggest — a realistic worked
@@ -235,12 +157,9 @@ module.exports = {
   report: report,
   stats: stats,
   reset: reset,
-  EDGE_NUMBERS: EDGE_NUMBERS,
-  EDGE_TEXT: EDGE_TEXT,
   each: each,
   map: map,
   filter: filter,
-  inputSweeps: inputSweeps,
   exampleValues: exampleValues,
   eachCard: eachCard,
   get failures() { return failures; }

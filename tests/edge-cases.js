@@ -103,7 +103,7 @@ function verifyOutput(page, id, caseLabel, out, v) {
   var problem = '';
 
   try {
-    val = H.invoke(page, out.compute, [v]);
+    val = H.invoke(page, out.compute, [v], out);
   } catch (e) {
     problem = 'threw: ' + e.message;
   }
@@ -114,7 +114,7 @@ function verifyOutput(page, id, caseLabel, out, v) {
 
   if (!problem && val !== null && val !== undefined && out.interpret) {
     try {
-      verdict = H.invoke(page, out.interpret, [val, v]);
+      verdict = H.invoke(page, out.interpret, [val, v], out);
     } catch (e) {
       problem = 'interpret() threw: ' + e.message;
     }
@@ -200,7 +200,7 @@ function run(page) {
     H.each(card.outputs, function (out) {
       var val;
       var problem = '';
-      try { val = H.invoke(page, out.compute, [v]); }
+      try { val = H.invoke(page, out.compute, [v], out); }
       catch (e) { problem = 'threw: ' + e.message; }
       if (!problem && val !== null && val !== undefined) {
         problem = 'returned ' + JSON.stringify(val);

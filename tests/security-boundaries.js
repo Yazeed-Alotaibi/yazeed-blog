@@ -4,6 +4,7 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var H = require('./harness');
+var vmContractSmoke = require('./vm-contract-smoke');
 
 function run(result, root) {
   var vmTemp = fs.mkdtempSync(path.join(root, '.lane-b-vm-'));
@@ -34,6 +35,9 @@ function run(result, root) {
       'canReachHost(spec.series)||canReachHost(spec.series[0])||' +
       'canReachHost(spec.series[0].points)||' +
       'canReachHost(spec.series[0].points[0])||canReachHost(spec.formatter)};' +
+      'window.vmOwner={calls:0,method:function(){this.calls+=1;' +
+      'return this===window.vmOwner&&!canReachHost(this)&&' +
+      '!canReachHost(this.hostValue)}};' +
       'window.vmListEscape=false;window.vmList=[1];' +
       'window.vmList.forEach=function(callback){' +
       'window.vmListEscape=canReachHost(callback)};</script>');
@@ -41,10 +45,10 @@ function run(result, root) {
     result('VM host escape', vmPage.sandbox.vmEscapes.length === 0,
       'host process was reachable through: ' + vmPage.sandbox.vmEscapes.join(', '));
 
-    function callbackProbe(name, fn, args) {
+    function callbackProbe(name, fn, args, receiver) {
       var escaped;
       try {
-        escaped = H.invoke(vmPage, fn, args);
+        escaped = H.invoke(vmPage, fn, args, receiver);
         result(name, escaped === false, 'host process was reachable');
       } catch (error) {
         result(name, false, error.message);
@@ -62,6 +66,8 @@ function run(result, root) {
         series: [{ points: [[1, 2]] }],
         formatter: vmPage.sandbox.vmFormatter
       }]);
+
+    vmContractSmoke(result, vmPage);
 
     var hostFunctionRejected = false;
     var spoofedFormatter = function () {};

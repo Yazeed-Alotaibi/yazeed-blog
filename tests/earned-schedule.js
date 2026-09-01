@@ -83,7 +83,8 @@ function run(page, options) {
         return;
       }
       try {
-        actual[normalized] = rounded(H.invoke(page, out.compute, [vector.inputs]));
+        actual[normalized] = rounded(H.invoke(page, out.compute,
+          [vector.inputs], out));
       } catch (e) {
         problem = key + ' threw: ' + e.message;
       }
