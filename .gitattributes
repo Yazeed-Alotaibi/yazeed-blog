@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Fonts are binary. Without this, text=auto above could line-ending-mangle
+# a woff2 on a checkout and the browser would reject the file.
+*.woff2 binary
