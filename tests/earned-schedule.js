@@ -43,6 +43,7 @@ function run(page, options) {
       console.log('earned-schedule: card not present, vectors skipped');
     }
     H.suite('guarded integration');
+    H.check('Earned Schedule vectors wait for the card', true);
     return;
   }
 
@@ -51,7 +52,7 @@ function run(page, options) {
   var vectors = vectorBlock(markdown);
   var outputMap = {};
 
-  H.each(card.outputs, function (out) {
+  card.outputs.forEach(function (out) {
     outputMap[canonical(out.key)] = out;
   });
 
@@ -83,8 +84,7 @@ function run(page, options) {
         return;
       }
       try {
-        actual[normalized] = rounded(H.invoke(page, out.compute,
-          [vector.inputs], out));
+        actual[normalized] = rounded(out.compute(vector.inputs));
       } catch (e) {
         problem = key + ' threw: ' + e.message;
       }

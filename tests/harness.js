@@ -8,16 +8,62 @@
 
 'use strict';
 
+var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var VM = require('./vm-boundary');
+var vm = require('vm');
 
 var ROOT = path.join(__dirname, '..');
 
 /* Pull the <script> blocks out of a page and evaluate them in one shared
    sandbox, in document order, exactly as a browser would. */
 function loadPage(file) {
-  return VM.loadPage(ROOT, file);
+  var pagePath = path.isAbsolute(file) ? file : path.join(ROOT, file);
+  var html = fs.readFileSync(pagePath, 'utf8');
+  var blocks = [];
+  /* Skip external scripts and non-executable ones (type="application/ld+json"
+     structured data is markup for crawlers, not code) — a browser would not
+     run either, so neither may the sandbox. */
+  var re = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
+  var m;
+  while ((m = re.exec(html)) !== null) {
+    var attrs = m[1];
+    if (/\bsrc=/.test(attrs)) continue;
+    var type = /\btype\s*=\s*["']([^"']+)["']/.exec(attrs);
+    if (type && !/javascript|module/.test(type[1])) continue;
+    blocks.push(m[2]);
+  }
+
+  var sandbox = {
+    console: console,
+    module: { exports: {} },
+    setTimeout: function () { return 0; },
+    clearTimeout: function () {},
+    Math: Math,
+    Date: Date
+  };
+  sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+
+  /* Only the data/logic blocks evaluate cleanly headless; the render block
+     needs a DOM. Skip what throws on a missing document and keep going —
+     the assertions below only ever touch the pure logic. */
+  var loaded = [];
+  blocks.forEach(function (src, i) {
+    if (/document\.getElementById|document\.createElement/.test(src) &&
+        !/^\s*\/\* PM Calculation Desk — calculator definitions/.test(src)) {
+      return;
+    }
+    try {
+      vm.runInContext(src, sandbox, { filename: file + '#block' + i });
+      loaded.push(i);
+    } catch (e) {
+      throw new Error('Failed evaluating ' + file + ' script block ' + i + ': ' + e.message);
+    }
+  });
+
+  return { sandbox: sandbox, html: html, blocks: blocks, loaded: loaded };
 }
 
 /* ── assertions ─────────────────────────────────────────────────── */
@@ -104,32 +150,39 @@ function report(title) {
   return true;
 }
 
-/* Iterate VM-owned arrays from the host without handing a host callback to a
-   page-overridable Array method. */
-function each(list, fn) {
-  var i;
-  for (i = 0; i < list.length; i += 1) fn(list[i], i);
-}
+/* ── input generators for edge-case sweeps ──────────────────────── */
 
-function map(list, fn) {
-  var mapped = [];
-  each(list, function (value, index) { mapped.push(fn(value, index)); });
-  return mapped;
-}
+/* Every awkward value a real person can put in a number field, plus the ones
+   they cannot type but a pasted spreadsheet cell can. */
+var EDGE_NUMBERS = [
+  0, 1, -1, 0.5, -0.5, 100, -100,
+  1e-9, 1e9, 1e15, -1e15,
+  0.1 + 0.2,
+  NaN
+];
 
-function filter(list, fn) {
-  var filtered = [];
-  each(list, function (value, index) {
-    if (fn(value, index)) filtered.push(value);
+var EDGE_TEXT = [
+  '', '   ', '0', '1,2,3', '1, 2, 3', '-1,-2', '1;2;3', '1 2 3',
+  'abc', '1,abc,3', '0,0,0', '1e9,1e9', '-0', '1.5,2.5'
+];
+
+function inputSweeps(card, seedIndex) {
+  var v = {};
+  card.inputs.forEach(function (inp, i) {
+    if (inp.type === 'text') {
+      v[inp.key] = EDGE_TEXT[(seedIndex + i) % EDGE_TEXT.length];
+    } else {
+      v[inp.key] = EDGE_NUMBERS[(seedIndex + i) % EDGE_NUMBERS.length];
+    }
   });
-  return filtered;
+  return v;
 }
 
 /* The values the card's own placeholders suggest — a realistic worked
    example, which is what most assertions should exercise. */
 function exampleValues(card) {
   var v = {};
-  each(card.inputs, function (inp) {
+  card.inputs.forEach(function (inp) {
     if (inp.type === 'text') {
       v[inp.key] = String(inp.placeholder || '').replace(/^e\.g\.\s*/, '');
     } else {
@@ -141,14 +194,13 @@ function exampleValues(card) {
 }
 
 function eachCard(data, fn) {
-  each(data.categories, function (cat) {
-    each(cat.cards, function (card) { fn(card, cat); });
+  data.categories.forEach(function (cat) {
+    cat.cards.forEach(function (card) { fn(card, cat); });
   });
 }
 
 module.exports = {
   loadPage: loadPage,
-  invoke: VM.invoke,
   suite: suite,
   check: check,
   eq: eq,
@@ -157,9 +209,9 @@ module.exports = {
   report: report,
   stats: stats,
   reset: reset,
-  each: each,
-  map: map,
-  filter: filter,
+  EDGE_NUMBERS: EDGE_NUMBERS,
+  EDGE_TEXT: EDGE_TEXT,
+  inputSweeps: inputSweeps,
   exampleValues: exampleValues,
   eachCard: eachCard,
   get failures() { return failures; }

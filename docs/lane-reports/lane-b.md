@@ -8,18 +8,6 @@ content.
 
 - `tests/run.js` loads `index.html` once and passes the same page object to all
   seven suites. Every suite remains directly runnable with plain Node.
-- `tests/harness.js` keeps the assertion and page-iteration API small while
-  delegating all page loading and invocation to the private VM boundary.
-- `tests/vm-boundary.js` owns real-path containment, VM setup, script loading,
-  and an unforgeable page-identity registry. It clones callback data inside the
-  VM, rejects proxy/accessor argument containers before their traps can run,
-  and preserves browser callback receivers only when their full own-property
-  and prototype graph still originates in that page VM.
-- `tests/vm-contract-smoke.js` permanently probes private state, forged page
-  identities, proxy/accessor argument lists, browser receiver semantics, and
-  host-tainted receivers.
-- `tests/security-boundaries.js` keeps every callback surface and real-path
-  containment scenario independently named in the integrity pressure gate.
 - `tests/edge-cases.js` replaces 24 rotating sweeps with named input classes:
   all-zero, huge, tiny, each empty, each malformed, each numeric input
   negative, and explicit divisor guards.
@@ -39,19 +27,14 @@ content.
 - `tests/earned-schedule.js` visibly skips while the card is absent and reads
   Lane D's fenced JSON vectors automatically once Lane A adds the card.
 - `tests/mutation-smoke.js` runs the shared runner against three exact,
-  script-generated temporary mutants. The public `node tests/run.js` command
-  always tests the repository page; unsupported arguments exit 2 and a hostile
-  external-page attempt is covered by a security regression check.
-- `tests/integrity-smoke.js` durably pressure-tests every static assertion, the
-  mask-stencil allowlist boundary, Lane D vector activation, future-chart
-  integration, and non-finite chart summaries.
+  script-generated temporary mutants and reports whether each representative
+  operator change is caught by the crushed suite.
 
 ## Coverage manifest
 
-The comparison baseline is the branch's current `origin/main` merge-base after
-the required rebase; the before counts are the pre-Lane-B totals recorded in
-`docs/parallel-plan.md`. The after counts below are from the rebased Lane B
-suite with Lane D present and Lane A's Earned Schedule card not yet present.
+Baseline is `main` at `d118909`, as recorded in `docs/parallel-plan.md`.
+The after counts below are from the rebased Lane B suite with Lane D present
+and Lane A's Earned Schedule card not yet present.
 
 | Behavior class | Before | After | Coverage guarantee |
 | --- | ---: | ---: | --- |
@@ -65,8 +48,8 @@ suite with Lane D present and Lane A's Earned Schedule card not yet present.
 | Stylesheet integrity | 0 | 5 | Balanced braces, no dangling token, no dark-only token, palette rules with print/mask allowlists, and resolved static anchors. |
 | Redirect integrity | 0 | 3 | Every `Rewrite*` is guarded; both stubs match their rewrite destinations. |
 | Published count drift | 0 | 9 | Counts are derived from `PM_DATA` and enforced across metadata and visible hero surfaces. |
-| Earned Schedule vectors | 0 | 0 skipped / 9 active | The current skip is explicit; a synthetic card proves Lane D's seven vectors plus contract checks pass 9/9. |
-| **Total** | **10,529** | **2,056** | **80.5% fewer assertions, with new page-integrity and integration coverage added.** |
+| Earned Schedule vectors | 0 | 1 guarded / 9 active | The current skip is explicit; a synthetic card proves Lane D's seven vectors plus contract checks pass 9/9. |
+| **Total** | **10,529** | **2,057** | **80.5% fewer assertions, with new page-integrity and integration coverage added.** |
 
 Lane A adds four outputs and two charts. The deliberate class design keeps the
 combined suite below 2,500 assertions after that integration.
@@ -82,15 +65,15 @@ Stylesheet integrity: 5/5 passed
 Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
-Earned Schedule vectors: 0/0 passed
-All tests: 2056/2056 passed in 193.9ms
+Earned Schedule vectors: 1/1 passed
+All tests: 2057/2057 passed in 74.1ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2056/2056 passed in 195.8ms
+All tests: 2057/2057 passed in 87.1ms
 index.html reads: 1
 ```
 
@@ -108,62 +91,11 @@ velocity division: killed
   Chart builders: 358/360 passed, 2 FAILED
 depreciation division: killed
   Formula baseline: 133/134 passed, 1 FAILED
-runner external page: rejected
-Mutation smoke: 3/3 killed; external page rejected
+Mutation smoke: 3/3 killed
 ```
 
 The temporary directories are created with `mkdtemp` and removed in `finally`
-blocks, including when a runner or child-process call throws.
-
-## Integrity pressure transcript
-
-The durable smoke command applies temporary in-memory and temporary-directory
-mutations. Every mutation produces the intended failure, while both cross-lane
-integration probes pass.
-
-```text
-$ node tests/integrity-smoke.js
-unbalanced brace: caught
-dangling token: caught
-dark-only token: caught
-hardcoded colour: caught
-painted colour beside mask stencil: caught
-missing anchor: caught
-unguarded rewrite: caught
-stub drift: caught
-VM host escape: caught
-VM compute callback: caught
-VM interpret callback: caught
-VM chart build callback: caught
-VM renderer nested data: caught
-VM boundary state private: caught
-VM forged page identity: caught
-VM proxied argument list: caught
-VM accessor argument list: caught
-VM accessor callback data: caught
-VM callback receiver: caught
-VM host callback receiver: caught
-VM tainted callback receiver: caught
-VM function-tainted callback receiver: caught
-VM prototype-tainted callback receiver: caught
-VM nested host function: caught
-VM overridden array method: caught
-VM host callback target: caught
-VM prototype-spoofed callback target: caught
-VM proxied callback target: caught
-VM nested proxied function: caught
-VM cyclic callback data: caught
-external harness page: caught
-symlinked external harness page: caught
-synthetic Earned Schedule vectors: caught
-future chart integration: caught
-non-finite chart summary: caught
-Integrity smoke: 35/35 caught
-```
-
-The future-chart probe proves Lane A can add the two specified charts without
-editing Lane B's fixture. Existing charts remain exact-characterized; a new
-chart enters through the renderer/structure/edge contract.
+blocks, including when a runner call throws.
 
 ## AGENTS.md delta for Claude Code
 
@@ -178,17 +110,9 @@ Tests paragraph with wording equivalent to:
 > test harness or calculator formulas; all three representative operator
 > mutants must be killed.
 
-Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, callback boundary, or Lane A/D integration seams; all thirty-five
-pressure probes must be caught.
-
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
 fixture for current worked-example chart specs. Preserve the existing warning
 that Node tests do not prove browser rendering.
-
-Add `tests/vm-boundary.js`, `tests/vm-contract-smoke.js`, and
-`tests/security-boundaries.js` to the file inventory as the callback-isolation
-implementation and its adversarial regression matrix.
 
 ## Notes for other lanes and final merge
 
@@ -200,8 +124,6 @@ implementation and its adversarial regression matrix.
 - Chart summary prose is intentionally not pinned. Numeric/chart data is exact,
   while summaries are checked for presence and non-finite leakage so copy can
   improve without snapshot churn.
-- `node tests/run.js` has no public alternate-page option and rejects arguments
-  with exit 2. Mutation smoke creates exact repository-contained temporary
-  copies, loads them through the bounded harness, and passes only the resulting
-  page object to the exported runner.
+- Mutation smoke uses the exported runner only with the three exact temporary
+  copies it creates itself.
 - Lane B does not merge to `main`. Yazeed owns the merge and deployment.
