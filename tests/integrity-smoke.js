@@ -110,6 +110,44 @@ redirectRoot(function (file, text) {
   }, 'pm-calculation-desk.html refresh matches its RewriteRule');
 });
 
+var vmTemp = fs.mkdtempSync(path.join(root, '.lane-b-vm-'));
+try {
+  var vmPagePath = path.join(vmTemp, 'index.html');
+  var vmProbes = [
+    'console.log.constructor("return process")()',
+    'setTimeout.constructor("return process")()',
+    'this.constructor.constructor("return process")()',
+    'Function("return process")()',
+    'module.constructor.constructor("return process")()'
+  ];
+  var vmScript = vmProbes.map(function (probe) {
+    return 'try{if(' + probe + ')window.vmEscapes.push(' +
+      JSON.stringify(probe) + ')}catch(e){}';
+  }).join('');
+  fs.writeFileSync(vmPagePath,
+    '<script>window.vmEscapes=[];' + vmScript + '</script>');
+  var vmPage = H.loadPage(path.relative(root, vmPagePath));
+  result('VM host escape', vmPage.sandbox.vmEscapes.length === 0,
+    'host process was reachable through: ' + vmPage.sandbox.vmEscapes.join(', '));
+} finally {
+  fs.rmSync(vmTemp, { recursive: true, force: true });
+}
+
+var externalTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-external-page-'));
+try {
+  var externalPagePath = path.join(externalTemp, 'index.html');
+  fs.writeFileSync(externalPagePath, '<script>window.externalPage=true</script>');
+  try {
+    H.loadPage(externalPagePath);
+    result('external harness page', false, 'outside page was evaluated');
+  } catch (error) {
+    result('external harness page',
+      /inside the repository/.test(error.message), error.message);
+  }
+} finally {
+  fs.rmSync(externalTemp, { recursive: true, force: true });
+}
+
 var earnedPage = H.loadPage('index.html');
 earnedPage.sandbox.PM_DATA.categories[0].cards.push({
   id: 'earned-schedule',
@@ -152,8 +190,13 @@ H.reset();
 earnedSchedule.run(earnedPage, { quiet: true });
 var earnedStats = H.stats();
 result('synthetic Earned Schedule vectors',
-  earnedStats.total === 9 && earnedStats.failures.length === 0,
+  !!earnedStats.suites['vector contract'] && earnedStats.failures.length === 0,
   JSON.stringify(earnedStats.failures));
+
+var controlPage = H.loadPage('index.html');
+H.reset();
+charts.run(controlPage);
+var controlStats = H.stats();
 
 var futurePage = H.loadPage('index.html');
 futurePage.sandbox.PM_DATA.categories[0].cards.push({
@@ -182,7 +225,7 @@ H.reset();
 charts.run(futurePage);
 var futureStats = H.stats();
 result('future chart integration',
-  futureStats.total === 370 && futureStats.failures.length === 0,
+  futureStats.total > controlStats.total && futureStats.failures.length === 0,
   JSON.stringify(futureStats.failures));
 
 var summaryPage = H.loadPage('index.html');

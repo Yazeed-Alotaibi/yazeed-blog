@@ -4,6 +4,7 @@ var childProcess = require('child_process');
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
+var H = require('./harness');
 var runner = require('./run');
 
 var root = path.join(__dirname, '..');
@@ -30,7 +31,7 @@ var survived = 0;
 mutations.forEach(function (mutation) {
   var first = source.indexOf(mutation.from);
   var second = first === -1 ? -1 : source.indexOf(mutation.from, first + mutation.from.length);
-  var temp = fs.mkdtempSync(path.join(os.tmpdir(), 'yazeed-blog-mutant-'));
+  var temp = fs.mkdtempSync(path.join(root, '.lane-b-mutant-'));
   var mutantPath = path.join(temp, 'index.html');
   try {
     if (first === -1 || second !== -1) {
@@ -42,7 +43,8 @@ mutations.forEach(function (mutation) {
     fs.writeFileSync(mutantPath,
       source.slice(0, first) + mutation.to + source.slice(first + mutation.from.length));
 
-    var result = runner.run(mutantPath, { quiet: true });
+    var mutantPage = H.loadPage(path.relative(root, mutantPath));
+    var result = runner.run(mutantPage, { quiet: true });
     var failed = result.suites.filter(function (testSuite) {
       return testSuite.failures.length > 0;
     });

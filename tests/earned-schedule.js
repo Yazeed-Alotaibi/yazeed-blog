@@ -43,7 +43,6 @@ function run(page, options) {
       console.log('earned-schedule: card not present, vectors skipped');
     }
     H.suite('guarded integration');
-    H.check('Earned Schedule vectors wait for the card', true);
     return;
   }
 

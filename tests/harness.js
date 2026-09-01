@@ -18,7 +18,12 @@ var ROOT = path.join(__dirname, '..');
 /* Pull the <script> blocks out of a page and evaluate them in one shared
    sandbox, in document order, exactly as a browser would. */
 function loadPage(file) {
-  var pagePath = path.isAbsolute(file) ? file : path.join(ROOT, file);
+  var rootPath = fs.realpathSync(ROOT);
+  var pagePath = fs.realpathSync(path.resolve(ROOT, file));
+  var relative = path.relative(rootPath, pagePath);
+  if (relative.indexOf('..' + path.sep) === 0 || path.isAbsolute(relative)) {
+    throw new Error('Test page must stay inside the repository: ' + file);
+  }
   var html = fs.readFileSync(pagePath, 'utf8');
   var blocks = [];
   /* Skip external scripts and non-executable ones (type="application/ld+json"
@@ -34,17 +39,17 @@ function loadPage(file) {
     blocks.push(m[2]);
   }
 
-  var sandbox = {
-    console: console,
-    module: { exports: {} },
-    setTimeout: function () { return 0; },
-    clearTimeout: function () {},
-    Math: Math,
-    Date: Date
-  };
-  sandbox.window = sandbox;
-  sandbox.globalThis = sandbox;
-  vm.createContext(sandbox);
+  var sandbox = Object.create(null);
+  vm.createContext(sandbox, {
+    codeGeneration: { strings: false, wasm: false }
+  });
+  vm.runInContext([
+    'this.window = this;',
+    'this.console = { log: function () {}, error: function () {}, warn: function () {} };',
+    'this.module = { exports: {} };',
+    'this.setTimeout = function () { return 0; };',
+    'this.clearTimeout = function () {};'
+  ].join('\n'), sandbox, { filename: 'test-harness-bootstrap.js' });
 
   /* Only the data/logic blocks evaluate cleanly headless; the render block
      needs a DOM. Skip what throws on a missing document and keep going —

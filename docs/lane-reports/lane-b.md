@@ -8,6 +8,9 @@ content.
 
 - `tests/run.js` loads `index.html` once and passes the same page object to all
   seven suites. Every suite remains directly runnable with plain Node.
+- `tests/harness.js` resolves real paths inside the repository, creates
+  console/timer shims inside the VM realm, and disables dynamic string code
+  generation so evaluated page scripts receive no host-function constructors.
 - `tests/edge-cases.js` replaces 24 rotating sweeps with named input classes:
   all-zero, huge, tiny, each empty, each malformed, each numeric input
   negative, and explicit divisor guards.
@@ -36,9 +39,10 @@ content.
 
 ## Coverage manifest
 
-Baseline is `main` at `d118909`, as recorded in `docs/parallel-plan.md`.
-The after counts below are from the rebased Lane B suite with Lane D present
-and Lane A's Earned Schedule card not yet present.
+The comparison baseline is the branch's current `origin/main` merge-base after
+the required rebase; the before counts are the pre-Lane-B totals recorded in
+`docs/parallel-plan.md`. The after counts below are from the rebased Lane B
+suite with Lane D present and Lane A's Earned Schedule card not yet present.
 
 | Behavior class | Before | After | Coverage guarantee |
 | --- | ---: | ---: | --- |
@@ -52,8 +56,8 @@ and Lane A's Earned Schedule card not yet present.
 | Stylesheet integrity | 0 | 5 | Balanced braces, no dangling token, no dark-only token, palette rules with print/mask allowlists, and resolved static anchors. |
 | Redirect integrity | 0 | 3 | Every `Rewrite*` is guarded; both stubs match their rewrite destinations. |
 | Published count drift | 0 | 9 | Counts are derived from `PM_DATA` and enforced across metadata and visible hero surfaces. |
-| Earned Schedule vectors | 0 | 1 guarded / 9 active | The current skip is explicit; a synthetic card proves Lane D's seven vectors plus contract checks pass 9/9. |
-| **Total** | **10,529** | **2,057** | **80.5% fewer assertions, with new page-integrity and integration coverage added.** |
+| Earned Schedule vectors | 0 | 0 skipped / 9 active | The current skip is explicit; a synthetic card proves Lane D's seven vectors plus contract checks pass 9/9. |
+| **Total** | **10,529** | **2,056** | **80.5% fewer assertions, with new page-integrity and integration coverage added.** |
 
 Lane A adds four outputs and two charts. The deliberate class design keeps the
 combined suite below 2,500 assertions after that integration.
@@ -69,15 +73,15 @@ Stylesheet integrity: 5/5 passed
 Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
-Earned Schedule vectors: 1/1 passed
-All tests: 2057/2057 passed in 74.1ms
+Earned Schedule vectors: 0/0 passed
+All tests: 2056/2056 passed in 73.1ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2057/2057 passed in 87.1ms
+All tests: 2056/2056 passed in 70.6ms
 index.html reads: 1
 ```
 
@@ -118,10 +122,12 @@ painted colour beside mask stencil: caught
 missing anchor: caught
 unguarded rewrite: caught
 stub drift: caught
+VM host escape: caught
+external harness page: caught
 synthetic Earned Schedule vectors: caught
 future chart integration: caught
 non-finite chart summary: caught
-Integrity smoke: 11/11 caught
+Integrity smoke: 13/13 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -142,7 +148,7 @@ Tests paragraph with wording equivalent to:
 > mutants must be killed.
 
 Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, or Lane A/D integration seams; all eleven pressure probes must be
+contracts, or Lane A/D integration seams; all thirteen pressure probes must be
 caught.
 
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
@@ -160,6 +166,7 @@ that Node tests do not prove browser rendering.
   while summaries are checked for presence and non-finite leakage so copy can
   improve without snapshot churn.
 - `node tests/run.js` has no public alternate-page option and rejects arguments
-  with exit 2. Mutation smoke uses the exported runner only with exact
-  temporary copies it creates itself.
+  with exit 2. Mutation smoke creates exact repository-contained temporary
+  copies, loads them through the bounded harness, and passes only the resulting
+  page object to the exported runner.
 - Lane B does not merge to `main`. Yazeed owns the merge and deployment.

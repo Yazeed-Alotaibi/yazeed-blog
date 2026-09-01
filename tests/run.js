@@ -12,9 +12,8 @@ var suites = [
   require('./earned-schedule')
 ];
 
-function run(pageFile, options) {
+function run(page, options) {
   var started = process.hrtime.bigint();
-  var page = H.loadPage(pageFile);
   var passed = 0;
   var total = 0;
   var allPassed = true;
@@ -63,7 +62,7 @@ if (require.main === module) {
     console.error('Usage: node tests/run.js');
     process.exitCode = 2;
   } else {
-    var result = run('index.html');
+    var result = run(H.loadPage('index.html'));
     if (!result.allPassed) process.exitCode = 1;
   }
 }
