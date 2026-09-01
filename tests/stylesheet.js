@@ -110,6 +110,14 @@ function uses(text) {
   return names;
 }
 
+function isMaskStencil(css, index, block) {
+  var start = css.lastIndexOf(';', index);
+  var end = css.indexOf(';', index);
+  if (start < block.start) start = block.start;
+  if (end === -1 || end > block.end) end = block.end;
+  return /^\s*(?:-webkit-)?mask-image\s*:/i.test(css.slice(start + 1, end));
+}
+
 function run(page) {
   var html = page.html;
   var css = styleText(html);
@@ -160,11 +168,10 @@ function run(page) {
       return block.start < color.index && color.index < block.end;
     });
     var allowed = containing.some(function (block) {
-      var blockText = block.end === -1 ? '' : css.slice(block.start + 1, block.end);
       return block.prelude === ':root' ||
         /@media\s*\(prefers-color-scheme:\s*dark\)/i.test(block.prelude) ||
         /@media\s+print\b/i.test(block.prelude) ||
-        (/#cat-nav\b/.test(block.prelude) && /mask-image\s*:/.test(blockText));
+        (/#cat-nav\b/.test(block.prelude) && isMaskStencil(css, color.index, block));
     });
     if (!allowed) hardcoded.push(color[0] + ' at CSS offset ' + color.index);
   }

@@ -28,8 +28,11 @@ content.
   Lane D's fenced JSON vectors automatically once Lane A adds the card.
 - `tests/mutation-smoke.js` runs the shared runner against three exact,
   script-generated temporary mutants. The public `node tests/run.js` command
-  always tests the repository page; an external `--page` argument is ignored
-  and covered by a security regression check.
+  always tests the repository page; unsupported arguments exit 2 and a hostile
+  external-page attempt is covered by a security regression check.
+- `tests/integrity-smoke.js` durably pressure-tests every static assertion, the
+  mask-stencil allowlist boundary, Lane D vector activation, future-chart
+  integration, and non-finite chart summaries.
 
 ## Coverage manifest
 
@@ -92,34 +95,33 @@ velocity division: killed
   Chart builders: 358/360 passed, 2 FAILED
 depreciation division: killed
   Formula baseline: 133/134 passed, 1 FAILED
-runner external page: blocked
-Mutation smoke: 3/3 killed; external page blocked
+runner external page: rejected
+Mutation smoke: 3/3 killed; external page rejected
 ```
 
-The three temporary directories are created with `mkdtemp`, contain only a
-mutated copy of `index.html`, and are removed by the script after each run.
+The temporary directories are created with `mkdtemp` and removed in `finally`
+blocks, including when a runner or child-process call throws.
 
 ## Integrity pressure transcript
 
-Each static assertion was run once against a temporary in-memory or temporary
-directory mutation. Every mutation produced exactly the intended failure.
+The durable smoke command applies temporary in-memory and temporary-directory
+mutations. Every mutation produces the intended failure, while both cross-lane
+integration probes pass.
 
 ```text
-unbalanced brace: caught (1 failure(s))
-dangling token: caught (1 failure(s))
-dark-only token: caught (1 failure(s))
-hardcoded colour: caught (1 failure(s))
-missing anchor: caught (1 failure(s))
-unguarded rewrite: caught (1 failure(s))
-stub drift: caught (1 failure(s))
-Static pressure: 7/7 caught
-```
-
-Two additional cross-lane probes passed:
-
-```text
-Synthetic Earned Schedule vectors: 9/9 passed
-Future chart integration: 370/370 passed
+$ node tests/integrity-smoke.js
+unbalanced brace: caught
+dangling token: caught
+dark-only token: caught
+hardcoded colour: caught
+painted colour beside mask stencil: caught
+missing anchor: caught
+unguarded rewrite: caught
+stub drift: caught
+synthetic Earned Schedule vectors: caught
+future chart integration: caught
+non-finite chart summary: caught
+Integrity smoke: 11/11 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -139,6 +141,10 @@ Tests paragraph with wording equivalent to:
 > test harness or calculator formulas; all three representative operator
 > mutants must be killed.
 
+Run `node tests/integrity-smoke.js` when changing the static parsers, chart
+contracts, or Lane A/D integration seams; all eleven pressure probes must be
+caught.
+
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
 fixture for current worked-example chart specs. Preserve the existing warning
 that Node tests do not prove browser rendering.
@@ -153,8 +159,9 @@ that Node tests do not prove browser rendering.
 - Chart summary prose is intentionally not pinned. Numeric/chart data is exact,
   while summaries are checked for presence and non-finite leakage so copy can
   improve without snapshot churn.
-- `node tests/run.js` has no public alternate-page option. Mutation smoke uses
-  the exported runner only with exact temporary copies it creates itself.
+- `node tests/run.js` has no public alternate-page option and rejects arguments
+  with exit 2. Mutation smoke uses the exported runner only with exact
+  temporary copies it creates itself.
 - Lane B does not merge to `main`. Yazeed owns the merge and deployment.
 
 ## Commits before this report
