@@ -12,7 +12,7 @@ directly with no build step:
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 34 calculators · 103 metrics rendered from a `PM_DATA` object |
+| `index.html` | The whole site — sidebar shell, hero with a live earned-value gauge, the About/Record section, and 14 domains · 34 calculators · 103 metrics rendered from a `PM_DATA` object. Also the whole `.xlsx` writer; see **Exporting to Excel** |
 | `404.html` | The branded not-found page — bench styling copied inline (not shared), an instrument at rest reading "READING NOT FOUND," and links back to the desk. Apache serves it via `ErrorDocument 404` in `.htaccess` |
 | `og.png` | The 1200×630 card shown when a link to the site is shared. The one image the site ships |
 
@@ -109,17 +109,55 @@ graduated scales, tabular figures.
 Copy the custom properties and font stack from `index.html` when adding a page —
 consistency across the bench is the point.
 
+## Exporting to Excel
+
+Every card carries an **Excel** button beside *Copy link*. It writes a real
+`.xlsx` — parameters, results with their verdict sentences, the formula, the
+how-to, and each chart as a data table beside a **native, editable Excel
+chart** drawn from those cells.
+
+There is no library. An `.xlsx` is a ZIP of XML parts, and three inline
+modules build one:
+
+| Module | Where | What it does |
+|---|---|---|
+| `PM_XLSX` | its own `<script>`, before `PM_CHARTS` | A ZIP writer (CRC32, stored entries) and the SpreadsheetML/DrawingML — worksheet, styles, chart, drawing |
+| `PM_CHARTS.exportData` | inside the charts module | Turns a plot spec into **raw numbers** and names the Excel chart type that carries it |
+| `PM_EXPORT` | its own `<script>`, after `PM_CHARTS` | Lays out the sheet and points each chart's series at the cells holding its numbers |
+
+`PM_EXPORT` is a pure function of the card, its values and its results — the
+download itself is `saveWorkbook` in the desk script, because the test harness
+skips any block that touches `document`. Keep it that way: the layout is only
+testable headless while it stays DOM-free.
+
+**Element order in those XML parts is not cosmetic.** The OOXML schemas are
+sequences, and Excel answers an out-of-order child with "we found a problem
+with some content" rather than with the chart. Move something only against
+ECMA-376, not against what looks tidy.
+
+Chart kinds map to Excel like this — `bars`, `distribution`, `rangeplot` and
+`quadrant` become column charts, `curve` a scatter with lines, `windows` a
+stacked bar whose first segment is invisible (which is what makes it a float
+diagram). **`meter` and `matrix` deliberately export no chart.** A gauge reads
+one value against threshold bands and a risk matrix reads a cell position;
+drawn as bars they would silently become magnitude comparisons. Those sheets
+carry the figures and a sentence saying why there is no plot. Adding a fake
+chart there would be a regression, not a feature.
+
+A new chart kind that `exportData` does not know about is caught by
+`tests/export.js`, not discovered by a reader with a blank sheet.
+
 ## Tests
 
 `node tests/run.js` is the complete dependency-free gate. It loads `index.html`
-once and runs eight suites against that single parse: the formula baseline,
+once and runs nine suites against that single parse: the formula baseline,
 deliberate edge classes, chart specs, stylesheet integrity, redirect integrity,
 published-count drift, guarded Earned Schedule vectors (which skip until a card
-with `id: 'earned-schedule'` exists, then activate themselves), and prerender
-freshness. Each suite file (`tests/baseline.js`, `edge-cases.js`, `charts.js`,
-`stylesheet.js`, `redirects.js`, `counts.js`, `earned-schedule.js`,
-`prerender.js`) is still directly runnable on its own for debugging — it
-re-parses the page itself when run standalone.
+with `id: 'earned-schedule'` exists, then activate themselves), prerender
+freshness, and spreadsheet export. Each suite file (`tests/baseline.js`,
+`edge-cases.js`, `charts.js`, `stylesheet.js`, `redirects.js`, `counts.js`,
+`earned-schedule.js`, `prerender.js`, `export.js`) is still directly runnable on
+its own for debugging — it re-parses the page itself when run standalone.
 
 `tests/baseline.json` records every calculator's output for one set of example
 inputs, so a refactor has to prove it changed nothing. `node tests/baseline.js
@@ -144,6 +182,18 @@ green throughout.
 So a green run is not evidence that a chart draws. Open the page and look at it.
 Adding a browser to the test suite would mean adding a dependency, which the
 hard constraints above rule out — the manual check is the deliberate trade.
+
+**The same gap applies to the export, one layer further out.** `tests/export.js`
+checks the ZIP, the parts, the CRCs, that every plotted value is a number rather
+than a formatted string, and that every chart's series reference resolves back
+to the cells it claims to plot — but nothing here opens a workbook. A file can
+satisfy all of it and still make Excel offer to repair it, because schema order
+is not something these assertions can see.
+
+When you change the XML, open the result. The workbooks that shipped this
+feature were checked against LibreOffice Calc and `openpyxl` (with warnings
+raised as errors) — both installable in a scratch directory, neither a
+dependency of this repository. Export a card, open it, look at the chart.
 
 ### Look at it in a foreground tab
 
