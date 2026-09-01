@@ -2074,6 +2074,9 @@ TCPI = (BAC − EV) ÷ (BAC − AC)</code></pre>
       <dt>AC — Actual Cost</dt>
       <dd>What the completed work really cost, regardless of what was budgeted (also called ACWP).</dd>
       <dd class="prerender-eg">e.g. 60000</dd>
+      <dt>EAC — management forecast (optional)</dt>
+      <dd>A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.</dd>
+      <dd class="prerender-eg">e.g. 125000</dd>
       </dl>
       <h4>Results</h4>
       <h5>Performance today</h5>
@@ -2104,11 +2107,11 @@ TCPI = (BAC − EV) ÷ (BAC − AC)</code></pre>
       <dt>ETC — Estimate to Complete</dt>
       <dd>EAC − AC (using the typical-variance EAC). Money still needed to finish the remaining work.</dd>
       <dt>VAC — Variance at Completion</dt>
-      <dd>BAC − EAC. The over- or under-run expected on the day the project finishes.</dd>
+      <dd>BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.</dd>
       <dt>TCPI — to hit BAC</dt>
       <dd>(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.</dd>
       <dt>TCPI — to hit EAC</dt>
-      <dd>(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit the new forecast instead of the original budget.</dd>
+      <dd>(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.</dd>
       </dl>
       <h4>Charts</h4>
       <dl class="prerender-charts">
@@ -2256,7 +2259,7 @@ Runway = (Budget − Spent) ÷ Burn rate</code></pre>
       <article class="prerender-card" id="prerender-calc-three-point">
       <h3>03.1 — Three-point estimate (PERT)</h3>
       <p class="prerender-tagline">Triangular · Beta · σ · confidence ranges</p>
-      <p class="prerender-about">Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike.</p>
+      <p class="prerender-about">Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.</p>
       <pre class="prerender-formula"><code>Triangular = (O + M + P) ÷ 3
 PERT (beta) = (O + 4M + P) ÷ 6
 σ = (P − O) ÷ 6        Variance = σ²</code></pre>
@@ -2298,7 +2301,7 @@ PERT (beta) = (O + 4M + P) ÷ 6
       <article class="prerender-card" id="prerender-calc-path-sigma">
       <h3>03.2 — Path uncertainty roll-up</h3>
       <p class="prerender-tagline">σ(path) = √(Σ σ²)</p>
-      <p class="prerender-about">Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk.</p>
+      <p class="prerender-about">Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk. That diversification assumes the activities are <strong>INDEPENDENT</strong>. Correlated risks — one team, one supplier, one weather window — break the assumption, and the true path σ is then larger than this. It also covers a single path, not the merge bias where parallel paths converge.</p>
       <pre class="prerender-formula"><code>σ(path) = √(σ₁² + σ₂² + … + σₙ²)</code></pre>
       <h4>Parameters</h4>
       <dl class="prerender-params">
@@ -2323,7 +2326,8 @@ PERT (beta) = (O + 4M + P) ÷ 6
       <h3>03.3 — Learning curve</h3>
       <p class="prerender-tagline">T(n) = T₁ × n^(log rate ÷ log 2)</p>
       <p class="prerender-about">Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.</p>
-      <pre class="prerender-formula"><code>Time for unit n = T₁ × n^(log(rate) ÷ log 2)</code></pre>
+      <pre class="prerender-formula"><code>Time for unit n = T₁ × n^(log(rate ÷ 100) ÷ log 2)
+rate is the learning rate as entered, in percent: 80 means 0.8</code></pre>
       <h4>Parameters</h4>
       <dl class="prerender-params">
       <dt>T₁ — first unit time (or cost)</dt>
@@ -2880,9 +2884,9 @@ Payback: periods until cumulative cash flow ≥ 0</code></pre>
       <dt>Net Present Value</dt>
       <dd>Value created in today’s money after paying back capital and the required return.</dd>
       <dt>Internal Rate of Return</dt>
-      <dd>The project’s intrinsic return per period. Compare it to the discount rate.</dd>
+      <dd>The project’s intrinsic return per period. Compare it to the discount rate. Reliable only for conventional flows — one outlay followed by inflows. If the signs change more than once, IRR can have several answers or none, and NPV is the measure to trust.</dd>
       <dt>Benefit–Cost Ratio</dt>
-      <dd>Present value of inflows per unit invested. Above 1 means benefits outweigh costs.</dd>
+      <dd>Present value of the future net cash flows per unit invested — net, so a negative period nets off rather than counting as a benefit. Above 1 means benefits outweigh costs.</dd>
       <dt>Payback period</dt>
       <dd>Periods until the undiscounted cash recovers the investment — a measure of capital risk, not profitability.</dd>
       </dl>
@@ -3447,7 +3451,8 @@ var PM_DATA = (function () {
             { key: 'bac', label: 'BAC — Budget at Completion', meaning: 'The total approved budget for all project work. The baseline everything else is measured against.', placeholder: 'e.g. 100000' },
             { key: 'pv', label: 'PV — Planned Value', meaning: 'The budgeted cost of the work that was scheduled to be done by now (also called BCWS).', placeholder: 'e.g. 50000' },
             { key: 'ev', label: 'EV — Earned Value', meaning: 'The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).', placeholder: 'e.g. 45000' },
-            { key: 'ac', label: 'AC — Actual Cost', meaning: 'What the completed work really cost, regardless of what was budgeted (also called ACWP).', placeholder: 'e.g. 60000' }
+            { key: 'ac', label: 'AC — Actual Cost', meaning: 'What the completed work really cost, regardless of what was budgeted (also called ACWP).', placeholder: 'e.g. 60000' },
+            { key: 'eacMgmt', label: 'EAC — management forecast (optional)', meaning: 'A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.', placeholder: 'e.g. 125000' }
           ],
           outputs: [
             {
@@ -3455,7 +3460,7 @@ var PM_DATA = (function () {
               key: 'cv', label: 'Cost Variance (CV)', format: 'money',
               meaning: 'Budget health in currency: value earned minus money spent.',
               compute: function (v) { return ok(v.ev, v.ac) ? v.ev - v.ac : null; },
-              interpret: function (x) { return x > 0 ? good('Under budget so far.') : x < 0 ? bad('Over budget by this amount.') : info('Exactly on budget.'); }
+              interpret: function (x) { return x > 0 ? good('The work performed cost less than its budgeted value.') : x < 0 ? bad('The work performed cost more than its budgeted value, by this amount.') : info('The work performed cost exactly its budgeted value.'); }
             },
             {
               group: 'Performance today',
@@ -3483,7 +3488,7 @@ var PM_DATA = (function () {
               key: 'csi', label: 'Cost–Schedule Index (CSI)', format: 'ratio',
               meaning: 'CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.',
               compute: function (v) { return ok(v.ev, v.pv, v.ac) && v.ac !== 0 && v.pv !== 0 ? (v.ev / v.ac) * (v.ev / v.pv) : null; },
-              interpret: function (x) { return x >= 1 ? good('Healthy overall.') : x >= 0.9 ? warn('Slipping — watch closely.') : bad('Recovery is statistically unlikely without intervention.'); }
+              interpret: function (x) { return x >= 1 ? good('Healthy overall.') : x >= 0.9 ? warn('Slipping — watch closely.') : bad('Past roughly 20% complete, recovery from here is rare without intervention. Early in a project this reading is still noisy.'); }
             },
             {
               group: 'Performance today',
@@ -3533,7 +3538,7 @@ var PM_DATA = (function () {
             {
               group: 'Forecasting completion',
               key: 'vac', label: 'VAC — Variance at Completion', format: 'money',
-              meaning: 'BAC − EAC. The over- or under-run expected on the day the project finishes.',
+              meaning: 'BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.',
               compute: function (v) { return ok(v.bac, v.ev, v.ac) && v.ev !== 0 ? v.bac - v.bac / (v.ev / v.ac) : null; },
               interpret: function (x) { return x >= 0 ? good('Expected to finish under or on budget.') : bad('Expected to finish over budget by this amount.'); }
             },
@@ -3551,13 +3556,26 @@ var PM_DATA = (function () {
             {
               group: 'Forecasting completion',
               key: 'tcpiEac', label: 'TCPI — to hit EAC', format: 'ratio',
-              meaning: '(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit the new forecast instead of the original budget.',
+              meaning: '(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.',
+              /* Read against BAC ÷ CPI, (BAC−EV)/(EAC−AC) cancels to EV/AC — the
+                 same CPI already shown two rows up, dressed as a second opinion.
+                 A management EAC is the number this test is actually for, so use
+                 it when given and say so plainly when it is not. */
               compute: function (v) {
                 if (!ok(v.bac, v.ev, v.ac) || v.ev === 0) return null;
-                var eac = v.bac / (v.ev / v.ac);
+                var eac = ok(v.eacMgmt) ? v.eacMgmt : v.bac / (v.ev / v.ac);
                 return (eac - v.ac) !== 0 ? (v.bac - v.ev) / (eac - v.ac) : null;
               },
-              interpret: function (x) { return x <= 1 ? good('The revised target is achievable at current efficiency.') : warn('Even the revised target demands improvement.'); }
+              interpret: function (x, v) {
+                if (!ok(v.eacMgmt)) {
+                  return info('This equals CPI by construction — the forecast it is measured against was derived from CPI. Enter a management EAC above to make it a real test.');
+                }
+                return x <= 1
+                  ? good('Achievable — the forecast holds at current efficiency.')
+                  : x <= 1.1
+                    ? warn('A stretch: the forecast needs remaining work run ' + f2((x - 1) * 100) + '% more efficiently.')
+                    : bad('The forecast is unrealistic at this efficiency — it needs re-setting, not more optimism.');
+              }
             }
           ],
           charts: [
@@ -3852,7 +3870,7 @@ var PM_DATA = (function () {
               key: 'pctUsed', label: '% of budget used', format: 'pct',
               meaning: 'Share of total funds already consumed.',
               compute: function (v) { return ok(v.budget, v.spent) && v.budget !== 0 ? (v.spent / v.budget) * 100 : null; },
-              interpret: function (x) { return x > 100 ? bad('Over budget.') : warn('Meaningful only next to % of work complete — see Earned Value.'); }
+              interpret: function (x) { return x > 100 ? bad('Over budget.') : info('Meaningful only next to % of work complete — see Earned Value.'); }
             }
           ],
           charts: [
@@ -3889,7 +3907,7 @@ var PM_DATA = (function () {
           id: 'three-point',
           name: 'Three-point estimate (PERT)',
           tagline: 'Triangular · Beta · σ · confidence ranges',
-          about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike.',
+          about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.',
           formula: [
             'Triangular = (O + M + P) ÷ 3',
             'PERT (beta) = (O + 4M + P) ÷ 6',
@@ -3978,7 +3996,7 @@ var PM_DATA = (function () {
           id: 'path-sigma',
           name: 'Path uncertainty roll-up',
           tagline: 'σ(path) = √(Σ σ²)',
-          about: 'Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk.',
+          about: 'Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk. That diversification assumes the activities are <strong>INDEPENDENT</strong>. Correlated risks — one team, one supplier, one weather window — break the assumption, and the true path σ is then larger than this. It also covers a single path, not the merge bias where parallel paths converge.',
           formula: ['σ(path) = √(σ₁² + σ₂² + … + σₙ²)'],
           inputs: [
             { key: 'sigmas', label: 'Activity σ values (comma-separated)', meaning: 'The standard deviation of each activity on the path, from the three-point calculator above.', placeholder: 'e.g. 1.33, 0.5, 2', type: 'text' }
@@ -4043,7 +4061,7 @@ var PM_DATA = (function () {
           name: 'Learning curve',
           tagline: 'T(n) = T₁ × n^(log rate ÷ log 2)',
           about: 'Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.',
-          formula: ['Time for unit n = T₁ × n^(log(rate) ÷ log 2)'],
+          formula: ['Time for unit n = T₁ × n^(log(rate ÷ 100) ÷ log 2)', 'rate is the learning rate as entered, in percent: 80 means 0.8'],
           inputs: [
             { key: 't1', label: 'T₁ — first unit time (or cost)', meaning: 'How long the first repetition took — the anchor of the curve.', placeholder: 'e.g. 100' },
             { key: 'rate', label: 'Learning rate (%)', meaning: 'Per-doubling retention: 80 means each doubling takes 80% of the previous. Typical: 70–90%; 100 = no learning.', placeholder: 'e.g. 80' },
@@ -4944,7 +4962,7 @@ var PM_DATA = (function () {
             },
             {
               key: 'irr', label: 'Internal Rate of Return', format: 'pct',
-              meaning: 'The project’s intrinsic return per period. Compare it to the discount rate.',
+              meaning: 'The project’s intrinsic return per period. Compare it to the discount rate. Reliable only for conventional flows — one outlay followed by inflows. If the signs change more than once, IRR can have several answers or none, and NPV is the measure to trust.',
               compute: function (v) {
                 var flows = parseFlows(v.flows);
                 return ok(v.inv) && flows ? irrOf(v.inv, flows) : null;
@@ -4953,7 +4971,7 @@ var PM_DATA = (function () {
             },
             {
               key: 'bcr', label: 'Benefit–Cost Ratio', format: 'ratio',
-              meaning: 'Present value of inflows per unit invested. Above 1 means benefits outweigh costs.',
+              meaning: 'Present value of the future net cash flows per unit invested — net, so a negative period nets off rather than counting as a benefit. Above 1 means benefits outweigh costs.',
               compute: function (v) {
                 var flows = parseFlows(v.flows);
                 if (!ok(v.rate, v.inv) || !flows || v.inv === 0) return null;
