@@ -10,7 +10,8 @@ var suites = [
   require('./redirects'),
   require('./counts'),
   require('./earned-schedule'),
-  require('./prerender')
+  require('./prerender'),
+  require('./export')
 ];
 
 function run(pageFile, options) {
