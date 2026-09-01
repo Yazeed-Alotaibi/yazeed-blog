@@ -36,6 +36,25 @@ function esc(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* Google's tag, identical on every shipped page. page_location omits the
+   hash so calculator inputs in a copied deep-link are not sent with the
+   page view. */
+function googleTag() {
+  return [
+    '  <!-- Google tag (gtag.js). page_location omits the hash so calculator',
+    '       inputs in a copied deep-link are not sent with the page view. -->',
+    '  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4XTN125MF"></script>',
+    '  <script>',
+    '    window.dataLayer = window.dataLayer || [];',
+    '    function gtag(){dataLayer.push(arguments);}',
+    "    gtag('js', new Date());",
+    "    gtag('config', 'G-J4XTN125MF', {",
+    "      page_location: location.protocol + '//' + location.host + location.pathname",
+    '    });',
+    '  </script>'
+  ].join('\n');
+}
+
 /* ── lifting the shared parts out of index.html ─────────────────── */
 
 function styleBlock(html) {
@@ -307,6 +326,7 @@ function build(spec, html, manifestPath) {
     '<!doctype html>',
     '<html lang="en">',
     '<head>',
+    googleTag(),
     '  <meta charset="utf-8">',
     '  <meta name="viewport" content="width=device-width, initial-scale=1">',
     '  <title>' + esc(spec.title) + '</title>',
@@ -395,9 +415,9 @@ function build(spec, html, manifestPath) {
     '  </main>',
     '',
     '  <footer class="doc-foot">',
-    '    <p>Every figure on this page is calculated in your browser. Nothing you',
-    '    type is sent anywhere — there is no server to send it to, and no',
-    '    analytics watching. <a href="/">Back to all ' + totalCards + ' calculators</a>.</p>',
+    '    <p>Every figure on this page is calculated in your browser. The numbers',
+    '    you type are not sent to us. Google Analytics records that the page was',
+    '    visited. <a href="/">Back to all ' + totalCards + ' calculators</a>.</p>',
     '  </footer>',
     '',
     '  <!-- The rendering engine expects these; this page has no use for them,',

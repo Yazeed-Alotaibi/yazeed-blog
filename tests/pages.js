@@ -9,10 +9,10 @@
    The rest guard the things that make a page worth having at all, and the
    things the SEO plan requires of this phase: a title short enough to survive
    Google's truncation, a canonical that points at a URL the host actually
-   answers, no third-party request smuggled in by a content file, real
-   long-form prose (not a thin keyword page), a breadcrumb that Google can
-   parse, a footer that carries the live calculator count, and a static link
-   from the desk to every page so a crawler has a route to it. */
+   answers, no third-party request other than the named Google Analytics tag,
+   real long-form prose (not a thin keyword page), a breadcrumb that Google
+   can parse, a footer that carries the live calculator count, and a static
+   link from the desk to every page so a crawler has a route to it. */
 
 'use strict';
 
@@ -50,6 +50,33 @@ function wordCount(text) {
 function hasCount(text, count, noun) {
   var prefix = noun === 'calculators' ? '(?:(?:PM|project-management)\\s+)?' : '';
   return new RegExp('\\b' + count + '\\s+' + prefix + noun + '\\b', 'i').test(text);
+}
+
+var GA_SRC = 'https://www.googletagmanager.com/gtag/js?id=G-J4XTN125MF';
+
+function gaHits(html) {
+  return (html.match(/gtag\/js\?id=G-J4XTN125MF/g) || []).length;
+}
+
+function allowedRequest(url) {
+  return url.indexOf('https://yazeed.blog/') === 0 || url === GA_SRC;
+}
+
+/* Keep external <script src> (the Google tag) visible, but drop inline
+   script bodies so a URL inside calculator data is not treated as a request. */
+function strayRequests(html) {
+  var markup = String(html).replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,
+    function (all, attrs) {
+      if (/\bsrc\s*=/.test(attrs)) return all;
+      return '<script' + attrs + '></script>';
+    });
+  var found = [];
+  var re = /<(?:link|script|img)\b[^>]*\b(?:href|src)\s*=\s*"(https?:\/\/[^"]+)"/gi;
+  var m;
+  while ((m = re.exec(markup)) !== null) {
+    if (!allowedRequest(m[1])) found.push(m[1]);
+  }
+  return found;
 }
 
 function run(page) {
@@ -129,16 +156,9 @@ function run(page) {
       /"@type": "SoftwareApplication"/.test(onDisk) &&
       /"@type": "BreadcrumbList"/.test(onDisk));
 
-    H.suite('no third-party requests');
-    var markup = onDisk.replace(/<script[\s\S]*?<\/script>/gi, '');
-    var external = [];
-    var re = /<link\b[^>]*\bhref\s*=\s*"(https?:\/\/[^"]+)"|\bsrc\s*=\s*"(https?:\/\/[^"]+)"/gi;
-    var m;
-    while ((m = re.exec(markup)) !== null) {
-      var url = m[1] || m[2];
-      if (url.indexOf('https://yazeed.blog/') !== 0) external.push(url);
-    }
-    H.deep(file + ': requests nothing from another origin', external.slice(0, 3), []);
+    H.suite('third-party requests');
+    H.check(file + ': carries the Google tag once', gaHits(onDisk) === 1);
+    H.deep(file + ': requests no other origin', strayRequests(onDisk).slice(0, 3), []);
 
     H.suite('long-form prose');
     var prosePath = path.join(ROOT, 'content', spec.slug + '.html');
@@ -201,6 +221,14 @@ function run(page) {
       indexOnDisk.indexOf('href="' + file + '"') !== -1,
       'no static href="' + file + '" in index.html — run node tools/prerender.js');
   });
+
+  H.suite('Google tag on every shipped page');
+  ['index.html', '404.html', 'pm-calculation-desk.html', 'wbs-estimation-toolkit.html']
+    .forEach(function (file) {
+      var html = fs.readFileSync(path.join(ROOT, file), 'utf8');
+      H.check(file + ': carries the Google tag once', gaHits(html) === 1);
+      H.deep(file + ': requests no other origin', strayRequests(html).slice(0, 3), []);
+    });
 }
 
 module.exports = { title: TITLE, run: run };

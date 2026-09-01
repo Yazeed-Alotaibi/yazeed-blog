@@ -29,6 +29,9 @@ function loadPage(file) {
   while ((m = re.exec(html)) !== null) {
     var attrs = m[1];
     if (/\bsrc=/.test(attrs)) continue;
+    /* The Google tag's inline boot reads `location` and talks to
+       googletagmanager — neither exists here. */
+    if (/G-J4XTN125MF/.test(m[2])) continue;
     var type = /\btype\s*=\s*["']([^"']+)["']/.exec(attrs);
     if (type && !/javascript|module/.test(type[1])) continue;
     blocks.push(m[2]);

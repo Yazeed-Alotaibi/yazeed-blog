@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js). page_location omits the hash so calculator
+       inputs in a copied deep-link are not sent with the page view. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4XTN125MF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J4XTN125MF', {
+      page_location: location.protocol + '//' + location.host + location.pathname
+    });
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Earned Value Analysis — CPI, SPI, EAC Calculator</title>
@@ -26,8 +37,8 @@
   <style>
 /* ── self-hosted webfonts ──────────────────────────────────────────────────
    These were a render-blocking stylesheet from Google. Same files, downloaded
-   into fonts/ and committed, so the page now makes no third-party request at
-   all — the footer's "nothing is sent anywhere" covers the fonts too. It also
+   into fonts/ and committed, so the faces themselves never leave this origin.
+   Google Analytics is the one third-party request the page makes. It also
    removes the serial hop this page used to wait on: connect to googleapis,
    fetch and parse CSS, only then connect to gstatic before a font byte moves.
 
@@ -2318,9 +2329,9 @@ before it is too late to act. Calculated fortnightly, it gives you time.</p>
     </article>
   </main>
   <footer class="doc-foot">
-    <p>Every figure on this page is calculated in your browser. Nothing you
-    type is sent anywhere — there is no server to send it to, and no
-    analytics watching. <a href="/">Back to all 34 calculators</a>.</p>
+    <p>Every figure on this page is calculated in your browser. The numbers
+    you type are not sent to us. Google Analytics records that the page was
+    visited. <a href="/">Back to all 34 calculators</a>.</p>
   </footer>
   <!-- The rendering engine expects these; this page has no use for them,
        so they exist off-screen rather than being coded around. Changing

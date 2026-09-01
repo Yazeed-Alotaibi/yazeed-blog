@@ -24,8 +24,8 @@ lands.
 
 `fonts/` holds the six woff2 files the pages use, plus the OFL licence they
 ship under. They were a render-blocking stylesheet from Google until the site
-took them in-house; see **No third-party requests** below for why that matters
-more than the bytes.
+took them in-house. Fonts stay on this origin; Google Analytics is the one
+named third-party exception — see **Third-party requests** below.
 
 `tools/prerender.js` renders `PM_DATA` to static markup and writes it into
 `index.html` between `<!-- prerender:start -->` and `<!-- prerender:end -->`.
@@ -103,20 +103,24 @@ These are not preferences. Breaking one breaks the site's premise.
 
 - **No build step.** No bundler, no transpiler, no framework. A file you open
   in a browser is the shipped artifact.
-- **No dependencies.** No npm packages, no CDN scripts.
-- **No third-party requests.** Neither page contacts any origin but its own —
-  the fonts were the last one and now ship from `fonts/`. The footers promise
-  "nothing is sent anywhere"; that promise is now literally true, and adding a
-  CDN script, a hosted font or an embed would break it. Same-origin assets are
-  fine.
+- **No dependencies.** No npm packages. The one allowed remote script is the
+  Google tag below; do not add another CDN, library, or hosted font.
+- **Third-party requests.** Google Analytics 4 (`G-J4XTN125MF`) via
+  `googletagmanager.com/gtag/js` is the only third-party request. It records
+  the visit. Calculator inputs stay in the browser; `page_location` is sent
+  without the URL hash so a copied deep-link's figures are not included.
+  No other CDN, hosted font, or embed. Same-origin assets are fine.
 - **Self-contained pages.** CSS in a `<style>` block, JavaScript in a `<script>`
-  block, both inline in the page that uses them. Pages do not share files —
-  `fonts/` is the one shared directory, and it holds no code.
-- **Client-side only.** Every calculation runs in the visitor's browser. No
-  backend, no analytics, no telemetry. The footers promise "nothing is sent
-  anywhere" — that promise is load-bearing.
+  block, both inline in the page that uses them — except the Google tag, which
+  Google requires as an external script. Pages do not share stylesheets or
+  application files; `fonts/` is the one shared directory, and it holds no
+  code.
+- **Client-side calculation.** Every calculation runs in the visitor's
+  browser. No backend. Google Analytics records page views; the footers must
+  say so and must not claim that nothing is sent anywhere.
 - **Plain ES5-compatible JavaScript.** Existing code uses `var`, IIFEs, and
-  `'use strict'`. Match it.
+  `'use strict'`. Match it. The Google tag is Google's snippet and is the
+  exception.
 
 ## Design language
 

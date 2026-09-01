@@ -1,10 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js). page_location omits the hash so calculator
+       inputs in a copied deep-link are not sent with the page view. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4XTN125MF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J4XTN125MF', {
+      page_location: location.protocol + '//' + location.host + location.pathname
+    });
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calculation Desk — 34 PM Calculators across 14 Domains</title>
-  <meta name="description" content="34 project-management calculators across 14 domains — free, in your browser. Nothing is sent anywhere. Earned value, PERT, risk, procurement and the rest of the desk.">
+  <meta name="description" content="34 project-management calculators across 14 domains — free, in your browser. Figures stay on the device; Google Analytics records the visit.">
   <!-- www and the apex both answer 200 with identical content, so name the one
        Google should index. Without this the two compete as duplicates. -->
   <link rel="canonical" href="https://yazeed.blog/">
@@ -25,7 +36,7 @@
   <meta property="og:url" content="https://yazeed.blog/">
   <meta property="og:site_name" content="Calculation Desk">
   <meta property="og:title" content="Calculation Desk — 34 PM Calculators across 14 Domains">
-  <meta property="og:description" content="34 project-management calculators across 14 domains. Free, client-side only — nothing leaves your browser.">
+  <meta property="og:description" content="34 project-management calculators across 14 domains. Figures stay on the device; Google Analytics records the visit.">
   <meta property="og:image" content="https://yazeed.blog/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -41,8 +52,8 @@
   <style>
 /* ── self-hosted webfonts ──────────────────────────────────────────────────
    These were a render-blocking stylesheet from Google. Same files, downloaded
-   into fonts/ and committed, so the page now makes no third-party request at
-   all — the footer's "nothing is sent anywhere" covers the fonts too. It also
+   into fonts/ and committed, so the faces themselves never leave this origin.
+   Google Analytics is the one third-party request the page makes. It also
    removes the serial hop this page used to wait on: connect to googleapis,
    fetch and parse CSS, only then connect to gstatic before a font byte moves.
 
@@ -1807,7 +1818,7 @@ h2 {
     "@type": "WebApplication",
     "name": "Calculation Desk",
     "url": "https://yazeed.blog/",
-    "description": "34 project-management calculators across 14 domains. Free, client-side only — nothing leaves the browser.",
+    "description": "34 project-management calculators across 14 domains. Figures stay on the device; Google Analytics records the visit.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires JavaScript",
@@ -1908,12 +1919,12 @@ h2 {
   <main id="content" tabindex="-1">
     <section class="hero" id="main-hero" aria-labelledby="hero-h">
         <div class="hero-col-a">
-          <p class="label">Free &middot; nothing leaves your browser</p>
+          <p class="label">Free &middot; figures stay in your browser</p>
           <h1 id="hero-h">34 calculators. Across 14 domains.</h1>
           <p class="hero-lede">
             A bench of project-management instruments &mdash; earned value, PERT, risk,
-            procurement and the rest &mdash; computed in your browser. Free. Nothing is
-            sent anywhere.
+            procurement and the rest &mdash; computed in your browser. Free. Google
+            Analytics records the visit.
           </p>
           <ul class="creds">
             <li class="cred-pill">PMP</li>
@@ -3354,8 +3365,9 @@ Flow efficiency % = Active work time ÷ Cycle time × 100</code></pre>
 
     <footer class="page-foot">
       Built as a study and working reference. Values compute locally in your
-      browser — nothing is sent anywhere. Interpretations are rules of thumb;
-      real decisions deserve context the formulas can't see.
+      browser. Google Analytics records the visit; the figures you type are
+      not sent to us. Interpretations are rules of thumb; real decisions
+      deserve context the formulas can't see.
       <span class="credit">
         Built by <a href="#about">Yazeed Alotaibi</a> &mdash; project controls,
         PMO &amp; risk. PMP &middot; PRINCE2 &middot; PMI-RMP.
