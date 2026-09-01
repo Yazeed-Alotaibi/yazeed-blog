@@ -28,3 +28,9 @@
   RewriteRule ^pm-calculation-desk\.html$    /#calc-sections  [R=301,L]
   RewriteRule ^wbs-estimation-toolkit\.html$ /#calc-sections  [R=301,L]
 </IfModule>
+
+# Branded not-found page. ErrorDocument is core Apache, not mod_rewrite, so it
+# sits outside the guard above on purpose: it cannot 500 for a missing module
+# the way a bare RewriteRule can. It needs the same AllowOverride FileInfo the
+# rewrites already rely on, so if the rules above work, this works.
+ErrorDocument 404 /404.html
