@@ -470,6 +470,12 @@ main {
 
 .card-action:active { box-shadow: var(--sunk); }
 
+.card-action.example-toggle {
+  border-color: var(--rule);
+  box-shadow: none;
+  background: transparent;
+}
+
 /* Selectable for the legacy copy fallback, but never visible on the desk. */
 .copy-source {
   position: fixed;
@@ -4020,6 +4026,15 @@ var PM_DATA = (function () {
   return { categories: categories };
 })();
 
+/* Lane D supplies the complete pack. Keeping the data outside PM_DATA lets a
+   worked reading demonstrate a card without changing its formulas or guards. */
+var EXAMPLES = {
+  'calc-earned-value': {
+    values: { bac: 200000, pv: 120000, ev: 108000, ac: 96000 },
+    note: 'Six months in: efficient spend, behind schedule.'
+  }
+};
+
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   </script>
@@ -5287,6 +5302,24 @@ var PM_CHART_MOUNT = (function () {
     return true;
   }
 
+  function setExample(card, el, values) {
+    card.inputs.forEach(function (inp) {
+      var node = el.querySelector('input[data-key="' + inp.key + '"]');
+      if (!node || !Object.prototype.hasOwnProperty.call(values, inp.key)) return;
+      node.value = String(values[inp.key]);
+      node.dispatchEvent(inputEvent());
+    });
+  }
+
+  function clearExample(card, el) {
+    card.inputs.forEach(function (inp) {
+      var node = el.querySelector('input[data-key="' + inp.key + '"]');
+      if (!node) return;
+      node.value = '';
+      node.dispatchEvent(inputEvent());
+    });
+  }
+
   function buildCard(card, index, categoryName) {
     card.inputs.forEach(function (inp) { inp.cardId = card.id; });
 
@@ -5314,12 +5347,14 @@ var PM_CHART_MOUNT = (function () {
     el.className = 'calc-card';
     el.id = 'calc-' + card.id;
     el.dataset.search = searchText;
+    var example = window.EXAMPLES && window.EXAMPLES[el.id];
     el.innerHTML =
       '<header class="card-head">' +
         '<span class="card-num">' + index + '</span>' +
         '<h3>' + card.name + '</h3>' +
         '<p class="tagline">' + card.tagline + '</p>' +
         '<div class="card-actions">' +
+          (example ? '<button class="card-action example-toggle" type="button">Example</button>' : '') +
           '<button class="card-action copy-link" type="button" aria-live="polite">Copy link</button>' +
         '</div>' +
       '</header>' +
@@ -5350,6 +5385,21 @@ var PM_CHART_MOUNT = (function () {
         wrap.appendChild(made.el);
       });
       el.appendChild(wrap);
+    }
+
+    if (example) {
+      el.querySelector('.example-toggle').addEventListener('click', function (event) {
+        var button = event.currentTarget;
+        if (button.dataset.active === 'true') {
+          clearExample(card, el);
+          button.dataset.active = 'false';
+          button.textContent = 'Example';
+        } else {
+          setExample(card, el, example.values);
+          button.dataset.active = 'true';
+          button.textContent = 'Clear';
+        }
+      });
     }
 
     el.querySelector('.copy-link').addEventListener('click', function (event) {
