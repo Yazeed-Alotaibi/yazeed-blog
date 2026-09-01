@@ -5201,6 +5201,11 @@ var PM_CHART_MOUNT = (function () {
     return found;
   }
 
+  function readingValueIsValid(node, value) {
+    return !!node && (typeof value === 'string' || typeof value === 'number') &&
+      String(value).trim() !== '' && (node.type !== 'number' || isFinite(value));
+  }
+
   function savedHasValues(saved) {
     return Object.keys(saved).some(function (cardId) {
       var cardEl = document.getElementById(cardId);
@@ -5210,8 +5215,7 @@ var PM_CHART_MOUNT = (function () {
       return Object.keys(values).some(function (key) {
         var node = inputForKey(cardEl, key);
         var value = values[key];
-        return !!node && (typeof value === 'string' || typeof value === 'number') &&
-          String(value).trim() !== '';
+        return readingValueIsValid(node, value);
       });
     });
   }
@@ -5226,13 +5230,13 @@ var PM_CHART_MOUNT = (function () {
       Object.keys(values).forEach(function (key) {
         var node = inputForKey(cardEl, key);
         var value = values[key];
-        if (!node || (typeof value !== 'string' && typeof value !== 'number')) return;
-        if (node.type === 'number' && !isFinite(parseFloat(value))) return;
+        if (!readingValueIsValid(node, value)) return;
         node.value = String(value);
         if (node.value.trim()) changed.push(node);
       });
     });
     changed.forEach(function (node) { node.dispatchEvent(inputEvent()); });
+    return changed[0] || null;
   }
 
   function dismissRestore(strip) {
@@ -5257,12 +5261,14 @@ var PM_CHART_MOUNT = (function () {
     sectionsEl.parentNode.insertBefore(strip, sectionsEl);
 
     strip.querySelector('.restore-readings').addEventListener('click', function () {
-      applySavedReadings(saved);
+      var firstRestored = applySavedReadings(saved);
       dismissRestore(strip);
+      (firstRestored || searchEl).focus();
     });
     strip.querySelector('.discard-readings').addEventListener('click', function () {
       clearSavedReadings();
       dismissRestore(strip);
+      searchEl.focus();
     });
   }
 
