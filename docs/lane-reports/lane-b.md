@@ -163,15 +163,3 @@ that Node tests do not prove browser rendering.
   with exit 2. Mutation smoke uses the exported runner only with exact
   temporary copies it creates itself.
 - Lane B does not merge to `main`. Yazeed owns the merge and deployment.
-
-## Commits before this report
-
-```text
-534d577 Crush redundant calculator test sweeps
-0b9c194 Keep chart snapshots focused on data
-0f31aee Add static integrity and count coverage
-71c4ca0 Add reproducible formula mutation smoke
-b5c1ca7 Allow future chart definitions through coverage
-8c15b6d Keep alternate pages inside mutation smoke
-11ec9fa Guard chart summaries without pinning copy
-```
