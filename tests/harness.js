@@ -50,6 +50,26 @@ function loadPage(file) {
     'this.setTimeout = function () { return 0; };',
     'this.clearTimeout = function () {};'
   ].join('\n'), sandbox, { filename: 'test-harness-bootstrap.js' });
+  var cloneData = vm.runInContext([
+    '(function () {',
+    '  var arrayIsArray = Array.isArray;',
+    '  var realmFunction = Function;',
+    '  var objectCreate = Object.create;',
+    '  var objectKeys = Object.keys;',
+    '  function clone(value) {',
+    '    var copy;',
+    '    if (typeof value === "function") {',
+    '      if (value instanceof realmFunction) return value;',
+    '      throw new TypeError("Cannot pass host functions into page callbacks");',
+    '    }',
+    '    if (value === null || typeof value !== "object") return value;',
+    '    copy = arrayIsArray(value) ? [] : objectCreate(null);',
+    '    objectKeys(value).forEach(function (key) { copy[key] = clone(value[key]); });',
+    '    return copy;',
+    '  }',
+    '  return clone;',
+    '}())'
+  ].join('\n'), sandbox, { filename: 'test-harness-clone.js' });
 
   /* Only the data/logic blocks evaluate cleanly headless; the render block
      needs a DOM. Skip what throws on a missing document and keep going —
@@ -68,7 +88,28 @@ function loadPage(file) {
     }
   });
 
-  return { sandbox: sandbox, html: html, blocks: blocks, loaded: loaded };
+  return {
+    sandbox: sandbox,
+    html: html,
+    blocks: blocks,
+    loaded: loaded,
+    cloneData: cloneData
+  };
+}
+
+/* Page callbacks run in the VM realm. Clone every data argument there before
+   invocation so calculator code never receives a host object constructor. */
+function invoke(page, fn, args) {
+  var safeArgs = [];
+  var i;
+  if (!page || typeof page.cloneData !== 'function') {
+    throw new TypeError('Page was not created by loadPage()');
+  }
+  if (typeof fn !== 'function') throw new TypeError('Page callback is not a function');
+  for (i = 0; i < (args || []).length; i += 1) {
+    safeArgs.push(Reflect.apply(page.cloneData, undefined, [args[i]]));
+  }
+  return Reflect.apply(fn, undefined, safeArgs);
 }
 
 /* ── assertions ─────────────────────────────────────────────────── */
@@ -171,9 +212,30 @@ var EDGE_TEXT = [
   'abc', '1,abc,3', '0,0,0', '1e9,1e9', '-0', '1.5,2.5'
 ];
 
+/* Iterate VM-owned arrays from the host without handing a host callback to a
+   page-overridable Array method. */
+function each(list, fn) {
+  var i;
+  for (i = 0; i < list.length; i += 1) fn(list[i], i);
+}
+
+function map(list, fn) {
+  var mapped = [];
+  each(list, function (value, index) { mapped.push(fn(value, index)); });
+  return mapped;
+}
+
+function filter(list, fn) {
+  var filtered = [];
+  each(list, function (value, index) {
+    if (fn(value, index)) filtered.push(value);
+  });
+  return filtered;
+}
+
 function inputSweeps(card, seedIndex) {
   var v = {};
-  card.inputs.forEach(function (inp, i) {
+  each(card.inputs, function (inp, i) {
     if (inp.type === 'text') {
       v[inp.key] = EDGE_TEXT[(seedIndex + i) % EDGE_TEXT.length];
     } else {
@@ -187,7 +249,7 @@ function inputSweeps(card, seedIndex) {
    example, which is what most assertions should exercise. */
 function exampleValues(card) {
   var v = {};
-  card.inputs.forEach(function (inp) {
+  each(card.inputs, function (inp) {
     if (inp.type === 'text') {
       v[inp.key] = String(inp.placeholder || '').replace(/^e\.g\.\s*/, '');
     } else {
@@ -199,13 +261,14 @@ function exampleValues(card) {
 }
 
 function eachCard(data, fn) {
-  data.categories.forEach(function (cat) {
-    cat.cards.forEach(function (card) { fn(card, cat); });
+  each(data.categories, function (cat) {
+    each(cat.cards, function (card) { fn(card, cat); });
   });
 }
 
 module.exports = {
   loadPage: loadPage,
+  invoke: invoke,
   suite: suite,
   check: check,
   eq: eq,
@@ -216,6 +279,9 @@ module.exports = {
   reset: reset,
   EDGE_NUMBERS: EDGE_NUMBERS,
   EDGE_TEXT: EDGE_TEXT,
+  each: each,
+  map: map,
+  filter: filter,
   inputSweeps: inputSweeps,
   exampleValues: exampleValues,
   eachCard: eachCard,

@@ -125,10 +125,42 @@ try {
       JSON.stringify(probe) + ')}catch(e){}';
   }).join('');
   fs.writeFileSync(vmPagePath,
-    '<script>window.vmEscapes=[];' + vmScript + '</script>');
+    '<script>window.vmEscapes=[];' + vmScript +
+    'function canReachHost(value){try{return !!value.constructor.constructor(' +
+    '"return process")()}catch(e){return false}}' +
+    'window.vmValueProbe=function(values,results){' +
+    'return canReachHost(values)||canReachHost(results)};' +
+    'window.vmSpecProbe=function(spec){' +
+    'return canReachHost(spec)||canReachHost(spec.series)};' +
+    'window.vmListEscape=false;window.vmList=[1];' +
+    'window.vmList.forEach=function(callback){' +
+    'window.vmListEscape=canReachHost(callback)};</script>');
   var vmPage = H.loadPage(path.relative(root, vmPagePath));
   result('VM host escape', vmPage.sandbox.vmEscapes.length === 0,
     'host process was reachable through: ' + vmPage.sandbox.vmEscapes.join(', '));
+  var callbackEscapes;
+  try {
+    callbackEscapes = [
+      H.invoke(vmPage, vmPage.sandbox.vmValueProbe, [{ value: 1 }, { result: 2 }]),
+      H.invoke(vmPage, vmPage.sandbox.vmSpecProbe, [{ series: [] }])
+    ];
+  } catch (error) {
+    callbackEscapes = [error.message];
+  }
+  var hostFunctionRejected = false;
+  try {
+    H.invoke(vmPage, vmPage.sandbox.vmSpecProbe,
+      [{ series: [], formatter: function () {} }]);
+  } catch (error) {
+    hostFunctionRejected = /host functions/.test(error.message);
+  }
+  H.each(vmPage.sandbox.vmList, function () {});
+  result('VM callback host escape',
+    callbackEscapes[0] === false && callbackEscapes[1] === false &&
+      hostFunctionRejected && vmPage.sandbox.vmListEscape === false,
+    'callback results: ' + JSON.stringify(callbackEscapes) +
+      ', host function rejected: ' + hostFunctionRejected +
+      ', array callback escape: ' + vmPage.sandbox.vmListEscape);
 } finally {
   fs.rmSync(vmTemp, { recursive: true, force: true });
 }
@@ -149,7 +181,8 @@ try {
 }
 
 var earnedPage = H.loadPage('index.html');
-earnedPage.sandbox.PM_DATA.categories[0].cards.push({
+var earnedCards = earnedPage.sandbox.PM_DATA.categories[0].cards;
+earnedCards[earnedCards.length] = {
   id: 'earned-schedule',
   inputs: [{ key: 'bac' }, { key: 'pd' }, { key: 'at' }, { key: 'ev' }],
   outputs: [
@@ -185,7 +218,7 @@ earnedPage.sandbox.PM_DATA.categories[0].cards.push({
       }
     }
   ]
-});
+};
 H.reset();
 earnedSchedule.run(earnedPage, { quiet: true });
 var earnedStats = H.stats();
@@ -199,7 +232,8 @@ charts.run(controlPage);
 var controlStats = H.stats();
 
 var futurePage = H.loadPage('index.html');
-futurePage.sandbox.PM_DATA.categories[0].cards.push({
+var futureCards = futurePage.sandbox.PM_DATA.categories[0].cards;
+futureCards[futureCards.length] = {
   id: 'future-card',
   inputs: [{ key: 'x', placeholder: '1' }],
   outputs: [{
@@ -220,7 +254,7 @@ futurePage.sandbox.PM_DATA.categories[0].cards.push({
       } : null;
     }
   }]
-});
+};
 H.reset();
 charts.run(futurePage);
 var futureStats = H.stats();

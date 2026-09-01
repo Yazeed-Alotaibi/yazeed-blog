@@ -51,7 +51,7 @@ function run(page, options) {
   var vectors = vectorBlock(markdown);
   var outputMap = {};
 
-  card.outputs.forEach(function (out) {
+  H.each(card.outputs, function (out) {
     outputMap[canonical(out.key)] = out;
   });
 
@@ -83,7 +83,7 @@ function run(page, options) {
         return;
       }
       try {
-        actual[normalized] = rounded(out.compute(vector.inputs));
+        actual[normalized] = rounded(H.invoke(page, out.compute, [vector.inputs]));
       } catch (e) {
         problem = key + ' threw: ' + e.message;
       }

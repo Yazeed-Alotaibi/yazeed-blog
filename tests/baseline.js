@@ -22,9 +22,10 @@ function collect(page) {
   H.eachCard(data, function (card, cat) {
     var v = H.exampleValues(card);
     var row = { _inputs: v };
-    card.outputs.forEach(function (out) {
+    H.each(card.outputs, function (out) {
       var val;
-      try { val = out.compute(v); } catch (e) { val = '<<THREW: ' + e.message + '>>'; }
+      try { val = H.invoke(page, out.compute, [v]); }
+      catch (e) { val = '<<THREW: ' + e.message + '>>'; }
       row[out.key] = typeof val === 'number' ? (isFinite(val) ? val : String(val)) : val;
     });
     actual[cat.id + '/' + card.id] = row;

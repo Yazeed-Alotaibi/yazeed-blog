@@ -91,19 +91,19 @@ var DIVISOR_CASES = {
 
 function valuesFor(card, numberValue, textValue) {
   var v = {};
-  card.inputs.forEach(function (inp) {
+  H.each(card.inputs, function (inp) {
     v[inp.key] = inp.type === 'text' ? textValue : numberValue;
   });
   return v;
 }
 
-function verifyOutput(id, caseLabel, out, v) {
+function verifyOutput(page, id, caseLabel, out, v) {
   var val;
   var verdict;
   var problem = '';
 
   try {
-    val = out.compute(v);
+    val = H.invoke(page, out.compute, [v]);
   } catch (e) {
     problem = 'threw: ' + e.message;
   }
@@ -114,7 +114,7 @@ function verifyOutput(id, caseLabel, out, v) {
 
   if (!problem && val !== null && val !== undefined && out.interpret) {
     try {
-      verdict = out.interpret(val, v);
+      verdict = H.invoke(page, out.interpret, [val, v]);
     } catch (e) {
       problem = 'interpret() threw: ' + e.message;
     }
@@ -130,13 +130,13 @@ function verifyOutput(id, caseLabel, out, v) {
     'inputs ' + JSON.stringify(v) + ' -> ' + problem);
 }
 
-function exercise(data, suiteName, casesForCard) {
+function exercise(page, data, suiteName, casesForCard) {
   H.suite(suiteName);
   H.eachCard(data, function (card, cat) {
     var id = cat.id + '/' + card.id;
     casesForCard(card, id).forEach(function (testCase) {
-      card.outputs.forEach(function (out) {
-        verifyOutput(id, testCase.label, out, testCase.values);
+      H.each(card.outputs, function (out) {
+        verifyOutput(page, id, testCase.label, out, testCase.values);
       });
     });
   });
@@ -145,38 +145,38 @@ function exercise(data, suiteName, casesForCard) {
 function run(page) {
   var data = page.sandbox.PM_DATA;
 
-  exercise(data, 'all inputs zero', function (card) {
+  exercise(page, data, 'all inputs zero', function (card) {
     return [{ label: 'all inputs zero', values: valuesFor(card, 0, '0') }];
   });
 
-  exercise(data, 'huge inputs', function (card) {
+  exercise(page, data, 'huge inputs', function (card) {
     return [{ label: 'huge inputs', values: valuesFor(card, 1e15, '1e15,1e15') }];
   });
 
-  exercise(data, 'tiny inputs', function (card) {
+  exercise(page, data, 'tiny inputs', function (card) {
     return [{ label: 'tiny inputs', values: valuesFor(card, 1e-9, '1e-9,1e-9') }];
   });
 
-  exercise(data, 'each input empty', function (card) {
-    return card.inputs.map(function (inp) {
+  exercise(page, data, 'each input empty', function (card) {
+    return H.map(card.inputs, function (inp) {
       var v = H.exampleValues(card);
       v[inp.key] = inp.type === 'text' ? '' : NaN;
       return { label: inp.key + ' empty', values: v };
     });
   });
 
-  exercise(data, 'each input malformed', function (card) {
-    return card.inputs.map(function (inp) {
+  exercise(page, data, 'each input malformed', function (card) {
+    return H.map(card.inputs, function (inp) {
       var v = H.exampleValues(card);
       v[inp.key] = 'abc';
       return { label: inp.key + ' malformed', values: v };
     });
   });
 
-  exercise(data, 'each numeric input negative', function (card) {
-    return card.inputs.filter(function (inp) {
+  exercise(page, data, 'each numeric input negative', function (card) {
+    return H.map(H.filter(card.inputs, function (inp) {
       return inp.type !== 'text';
-    }).map(function (inp) {
+    }), function (inp) {
       var v = H.exampleValues(card);
       var n = Math.abs(Number(v[inp.key]));
       v[inp.key] = -(isFinite(n) && n > 0 ? n : 1);
@@ -184,7 +184,7 @@ function run(page) {
     });
   });
 
-  exercise(data, 'division guards', function (card, id) {
+  exercise(page, data, 'division guards', function (card, id) {
     var definitions = DIVISOR_CASES[id] || [];
     return definitions.map(function (definition) {
       var v = H.exampleValues(card);
@@ -197,10 +197,11 @@ function run(page) {
   H.eachCard(data, function (card, cat) {
     var id = cat.id + '/' + card.id;
     var v = valuesFor(card, NaN, '');
-    card.outputs.forEach(function (out) {
+    H.each(card.outputs, function (out) {
       var val;
       var problem = '';
-      try { val = out.compute(v); } catch (e) { problem = 'threw: ' + e.message; }
+      try { val = H.invoke(page, out.compute, [v]); }
+      catch (e) { problem = 'threw: ' + e.message; }
       if (!problem && val !== null && val !== undefined) {
         problem = 'returned ' + JSON.stringify(val);
       }

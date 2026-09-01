@@ -10,10 +10,11 @@ var H = require('./harness');
 var BASELINE = require('./charts-baseline.json');
 var TITLE = 'Chart builders';
 
-function computeResults(card, v) {
+function computeResults(page, card, v) {
   var r = {};
-  card.outputs.forEach(function (out) {
-    try { r[out.key] = out.compute(v); } catch (e) { r[out.key] = null; }
+  H.each(card.outputs, function (out) {
+    try { r[out.key] = H.invoke(page, out.compute, [v]); }
+    catch (e) { r[out.key] = null; }
   });
   return r;
 }
@@ -30,12 +31,12 @@ function pointBoundaries(spec) {
   var boundaries = [];
   if (!spec || !spec.series) return null;
 
-  spec.series.forEach(function (series) {
+  H.each(spec.series, function (series) {
     var xs;
     var ys;
     if (!series.points || !series.points.length) return;
-    xs = series.points.map(function (point) { return point[0]; });
-    ys = series.points.map(function (point) { return point[1]; });
+    xs = H.map(series.points, function (point) { return point[0]; });
+    ys = H.map(series.points, function (point) { return point[1]; });
     boundaries.push({
       label: series.label,
       first: series.points[0],
@@ -50,11 +51,11 @@ function pointBoundaries(spec) {
   return boundaries.length ? boundaries : null;
 }
 
-function renderAt(id, renderer, spec, width) {
+function renderAt(page, id, renderer, spec, width) {
   var out;
   var problem = '';
   try {
-    out = renderer(spec, width);
+    out = H.invoke(page, renderer, [spec, width]);
   } catch (e) {
     problem = 'threw: ' + e.message;
   }
@@ -73,24 +74,26 @@ function renderAt(id, renderer, spec, width) {
 
 function edgeValues(card, numberValue, textValue) {
   var v = {};
-  card.inputs.forEach(function (inp) {
+  H.each(card.inputs, function (inp) {
     v[inp.key] = inp.type === 'text' ? textValue : numberValue;
   });
   return v;
 }
 
-function verifyEdge(id, def, renderer, v, label, card) {
+function verifyEdge(page, id, def, renderer, v, label, card) {
   var spec;
   var out;
   var problem = '';
-  var results = computeResults(card, v);
+  var results = computeResults(page, card, v);
 
-  try { spec = def.build(v, results); } catch (e) { problem = 'build threw: ' + e.message; }
+  try { spec = H.invoke(page, def.build, [v, results]); }
+  catch (e) { problem = 'build threw: ' + e.message; }
   if (!problem && spec !== null && spec !== undefined && typeof spec !== 'object') {
     problem = 'build returned ' + JSON.stringify(spec);
   }
   if (!problem && spec !== null && spec !== undefined) {
-    try { out = renderer(spec, 360); } catch (e) { problem = 'renderer threw: ' + e.message; }
+    try { out = H.invoke(page, renderer, [spec, 360]); }
+    catch (e) { problem = 'renderer threw: ' + e.message; }
     if (!problem && out && typeof out.svg === 'string' &&
         (out.svg.indexOf('NaN') !== -1 || out.svg.indexOf('Infinity') !== -1)) {
       problem = 'renderer emitted a non-finite SVG coordinate';
@@ -115,9 +118,9 @@ function run(page) {
   H.eachCard(data, function (card, cat) {
     if (!card.charts || !card.charts.length) return;
     var v = H.exampleValues(card);
-    var results = computeResults(card, v);
+    var results = computeResults(page, card, v);
 
-    card.charts.forEach(function (def) {
+    H.each(card.charts, function (def) {
       var id = cat.id + '/' + card.id + ' :: ' + def.title;
       var expected = BASELINE[id];
       var renderer = charts && charts.renderers[def.kind];
@@ -130,7 +133,8 @@ function run(page) {
         typeof renderer === 'function',
         'kind=' + def.kind);
 
-      try { spec = def.build(v, results); } catch (e) { problem = e.message; }
+      try { spec = H.invoke(page, def.build, [v, results]); }
+      catch (e) { problem = e.message; }
       if (expected) {
         H.deep(id + ' matches its worked-example spec',
           problem ? { threw: problem } : plain(spec),
@@ -148,8 +152,8 @@ function run(page) {
       }
 
       if (!problem && spec !== null && spec !== undefined && typeof renderer === 'function') {
-        renderAt(id, renderer, spec, 360);
-        renderAt(id, renderer, spec, 900);
+        renderAt(page, id, renderer, spec, 360);
+        renderAt(page, id, renderer, spec, 900);
       }
     });
   });
@@ -169,11 +173,11 @@ function run(page) {
       ['malformed inputs', edgeValues(card, 'abc', 'abc')]
     ];
 
-    card.charts.forEach(function (def) {
+    H.each(card.charts, function (def) {
       var id = cat.id + '/' + card.id + ' :: ' + def.title;
       var renderer = charts.renderers[def.kind];
       cases.forEach(function (testCase) {
-        verifyEdge(id, def, renderer, testCase[1], testCase[0], card);
+        verifyEdge(page, id, def, renderer, testCase[1], testCase[0], card);
       });
     });
   });
@@ -182,13 +186,14 @@ function run(page) {
   H.eachCard(data, function (card, cat) {
     if (!card.charts || !card.charts.length) return;
     var v = edgeValues(card, NaN, '');
-    var results = computeResults(card, v);
+    var results = computeResults(page, card, v);
 
-    card.charts.forEach(function (def) {
+    H.each(card.charts, function (def) {
       var id = cat.id + '/' + card.id + ' :: ' + def.title;
       var spec;
       var problem = '';
-      try { spec = def.build(v, results); } catch (e) { problem = 'threw: ' + e.message; }
+      try { spec = H.invoke(page, def.build, [v, results]); }
+      catch (e) { problem = 'threw: ' + e.message; }
       if (!problem && spec !== null && spec !== undefined) {
         problem = 'returned ' + JSON.stringify(spec);
       }

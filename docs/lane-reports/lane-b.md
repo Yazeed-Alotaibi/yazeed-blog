@@ -10,7 +10,8 @@ content.
   seven suites. Every suite remains directly runnable with plain Node.
 - `tests/harness.js` resolves real paths inside the repository, creates
   console/timer shims inside the VM realm, and disables dynamic string code
-  generation so evaluated page scripts receive no host-function constructors.
+  generation. Every calculator/chart callback receives a VM-realm data clone,
+  and page-owned arrays are traversed without receiving host callbacks.
 - `tests/edge-cases.js` replaces 24 rotating sweeps with named input classes:
   all-zero, huge, tiny, each empty, each malformed, each numeric input
   negative, and explicit divisor guards.
@@ -74,14 +75,14 @@ Redirect integrity: 3/3 passed
 Published counts: 9/9 passed
 earned-schedule: card not present, vectors skipped
 Earned Schedule vectors: 0/0 passed
-All tests: 2056/2056 passed in 73.1ms
+All tests: 2056/2056 passed in 72.7ms
 ```
 
 Parse-once instrumentation wrapped `fs.readFileSync` and counted only reads of
 `index.html`:
 
 ```text
-All tests: 2056/2056 passed in 70.6ms
+All tests: 2056/2056 passed in 73.3ms
 index.html reads: 1
 ```
 
@@ -123,11 +124,12 @@ missing anchor: caught
 unguarded rewrite: caught
 stub drift: caught
 VM host escape: caught
+VM callback host escape: caught
 external harness page: caught
 synthetic Earned Schedule vectors: caught
 future chart integration: caught
 non-finite chart summary: caught
-Integrity smoke: 13/13 caught
+Integrity smoke: 14/14 caught
 ```
 
 The future-chart probe proves Lane A can add the two specified charts without
@@ -148,7 +150,7 @@ Tests paragraph with wording equivalent to:
 > mutants must be killed.
 
 Run `node tests/integrity-smoke.js` when changing the static parsers, chart
-contracts, or Lane A/D integration seams; all thirteen pressure probes must be
+contracts, or Lane A/D integration seams; all fourteen pressure probes must be
 caught.
 
 Add `tests/charts-baseline.json` to the file inventory as the machine-data
