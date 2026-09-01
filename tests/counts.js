@@ -22,6 +22,14 @@ function hasCount(text, count, noun) {
   return new RegExp('\\b' + count + '\\s+' + prefix + noun + '\\b', 'i').test(text);
 }
 
+function allCountsMatch(text, count, noun) {
+  var values = [];
+  var re = new RegExp('\\b(\\d+)\\s+' + noun + '\\b', 'gi');
+  var match;
+  while ((match = re.exec(text)) !== null) values.push(Number(match[1]));
+  return values.length > 0 && values.every(function (value) { return value === count; });
+}
+
 function run(page) {
   var html = page.html;
   var data = page.sandbox.PM_DATA;
@@ -32,6 +40,7 @@ function run(page) {
   var jsonMatch;
   var jsonLd = null;
   var figures = {};
+  var heroMatch;
 
   H.eachCard(data, function (card) {
     calculators += 1;
@@ -43,6 +52,7 @@ function run(page) {
   if (jsonMatch) {
     try { jsonLd = JSON.parse(jsonMatch[1]); } catch (e) { jsonLd = null; }
   }
+  heroMatch = /<section\b[^>]*id\s*=\s*["']main-hero["'][^>]*>([\s\S]*?)<\/section>/i.exec(html);
 
   html.replace(/hero-fig-num[^>]*>(\d+)<[\s\S]*?hero-fig-lab[^>]*>([^<]+)</gi,
     function (whole, number, label) {
@@ -76,8 +86,8 @@ function run(page) {
   });
   H.check('hero copy states calculators and domains',
     hasCount(html, calculators, 'calculators') && hasCount(html, domains, 'domains'));
-  H.check('hero metric callout states the metric count',
-    new RegExp('Four\\s+of\\s+' + metrics + '\\s+metrics', 'i').test(html));
+  H.check('every metric count in the hero matches PM_DATA',
+    allCountsMatch(heroMatch ? heroMatch[1] : '', metrics, 'metrics'));
 }
 
 module.exports = { title: TITLE, run: run };

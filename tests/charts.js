@@ -60,7 +60,8 @@ function renderAt(id, renderer, spec, width) {
   }
   if (!problem && (!out ||
       typeof out.svg !== 'string' || out.svg.indexOf('<svg') !== 0 ||
-      typeof out.summary !== 'string' ||
+      typeof out.summary !== 'string' || !out.summary.length ||
+      /NaN|Infinity/.test(out.summary) ||
       !out.table || !Array.isArray(out.table.head) || !Array.isArray(out.table.rows))) {
     problem = 'renderer returned a malformed result';
   }
@@ -93,6 +94,11 @@ function verifyEdge(id, def, renderer, v, label, card) {
     if (!problem && out && typeof out.svg === 'string' &&
         (out.svg.indexOf('NaN') !== -1 || out.svg.indexOf('Infinity') !== -1)) {
       problem = 'renderer emitted a non-finite SVG coordinate';
+    }
+    if (!problem && out &&
+        (typeof out.summary !== 'string' || !out.summary.length ||
+         /NaN|Infinity/.test(out.summary))) {
+      problem = 'renderer emitted a malformed summary';
     }
   }
 
