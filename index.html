@@ -5806,6 +5806,735 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
   </script>
   <script>
+/* ══ PM_XLSX ═══════════════════════════════════════════════════════════
+   Writes a real .xlsx in the browser, with no library.
+
+   An .xlsx is a ZIP holding a handful of XML files. Both halves are here:
+   a minimal ZIP writer, and just enough SpreadsheetML and DrawingML to
+   carry a formatted sheet and a live, editable chart.
+
+   The ZIP is written with compression method 0 — "stored", the bytes as
+   they are. DEFLATE would need another two hundred lines to save a few
+   kilobytes on a file that leaves in a download, and every reader that
+   opens an .xlsx at all opens a stored one.
+
+   Element order in these XML parts is not cosmetic. The schemas are
+   sequences, and Excel answers an out-of-order child with "we found a
+   problem with some content" rather than with the chart. Anything moved
+   here must be moved against ECMA-376, not against what looks tidy. */
+
+var PM_XLSX = (function () {
+  'use strict';
+
+  /* ── bytes ─────────────────────────────────────────────────────── */
+
+  var crcTable = null;
+  function crc32(bytes) {
+    var i, k, c;
+    if (!crcTable) {
+      crcTable = [];
+      for (i = 0; i < 256; i++) {
+        c = i;
+        for (k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        crcTable[i] = c >>> 0;
+      }
+    }
+    c = 0xffffffff;
+    for (i = 0; i < bytes.length; i++) {
+      c = crcTable[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+    }
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  /* TextEncoder is not on the ES5 floor this file is written to, so the
+     UTF-8 is done by hand. Surrogate pairs are joined before encoding —
+     an emoji in a card name would otherwise arrive as two broken halves. */
+  function utf8(str) {
+    var out = [], i, c, next;
+    for (i = 0; i < str.length; i++) {
+      c = str.charCodeAt(i);
+      if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+        next = str.charCodeAt(i + 1);
+        if (next >= 0xdc00 && next <= 0xdfff) {
+          c = 0x10000 + ((c - 0xd800) << 10) + (next - 0xdc00);
+          i++;
+        }
+      }
+      if (c < 0x80) {
+        out.push(c);
+      } else if (c < 0x800) {
+        out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      } else if (c < 0x10000) {
+        out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      } else {
+        out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63),
+          0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      }
+    }
+    return new Uint8Array(out);
+  }
+
+  function pushU16(arr, n) { arr.push(n & 0xff, (n >>> 8) & 0xff); }
+  function pushU32(arr, n) {
+    arr.push(n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff);
+  }
+  function pushBytes(arr, bytes) {
+    for (var i = 0; i < bytes.length; i++) arr.push(bytes[i]);
+  }
+
+  /* ── zip ───────────────────────────────────────────────────────── */
+
+  function dosStamp(date) {
+    var y = date.getFullYear();
+    /* The DOS epoch starts in 1980 and there is no room to say otherwise. */
+    if (y < 1980) y = 1980;
+    return {
+      time: (date.getHours() << 11) | (date.getMinutes() << 5) |
+        (Math.floor(date.getSeconds() / 2)),
+      date: ((y - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()
+    };
+  }
+
+  /* files: [{ name: 'xl/workbook.xml', text: '<?xml …' }] */
+  function zip(files, now) {
+    var stamp = dosStamp(now || new Date());
+    var out = [], central = [], offset = 0, i;
+
+    for (i = 0; i < files.length; i++) {
+      var nameBytes = utf8(files[i].name);
+      var body = utf8(files[i].text);
+      var crc = crc32(body);
+
+      /* Local file header. Bit 11 of the flags declares the name UTF-8,
+         which matters for nothing here but costs nothing and is correct. */
+      pushU32(out, 0x04034b50);
+      pushU16(out, 20);
+      pushU16(out, 0x0800);
+      pushU16(out, 0);
+      pushU16(out, stamp.time);
+      pushU16(out, stamp.date);
+      pushU32(out, crc);
+      pushU32(out, body.length);
+      pushU32(out, body.length);
+      pushU16(out, nameBytes.length);
+      pushU16(out, 0);
+      pushBytes(out, nameBytes);
+      pushBytes(out, body);
+
+      pushU32(central, 0x02014b50);
+      pushU16(central, 20);
+      pushU16(central, 20);
+      pushU16(central, 0x0800);
+      pushU16(central, 0);
+      pushU16(central, stamp.time);
+      pushU16(central, stamp.date);
+      pushU32(central, crc);
+      pushU32(central, body.length);
+      pushU32(central, body.length);
+      pushU16(central, nameBytes.length);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU16(central, 0);
+      pushU32(central, 0);
+      pushU32(central, offset);
+      pushBytes(central, nameBytes);
+
+      offset += 30 + nameBytes.length + body.length;
+    }
+
+    var cdSize = central.length;
+    pushBytes(out, central);
+    pushU32(out, 0x06054b50);
+    pushU16(out, 0);
+    pushU16(out, 0);
+    pushU16(out, files.length);
+    pushU16(out, files.length);
+    pushU32(out, cdSize);
+    pushU32(out, offset);
+    pushU16(out, 0);
+
+    return new Uint8Array(out);
+  }
+
+  /* ── xml ───────────────────────────────────────────────────────── */
+
+  var HEAD = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      /* XML 1.0 has no way to spell a control character, and Excel rejects
+         the file rather than skipping one. Drop them. */
+      .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
+  }
+
+  /* A1, B1 … Z1, AA1. Column index is zero-based. */
+  function colName(index) {
+    var name = '';
+    var n = index;
+    do {
+      name = String.fromCharCode(65 + (n % 26)) + name;
+      n = Math.floor(n / 26) - 1;
+    } while (n >= 0);
+    return name;
+  }
+
+  function cellRef(col, row) { return colName(col) + (row + 1); }
+
+  /* Sheet names cannot hold : \ / ? * [ ] and cap at 31 characters. Excel
+     refuses to open a workbook that breaks either rule. */
+  function safeSheetName(name) {
+    var s = String(name || 'Sheet1').replace(/[:\\\/?*\[\]]/g, ' ').trim();
+    if (s.length > 31) s = s.slice(0, 31).trim();
+    return s || 'Sheet1';
+  }
+
+  function absRange(sheet, col, rowStart, rowEnd) {
+    var q = "'" + String(sheet).replace(/'/g, "''") + "'";
+    return q + '!$' + colName(col) + '$' + (rowStart + 1) +
+      ':$' + colName(col) + '$' + (rowEnd + 1);
+  }
+
+  function absCell(sheet, col, row) {
+    var q = "'" + String(sheet).replace(/'/g, "''") + "'";
+    return q + '!$' + colName(col) + '$' + (row + 1);
+  }
+
+  /* ── styles ────────────────────────────────────────────────────── */
+
+  /* Style indexes, referenced by the sheet builder as S.title, S.money … */
+  var S = {
+    base: 0, title: 1, subtitle: 2, section: 3, head: 4, label: 5,
+    money: 6, pct: 7, ratio: 8, int: 9, num: 10, wrap: 11, note: 12,
+    headNum: 13
+  };
+
+  function stylesXml() {
+    return HEAD +
+      '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+        '<numFmts count="5">' +
+          '<numFmt numFmtId="164" formatCode="#,##0.00"/>' +
+          /* Values reach here already on a 0–100 scale, so the percent sign
+             is quoted text rather than Excel's % format, which would
+             multiply by a hundred a second time. */
+          '<numFmt numFmtId="165" formatCode="0.0&quot;%&quot;"/>' +
+          '<numFmt numFmtId="166" formatCode="0.00"/>' +
+          '<numFmt numFmtId="167" formatCode="#,##0"/>' +
+          '<numFmt numFmtId="168" formatCode="#,##0.##"/>' +
+        '</numFmts>' +
+        '<fonts count="5">' +
+          '<font><sz val="11"/><name val="Calibri"/></font>' +
+          '<font><b/><sz val="15"/><name val="Calibri"/></font>' +
+          '<font><sz val="10"/><color rgb="FF6B6B6B"/><name val="Calibri"/></font>' +
+          '<font><b/><sz val="11"/><name val="Calibri"/></font>' +
+          '<font><i/><sz val="10"/><color rgb="FF6B6B6B"/><name val="Calibri"/></font>' +
+        '</fonts>' +
+        /* Excel expects fill 0 to be none and fill 1 to be gray125; it
+           rewrites the file if they are missing. */
+        '<fills count="3">' +
+          '<fill><patternFill patternType="none"/></fill>' +
+          '<fill><patternFill patternType="gray125"/></fill>' +
+          '<fill><patternFill patternType="solid">' +
+            '<fgColor rgb="FFEFEDE8"/><bgColor indexed="64"/></patternFill></fill>' +
+        '</fills>' +
+        '<borders count="2">' +
+          '<border><left/><right/><top/><bottom/><diagonal/></border>' +
+          '<border><left/><right/><top/>' +
+            '<bottom style="thin"><color rgb="FF9A968E"/></bottom><diagonal/></border>' +
+        '</borders>' +
+        '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+        '<cellXfs count="14">' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+          '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+          '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+          '<xf numFmtId="0" fontId="3" fillId="2" borderId="1" xfId="0"' +
+            ' applyFont="1" applyFill="1" applyBorder="1"/>' +
+          '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0"' +
+            ' applyFont="1" applyBorder="1"/>' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"' +
+            ' applyAlignment="1"><alignment vertical="top" wrapText="0"/></xf>' +
+          '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="166" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="168" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+          '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"' +
+            ' applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+          '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0"' +
+            ' applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+          '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0"' +
+            ' applyFont="1" applyBorder="1" applyAlignment="1">' +
+            '<alignment horizontal="right"/></xf>' +
+        '</cellXfs>' +
+        '<cellStyles count="1">' +
+          '<cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
+        '<dxfs count="0"/>' +
+        '<tableStyles count="0" defaultTableStyle="TableStyleMedium2"/>' +
+      '</styleSheet>';
+  }
+
+  /* Maps a calculator's output format onto one of the styles above. */
+  function styleForFormat(format) {
+    switch (format) {
+      case 'money': return S.money;
+      case 'pct': return S.pct;
+      case 'ratio': return S.ratio;
+      case 'int': return S.int;
+      case 'text': return S.base;
+      default: return S.num;
+    }
+  }
+
+  /* ── worksheet ─────────────────────────────────────────────────── */
+
+  /* A cell is null, a number, a string, or { v, s } to carry a style. */
+  function cellXml(col, row, cell) {
+    var value = cell, style = 0;
+    if (cell && typeof cell === 'object') { value = cell.v; style = cell.s || 0; }
+    if (value === null || value === undefined || value === '') {
+      return style ? '<c r="' + cellRef(col, row) + '" s="' + style + '"/>' : '';
+    }
+    var attrs = ' r="' + cellRef(col, row) + '"' + (style ? ' s="' + style + '"' : '');
+    if (typeof value === 'number' && isFinite(value)) {
+      return '<c' + attrs + '><v>' + numText(value) + '</v></c>';
+    }
+    /* Inline strings keep the whole workbook to one part per sheet; a
+       shared string table would buy deduplication this file never needs. */
+    return '<c' + attrs + ' t="inlineStr"><is><t xml:space="preserve">' +
+      esc(value) + '</t></is></c>';
+  }
+
+  /* Excel stores numbers as decimal text. Exponential notation is legal
+     but reads badly in the XML and some parsers are fussier than the
+     spec, so keep ordinary magnitudes in plain form. */
+  function numText(n) {
+    if (n === Math.floor(n) && Math.abs(n) < 1e15) return String(n);
+    var s = String(n);
+    if (s.indexOf('e') === -1 && s.indexOf('E') === -1) return s;
+    return n.toFixed(10).replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  function sheetXml(sheet) {
+    var rows = sheet.rows || [];
+    var maxCol = 0, i, j, body = '';
+
+    for (i = 0; i < rows.length; i++) {
+      var row = rows[i] || [];
+      if (row.length > maxCol) maxCol = row.length;
+      var cells = '';
+      for (j = 0; j < row.length; j++) cells += cellXml(j, i, row[j]);
+      if (cells) body += '<row r="' + (i + 1) + '">' + cells + '</row>';
+    }
+    if (maxCol < 1) maxCol = 1;
+
+    var cols = '';
+    if (sheet.cols && sheet.cols.length) {
+      cols = '<cols>';
+      for (i = 0; i < sheet.cols.length; i++) {
+        cols += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' +
+          sheet.cols[i] + '" customWidth="1"/>';
+      }
+      cols += '</cols>';
+    }
+
+    /* CT_Worksheet is a sequence: dimension, sheetViews, sheetFormatPr,
+       cols, sheetData, then much later pageMargins and drawing. */
+    return HEAD +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' +
+      ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<dimension ref="A1:' + cellRef(maxCol - 1, Math.max(0, rows.length - 1)) + '"/>' +
+        '<sheetViews><sheetView workbookViewId="0" showGridLines="0"' +
+          ' tabSelected="1"/></sheetViews>' +
+        '<sheetFormatPr defaultRowHeight="15"/>' +
+        cols +
+        '<sheetData>' + body + '</sheetData>' +
+        '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75"' +
+          ' header="0.3" footer="0.3"/>' +
+        (sheet.charts && sheet.charts.length ? '<drawing r:id="rId1"/>' : '') +
+      '</worksheet>';
+  }
+
+  /* ── chart ─────────────────────────────────────────────────────── */
+
+  /* Line colours, in the order series are added. Kept deliberately close
+     to the desk's own ink: graphite first, indigo second. */
+  var SERIES_INK = ['3C3B38', '3B4CA8', '8A6A2F', '5B7A5B', '8A3F3F', '55606B'];
+
+  function numCache(values, formatCode) {
+    var pts = '', i;
+    for (i = 0; i < values.length; i++) {
+      if (typeof values[i] === 'number' && isFinite(values[i])) {
+        pts += '<c:pt idx="' + i + '"><c:v>' + numText(values[i]) + '</c:v></c:pt>';
+      }
+    }
+    return '<c:formatCode>' + (formatCode || 'General') + '</c:formatCode>' +
+      '<c:ptCount val="' + values.length + '"/>' + pts;
+  }
+
+  function strCache(values) {
+    var pts = '', i;
+    for (i = 0; i < values.length; i++) {
+      pts += '<c:pt idx="' + i + '"><c:v>' + esc(values[i]) + '</c:v></c:pt>';
+    }
+    return '<c:ptCount val="' + values.length + '"/>' + pts;
+  }
+
+  function numRef(tag, ref, values, formatCode) {
+    return '<c:' + tag + '><c:numRef><c:f>' + esc(ref) + '</c:f>' +
+      '<c:numCache>' + numCache(values, formatCode) + '</c:numCache>' +
+      '</c:numRef></c:' + tag + '>';
+  }
+
+  function seriesTitle(ref, name) {
+    return '<c:tx><c:strRef><c:f>' + esc(ref) + '</c:f><c:strCache>' +
+      strCache([name]) + '</c:strCache></c:strRef></c:tx>';
+  }
+
+  function linePr(hex, dash) {
+    return '<c:spPr><a:ln w="22225" cap="rnd"><a:solidFill>' +
+      '<a:srgbClr val="' + hex + '"/></a:solidFill>' +
+      (dash ? '<a:prstDash val="' + dash + '"/>' : '<a:prstDash val="solid"/>') +
+      '<a:round/></a:ln><a:effectLst/></c:spPr>';
+  }
+
+  function fillPr(hex) {
+    return '<c:spPr><a:solidFill><a:srgbClr val="' + hex + '"/></a:solidFill>' +
+      '<a:ln><a:noFill/></a:ln></c:spPr>';
+  }
+
+  function chartTitle(text) {
+    if (!text) return '<c:autoTitleDeleted val="1"/>';
+    return '<c:title><c:tx><c:rich>' +
+      '<a:bodyPr rot="0" spcFirstLastPara="1" vertOverflow="ellipsis" vert="horz" wrap="square" anchor="ctr" anchorCtr="1"/>' +
+      '<a:lstStyle/><a:p><a:pPr><a:defRPr sz="1100" b="1"/></a:pPr>' +
+      '<a:r><a:rPr lang="en-US" sz="1100" b="1"/><a:t>' + esc(text) + '</a:t></a:r>' +
+      '</a:p></c:rich></c:tx><c:overlay val="0"/></c:title>' +
+      '<c:autoTitleDeleted val="0"/>';
+  }
+
+  function axisTitle(text, rotated) {
+    if (!text) return '';
+    return '<c:title><c:tx><c:rich>' +
+      '<a:bodyPr' + (rotated ? ' rot="-5400000" vert="horz"' : ' rot="0" vert="horz"') + '/>' +
+      '<a:lstStyle/><a:p><a:pPr><a:defRPr sz="900" b="0"/></a:pPr>' +
+      '<a:r><a:rPr lang="en-US" sz="900" b="0"/><a:t>' + esc(text) + '</a:t></a:r>' +
+      '</a:p></c:rich></c:tx><c:overlay val="0"/></c:title>';
+  }
+
+  /* CT_CatAx and CT_ValAx are sequences too: axId, scaling, delete, axPos,
+     majorGridlines, title, numFmt, tickMarks, tickLblPos, spPr, txPr,
+     crossAx, crosses, then the axis-specific tail. */
+  function valAx(id, crossId, title, gridlines, formatCode) {
+    return '<c:valAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="l"/>' +
+      (gridlines ? '<c:majorGridlines/>' : '') +
+      axisTitle(title, true) +
+      '<c:numFmt formatCode="' + (formatCode || 'General') + '" sourceLinked="0"/>' +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:crossBetween val="between"/></c:valAx>';
+  }
+
+  function valAxBottom(id, crossId, title, formatCode) {
+    return '<c:valAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="b"/>' +
+      axisTitle(title, false) +
+      '<c:numFmt formatCode="' + (formatCode || 'General') + '" sourceLinked="0"/>' +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:crossBetween val="midCat"/></c:valAx>';
+  }
+
+  function catAx(id, crossId, title) {
+    return '<c:catAx><c:axId val="' + id + '"/>' +
+      '<c:scaling><c:orientation val="minMax"/></c:scaling>' +
+      '<c:delete val="0"/><c:axPos val="b"/>' +
+      axisTitle(title, false) +
+      '<c:majorTickMark val="out"/><c:minorTickMark val="none"/>' +
+      '<c:tickLblPos val="nextTo"/>' +
+      '<c:crossAx val="' + crossId + '"/><c:crosses val="autoZero"/>' +
+      '<c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/>' +
+      '<c:noMultiLvlLbl val="0"/></c:catAx>';
+  }
+
+  /* def:
+       { type: 'col' | 'bar' | 'stacked' | 'scatter',
+         title, xTitle, yTitle, valFormat,
+         cats: { ref, values },                    // categories, or x for scatter
+         series: [ { name, nameRef, ref, values, dash, noFill }] } */
+  function chartXml(def) {
+    var AX_A = 111111111, AX_B = 222222222;
+    var plot = '', i;
+
+    if (def.type === 'scatter') {
+      var sers = '';
+      for (i = 0; i < def.series.length; i++) {
+        var s = def.series[i];
+        /* Series usually share one x column, but not always: a flat
+           baseline drawn across a sampled curve has its own two points.
+           A scatter series carries its own xVal, so let it. */
+        var xRef = s.xRef || def.cats.ref;
+        var xValues = s.xValues || def.cats.values;
+        sers += '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/>' +
+          seriesTitle(s.nameRef, s.name) +
+          linePr(SERIES_INK[i % SERIES_INK.length], s.dash) +
+          '<c:marker><c:symbol val="none"/></c:marker>' +
+          numRef('xVal', xRef, xValues, 'General') +
+          numRef('yVal', s.ref, s.values, def.valFormat) +
+          '<c:smooth val="0"/></c:ser>';
+      }
+      plot = '<c:scatterChart><c:scatterStyle val="lineMarker"/>' +
+        '<c:varyColors val="0"/>' + sers +
+        '<c:axId val="' + AX_A + '"/><c:axId val="' + AX_B + '"/></c:scatterChart>' +
+        valAxBottom(AX_A, AX_B, def.xTitle, 'General') +
+        valAx(AX_B, AX_A, def.yTitle, true, def.valFormat);
+    } else {
+      var bars = '';
+      for (i = 0; i < def.series.length; i++) {
+        var b = def.series[i];
+        bars += '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/>' +
+          seriesTitle(b.nameRef, b.name) +
+          (b.noFill
+            ? '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>'
+            : fillPr(SERIES_INK[i % SERIES_INK.length])) +
+          '<c:invertIfNegative val="0"/>' +
+          '<c:cat><c:strRef><c:f>' + esc(def.cats.ref) + '</c:f><c:strCache>' +
+            strCache(def.cats.values) + '</c:strCache></c:strRef></c:cat>' +
+          numRef('val', b.ref, b.values, def.valFormat) +
+          '</c:ser>';
+      }
+      plot = '<c:barChart><c:barDir val="' + (def.type === 'bar' ? 'bar' : 'col') + '"/>' +
+        '<c:grouping val="' + (def.type === 'stacked' ? 'stacked' : 'clustered') + '"/>' +
+        '<c:varyColors val="0"/>' + bars +
+        '<c:gapWidth val="' + (def.type === 'stacked' ? '40' : '80') + '"/>' +
+        (def.type === 'stacked' ? '<c:overlap val="100"/>' : '<c:overlap val="-20"/>') +
+        '<c:axId val="' + AX_A + '"/><c:axId val="' + AX_B + '"/></c:barChart>' +
+        catAx(AX_A, AX_B, def.xTitle) +
+        valAx(AX_B, AX_A, def.yTitle, true, def.valFormat);
+    }
+
+    /* One series needs no key to tell it apart from the others. */
+    var wantLegend = def.series.filter(function (s) { return !s.noFill; }).length > 1;
+
+    return HEAD +
+      '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"' +
+      ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"' +
+      ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<c:roundedCorners val="0"/>' +
+        '<c:chart>' +
+          chartTitle(def.title) +
+          '<c:plotArea><c:layout/>' + plot + '<c:spPr><a:noFill/>' +
+            '<a:ln><a:noFill/></a:ln></c:spPr></c:plotArea>' +
+          (wantLegend
+            ? '<c:legend><c:legendPos val="b"/><c:overlay val="0"/></c:legend>'
+            : '') +
+          '<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/>' +
+        '</c:chart>' +
+        '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>' +
+      '</c:chartSpace>';
+  }
+
+  function drawingXml(charts) {
+    var body = '', i;
+    for (i = 0; i < charts.length; i++) {
+      var a = charts[i].anchor;
+      body += '<xdr:twoCellAnchor>' +
+        '<xdr:from><xdr:col>' + a.col + '</xdr:col><xdr:colOff>0</xdr:colOff>' +
+          '<xdr:row>' + a.row + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>' +
+        '<xdr:to><xdr:col>' + a.colEnd + '</xdr:col><xdr:colOff>0</xdr:colOff>' +
+          '<xdr:row>' + a.rowEnd + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>' +
+        '<xdr:graphicFrame macro="">' +
+          '<xdr:nvGraphicFramePr>' +
+            '<xdr:cNvPr id="' + (i + 2) + '" name="Chart ' + (i + 1) + '"/>' +
+            '<xdr:cNvGraphicFramePr/>' +
+          '</xdr:nvGraphicFramePr>' +
+          '<xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm>' +
+          '<a:graphic><a:graphicData' +
+            ' uri="http://schemas.openxmlformats.org/drawingml/2006/chart">' +
+            '<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"' +
+            ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"' +
+            ' r:id="rId' + (i + 1) + '"/>' +
+          '</a:graphicData></a:graphic>' +
+        '</xdr:graphicFrame>' +
+        '<xdr:clientData/></xdr:twoCellAnchor>';
+    }
+    return HEAD +
+      '<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"' +
+      ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' + body + '</xdr:wsDr>';
+  }
+
+  /* ── package ───────────────────────────────────────────────────── */
+
+  /* sheet: { name, rows, cols, charts: [ { anchor, …chart def } ] }
+     Returns the .xlsx as a Uint8Array. */
+  function build(sheet, meta) {
+    var charts = sheet.charts || [];
+    var name = safeSheetName(sheet.name);
+    var files = [];
+    var i;
+
+    var overrides = '';
+    for (i = 0; i < charts.length; i++) {
+      overrides += '<Override PartName="/xl/charts/chart' + (i + 1) + '.xml"' +
+        ' ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>';
+    }
+
+    files.push({
+      name: '[Content_Types].xml',
+      text: HEAD +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+          '<Default Extension="rels"' +
+            ' ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+          '<Default Extension="xml" ContentType="application/xml"/>' +
+          '<Override PartName="/xl/workbook.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+          '<Override PartName="/xl/worksheets/sheet1.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+          '<Override PartName="/xl/styles.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+          (charts.length
+            ? '<Override PartName="/xl/drawings/drawing1.xml"' +
+              ' ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>'
+            : '') +
+          overrides +
+          '<Override PartName="/docProps/core.xml"' +
+            ' ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>' +
+          '<Override PartName="/docProps/app.xml"' +
+            ' ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>' +
+        '</Types>'
+    });
+
+    files.push({
+      name: '_rels/.rels',
+      text: HEAD +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+          '<Relationship Id="rId1"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"' +
+            ' Target="xl/workbook.xml"/>' +
+          '<Relationship Id="rId2"' +
+            ' Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"' +
+            ' Target="docProps/core.xml"/>' +
+          '<Relationship Id="rId3"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"' +
+            ' Target="docProps/app.xml"/>' +
+        '</Relationships>'
+    });
+
+    var stamp = ((meta && meta.date) || new Date()).toISOString().replace(/\.\d+Z$/, 'Z');
+    files.push({
+      name: 'docProps/core.xml',
+      text: HEAD +
+        '<cp:coreProperties' +
+        ' xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"' +
+        ' xmlns:dc="http://purl.org/dc/elements/1.1/"' +
+        ' xmlns:dcterms="http://purl.org/dc/terms/"' +
+        ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+          '<dc:title>' + esc((meta && meta.title) || name) + '</dc:title>' +
+          '<dc:creator>yazeed.blog</dc:creator>' +
+          '<cp:lastModifiedBy>yazeed.blog</cp:lastModifiedBy>' +
+          '<dcterms:created xsi:type="dcterms:W3CDTF">' + stamp + '</dcterms:created>' +
+          '<dcterms:modified xsi:type="dcterms:W3CDTF">' + stamp + '</dcterms:modified>' +
+        '</cp:coreProperties>'
+    });
+
+    files.push({
+      name: 'docProps/app.xml',
+      text: HEAD +
+        '<Properties' +
+        ' xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"' +
+        ' xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">' +
+          '<Application>yazeed.blog</Application>' +
+          '<Company></Company>' +
+        '</Properties>'
+    });
+
+    files.push({
+      name: 'xl/workbook.xml',
+      text: HEAD +
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' +
+        ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+          '<workbookPr/>' +
+          '<sheets><sheet name="' + esc(name) + '" sheetId="1" r:id="rId1"/></sheets>' +
+        '</workbook>'
+    });
+
+    files.push({
+      name: 'xl/_rels/workbook.xml.rels',
+      text: HEAD +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+          '<Relationship Id="rId1"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' +
+            ' Target="worksheets/sheet1.xml"/>' +
+          '<Relationship Id="rId2"' +
+            ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"' +
+            ' Target="styles.xml"/>' +
+        '</Relationships>'
+    });
+
+    files.push({ name: 'xl/styles.xml', text: stylesXml() });
+    files.push({ name: 'xl/worksheets/sheet1.xml', text: sheetXml(sheet) });
+
+    if (charts.length) {
+      files.push({
+        name: 'xl/worksheets/_rels/sheet1.xml.rels',
+        text: HEAD +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+            '<Relationship Id="rId1"' +
+              ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"' +
+              ' Target="../drawings/drawing1.xml"/>' +
+          '</Relationships>'
+      });
+
+      files.push({ name: 'xl/drawings/drawing1.xml', text: drawingXml(charts) });
+
+      var drawRels = '';
+      for (i = 0; i < charts.length; i++) {
+        drawRels += '<Relationship Id="rId' + (i + 1) + '"' +
+          ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"' +
+          ' Target="../charts/chart' + (i + 1) + '.xml"/>';
+      }
+      files.push({
+        name: 'xl/drawings/_rels/drawing1.xml.rels',
+        text: HEAD +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+            drawRels + '</Relationships>'
+      });
+
+      for (i = 0; i < charts.length; i++) {
+        files.push({
+          name: 'xl/charts/chart' + (i + 1) + '.xml',
+          text: chartXml(charts[i])
+        });
+      }
+    }
+
+    return zip(files, (meta && meta.date) || new Date());
+  }
+
+  return {
+    build: build,
+    zip: zip,
+    crc32: crc32,
+    utf8: utf8,
+    colName: colName,
+    cellRef: cellRef,
+    absRange: absRange,
+    absCell: absCell,
+    safeSheetName: safeSheetName,
+    styleForFormat: styleForFormat,
+    styles: S
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_XLSX;
+  </script>
+  <script>
 /* PM Calculation Desk — instrument plotting.
 
    Charts here are drawings on the same sheet as everything else: hairline
@@ -6558,17 +7287,511 @@ var PM_CHARTS = (function () {
     };
   };
 
+  /* ── export ────────────────────────────────────────────────────── */
+
+  /* A spreadsheet needs the numbers a chart was drawn from, not the strings
+     it was labelled with. The `table` each renderer returns is formatted for
+     reading — "1.2M" and "12,000.00" — and neither plots nor sums. This
+     walks the same specs the renderers walk and hands back raw values, plus
+     the Excel chart type that carries each kind without flattering it.
+
+     `chart: null` is a real answer, not a gap. A gauge reads one value
+     against threshold bands and a probability–impact grid reads a cell
+     position; drawing either as a bar chart would silently convert a
+     threshold reading into a magnitude comparison, which is the kind of
+     wrong that survives review because it looks like a chart. Those kinds
+     export their data and state why there is no plot. */
+
+  /* Excel redraws every point, so a 2,000-point curve costs the reader
+     2,000 rows to scroll past for a line they cannot tell from a 60-point
+     one. Sample, but never drop the last point — a curve that stops short
+     of its final x reads as a shorter project, not a sampled one. */
+  function sampled(points, cap) {
+    var stride = Math.max(1, Math.ceil(points.length / cap));
+    var out = [], i;
+    for (i = 0; i < points.length; i += stride) out.push(points[i]);
+    if (points.length && out[out.length - 1] !== points[points.length - 1]) {
+      out.push(points[points.length - 1]);
+    }
+    return out;
+  }
+
+  function sharesX(series) {
+    var base = series[0].points, i, j;
+    for (i = 1; i < series.length; i++) {
+      if (series[i].points.length !== base.length) return false;
+      for (j = 0; j < base.length; j++) {
+        if (series[i].points[j][0] !== base[j][0]) return false;
+      }
+    }
+    return true;
+  }
+
+  function num(x) { return typeof x === 'number' && isFinite(x) ? x : null; }
+
+  /* Returns:
+       { chart, reason, xTitle, yTitle, head, rows, chartRows, catCol,
+         seriesCols, noFillCols, xCols }
+     `chartRows` is how many leading rows the plot covers — trailing rows
+     (a standard deviation, a band, a note) belong in the table but not in
+     the series. */
+  function exportData(kind, spec) {
+    var head, rows, i;
+
+    if (kind === 'bars') {
+      var bs = (spec.series || []).filter(function (s) { return isFinite(s.value); });
+      if (!bs.length) return null;
+      head = [spec.catHead || 'Measure', spec.valHead || 'Value'];
+      rows = bs.map(function (s) {
+        return [s.label + (s.sub ? ' (' + s.sub + ')' : ''), num(s.value)];
+      });
+      /* The reference is a line on the desk and a column here. Same
+         comparison, and Excel has no cheap way to draw the line. */
+      if (isFinite(spec.refValue)) {
+        rows.push([(spec.refLabel || 'Reference') + ' (reference)', num(spec.refValue)]);
+      }
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: spec.valHead || ''
+      };
+    }
+
+    if (kind === 'curve') {
+      var cs = (spec.series || []).filter(function (s) { return s.points && s.points.length > 1; });
+      if (!cs.length) return null;
+      var xLabel = spec.xLabel || 'x';
+
+      if (sharesX(cs)) {
+        var keep = [], stride = Math.max(1, Math.ceil(cs[0].points.length / 60));
+        for (i = 0; i < cs[0].points.length; i += stride) keep.push(i);
+        if (keep[keep.length - 1] !== cs[0].points.length - 1) keep.push(cs[0].points.length - 1);
+        head = [xLabel].concat(cs.map(function (s) { return s.label; }));
+        rows = keep.map(function (idx) {
+          var row = [num(cs[0].points[idx][0])];
+          for (var s = 0; s < cs.length; s++) {
+            row.push(cs[s].points[idx] ? num(cs[s].points[idx][1]) : null);
+          }
+          return row;
+        });
+        return {
+          chart: 'scatter', head: head, rows: rows, chartRows: rows.length,
+          catCol: 0,
+          seriesCols: cs.map(function (s, n) { return n + 1; }),
+          dashes: cs.map(function (s) { return s.style === 'dashed' ? 'dash' : null; }),
+          xTitle: xLabel, yTitle: spec.yLabel || ''
+        };
+      }
+
+      /* Series on different x grids get their own pair of columns — a flat
+         baseline spanning two points must not be resampled onto a curve's
+         grid, which is exactly how it would end up two units long. */
+      var cols = [], longest = 0;
+      head = [];
+      var seriesCols = [], xCols = [], dashes = [];
+      for (i = 0; i < cs.length; i++) {
+        var p = sampled(cs[i].points, 60);
+        head.push(xLabel + ' — ' + cs[i].label, cs[i].label);
+        cols.push(p.map(function (pt) { return num(pt[0]); }));
+        cols.push(p.map(function (pt) { return num(pt[1]); }));
+        xCols.push(i * 2);
+        seriesCols.push(i * 2 + 1);
+        dashes.push(cs[i].style === 'dashed' ? 'dash' : null);
+        if (p.length > longest) longest = p.length;
+      }
+      rows = [];
+      for (i = 0; i < longest; i++) {
+        rows.push(cols.map(function (c) { return i < c.length ? c[i] : null; }));
+      }
+      return {
+        chart: 'scatter', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: seriesCols, xCols: xCols, dashes: dashes,
+        xTitle: xLabel, yTitle: spec.yLabel || ''
+      };
+    }
+
+    if (kind === 'distribution') {
+      if (!isFinite(spec.o) || !isFinite(spec.m) || !isFinite(spec.p) || !isFinite(spec.e)) return null;
+      head = ['Point', 'Value'];
+      rows = [
+        ['Optimistic (O)', num(spec.o)],
+        ['Most likely (M)', num(spec.m)],
+        ['Pessimistic (P)', num(spec.p)],
+        ['PERT estimate (E)', num(spec.e)]
+      ];
+      var chartRows = rows.length;
+      if (isFinite(spec.sd)) {
+        rows.push(['Standard deviation (sigma)', num(spec.sd)]);
+        rows.push(['68% range — low', num(spec.e - spec.sd)]);
+        rows.push(['68% range — high', num(spec.e + spec.sd)]);
+      }
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: chartRows,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'rangeplot') {
+      var marks = (spec.marks || []).filter(function (m) { return isFinite(m.at); });
+      var bands = (spec.bands || []).filter(function (b) { return isFinite(b.from) && isFinite(b.to); });
+      if (!marks.length && !bands.length) return null;
+      head = ['Point', 'Value'];
+      rows = marks.map(function (m) { return [m.label, num(m.at)]; });
+      var markCount = rows.length;
+      bands.forEach(function (b) {
+        rows.push([(b.label || 'Band') + ' — from', num(b.from)]);
+        rows.push([(b.label || 'Band') + ' — to', num(b.to)]);
+      });
+      return {
+        chart: markCount ? 'col' : null,
+        reason: markCount ? '' : 'This plot is a range with no marked points.',
+        head: head, rows: rows, chartRows: markCount,
+        catCol: 0, seriesCols: [1], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'quadrant') {
+      if (!isFinite(spec.x) || !isFinite(spec.y)) return null;
+      var rx = isFinite(spec.refX) ? spec.refX : 1;
+      var ry = isFinite(spec.refY) ? spec.refY : 1;
+      head = ['Axis', 'Reading', 'Reference'];
+      rows = [
+        [spec.xLabel || 'x', num(spec.x), num(rx)],
+        [spec.yLabel || 'y', num(spec.y), num(ry)]
+      ];
+      /* Two clustered columns rather than a scatter: a single plotted point
+         against crossed reference lines is a picture Excel cannot draw, and
+         reading against reference is the whole point of the quadrant. */
+      return {
+        chart: 'col', head: head, rows: rows, chartRows: rows.length,
+        catCol: 0, seriesCols: [1, 2], xTitle: '', yTitle: ''
+      };
+    }
+
+    if (kind === 'windows') {
+      var ws = (spec.rows || []).filter(function (r) { return isFinite(r.from) && isFinite(r.to); });
+      if (!ws.length) return null;
+      head = ['Window', 'Start', 'Span', 'Finish'];
+      rows = ws.map(function (r) {
+        return [r.label, num(r.from), num(Math.abs(r.to - r.from)), num(r.to)];
+      });
+      var winRows = rows.length;
+      (spec.marks || []).forEach(function (m) {
+        if (isFinite(m.at)) rows.push([m.label || 'Mark', num(m.at), null, null]);
+      });
+      /* A stacked bar with an invisible first segment is the float diagram:
+         the offset holds the bar away from zero, the span is the window.
+         It only works while the offsets are positive. */
+      var negative = ws.some(function (r) { return r.from < 0; });
+      return {
+        chart: 'stacked', head: head, rows: rows, chartRows: winRows,
+        catCol: 0,
+        seriesCols: negative ? [1, 3] : [1, 2],
+        noFillCols: negative ? [] : [1],
+        stackedFallback: negative,
+        xTitle: '', yTitle: 'Time'
+      };
+    }
+
+    if (kind === 'meter') {
+      var zones = (spec.zones || []).filter(function (z) { return isFinite(z.from) && isFinite(z.to); });
+      head = ['Band', 'From', 'To'];
+      rows = zones.map(function (z) { return [z.label || 'Band', num(z.from), num(z.to)]; });
+      rows.push([(spec.label || 'Reading') + ' (this reading)', num(spec.value), null]);
+      return {
+        chart: null,
+        reason: 'A gauge reads one value against threshold bands. Drawn as a bar ' +
+          'chart it would read as a magnitude comparison instead, so the bands ' +
+          'and the reading are given as figures.',
+        head: head, rows: rows, chartRows: 0
+      };
+    }
+
+    if (kind === 'matrix') {
+      if (!isFinite(spec.p) || !isFinite(spec.i)) return null;
+      var score = spec.p * spec.i;
+      head = ['Probability', 'Impact', 'Score', 'Band'];
+      rows = [[num(spec.p), num(spec.i), num(score),
+        score >= 15 ? 'High' : score >= 8 ? 'Moderate' : 'Low']];
+      return {
+        chart: null,
+        reason: 'This plot is a position on a probability–impact grid, not a ' +
+          'quantity. The coordinates and the resulting band are given as figures.',
+        head: head, rows: rows, chartRows: 0
+      };
+    }
+
+    return null;
+  }
+
   return {
     renderers: R,
     esc: esc,
     short: short,
     full: full,
     trim: trim,
-    ticks: ticks
+    ticks: ticks,
+    exportData: exportData
   };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_CHARTS;
+  </script>
+  <script>
+/* ══ PM_EXPORT ═════════════════════════════════════════════════════════
+   Lays a calculator out as a spreadsheet: what was entered, what came out,
+   what each reading means, and every chart as data beside a live Excel
+   chart drawn from that data.
+
+   `sheetFor` is a pure function of the card, the values and the results —
+   no DOM, no download — so the whole layout is testable without a browser.
+   The parts that touch the page are the two functions below it. */
+
+var PM_EXPORT = (function () {
+  'use strict';
+
+  var S = PM_XLSX.styles;
+
+  /* Prose in PM_DATA is authored as HTML — a card's `about` carries
+     <strong> and the odd entity. A spreadsheet cell wants the sentence. */
+  var NAMED = {
+    amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
+    nbsp: ' ', middot: '·', mdash: '—', ndash: '–', reg: '®'
+  };
+
+  function plain(html) {
+    return String(html == null ? '' : html)
+      .replace(/<[^>]*>/g, '')
+      .replace(/&#(\d+);/g, function (m, code) {
+        return String.fromCharCode(Number(code));
+      })
+      .replace(/&([a-zA-Z][a-zA-Z0-9]*);/g, function (m, name) {
+        var key = name.toLowerCase();
+        return Object.prototype.hasOwnProperty.call(NAMED, key) ? NAMED[key] : m;
+      })
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /* Column layout. A is the label column and stays wide; C carries the
+     verdict sentences and stays wider still. Charts are anchored well to
+     the right of anything the tables use. */
+  var COLS = [44, 17, 54, 17, 17, 17, 17];
+  var CHART_COL = 8;          /* anchor column — I, clear of the tables */
+  var CHART_W = 9;            /* columns wide */
+  var CHART_H = 17;           /* rows tall */
+
+  function styleFor(format) { return PM_XLSX.styleForFormat(format); }
+
+  /* card:    a PM_DATA card
+     values:  { inputKey: number|string }
+     results: { outputKey: number|string|null }
+     charts:  [ { def, spec } ] — the chart definitions with their live specs
+     Returns a sheet ready for PM_XLSX.build. */
+  function sheetFor(card, values, results, charts, now) {
+    var sheetName = PM_XLSX.safeSheetName(card.name);
+    var rows = [];
+    var chartDefs = [];
+    var chartFloor = 0;
+
+    function add(row) { rows.push(row || []); return rows.length - 1; }
+    function blank() { add([]); }
+    function section(text) { return add([{ v: text, s: S.section }, { v: '', s: S.section }]); }
+    function note(text) { return add([{ v: text, s: S.note }]); }
+
+    add([{ v: card.name, s: S.title }]);
+    add([{ v: plain(card.tagline), s: S.subtitle }]);
+    if (card.about) note(plain(card.about));
+    blank();
+    add([{ v: 'Exported from yazeed.blog · ' + ymd(now), s: S.note }]);
+    blank();
+
+    if (card.formula && card.formula.length) {
+      section('FORMULA');
+      /* Formula lines are padded with spaces so that two formulas sit in
+         columns under a monospace font. Collapsing that to one space loses
+         the pairing, so split the line and let the sheet's own columns do
+         the aligning instead.
+
+         The threshold is four because the padding and the separator are
+         different sizes: a run of two spaces aligns an operator inside one
+         formula ("CV  = EV − AC"), while six or more divides one formula
+         from the next. tests/export.js holds that gap open. */
+      card.formula.forEach(function (line) {
+        add(String(line).replace(/<[^>]*>/g, '').split(/\s{4,}/)
+          .map(function (piece) { return plain(piece); })
+          .filter(function (piece) { return piece !== ''; }));
+      });
+      blank();
+    }
+
+    section('PARAMETERS');
+    add([{ v: 'Parameter', s: S.head }, { v: 'Value', s: S.headNum },
+      { v: 'What it means', s: S.head }]);
+    card.inputs.forEach(function (inp) {
+      var raw = values[inp.key];
+      var cell = (typeof raw === 'number' && isFinite(raw)) ? { v: raw, s: S.num }
+        : { v: raw === undefined || raw === null || raw !== raw ? '' : String(raw), s: S.base };
+      add([plain(inp.label), cell, { v: plain(inp.meaning), s: S.wrap }]);
+    });
+    blank();
+
+    section('RESULTS');
+    add([{ v: 'Result', s: S.head }, { v: 'Value', s: S.headNum },
+      { v: 'Reading', s: S.head }]);
+    card.outputs.forEach(function (out) {
+      var val = results[out.key];
+      var has = val !== null && val !== undefined && !(typeof val === 'number' && !isFinite(val));
+      var verdict = null;
+      if (has && out.interpret) {
+        try { verdict = out.interpret(val, values); } catch (e) { verdict = null; }
+      }
+      var cell = has
+        ? (typeof val === 'number' ? { v: val, s: styleFor(out.format) } : { v: String(val), s: S.base })
+        : { v: '—', s: S.base };
+      add([plain(out.label), cell, { v: verdict ? plain(verdict.text) : '', s: S.wrap }]);
+    });
+    blank();
+
+    if (card.howto && card.howto.length) {
+      section('HOW TO USE IT');
+      card.howto.forEach(function (step, n) {
+        add([{ v: (n + 1) + '. ' + plain(step), s: S.wrap }]);
+      });
+      blank();
+    }
+
+    (charts || []).forEach(function (entry) {
+      var data = null;
+      try {
+        data = entry.spec ? PM_CHARTS.exportData(entry.def.kind, entry.spec) : null;
+      } catch (e) {
+        data = null;
+      }
+
+      section(plain(entry.def.title));
+      if (entry.def.purpose) note(plain(entry.def.purpose));
+
+      if (!data) {
+        note(entry.spec
+          ? 'These parameters cannot be plotted.'
+          : 'Not plotted — this chart needs parameters that are not filled in.');
+        blank();
+        return;
+      }
+
+      if (entry.spec.summary) note(plain(entry.spec.summary));
+      if (data.reason) note(data.reason);
+
+      var headRow = add(data.head.map(function (h, n) {
+        return { v: h, s: n === 0 ? S.head : S.headNum };
+      }));
+      var first = rows.length;
+      data.rows.forEach(function (r) {
+        add(r.map(function (cell, n) {
+          if (typeof cell === 'number') return { v: cell, s: S.num };
+          return { v: cell === null || cell === undefined ? '' : String(cell), s: n === 0 ? S.base : S.base };
+        }));
+      });
+      var last = rows.length - 1;
+
+      if (data.chart && data.chartRows > 0) {
+        var lastPlotted = first + data.chartRows - 1;
+        var anchorRow = Math.max(headRow - 1, chartFloor);
+        chartFloor = anchorRow + CHART_H + 1;
+
+        var cats = data.chart === 'scatter'
+          ? {
+            ref: PM_XLSX.absRange(sheetName, data.catCol, first, lastPlotted),
+            values: column(data.rows, data.catCol, data.chartRows)
+          }
+          : {
+            ref: PM_XLSX.absRange(sheetName, data.catCol, first, lastPlotted),
+            values: column(data.rows, data.catCol, data.chartRows).map(function (c) {
+              return c === null || c === undefined ? '' : String(c);
+            })
+          };
+
+        var series = data.seriesCols.map(function (col, n) {
+          var s = {
+            name: data.head[col],
+            nameRef: PM_XLSX.absCell(sheetName, col, headRow),
+            ref: PM_XLSX.absRange(sheetName, col, first, lastPlotted),
+            values: column(data.rows, col, data.chartRows),
+            dash: data.dashes ? data.dashes[n] : null,
+            noFill: !!(data.noFillCols && data.noFillCols.indexOf(col) !== -1)
+          };
+          /* Series on their own x grid carry their own x column. */
+          if (data.xCols && data.xCols[n] !== undefined) {
+            s.xRef = PM_XLSX.absRange(sheetName, data.xCols[n], first, lastPlotted);
+            s.xValues = column(data.rows, data.xCols[n], data.chartRows);
+          }
+          return s;
+        });
+
+        chartDefs.push({
+          type: data.chart === 'stacked' && data.stackedFallback ? 'col' : data.chart,
+          title: plain(entry.def.title),
+          xTitle: data.xTitle || '',
+          yTitle: data.yTitle || '',
+          valFormat: '#,##0.##',
+          anchor: {
+            col: CHART_COL, row: anchorRow,
+            colEnd: CHART_COL + CHART_W, rowEnd: anchorRow + CHART_H
+          },
+          cats: cats,
+          series: series
+        });
+      }
+
+      blank();
+    });
+
+    add([{ v: 'Calculated in the browser at yazeed.blog — nothing was uploaded.', s: S.note }]);
+
+    return {
+      name: sheetName,
+      rows: rows,
+      cols: COLS,
+      charts: chartDefs
+    };
+  }
+
+  function column(rows, index, limit) {
+    var out = [], i;
+    for (i = 0; i < rows.length && i < limit; i++) {
+      var cell = rows[i][index];
+      out.push(cell === undefined ? null : cell);
+    }
+    return out;
+  }
+
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function ymd(now) {
+    var d = now || new Date();
+    return d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate());
+  }
+
+  function slug(name) {
+    return String(name).toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'calculator';
+  }
+
+  function filenameFor(card, now) {
+    return slug(card.name) + '-' + ymd(now) + '.xlsx';
+  }
+
+  /* Handing the bytes to the browser needs a document, so that half lives
+     with the rest of the page code. Everything here is a pure function of
+     the card and its numbers, which is what makes it testable headless. */
+
+  return {
+    sheetFor: sheetFor,
+    filenameFor: filenameFor,
+    plain: plain
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_EXPORT;
   </script>
   <script>
 /* PM Calculation Desk — chart mounting and lifecycle.
@@ -6892,13 +8115,65 @@ var PM_CHART_MOUNT = (function () {
     copyFallback(text, done);
   }
 
-  function confirmCopy(button) {
-    if (button.copyTimer) clearTimeout(button.copyTimer);
-    button.textContent = 'Copied';
-    button.copyTimer = setTimeout(function () {
-      button.textContent = 'Copy link';
-      button.copyTimer = null;
-    }, 1500);
+  /* A card action reports back on its own face and then forgets. The
+     buttons carry aria-live, so the swap is the announcement too. */
+  function flash(button, text, restore) {
+    if (button.flashTimer) clearTimeout(button.flashTimer);
+    button.textContent = text;
+    button.flashTimer = setTimeout(function () {
+      button.textContent = restore;
+      button.flashTimer = null;
+    }, 1600);
+  }
+
+  function confirmCopy(button) { flash(button, 'Copied', 'Copy link'); }
+
+  /* The bytes are assembled in the page and handed to the browser's own
+     download. There is no request here, and nowhere for one to go. */
+  function saveWorkbook(bytes, filename) {
+    var blob = new Blob([bytes], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    if (navigator.msSaveBlob) { navigator.msSaveBlob(blob, filename); return; }
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.position = 'fixed';
+    link.style.left = '-9999px';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  /* Builds the workbook from what is on the card right now. */
+  function exportCard(card, el, button) {
+    var v = readValues(card, el);
+    var entered = card.inputs.some(function (inp) {
+      var raw = v[inp.key];
+      return typeof raw === 'number' ? isFinite(raw) : String(raw || '').trim() !== '';
+    });
+    if (!entered) { flash(button, 'Enter values first', 'Excel'); return; }
+
+    var results = computeResults(card, v);
+    var charts = (card.charts || []).map(function (def) {
+      var spec = null;
+      /* A chart that cannot build is not a failed export — it is a chart
+         with nothing to say about these values, and the sheet says so. */
+      try { spec = def.build(v, results); } catch (e) { spec = null; }
+      return { def: def, spec: spec };
+    });
+
+    try {
+      var now = new Date();
+      var sheet = PM_EXPORT.sheetFor(card, v, results, charts, now);
+      saveWorkbook(PM_XLSX.build(sheet, { title: card.name, date: now }),
+        PM_EXPORT.filenameFor(card, now));
+      flash(button, 'Downloaded', 'Excel');
+    } catch (e) {
+      flash(button, 'Export failed', 'Excel');
+    }
   }
 
   function inputEvent() {
@@ -7141,6 +8416,7 @@ var PM_CHART_MOUNT = (function () {
         '<div class="card-actions">' +
           (example ? '<button class="card-action example-toggle" type="button">Example</button>' : '') +
           '<button class="card-action copy-link" type="button" aria-live="polite">Copy link</button>' +
+          '<button class="card-action export-xlsx" type="button" aria-live="polite">Excel</button>' +
         '</div>' +
       '</header>' +
       '<p class="about">' + card.about + '</p>' +
@@ -7201,6 +8477,10 @@ var PM_CHART_MOUNT = (function () {
       copyText(stateUrl(card, el), function () { confirmCopy(button); });
     });
 
+    el.querySelector('.export-xlsx').addEventListener('click', function (event) {
+      exportCard(card, el, event.currentTarget);
+    });
+
     el.addEventListener('input', function () { computeCard(card, el); });
     return el;
   }
@@ -7215,19 +8495,28 @@ var PM_CHART_MOUNT = (function () {
     return v;
   }
 
+  /* Every output a card produces, keyed the same way PM_DATA keys it — the
+     one map a chart builder is allowed to read instead of re-deriving a
+     formula. Kept separate from the display so the exporter can ask for the
+     numbers without a card on screen to paint them onto. */
+  function computeResults(card, v) {
+    var results = {};
+    card.outputs.forEach(function (out) {
+      var val = null;
+      try { val = out.compute(v); } catch (e) { val = null; }
+      results[out.key] = val;
+    });
+    return results;
+  }
+
   function computeCard(card, el) {
     var v = readValues(card, el);
-    /* Every output the card just computed, keyed the same way PM_DATA keys
-       it — the one map a chart builder is allowed to read instead of
-       re-deriving a formula. */
-    var results = {};
+    var results = computeResults(card, v);
     card.outputs.forEach(function (out) {
       var chip = el.querySelector('.result[data-out="' + out.key + '"]');
       var valueEl = chip.querySelector('.r-value');
       var verdictEl = chip.querySelector('.r-verdict');
-      var val = null;
-      try { val = out.compute(v); } catch (e) { val = null; }
-      results[out.key] = val;
+      var val = results[out.key];
 
       valueEl.textContent = formatValue(val, out.format);
       chip.classList.remove('good', 'warn', 'bad', 'info');
