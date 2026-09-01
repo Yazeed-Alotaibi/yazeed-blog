@@ -39,11 +39,11 @@ instrument, so the card shows a real reading. Re-render it by screenshotting tha
 file at 1200×630 — and re-render it whenever the figures on it (14 · 34 · 103)
 stop being true. Nothing automates this; the PNG is committed.
 
-One trap if you do re-render it: everything under `design/` still pulls its
-webfonts from Google, because those pages are not deployed and nobody moved
-them. The shipped pages no longer do. Point the source page at `../fonts/`
-before screenshotting, or the card will be set in whatever Google serves that
-day rather than in the faces the site actually uses.
+The source page loads its faces from `../fonts/` with the same `@font-face`
+declarations as `index.html`, so a render needs no fix-up first — but the other
+pages under `design/` still pull their webfonts from Google, because they are
+not deployed and nobody moved them. If you screenshot one of those, point it at
+`../fonts/` first or it will be set in whatever Google serves that day.
 
 `tests/counts.js` is the tripwire for exactly that drift: it derives the three
 figures from `PM_DATA` and checks them against the hero copy, the `<title>`,
