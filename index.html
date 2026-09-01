@@ -433,6 +433,50 @@ main {
   gap: 0.35rem 0.85rem;
 }
 
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  box-shadow: var(--lip);
+  background: var(--sheet);
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease),
+              background var(--dur) var(--ease),
+              color var(--dur) var(--ease);
+}
+
+.card-action:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.card-action:active { box-shadow: var(--sunk); }
+
+/* Selectable for the legacy copy fallback, but never visible on the desk. */
+.copy-source {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+}
+
 .card-num {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -5004,6 +5048,97 @@ var PM_CHART_MOUNT = (function () {
       '</div>';
   }
 
+  function stateUrl(card, el) {
+    var params = [];
+    card.inputs.forEach(function (inp) {
+      var node = el.querySelector('input[data-key="' + inp.key + '"]');
+      if (!node || !node.value.trim()) return;
+      params.push(encodeURIComponent(inp.key) + '=' + encodeURIComponent(node.value));
+    });
+    return 'https://yazeed.blog/#' + el.id +
+      (params.length ? '?' + params.join('&') : '');
+  }
+
+  function copyFallback(text, done) {
+    var source = document.createElement('textarea');
+    var copied = false;
+    source.className = 'copy-source';
+    source.value = text;
+    source.setAttribute('readonly', '');
+    source.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(source);
+    source.select();
+    try { copied = document.execCommand('copy'); } catch (e) { copied = false; }
+    document.body.removeChild(source);
+    if (copied) done();
+  }
+
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {
+        copyFallback(text, done);
+      });
+      return;
+    }
+    copyFallback(text, done);
+  }
+
+  function confirmCopy(button) {
+    if (button.copyTimer) clearTimeout(button.copyTimer);
+    button.textContent = 'Copied';
+    button.copyTimer = setTimeout(function () {
+      button.textContent = 'Copy link';
+      button.copyTimer = null;
+    }, 1500);
+  }
+
+  function inputEvent() {
+    var event;
+    if (typeof Event === 'function') {
+      event = new Event('input', { bubbles: true });
+    } else {
+      event = document.createEvent('Event');
+      event.initEvent('input', true, false);
+    }
+    return event;
+  }
+
+  function decoded(value) {
+    try { return decodeURIComponent(value.replace(/\+/g, ' ')); }
+    catch (e) { return null; }
+  }
+
+  function restoreStateHash() {
+    var hash = location.hash.slice(1);
+    var mark = hash.indexOf('?');
+    if (mark < 1 || mark === hash.length - 1) return false;
+
+    var cardEl = document.getElementById(decoded(hash.slice(0, mark)) || '');
+    if (!cardEl || !cardEl.classList.contains('calc-card')) return false;
+
+    var allowed = {};
+    cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
+      allowed[node.dataset.key] = node;
+    });
+
+    var changed = [];
+    hash.slice(mark + 1).split('&').forEach(function (pair) {
+      var equals = pair.indexOf('=');
+      if (equals < 1) return;
+      var key = decoded(pair.slice(0, equals));
+      var raw = decoded(pair.slice(equals + 1));
+      var value = raw === null ? NaN : parseFloat(raw);
+      if (!key || !allowed[key] || !isFinite(value)) return;
+      allowed[key].value = String(value);
+      if (changed.indexOf(allowed[key]) === -1) changed.push(allowed[key]);
+    });
+
+    if (!changed.length) return false;
+    changed.forEach(function (node) { node.dispatchEvent(inputEvent()); });
+    cardEl.scrollIntoView();
+    return true;
+  }
+
   function buildCard(card, index, categoryName) {
     card.inputs.forEach(function (inp) { inp.cardId = card.id; });
 
@@ -5036,6 +5171,9 @@ var PM_CHART_MOUNT = (function () {
         '<span class="card-num">' + index + '</span>' +
         '<h3>' + card.name + '</h3>' +
         '<p class="tagline">' + card.tagline + '</p>' +
+        '<div class="card-actions">' +
+          '<button class="card-action copy-link" type="button" aria-live="polite">Copy link</button>' +
+        '</div>' +
       '</header>' +
       '<p class="about">' + card.about + '</p>' +
       '<div class="formula">' +
@@ -5065,6 +5203,11 @@ var PM_CHART_MOUNT = (function () {
       });
       el.appendChild(wrap);
     }
+
+    el.querySelector('.copy-link').addEventListener('click', function (event) {
+      var button = event.currentTarget;
+      copyText(stateUrl(card, el), function () { confirmCopy(button); });
+    });
 
     el.addEventListener('input', function () { computeCard(card, el); });
     return el;
@@ -5197,6 +5340,8 @@ var PM_CHART_MOUNT = (function () {
     link.innerHTML = '<span class="nav-num">' + String(i + 1).padStart(2, '0') + '</span>' + cat.name;
     navEl.appendChild(link);
   });
+
+  restoreStateHash();
 
   if (statsEl) {
     statsEl.textContent = DATA.categories.length + ' domains · ' +
