@@ -1,0 +1,137 @@
+{
+  "earned-value": {
+    "values": { "bac": 200000, "pv": 120000, "ev": 108000, "ac": 96000 },
+    "note": "Six months in: efficient spend, behind schedule."
+  },
+  "time-forecast": {
+    "values": { "plannedDur": 12, "ev": 80000, "pv": 100000 },
+    "note": "Progress is 80% of plan, pointing to a three-period slip."
+  },
+  "burn-rate": {
+    "values": { "budget": 120000, "spent": 45000, "elapsed": 3, "planLeft": 6 },
+    "note": "The remaining budget buys five periods at the current burn."
+  },
+  "three-point": {
+    "values": { "o": 4, "m": 6, "p": 12 },
+    "note": "The wide pessimistic case makes the estimate worth protecting."
+  },
+  "path-sigma": {
+    "values": { "sigmas": "1.33, 0.5, 2" },
+    "note": "Three activity uncertainties roll up to less than their sum."
+  },
+  "learning-curve": {
+    "values": { "t1": 100, "rate": 80, "n": 4 },
+    "note": "By unit four, learning cuts effort by 36 percent."
+  },
+  "float": {
+    "values": { "es": 5, "ef": 9, "ls": 8, "lf": 12, "succEs": 11 },
+    "note": "Three periods of total float leave two periods free before the successor."
+  },
+  "crash": {
+    "values": { "normalCost": 10000, "crashCost": 16000, "normalDur": 10, "crashDur": 8 },
+    "note": "Buying two periods of compression costs 6,000 in total."
+  },
+  "fte": {
+    "values": { "effort": 2080, "hoursPer": 130, "periods": 4 },
+    "note": "The work needs four full-time equivalents across the window."
+  },
+  "utilization": {
+    "values": { "allocated": 150, "available": 160 },
+    "note": "A 93.75 percent allocation leaves only ten hours uncommitted."
+  },
+  "labor-cost": {
+    "values": { "hours": 400, "rate": 60, "overhead": 35 },
+    "note": "A 35 percent burden turns a 24,000 base into 32,400 loaded."
+  },
+  "channels": {
+    "values": { "n": 10, "n2": 15 },
+    "note": "Adding five people creates 60 additional communication channels."
+  },
+  "emv": {
+    "values": { "p": 30, "impact": -50000 },
+    "note": "A 30 percent threat with a 50,000 impact carries 15,000 EMV."
+  },
+  "risk-score": {
+    "values": { "p": 4, "i": 3 },
+    "note": "A likely, moderate-impact risk scores 12 and needs a watchlist owner."
+  },
+  "contingency": {
+    "values": { "probs": "30, 10, 50", "impacts": "-50000, -20000, 10000" },
+    "note": "Threats outweigh the opportunity, suggesting a 12,000 reserve."
+  },
+  "decision-tree": {
+    "values": {
+      "costA": 40000, "pA": 60, "winA": 100000, "loseA": 0,
+      "costB": 10000, "pB": 30, "winB": 60000, "loseB": 0
+    },
+    "note": "Option A has the higher expected value despite its larger entry cost."
+  },
+  "dpmo": {
+    "values": { "defects": 25, "units": 1000, "opps": 4 },
+    "note": "Twenty-five defects across 4,000 opportunities gives 6,250 DPMO."
+  },
+  "control": {
+    "values": { "mean": 50, "sigma": 2 },
+    "note": "Normal variation spans 44 to 56, with a 46 to 54 warning zone."
+  },
+  "cpk": {
+    "values": { "usl": 10, "lsl": 4, "mean": 6, "sigma": 0.5 },
+    "note": "The process is centred in the six-unit specification window."
+  },
+  "coq": {
+    "values": { "prevention": 20000, "appraisal": 30000, "internal": 40000, "external": 25000 },
+    "note": "Failure costs are 56.52 percent of the 115,000 quality total."
+  },
+  "roi": {
+    "values": { "cost": 200000, "benefit": 260000 },
+    "note": "A 60,000 net benefit is a 30 percent return on the investment."
+  },
+  "npv": {
+    "values": { "rate": 10, "inv": 1000, "flows": "500, 500, 500" },
+    "note": "Three 500 inflows clear the 10 percent hurdle and repay in period two."
+  },
+  "tvm": {
+    "values": { "amount": 10000, "rate": 8, "n": 5 },
+    "note": "At eight percent, 10,000 grows to about 14,693 over five periods."
+  },
+  "breakeven": {
+    "values": { "fixed": 50000, "price": 25, "varCost": 15 },
+    "note": "A ten-unit contribution margin requires 5,000 units to break even."
+  },
+  "depreciation": {
+    "values": { "cost": 120000, "salvage": 20000, "life": 5 },
+    "note": "The asset depreciates by 20,000 per year over five years."
+  },
+  "scoring": {
+    "values": { "weights": "5, 3, 2", "scores": "8, 6, 9" },
+    "note": "The weighted score is 7.6 on the original ten-point scale."
+  },
+  "pta": {
+    "values": { "ceiling": 180000, "targetPrice": 165000, "targetCost": 150000, "buyerShare": 80 },
+    "note": "The 80 percent share puts point of total assumption at 168,750."
+  },
+  "fpif": {
+    "values": { "targetCost": 150000, "targetFee": 15000, "actualCost": 140000, "sellerShare": 20, "ceiling": 180000 },
+    "note": "Cost savings increase the seller fee to 17,000 under the 20 percent share."
+  },
+  "cpif": {
+    "values": { "targetCost": 100000, "targetFee": 10000, "actualCost": 90000, "sellerShare": 20, "minFee": 4000, "maxFee": 15000 },
+    "note": "The final 12,000 fee stays inside the agreed minimum and maximum."
+  },
+  "velocity": {
+    "values": { "points": 120, "sprints": 4, "backlog": 200, "weeks": 2 },
+    "note": "Four sprints of history forecast seven sprints, or 14 weeks, remaining."
+  },
+  "capacity": {
+    "values": { "members": 5, "days": 9, "hoursPerDay": 8, "focus": 65 },
+    "note": "A 65 percent focus factor turns 360 raw hours into 234 plannable hours."
+  },
+  "say-do": {
+    "values": { "committed": 34, "delivered": 29 },
+    "note": "The team delivered 85.29 percent of its commitment."
+  },
+  "littles-law": {
+    "values": { "wip": 12, "throughput": 3, "workTime": 0.5 },
+    "note": "Twelve items at three per period means four periods of cycle time."
+  }
+}
