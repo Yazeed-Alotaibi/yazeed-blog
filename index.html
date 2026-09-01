@@ -5202,8 +5202,13 @@ var PM_CHART_MOUNT = (function () {
   }
 
   function readingValueIsValid(node, value) {
-    return !!node && (typeof value === 'string' || typeof value === 'number') &&
-      String(value).trim() !== '' && (node.type !== 'number' || isFinite(value));
+    if (!node || (typeof value !== 'string' && typeof value !== 'number') ||
+        String(value).trim() === '') return false;
+    if (node.type !== 'number') return true;
+    var probe = document.createElement('input');
+    probe.type = 'number';
+    probe.value = String(value);
+    return probe.value !== '' && isFinite(parseFloat(probe.value));
   }
 
   function savedHasValues(saved) {
