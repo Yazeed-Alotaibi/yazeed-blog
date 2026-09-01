@@ -407,6 +407,27 @@ main {
   font-size: 0.9rem;
 }
 
+.cat-citation {
+  display: block;
+  margin-top: 0.65rem;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.cat-citation a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  vertical-align: middle;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cat-citation a:hover { color: var(--ink); }
+
 /* --------------------------------------------------------------- card */
 .calc-card {
   background: var(--sheet);
@@ -1954,6 +1975,7 @@ var PM_DATA = (function () {
       id: 'evm',
       name: 'Earned Value Management',
       blurb: 'One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.',
+      citation: 'EVM — PMI Practice Standard; Lipke, “Schedule is Different.”',
       cards: [
         {
           id: 'earned-value',
@@ -2327,6 +2349,7 @@ var PM_DATA = (function () {
       id: 'burn',
       name: 'Budget & Burn Rate',
       blurb: 'The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.',
+      citation: 'Budget & burn — PMI PMBOK Guide, Cost Management.',
       cards: [
         {
           id: 'burn-rate',
@@ -2402,6 +2425,7 @@ var PM_DATA = (function () {
       id: 'estimation',
       name: 'Estimation',
       blurb: 'Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.',
+      citation: 'Estimation — PMI Practice Standard for Project Estimating.',
       cards: [
         {
           id: 'three-point',
@@ -2615,6 +2639,7 @@ var PM_DATA = (function () {
       id: 'schedule',
       name: 'Schedule & Critical Path',
       blurb: 'The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.',
+      citation: 'Schedule — PMI Practice Standard for Scheduling.',
       cards: [
         {
           id: 'float',
@@ -2684,6 +2709,7 @@ var PM_DATA = (function () {
       id: 'compression',
       name: 'Schedule Compression',
       blurb: 'When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.',
+      citation: 'Compression — PMI PMBOK Guide, Schedule Compression.',
       cards: [
         {
           id: 'crash',
@@ -2749,6 +2775,7 @@ var PM_DATA = (function () {
       id: 'resources',
       name: 'Resources & Team',
       blurb: 'Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.',
+      citation: 'Resources — PMI PMBOK Guide, Resource Management.',
       cards: [
         {
           id: 'fte',
@@ -2863,6 +2890,7 @@ var PM_DATA = (function () {
       id: 'comms',
       name: 'Communication',
       blurb: 'Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.',
+      citation: 'Communication — PMI PMBOK Guide, Communications Management.',
       cards: [
         {
           id: 'channels',
@@ -2925,6 +2953,7 @@ var PM_DATA = (function () {
       id: 'risk',
       name: 'Risk',
       blurb: 'Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.',
+      citation: 'Risk — PMI Risk Management in Portfolios, Programs, and Projects.',
       cards: [
         {
           id: 'emv',
@@ -3072,6 +3101,7 @@ var PM_DATA = (function () {
       id: 'decision',
       name: 'Decision Analysis',
       blurb: 'Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.',
+      citation: 'Decision — PMI PMBOK Guide, Decision Analysis.',
       cards: [
         {
           id: 'decision-tree',
@@ -3148,6 +3178,7 @@ var PM_DATA = (function () {
       id: 'quality',
       name: 'Quality & Six Sigma',
       blurb: 'Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?',
+      citation: 'Quality — ASQ Quality Resources and Six Sigma guidance.',
       cards: [
         {
           id: 'dpmo',
@@ -3401,6 +3432,7 @@ var PM_DATA = (function () {
       id: 'financial',
       name: 'Project Selection & Finance',
       blurb: 'The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.',
+      citation: 'Finance — PMI PMBOK Guide, Project Finance and Benefits.',
       cards: [
         {
           id: 'roi',
@@ -3716,6 +3748,7 @@ var PM_DATA = (function () {
       id: 'procurement',
       name: 'Procurement & Contracts',
       blurb: 'The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.',
+      citation: 'Procurement — PMI PMBOK Guide, Procurement Management.',
       cards: [
         {
           id: 'pta',
@@ -3917,6 +3950,7 @@ var PM_DATA = (function () {
       id: 'agile',
       name: 'Agile Forecasting',
       blurb: 'Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.',
+      citation: 'Agile — Scrum Guide (2020): scrumguides.org/scrum-guide.html',
       cards: [
         {
           id: 'velocity',
@@ -4081,6 +4115,7 @@ var PM_DATA = (function () {
       id: 'flow',
       name: 'Lean & Flow',
       blurb: 'Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.',
+      citation: 'Flow — Little (1961), “A Proof for L = λW”: doi.org/10.1287/opre.9.3.383',
       cards: [
         {
           id: 'littles-law',
@@ -5784,6 +5819,25 @@ var PM_CHART_MOUNT = (function () {
   /* --------------------------------------------------------- sections */
   var totalCards = 0, totalOutputs = 0;
 
+  /* The citation pack is plain text by default. These are the only two
+     canonical URL strings allowed to become links in a domain footer. */
+  var citationLinks = {
+    'scrumguides.org/scrum-guide.html': '<a href="https://scrumguides.org/scrum-guide.html" rel="noopener" target="_blank">scrumguides.org/scrum-guide.html</a>',
+    'doi.org/10.1287/opre.9.3.383': '<a href="https://doi.org/10.1287/opre.9.3.383" rel="noopener" target="_blank">doi.org/10.1287/opre.9.3.383</a>'
+  };
+
+  function renderCitation(citation) {
+    var keys = Object.keys(citationLinks);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var position = citation.indexOf(key);
+      if (position === -1) continue;
+      return citation.slice(0, position) + citationLinks[key] +
+        citation.slice(position + key.length);
+    }
+    return citation;
+  }
+
   DATA.categories.forEach(function (cat, i) {
     var section = document.createElement('section');
     section.className = 'category';
@@ -5793,7 +5847,8 @@ var PM_CHART_MOUNT = (function () {
       '<header class="cat-head">' +
         '<span class="cat-num">' + String(i + 1).padStart(2, '0') + '</span>' +
         '<div><h2 id="cat-h-' + cat.id + '">' + cat.name + '</h2>' +
-        '<p class="cat-blurb">' + cat.blurb + '</p></div>' +
+        '<p class="cat-blurb">' + cat.blurb + '</p>' +
+        '<small class="cat-citation">' + renderCitation(cat.citation) + '</small></div>' +
       '</header>';
 
     cat.cards.forEach(function (card, j) {
