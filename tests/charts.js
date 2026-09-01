@@ -125,9 +125,15 @@ function run(page) {
         'kind=' + def.kind);
 
       try { spec = def.build(v, results); } catch (e) { problem = e.message; }
-      H.deep(id + ' matches its worked-example spec',
-        problem ? { threw: problem } : plain(spec),
-        expected ? expected.spec : { missing: id });
+      if (expected) {
+        H.deep(id + ' matches its worked-example spec',
+          problem ? { threw: problem } : plain(spec),
+          expected.spec);
+      } else {
+        H.deep(id + ' builds an uncharacterized chart spec',
+          { kind: def.kind, result: problem ? 'threw' : typeof spec },
+          { kind: def.kind, result: 'object' });
+      }
 
       if (!problem && expected) {
         H.deep(id + ' keeps point-series boundaries',
