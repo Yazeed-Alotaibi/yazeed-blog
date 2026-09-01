@@ -1,0 +1,341 @@
+{
+  "evm/earned-value": {
+    "_inputs": {
+      "bac": 100000,
+      "pv": 50000,
+      "ev": 45000,
+      "ac": 60000
+    },
+    "cv": -15000,
+    "sv": -5000,
+    "cpi": 0.75,
+    "spi": 0.9,
+    "csi": 0.675,
+    "pctComplete": 45,
+    "pctSpent": 60,
+    "eacTypical": 133333.33333333334,
+    "eacAtypical": 115000,
+    "eacBoth": 141481.48148148146,
+    "etc": 73333.33333333334,
+    "vac": -33333.33333333334,
+    "tcpiBac": 1.375,
+    "tcpiEac": 0.7499999999999999
+  },
+  "evm/time-forecast": {
+    "_inputs": {
+      "plannedDur": 12,
+      "ev": 45000,
+      "pv": 50000
+    },
+    "spi": 0.9,
+    "forecastDur": 13.333333333333332,
+    "delay": 1.3333333333333321
+  },
+  "burn/burn-rate": {
+    "_inputs": {
+      "budget": 120000,
+      "spent": 45000,
+      "elapsed": 3,
+      "planLeft": 6
+    },
+    "burnRate": 15000,
+    "remaining": 75000,
+    "runway": 5,
+    "pctUsed": 37.5
+  },
+  "estimation/three-point": {
+    "_inputs": {
+      "o": 4,
+      "m": 6,
+      "p": 12
+    },
+    "tri": 7.333333333333333,
+    "pert": 6.666666666666667,
+    "sd": 1.3333333333333333,
+    "variance": 1.7777777777777777,
+    "r68": "5.33 – 8",
+    "r95": "4 – 9.33",
+    "r997": "2.67 – 10.67"
+  },
+  "estimation/path-sigma": {
+    "_inputs": {
+      "sigmas": "1.33, 0.5, 2"
+    },
+    "pathSigma": 2.4533446557709744,
+    "naiveSum": 3.83
+  },
+  "estimation/learning-curve": {
+    "_inputs": {
+      "t1": 100,
+      "rate": 80,
+      "n": 4
+    },
+    "tn": 64,
+    "improvement": 36
+  },
+  "schedule/float": {
+    "_inputs": {
+      "es": 5,
+      "ef": 9,
+      "ls": 8,
+      "lf": 12,
+      "succEs": 11
+    },
+    "tf": 3,
+    "tfCheck": 3,
+    "ff": 2
+  },
+  "compression/crash": {
+    "_inputs": {
+      "normalCost": 10000,
+      "crashCost": 16000,
+      "normalDur": 10,
+      "crashDur": 8
+    },
+    "slope": 3000,
+    "maxSaving": 2,
+    "premium": 6000
+  },
+  "resources/fte": {
+    "_inputs": {
+      "effort": 2080,
+      "hoursPer": 130,
+      "periods": 4
+    },
+    "fte": 4,
+    "headcount": 4
+  },
+  "resources/utilization": {
+    "_inputs": {
+      "allocated": 150,
+      "available": 160
+    },
+    "util": 93.75,
+    "slack": 10
+  },
+  "resources/labor-cost": {
+    "_inputs": {
+      "hours": 400,
+      "rate": 60,
+      "overhead": 35
+    },
+    "base": 24000,
+    "loaded": 32400.000000000004,
+    "loadedRate": 81
+  },
+  "comms/channels": {
+    "_inputs": {
+      "n": 10,
+      "n2": 15
+    },
+    "ch": 45,
+    "ch2": 105,
+    "delta": 60
+  },
+  "risk/emv": {
+    "_inputs": {
+      "p": 30,
+      "impact": -50000
+    },
+    "emv": -15000,
+    "residual": -50000
+  },
+  "risk/risk-score": {
+    "_inputs": {
+      "p": 4,
+      "i": 3
+    },
+    "score": 12
+  },
+  "risk/contingency": {
+    "_inputs": {
+      "probs": "30, 10, 50",
+      "impacts": "-50000, -20000, 10000"
+    },
+    "netEmv": -12000,
+    "reserve": 12000
+  },
+  "decision/decision-tree": {
+    "_inputs": {
+      "costA": 40000,
+      "pA": 60,
+      "winA": 100000,
+      "loseA": 0,
+      "costB": 10000,
+      "pB": 30,
+      "winB": 60000,
+      "loseB": 0
+    },
+    "emvA": 20000,
+    "emvB": 8000,
+    "verdict": "Option A by 12,000"
+  },
+  "quality/dpmo": {
+    "_inputs": {
+      "defects": 25,
+      "units": 1000,
+      "opps": 4
+    },
+    "dpmo": 6250,
+    "yield": 99.375,
+    "sigma": 3.9961842714774196
+  },
+  "quality/control": {
+    "_inputs": {
+      "mean": 50,
+      "sigma": 2
+    },
+    "ucl": 56,
+    "lcl": 44,
+    "warnZone": "46 – 54"
+  },
+  "quality/cpk": {
+    "_inputs": {
+      "usl": 10,
+      "lsl": 4,
+      "mean": 6,
+      "sigma": 0.5
+    },
+    "cp": 2,
+    "cpk": 1.3333333333333333
+  },
+  "quality/coq": {
+    "_inputs": {
+      "prevention": 20000,
+      "appraisal": 30000,
+      "internal": 40000,
+      "external": 25000
+    },
+    "conformance": 50000,
+    "nonconformance": 65000,
+    "total": 115000,
+    "failShare": 56.52173913043478
+  },
+  "financial/roi": {
+    "_inputs": {
+      "cost": 200000,
+      "benefit": 260000
+    },
+    "roi": 30,
+    "net": 60000
+  },
+  "financial/npv": {
+    "_inputs": {
+      "rate": 10,
+      "inv": 1000,
+      "flows": "500, 500, 500"
+    },
+    "npv": 243.42599549211099,
+    "irr": 23.375192852825865,
+    "bcr": 1.243425995492111,
+    "payback": "2 periods"
+  },
+  "financial/tvm": {
+    "_inputs": {
+      "amount": 10000,
+      "rate": 8,
+      "n": 5
+    },
+    "fv": 14693.280768000006,
+    "pv": 6805.831970337529,
+    "doubling": 9
+  },
+  "financial/breakeven": {
+    "_inputs": {
+      "fixed": 50000,
+      "price": 25,
+      "varCost": 15
+    },
+    "units": 5000,
+    "revenue": 125000,
+    "margin": 10
+  },
+  "financial/depreciation": {
+    "_inputs": {
+      "cost": 120000,
+      "salvage": 20000,
+      "life": 5
+    },
+    "annual": 20000,
+    "ratePct": 20
+  },
+  "financial/scoring": {
+    "_inputs": {
+      "weights": "5, 3, 2",
+      "scores": "8, 6, 9"
+    },
+    "weighted": 7.6,
+    "raw": 76
+  },
+  "procurement/pta": {
+    "_inputs": {
+      "ceiling": 180000,
+      "targetPrice": 165000,
+      "targetCost": 150000,
+      "buyerShare": 80
+    },
+    "pta": 168750,
+    "headroom": 18750
+  },
+  "procurement/fpif": {
+    "_inputs": {
+      "targetCost": 150000,
+      "targetFee": 15000,
+      "actualCost": 140000,
+      "sellerShare": 20,
+      "ceiling": 180000
+    },
+    "finalFee": 17000,
+    "finalPrice": 157000
+  },
+  "procurement/cpif": {
+    "_inputs": {
+      "targetCost": 100000,
+      "targetFee": 10000,
+      "actualCost": 90000,
+      "sellerShare": 20,
+      "minFee": 4000,
+      "maxFee": 15000
+    },
+    "fee": 12000,
+    "price": 102000
+  },
+  "agile/velocity": {
+    "_inputs": {
+      "points": 120,
+      "sprints": 4,
+      "backlog": 200,
+      "weeks": 2
+    },
+    "velocity": 30,
+    "sprintsLeft": 7,
+    "weeksLeft": "14 weeks (≈ 3.23 months)"
+  },
+  "agile/capacity": {
+    "_inputs": {
+      "members": 5,
+      "days": 9,
+      "hoursPerDay": 8,
+      "focus": 65
+    },
+    "raw": 360,
+    "capacity": 234
+  },
+  "agile/say-do": {
+    "_inputs": {
+      "committed": 34,
+      "delivered": 29
+    },
+    "ratio": 85.29411764705883,
+    "gap": -5
+  },
+  "flow/littles-law": {
+    "_inputs": {
+      "wip": 12,
+      "throughput": 3,
+      "workTime": 0.5
+    },
+    "cycleTime": 4,
+    "flowEff": 12.5
+  }
+}

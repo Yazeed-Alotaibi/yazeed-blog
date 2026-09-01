@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground:#d9d7cf; --sheet:#f3f2ed; --sheet-sunk:#e6e4db;
+    --ink:#15181a; --ink-2:#43474a; --ink-3:#585c5e;
+    --rule:#c6c4b9; --rule-2:#87867d;
+    --accent:#3b3690; --good:#1f6b4f; --good-soft:#dfe9e4;
+    --warn:#7d5703; --bad:#a32c22;
+    --strip:#1b1e22; --strip-ink:#d7dbd2;
+    --display:"Big Shoulders Display",Impact,sans-serif;
+    --body:"Libre Franklin",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --lip: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+    --sunk: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+    --shadow: 0 1px 0 rgba(0,0,0,.07), 0 14px 30px -24px rgba(0,0,0,.5);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    width:1200px; height:630px; overflow:hidden;
+    background:var(--ground); color:var(--ink); font-family:var(--body);
+    display:grid; grid-template-columns:1fr 468px; gap:52px;
+    padding:52px 60px 46px;
+    align-items:stretch;
+  }
+  .left { display:flex; flex-direction:column; justify-content:space-between; min-height:0; }
+  .label {
+    display:inline-block; font-family:var(--mono); font-size:14px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    background:var(--sheet-sunk); box-shadow:var(--sunk);
+    border-radius:2px; padding:8px 13px;
+  }
+  h1 {
+    font-family:var(--display); font-weight:800; font-size:84px; line-height:.86;
+    letter-spacing:-.005em; text-transform:uppercase; margin-top:26px;
+  }
+  h1 span { color:var(--accent); }
+  .lede { margin-top:20px; font-size:21px; line-height:1.45; color:var(--ink-2); max-width:19em; }
+
+  .figs { display:flex; gap:44px; margin-top:26px; padding-top:22px; border-top:1px solid var(--rule); }
+  .fig-n { font-family:var(--mono); font-size:38px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; }
+  .fig-l { display:block; margin-top:8px; font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); }
+
+  .site {
+    margin-top:16px;
+    font-family:var(--mono); font-size:17px; font-weight:500; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--ink-2);
+  }
+  .site b { color:var(--accent); font-weight:600; }
+
+  /* ---- instrument ---- */
+  .instrument {
+    background:var(--sheet); border:1px solid var(--rule-2); border-radius:4px;
+    box-shadow:var(--shadow), var(--lip); overflow:hidden;
+  }
+  .ihead {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:15px 18px; border-bottom:1px solid var(--rule);
+  }
+  .ihead strong { font-size:19px; font-weight:600; }
+  .ihead .label { font-size:12px; padding:6px 10px; }
+  .strip { background:var(--strip); padding:14px 18px; }
+  .strip code {
+    display:block; font-family:var(--mono); font-size:15px; line-height:1.85;
+    color:var(--strip-ink); white-space:pre;
+  }
+  .dial { padding:12px 18px 14px; text-align:center; }
+  .dial svg { width:278px; height:auto; display:block; margin:0 auto; }
+  .g-arc { fill:none; stroke-width:9; stroke-linecap:butt; }
+  .g-zone-bad{stroke:var(--bad);opacity:.34} .g-zone-warn{stroke:var(--warn);opacity:.34} .g-zone-good{stroke:var(--good);opacity:.42}
+  .g-tick{stroke:var(--rule-2);stroke-width:1.4} .g-tick.major{stroke:var(--ink);stroke-width:2.4}
+  .g-tlabel{font-family:var(--mono);font-size:11px;fill:var(--ink-3);text-anchor:middle}
+  .g-needle{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+  .g-hub{fill:var(--ink)}
+  .gcap { font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px; }
+  .gval { font-family:var(--mono); font-size:46px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--good); line-height:1.05; }
+  .gverdict {
+    display:inline-block; margin-top:9px; padding:6px 12px;
+    font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--good); background:var(--good-soft); border:1px solid var(--good); border-radius:2px;
+  }
+  .vrow { display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--rule); }
+  .vcell { padding:11px 18px; }
+  .vcell + .vcell { border-left:1px solid var(--rule); }
+  .vlab { font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); }
+  .vval { font-family:var(--mono); font-size:25px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:4px; }
+  .vval.good{color:var(--good)} .vval.bad{color:var(--bad)}
+</style>
+</head>
+<body>
+  <div class="left">
+    <div>
+      <span class="label">Free &middot; nothing leaves your browser</span>
+      <h1>Earned value,<br><span>explained.</span></h1>
+      <p class="lede">CPI, SPI, EAC and variance — computed live, then read back in plain English.</p>
+    </div>
+    <div>
+      <div class="figs">
+        <div><span class="fig-n">14</span><span class="fig-l">Domains</span></div>
+        <div><span class="fig-n">33</span><span class="fig-l">Calculators</span></div>
+        <div><span class="fig-n">99</span><span class="fig-l">Metrics</span></div>
+      </div>
+      <div class="site"><b>yazeed.blog</b> &middot; Calculation Desk</div>
+    </div>
+  </div>
+
+  <div class="instrument">
+    <div class="ihead"><strong>Earned value, live</strong><span class="label">Try it</span></div>
+    <div class="strip"><code>CPI = EV ÷ AC    CV = EV − AC</code><code>SPI = EV ÷ PV    SV = EV − PV</code></div>
+    <div class="dial">
+      <svg viewBox="-6 0 212 130" id="g"></svg>
+      <div class="gcap">CPI &middot; Cost</div>
+      <div class="gval">1.13</div>
+      <div class="gverdict">Under budget</div>
+    </div>
+    <div class="vrow">
+      <div class="vcell"><div class="vlab">CV &middot; Cost variance</div><div class="vval good">+12,000</div></div>
+      <div class="vcell"><div class="vlab">SV &middot; Schedule variance</div><div class="vval bad">−12,000</div></div>
+    </div>
+  </div>
+
+<script>
+/* Geometry copied verbatim from the hero instrument in index.html, so the
+   card shows the real dial rather than an artist's impression of it. */
+var LO = 0.70, HI = 1.30, CX = 100, CY = 100, R = 74;
+function angleFor(v){ var c = Math.min(HI, Math.max(LO, v)); return 180 - ((c - LO)/(HI - LO))*180; }
+function polar(deg, r){ var rad = deg*Math.PI/180; return [CX + r*Math.cos(rad), CY - r*Math.sin(rad)]; }
+function arcPath(from, to){
+  var a = polar(angleFor(from), R), b = polar(angleFor(to), R);
+  return 'M'+a[0].toFixed(2)+' '+a[1].toFixed(2)+'A'+R+' '+R+' 0 0 1 '+b[0].toFixed(2)+' '+b[1].toFixed(2);
+}
+var s = '<path class="g-arc g-zone-bad" d="'+arcPath(LO,0.95)+'"/>'+
+        '<path class="g-arc g-zone-warn" d="'+arcPath(0.95,1.00)+'"/>'+
+        '<path class="g-arc g-zone-good" d="'+arcPath(1.00,HI)+'"/>';
+var ticks = [0.70,0.80,0.90,1.00,1.10,1.20,1.30];
+for (var i=0;i<ticks.length;i++){
+  var v=ticks[i], deg=angleFor(v), major=(v===1.00);
+  var outer=polar(deg,R+5), inner=polar(deg, major?R-12:R-7);
+  s += '<line class="g-tick'+(major?' major':'')+'" x1="'+outer[0].toFixed(1)+'" y1="'+outer[1].toFixed(1)+
+       '" x2="'+inner[0].toFixed(1)+'" y2="'+inner[1].toFixed(1)+'"/>';
+  if (v===LO||v===1.00||v===HI){
+    var lab=polar(deg,R+15);
+    s += '<text class="g-tlabel" x="'+lab[0].toFixed(1)+'" y="'+(lab[1]+4).toFixed(1)+'">'+v.toFixed(2)+'</text>';
+  }
+}
+var deg = angleFor(1.13), tip = polar(deg, R-14);
+s += '<line class="g-needle" x1="'+CX+'" y1="'+CY+'" x2="'+tip[0].toFixed(2)+'" y2="'+tip[1].toFixed(2)+'"/>'+
+     '<circle class="g-hub" cx="'+CX+'" cy="'+CY+'" r="4.5"/>';
+document.getElementById('g').innerHTML = s;
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1880,
+      "title": "Desk-first (leading)"
+    },
+    {
+      "file": "Instrument.dc.html",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1180,
+      "title": "Instrument-first (alternate)"
+    },
+    {
+      "file": "Card.dc.html",
+      "x": 0,
+      "y": 2180,
+      "w": 900,
+      "h": 1320,
+      "title": "Calculator card \u2014 states"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -190,
+      "w": 640,
+      "text": "The site is only the Calculation Desk now.\nThe open question is the top of the page \u2014 the two artboards answer it differently. Both use the real tokens from index.html."
+    },
+    {
+      "id": "note-desk-first",
+      "x": 0,
+      "y": 1930,
+      "w": 400,
+      "text": "Desk-first: no gauge, no About. A visitor is reading calculators within one screen. Trade-off \u2014 nothing proves the tool works until you scroll."
+    },
+    {
+      "id": "note-instrument",
+      "x": 1560,
+      "y": 1240,
+      "w": 400,
+      "text": "Instrument-first: keeps the live earned-value gauge, so the page demonstrates itself before describing itself. Trade-off \u2014 the desk proper starts ~600px lower."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600&display=swap">
+  <style>
+    :root {
+      --ground:#d9d7cf; --sheet:#f3f2ed; --sunk:#e6e4db;
+      --ink:#15181a; --ink2:#43474a; --ink3:#585c5e;
+      --rule:#c6c4b9; --rule2:#87867d; --accent:#3b3690;
+      --good:#1f6b4f; --warn:#7d5703; --bad:#a32c22;
+      --strip:#1b1e22; --strip-ink:#d7dbd2;
+      --display:"Big Shoulders Display","Haettenschweiler",Impact,sans-serif;
+      --body:"Libre Franklin",system-ui,-apple-system,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+      --lip: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.05);
+      --sunkshadow: inset 0 2px 4px rgba(0,0,0,.10), inset 0 -1px 0 rgba(255,255,255,.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; font-family: var(--body); }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:hover { color: var(--ink); }
+  </style>
+</helmet>
+
+<div style="display:grid; grid-template-columns:272px minmax(0,1fr); width:1440px; min-height:1180px; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;">
+
+  <aside style="display:flex; flex-direction:column; gap:1.1rem; padding:1.5rem 1.25rem; background:var(--sheet); border-right:1px solid var(--rule2);">
+    <div style="display:flex; align-items:center; gap:0.7rem; padding-bottom:1.1rem; border-bottom:1px solid var(--rule);">
+      <span style="display:grid; place-items:center; width:2.3rem; height:2.3rem; border:1px solid var(--rule2); background:var(--sunk); color:var(--accent); font-family:var(--mono); font-size:1rem; font-weight:500;">&Sigma;</span>
+      <div>
+        <strong style="display:block; font-size:0.95rem; font-weight:600; letter-spacing:-0.01em;">Calculation Desk</strong>
+        <span style="display:block; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink3);">for project managers</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="width:100%; min-height:44px; display:flex; align-items:center; padding:0.5rem 0.7rem; font-size:0.85rem; color:var(--ink3); background:var(--sunk); border:1px solid var(--rule2); box-shadow:var(--sunkshadow);">Find a formula&hellip; e.g. CPI, float, NPV</div>
+    </div>
+
+    <nav style="display:flex; flex-direction:column;">
+      <sc-for list="{{cats}}" as="cat" hint-placeholder-count="14">
+        <div style="display:flex; align-items:baseline; gap:0.65rem; padding:0.55rem 0.7rem; border-left:2px solid {{cat.edge}}; background:{{cat.bg}}; color:{{cat.fg}}; font-size:0.85rem;">
+          <span style="font-family:var(--mono); font-size:0.66rem; font-variant-numeric:tabular-nums; color:{{cat.num}};">{{cat.no}}</span>
+          <span>{{cat.name}}</span>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto; padding-top:1.1rem; border-top:1px solid var(--rule); font-size:0.78rem; line-height:1.5; color:var(--ink2);">
+      Built by <a href="#">Yazeed Alotaibi</a> &mdash; PMP &middot; PRINCE2 &middot; PMI-RMP
+    </div>
+  </aside>
+
+  <main style="padding:0 4rem 5rem; max-width:1240px;">
+
+    <!-- Masthead carries a working instrument: the desk demonstrates itself
+         before it describes itself. -->
+    <header style="display:grid; grid-template-columns:minmax(0,1fr) 470px; gap:3rem; align-items:start; padding:3.4rem 0 2.4rem; border-bottom:1px solid var(--rule2);">
+      <div>
+        <p style="font-family:var(--mono); font-size:0.64rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3);">Every formula &middot; explained</p>
+        <h1 style="margin-top:0.7rem; font-family:var(--display); font-weight:700; font-size:4.1rem; line-height:0.9; text-transform:uppercase;">The Project Manager's <span style="color:var(--accent);">Calculation Desk</span></h1>
+        <p style="margin-top:1.1rem; max-width:46ch; font-size:1.02rem; color:var(--ink2);">
+          Earned value, float, expected monetary value, procurement, agile
+          forecasting. Each calculator runs the arithmetic, then tells you how
+          to read the answer.
+        </p>
+
+        <div style="display:flex; gap:2.4rem; margin-top:1.6rem; padding-top:1.2rem; border-top:1px solid var(--rule);">
+          <sc-for list="{{figures}}" as="fig" hint-placeholder-count="3">
+            <div>
+              <span style="font-family:var(--mono); font-size:1.6rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums;">{{fig.n}}</span>
+              <span style="display:block; margin-top:0.3rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink3);">{{fig.label}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- the instrument -->
+      <figure style="background:var(--sheet); border:1px solid var(--rule); box-shadow:var(--lip);">
+        <figcaption style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; padding:0.8rem 1rem; border-bottom:1px solid var(--rule);">
+          <strong style="font-size:0.93rem; font-weight:600; letter-spacing:-0.01em;">Earned value, live</strong>
+          <span style="font-family:var(--mono); font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink3); background:var(--sunk); box-shadow:var(--sunkshadow); padding:0.3rem 0.55rem; border-radius:2px;">Try it</span>
+        </figcaption>
+
+        <div style="padding:0.75rem 1rem; background:var(--strip);">
+          <code style="display:block; font-family:var(--mono); font-size:0.78rem; line-height:1.9; color:var(--strip-ink); white-space:pre;">CPI = EV &divide; AC     CV = EV &minus; AC
+SPI = EV &divide; PV     SV = EV &minus; PV</code>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.6rem; padding:0.9rem 1rem; background:var(--sunk); border-bottom:1px solid var(--rule);">
+          <sc-for list="{{inputs}}" as="inp" hint-placeholder-count="3">
+            <div>
+              <span style="display:block; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink3);">{{inp.label}}</span>
+              <div style="margin-top:0.3rem; min-height:44px; display:flex; align-items:center; padding:0.4rem 0.5rem; font-family:var(--mono); font-size:0.92rem; font-variant-numeric:tabular-nums; background:var(--sheet); border:1px solid var(--rule2);">{{inp.value}}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; padding:1.1rem 1rem;">
+          <sc-for list="{{gauges}}" as="g" hint-placeholder-count="2">
+            <div style="text-align:center;">
+              <!-- Three graduated zones, as on the desk: below 0.95 is
+                   unfavourable, 0.95–1.00 is watch, 1.00 up is favourable. -->
+              <svg viewBox="-6 0 212 130" width="100%" role="img" aria-label="{{g.alt}}">
+                <path d="{{g.arcBad}}" fill="none" stroke="{{c.bad}}" stroke-width="7" opacity="0.32"></path>
+                <path d="{{g.arcWarn}}" fill="none" stroke="{{c.warn}}" stroke-width="7" opacity="0.32"></path>
+                <path d="{{g.arcGood}}" fill="none" stroke="{{c.good}}" stroke-width="7" opacity="0.32"></path>
+                <sc-for list="{{ticks}}" as="t" hint-placeholder-count="7">
+                  <line x1="{{t.x1}}" y1="{{t.y1}}" x2="{{t.x2}}" y2="{{t.y2}}" stroke="{{t.stroke}}" stroke-width="{{t.w}}"></line>
+                </sc-for>
+                <text x="100" y="14" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">1.00</text>
+                <text x="20" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">0.70</text>
+                <text x="180" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="{{c.ink3}}">1.30</text>
+                <line x1="100" y1="100" x2="{{g.nx}}" y2="{{g.ny}}" stroke="{{c.ink}}" stroke-width="2.4" stroke-linecap="round"></line>
+                <circle cx="100" cy="100" r="5" fill="{{c.ink}}"></circle>
+              </svg>
+              <span style="display:block; margin-top:0.2rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.13em; text-transform:uppercase; color:var(--ink3);">{{g.label}}</span>
+              <span style="display:block; margin-top:0.25rem; font-family:var(--mono); font-size:2rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; color:{{g.tone}};">{{g.value}}</span>
+              <!-- The verdict is a word, so it survives greyscale. -->
+              <span style="display:inline-block; margin-top:0.5rem; padding:0.25rem 0.5rem; font-family:var(--mono); font-size:0.62rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:{{g.tone}}; border:1px solid {{g.tone}}; border-radius:2px;">{{g.verdict}}</span>
+              <span style="display:block; margin-top:0.5rem; font-size:0.78rem; line-height:1.4; color:var(--ink2);">{{g.meaning}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </figure>
+    </header>
+
+    <section style="padding-top:2.4rem;">
+      <div style="display:flex; gap:1.1rem; align-items:baseline; padding-bottom:1rem; border-bottom:1px solid var(--rule); margin-bottom:1.5rem;">
+        <span style="font-family:var(--mono); font-size:0.8rem; font-weight:500; color:var(--accent); font-variant-numeric:tabular-nums;">01</span>
+        <div>
+          <h2 style="font-family:var(--display); font-weight:700; font-size:2.6rem; line-height:0.95; text-transform:uppercase;">Earned Value Management</h2>
+          <p style="margin-top:0.6rem; max-width:74ch; font-size:0.9rem; color:var(--ink2);">
+            One integrated system that answers three questions at once: are we on
+            budget, are we on schedule, and where will we land at completion?
+          </p>
+        </div>
+      </div>
+
+      <article style="background:var(--sheet); border:1px solid var(--rule); padding:1.85rem; box-shadow:var(--lip); max-height:190px; overflow:hidden;">
+        <header style="display:flex; flex-wrap:wrap; align-items:baseline; gap:0.35rem 0.85rem;">
+          <span style="font-family:var(--mono); font-size:0.72rem; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums;">01.1</span>
+          <h3 style="font-family:var(--display); font-weight:600; font-size:1.8rem; line-height:1; text-transform:uppercase;">Earned value core &amp; forecasting</h3>
+        </header>
+        <div style="margin-top:1rem; padding:0.85rem 1.05rem; background:var(--strip); border-radius:2px;">
+          <code style="display:block; font-family:var(--mono); font-size:0.82rem; line-height:1.95; color:var(--strip-ink); white-space:pre;">CV  = EV &minus; AC          SV  = EV &minus; PV
+CPI = EV &divide; AC          SPI = EV &divide; PV</code>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    var c = {
+      ink: '#15181a', ink3: '#585c5e', rule: '#c6c4b9', rule2: '#87867d',
+      good: '#1f6b4f', warn: '#7d5703', bad: '#a32c22'
+    };
+
+    var names = [
+      'Earned Value Management', 'Budget & Burn Rate', 'Estimation',
+      'Schedule & Critical Path', 'Schedule Compression', 'Resources & Team',
+      'Communication', 'Risk', 'Decision Analysis', 'Quality & Six Sigma',
+      'Project Selection & Finance', 'Procurement & Contracts',
+      'Agile Forecasting', 'Lean & Flow'
+    ];
+    var cats = names.map(function (name, i) {
+      var on = i === 0;
+      return {
+        no: (i + 1 < 10 ? '0' : '') + (i + 1),
+        name: name,
+        edge: on ? '#3b3690' : 'transparent',
+        bg: on ? '#e6e4db' : 'transparent',
+        fg: on ? '#15181a' : '#43474a',
+        num: on ? '#3b3690' : '#585c5e'
+      };
+    });
+
+    // Geometry: 0.70 sits at 180°, 1.30 at 0°, on a radius of 74.
+    var LO = 0.70, HI = 1.30, R = 74, CX = 100, CY = 100;
+    function ang(v) {
+      var t = (v - LO) / (HI - LO);
+      t = t < 0 ? 0 : (t > 1 ? 1 : t);
+      return (180 - t * 180) * Math.PI / 180;
+    }
+    function pt(v, r) {
+      var a = ang(v);
+      return [CX + r * Math.cos(a), CY - r * Math.sin(a)];
+    }
+    function arc(from, to) {
+      var p = pt(from, R), q = pt(to, R);
+      return 'M ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) +
+             ' A ' + R + ' ' + R + ' 0 0 1 ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+    }
+
+    // Seven graduations; the 1.00 mark is the one being read against.
+    var ticks = [];
+    for (var v = 0.70; v <= 1.301; v += 0.10) {
+      var major = Math.abs(v - 1) < 0.001;
+      var inner = pt(v, R - (major ? 13 : 9)), outer = pt(v, R + 5);
+      ticks.push({
+        x1: inner[0].toFixed(1), y1: inner[1].toFixed(1),
+        x2: outer[0].toFixed(1), y2: outer[1].toFixed(1),
+        stroke: major ? c.ink : c.rule2,
+        w: major ? '2' : '1'
+      });
+    }
+
+    function gauge(label, value, verdict, tone, meaning, alt) {
+      var n = pt(value, R * 0.86);
+      return {
+        label: label,
+        value: value.toFixed(2),
+        verdict: verdict,
+        tone: tone,
+        meaning: meaning,
+        alt: alt,
+        nx: n[0].toFixed(1),
+        ny: n[1].toFixed(1),
+        arcBad: arc(LO, 0.95),
+        arcWarn: arc(0.95, 1.00),
+        arcGood: arc(1.00, HI)
+      };
+    }
+
+    return {
+      c: c,
+      figures: [
+        { n: '14', label: 'Domains' },
+        { n: '33', label: 'Calculators' },
+        { n: '99', label: 'Metrics' }
+      ],
+      inputs: [
+        { label: 'EV earned', value: '108,000' },
+        { label: 'AC spent', value: '96,000' },
+        { label: 'PV planned', value: '120,000' }
+      ],
+      ticks: ticks,
+      gauges: [
+        gauge('CPI · cost', 1.13, 'Under budget', c.good,
+              'Each unit spent is buying 1.13 of planned work.',
+              'Cost performance index, plotted against 1.00'),
+        gauge('SPI · schedule', 0.90, 'Behind', c.bad,
+              'Only 90% of the scheduled work is done.',
+              'Schedule performance index, plotted against 1.00')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

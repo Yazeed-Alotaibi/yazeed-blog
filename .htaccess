@@ -1,0 +1,30 @@
+# Server-side redirects. Everything here sits inside the <IfModule> guard: if
+# mod_rewrite is unavailable on the origin, this file does nothing at all
+# rather than returning a 500. A RewriteRule outside the guard would take the
+# whole site down on a host without the module.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Canonical host.
+  #
+  # www.yazeed.blog and yazeed.blog both answered 200 with byte-identical
+  # content and neither redirected, so the two competed as duplicates — Google
+  # indexed the www one. index.html carries a <link rel="canonical"> to the
+  # apex, which is a strong hint; this makes it unambiguous.
+  RewriteCond %{HTTP_HOST} ^www\.yazeed\.blog$ [NC]
+  RewriteRule ^(.*)$ https://yazeed.blog/$1 [R=301,L]
+
+  # Retired tool pages.
+  #
+  # Both were merged into index.html. HTML stubs still sit at these paths and
+  # redirect via <meta http-equiv="refresh">, but that is a browser-side
+  # redirect: the server answers 200, so a crawler sees two thin pages rather
+  # than a move. These rules answer 301 instead, which consolidates them into
+  # the home page and passes any link equity along.
+  #
+  # The stub files are kept deliberately. If mod_rewrite is ever unavailable
+  # the guard above skips these rules and the stubs still get visitors to the
+  # right place — worse for search, but never a dead link.
+  RewriteRule ^pm-calculation-desk\.html$    /#calc-sections  [R=301,L]
+  RewriteRule ^wbs-estimation-toolkit\.html$ /#calc-sections  [R=301,L]
+</IfModule>
