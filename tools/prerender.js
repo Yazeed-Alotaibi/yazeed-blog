@@ -174,6 +174,11 @@ function cardMarkup(card, index, out) {
   out.push('<p class="prerender-tagline">' + html(card.tagline, where + '.tagline') + '</p>');
   out.push('<p class="prerender-about">' + html(card.about, where + '.about') + '</p>');
 
+  if (card.page) {
+    out.push('<p class="prerender-page"><a href="' + attr(card.page) +
+      '">Full analysis</a></p>');
+  }
+
   if (card.formula && card.formula.length) {
     out.push('<pre class="prerender-formula"><code>' +
       card.formula.map(function (line, i) {
@@ -460,6 +465,11 @@ module.exports = {
   MARKER_START: MARKER_START,
   MARKER_END: MARKER_END,
   generate: generate,
+  /* One card's markup on its own, for the per-calculator pages built by
+     tools/calcpage.js. Those pages hold a single calculator, so the domain
+     index and the whole-desk lede above would both be nonsense there — but
+     the card block itself is exactly the same mirror, and must stay so. */
+  cardMarkup: cardMarkup,
   generateLines: generateLines,
   apply: apply,
   isCurrent: isCurrent,

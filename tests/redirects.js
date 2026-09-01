@@ -32,12 +32,16 @@ function run(page, options) {
   var root = options && options.root ? options.root : path.join(__dirname, '..');
   var htaccess = fs.readFileSync(path.join(root, '.htaccess'), 'utf8');
   var moduleStack = [];
-  var outside = [];
+  var rewriteOutside = [];
+  var headerOutside = [];
 
   htaccess.split(/\r?\n/).forEach(function (line) {
     var opening = /^\s*<IfModule\s+([^>]+)>/i.exec(line);
     if (opening) {
-      moduleStack.push(/mod_rewrite\.c/i.test(opening[1]));
+      moduleStack.push({
+        rewrite: /mod_rewrite\.c/i.test(opening[1]),
+        headers: /mod_headers\.c/i.test(opening[1])
+      });
       return;
     }
     if (/^\s*<\/IfModule>/i.test(line)) {
@@ -45,14 +49,22 @@ function run(page, options) {
       return;
     }
     if (/^\s*Rewrite(?:Rule|Cond|Engine)\b/i.test(line) &&
-        moduleStack.indexOf(true) === -1) {
-      outside.push(line.trim());
+        !moduleStack.some(function (frame) { return frame.rewrite; })) {
+      rewriteOutside.push(line.trim());
+    }
+    if (/^\s*Header\b/i.test(line) &&
+        !moduleStack.some(function (frame) { return frame.headers; })) {
+      headerOutside.push(line.trim());
     }
   });
 
   H.suite('rewrite guard');
-  H.check('every Rewrite directive is guarded by mod_rewrite', outside.length === 0,
-    'outside guard: ' + outside.join(' | '));
+  H.check('every Rewrite directive is guarded by mod_rewrite', rewriteOutside.length === 0,
+    'outside guard: ' + rewriteOutside.join(' | '));
+
+  H.suite('header guard');
+  H.check('every Header directive is guarded by mod_headers', headerOutside.length === 0,
+    'outside guard: ' + headerOutside.join(' | '));
 
   var targets = rewriteTargets(htaccess);
   H.suite('stub destinations');

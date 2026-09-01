@@ -11,6 +11,7 @@ var suites = [
   require('./counts'),
   require('./earned-schedule'),
   require('./prerender'),
+  require('./pages'),
   require('./export')
 ];
 

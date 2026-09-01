@@ -3,39 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Calculation Desk — 34 PM Calculators across 14 Domains</title>
-  <meta name="description" content="34 project-management calculators across 14 domains — free, in your browser. Nothing is sent anywhere. Earned value, PERT, risk, procurement and the rest of the desk.">
-  <!-- www and the apex both answer 200 with identical content, so name the one
-       Google should index. Without this the two compete as duplicates. -->
-  <link rel="canonical" href="https://yazeed.blog/">
-
-  <!-- The brand mark as the tab icon, inlined so the page stays one file and
-       the browser stops asking for a favicon.ico that isn't there. -->
+  <title>Earned Value Analysis — CPI, SPI, EAC Calculator</title>
+  <meta name="description" content="Work through earned value with real numbers: CPI, SPI, EAC, ETC, VAC and TCPI computed live, which EAC formula to use, and where SPI stops telling the truth.">
+  <link rel="canonical" href="https://yazeed.blog/earned-value-analysis.html">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%233b3690'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='bold' text-anchor='middle' fill='%23f3f2ed'%3E%CE%A3%3C/text%3E%3C/svg%3E">
-
-  <!-- Browser chrome tinted to the enamel body, one value per scheme. -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#d9d7cf">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131518">
-
-  <!-- What a shared link says for itself. og.png is the one image the site
-       ships; design/og-card.source.html is the page it was rendered from, and
-       its dial geometry is copied from the hero instrument below, so the card
-       shows the real reading rather than an artist's impression of it. -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://yazeed.blog/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yazeed.blog/earned-value-analysis.html">
   <meta property="og:site_name" content="Calculation Desk">
-  <meta property="og:title" content="Calculation Desk — 34 PM Calculators across 14 Domains">
-  <meta property="og:description" content="34 project-management calculators across 14 domains. Free, client-side only — nothing leaves your browser.">
+  <meta property="og:title" content="Earned Value Analysis — CPI, SPI, EAC Calculator">
+  <meta property="og:description" content="Work through earned value with real numbers: CPI, SPI, EAC, ETC, VAC and TCPI computed live, which EAC formula to use, and where SPI stops telling the truth.">
   <meta property="og:image" content="https://yazeed.blog/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Calculation Desk — a cost performance index gauge reading 1.13, under budget, beside 14 domains, 34 calculators and 103 metrics.">
+  <meta property="og:image:alt" content="Earned value core &amp; forecasting on the Calculation Desk — an instrument panel of project-management figures.">
   <meta property="og:locale" content="en_US">
-  <!-- X falls back to the og:* tags for title, description and image, but not
-       for image alt — that one has no fallback, so a screen-reader user on a
-       shared link gets nothing unless it is stated here too. -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="Calculation Desk — a cost performance index gauge reading 1.13, under budget, beside 14 domains, 34 calculators and 103 metrics.">
+  <meta name="twitter:image:alt" content="Earned value core &amp; forecasting on the Calculation Desk.">
   <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/big-shoulders-display-700.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/libre-franklin-var.woff2">
   <style>
@@ -1798,1573 +1783,554 @@ h2 {
 }
 
   </style>
+  <style>
+/* ── one-calculator page ─────────────────────────────────────── */
 
-  <!-- Structured data: what this page is and who keeps it, stated once in the
-       vocabulary search engines actually read. -->
+/* The desk is a two-column grid beside a sticky sidebar. This page has
+   no sidebar, so it reverts to a single column and centres itself. */
+body { display: block; }
+main { margin: 0 auto; max-width: 78ch; padding-bottom: 4rem; }
+
+/* The engine needs these to exist; this page has no use for them. */
+.engine-hooks { position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.doc-head { display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: .5rem 1rem; max-width: 78ch; margin: 0 auto;
+  padding: 1.25rem clamp(1.25rem, 4vw, 4rem) 0; }
+.doc-head a { color: var(--ink-2); text-decoration: none; }
+.doc-head a:hover { color: var(--accent); text-decoration: underline; }
+.doc-brand { font-family: var(--display); font-size: 1.15rem;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--ink); }
+.crumbs { font-family: var(--mono); font-size: .7rem;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.crumbs span { margin: 0 .35rem; }
+
+.doc-title { padding: clamp(2rem, 5vw, 3.25rem) 0 0; }
+.doc-title h1 { margin: 0 0 .75rem; font-family: var(--display);
+  font-size: clamp(2rem, 1.4rem + 3vw, 3.1rem); line-height: 1.02;
+  text-transform: uppercase; letter-spacing: .005em;
+  overflow-wrap: anywhere; }
+.lede { margin: 0 0 .6rem; font-size: 1.06rem; color: var(--ink-2); }
+.byline { margin: 0 0 2rem; font-family: var(--mono); font-size: .7rem;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.byline a { color: inherit; text-decoration: none; text-underline-offset: 2px; }
+.byline a:hover { color: var(--accent); text-decoration: underline; }
+
+.tool { margin: 0 0 var(--space-section); }
+.tool > h2 { position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); }
+
+/* The engine prints the domain heading and blurb above its cards. On the
+   desk that separates fourteen domains; here there is one card, the
+   breadcrumb already names the domain, and the page has its own opening.
+   Hiding it lifts the instrument up the page instead of restating what
+   the reader just read. */
+.tool .cat-head { display: none; }
+.tool .calc-card { margin-top: 0; }
+
+/* ── prose ───────────────────────────────────────────────────── */
+.prose { font-size: 1.02rem; line-height: 1.65; }
+.prose h2 { margin: var(--space-section) 0 .9rem;
+  font-family: var(--display); font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
+  line-height: 1.06; text-transform: uppercase; letter-spacing: .01em;
+  padding-bottom: .5rem; border-bottom: 1px solid var(--rule-2); }
+.prose h3 { margin: 2rem 0 .5rem; font-family: var(--body);
+  font-size: 1.06rem; font-weight: 600; color: var(--ink); }
+.prose p, .prose li { color: var(--ink-2); }
+.prose li { margin-bottom: .5rem; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose a { color: var(--accent); text-underline-offset: 2px; }
+
+/* Worked arithmetic gets the engraved-plate treatment the desk gives a
+   formula, so a reader recognises it as the same kind of thing. */
+.prose pre { margin: 1.1rem 0; padding: .95rem 1.1rem;
+  background: var(--sheet-sunk); border: 1px solid var(--rule);
+  border-radius: 3px; box-shadow: var(--sunk);
+  overflow-x: auto; }
+.prose pre code { font-family: var(--mono); font-size: .85rem;
+  line-height: 1.85; color: var(--ink);
+  font-variant-numeric: tabular-nums; white-space: pre; }
+.prose p code, .prose li code { font-family: var(--mono); font-size: .85em;
+  padding: .1em .35em; background: var(--sheet-sunk);
+  border: 1px solid var(--rule); border-radius: 2px; color: var(--ink); }
+
+.prose .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.prose table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+.prose th, .prose td { padding: .6rem .7rem; text-align: left;
+  border-bottom: 1px solid var(--rule); vertical-align: top; }
+.prose thead th { font-family: var(--mono); font-size: .68rem;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3);
+  border-bottom: 1px solid var(--rule-2); }
+.prose tbody td { color: var(--ink-2); }
+/* A row label like "CPI ≥ 1, SPI < 1" reads badly broken across two
+   lines. Hold it on one where there is room; let it wrap where there is
+   not, since the table scrolls rather than overflows. */
+@media (min-width: 34em) {
+  .prose tbody td:first-child { white-space: nowrap; }
+}
+
+/* ── related + footer ────────────────────────────────────────── */
+.related { margin: var(--space-section) 0 0; padding-top: 1.4rem;
+  border-top: 1px solid var(--rule-2); }
+.related h2 { margin: 0 0 .9rem; font-family: var(--mono); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .09em; color: var(--ink-3); }
+.related ul { list-style: none; margin: 0; padding: 0; display: grid;
+  gap: .5rem; }
+.related a { display: block; min-height: 44px; padding: .7rem .9rem;
+  background: var(--sheet); border: 1px solid var(--rule-2);
+  border-radius: 2px; box-shadow: var(--lip);
+  color: var(--ink); text-decoration: none; }
+.related a:hover { border-color: var(--accent); color: var(--accent); }
+.related b { display: block; font-weight: 600; }
+.related span { font-family: var(--mono); font-size: .72rem;
+  color: var(--ink-3); }
+.related a:hover span { color: var(--accent); }
+
+.doc-foot { max-width: 78ch; margin: 0 auto;
+  padding: 2rem clamp(1.25rem, 4vw, 4rem) 3rem;
+  border-top: 1px solid var(--rule); font-size: .85rem; color: var(--ink-3); }
+.doc-foot a { color: var(--ink-2); }
+
+@media (max-width: 40em) {
+  main { padding-left: clamp(1rem, 4vw, 2rem); padding-right: clamp(1rem, 4vw, 2rem); }
+}
+  </style>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Calculation Desk",
-    "url": "https://yazeed.blog/",
-    "description": "34 project-management calculators across 14 domains. Free, client-side only — nothing leaves the browser.",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Any",
-    "browserRequirements": "Requires JavaScript",
-    "inLanguage": "en",
-    "isAccessibleForFree": true,
-    "featureList": [
-      "Earned value core & forecasting",
-      "Earned Schedule",
-      "Time forecasting (SPI-based)",
-      "Burn rate & runway",
-      "Three-point estimate (PERT)",
-      "Path uncertainty roll-up",
-      "Learning curve",
-      "Float (slack)",
-      "Crash cost slope",
-      "Full-time equivalents (FTE)",
-      "Utilization",
-      "Loaded labor cost",
-      "Communication channels",
-      "Expected Monetary Value (EMV)",
-      "Qualitative risk score",
-      "Contingency reserve roll-up",
-      "Decision tree — compare two options",
-      "DPMO & sigma level",
-      "Control limits (±3σ)",
-      "Process capability (Cp / Cpk)",
-      "Cost of Quality (CoQ)",
-      "Return on Investment (ROI)",
-      "NPV · IRR · Payback",
-      "Present & Future Value",
-      "Break-even point",
-      "Straight-line depreciation",
-      "Weighted scoring model",
-      "Point of Total Assumption (PTA)",
-      "FPIF final fee & price",
-      "CPIF final fee & price",
-      "Velocity & release forecast",
-      "Sprint capacity",
-      "Say/do ratio",
-      "Little’s Law & flow efficiency"
-    ],
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "author": {
-      "@type": "Person",
-      "name": "Yazeed Alotaibi",
-      "jobTitle": "Project Engineer",
-      "sameAs": ["https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2"]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Calculation Desk",
+          "item": "https://yazeed.blog/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Earned Value Management",
+          "item": "https://yazeed.blog/#cat-evm"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Earned value core & forecasting",
+          "item": "https://yazeed.blog/earned-value-analysis.html"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Earned value core & forecasting",
+      "url": "https://yazeed.blog/earned-value-analysis.html",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "featureList": [
+        "Cost Variance (CV)",
+        "Schedule Variance (SV)",
+        "Cost Performance Index (CPI)",
+        "Schedule Performance Index (SPI)",
+        "Cost–Schedule Index (CSI)",
+        "% Complete",
+        "% Spent",
+        "EAC — typical variance",
+        "EAC — atypical variance",
+        "EAC — cost & schedule",
+        "ETC — Estimate to Complete",
+        "VAC — Variance at Completion",
+        "TCPI — to hit BAC",
+        "TCPI — to hit EAC"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "Earned value analysis, worked through end to end",
+      "description": "Work through earned value with real numbers: CPI, SPI, EAC, ETC, VAC and TCPI computed live, which EAC formula to use, and where SPI stops telling the truth.",
+      "inLanguage": "en",
+      "mainEntityOfPage": "https://yazeed.blog/earned-value-analysis.html",
+      "datePublished": "2026-09-02",
+      "dateModified": "2026-09-02",
+      "author": {
+        "@type": "Person",
+        "name": "Yazeed Alotaibi",
+        "jobTitle": "Project Engineer",
+        "sameAs": [
+          "https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2"
+        ]
+      }
     }
-  }
+  ]
+}
   </script>
 </head>
 <body>
-  <!-- First tab stop on the page. Invisible until focused (see .skip), then
-       jumps a keyboard user past the sidebar's eighteen stops straight to the
-       hero. Absolutely positioned, so the body grid never sees it. -->
-  <a class="skip" href="#content">Skip to content</a>
-
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <defs>
-      <pattern id="ch-hatch-pattern" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <line x1="0" y1="0" x2="0" y2="6" class="ch-hatch-stroke"></line>
-      </pattern>
-    </defs>
-  </svg>
-
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <a href="#main-hero">Top</a>
-      <a href="#about">About</a>
-    </div>
-    <a class="brand" href="#main-hero" aria-label="Yazeed Alotaibi — home">
-      <span class="brand-mark" aria-hidden="true">Σ</span>
-      <div>
-        <strong>Calculation Desk</strong>
-        <span>for project managers</span>
+  <a class="skip-link" href="#main">Skip to the calculator</a>
+  <header class="doc-head">
+    <a class="doc-brand" href="/">Calculation Desk</a>
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Desk</a><span aria-hidden="true">·</span><a href="/#cat-evm">Earned Value Management</a><span aria-hidden="true">·</span>Earned value core &amp; forecasting
+    </nav>
+  </header>
+  <main id="main">
+    <article>
+      <div class="doc-title">
+        <h1>Earned value analysis, worked through end to end</h1>
+        <p class="lede">Enter four numbers and every earned-value metric updates live. Below the calculator: a full worked example, the four EAC formulas and when each one is right, and the mistakes that survive into real project reporting.</p>
+        <p class="byline"><a href="/#about-h">Yazeed Alotaibi</a> · PMI-RMP · PRINCE2 · updated 2026-09-02</p>
       </div>
-    </a>
-
-    <div class="sidebar-sticky">
-      <div class="search">
-        <label class="sr-only" for="search">Search calculators</label>
-        <input id="search" type="search" placeholder="Search… CPI, float, NPV" autocomplete="off">
-        <span class="search-hint">Press <kbd>/</kbd> to search</span>
-      </div>
-
-      <nav id="cat-nav" aria-label="Calculation categories"></nav>
-    </div>
-
-    <footer>
-      Formulas follow PMBOK / PMP-exam conventions. Enter any consistent
-      currency and time units — the math doesn't care which.
-      <p class="credit">Made by
-        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">Yazeed Alotaibi</a>
-      </p>
-    </footer>
-  </aside>
-
-  <main id="content" tabindex="-1">
-    <section class="hero" id="main-hero" aria-labelledby="hero-h">
-        <div class="hero-col-a">
-          <p class="label">Free &middot; nothing leaves your browser</p>
-          <h1 id="hero-h">34 calculators. Across 14 domains.</h1>
-          <p class="hero-lede">
-            A bench of project-management instruments &mdash; earned value, PERT, risk,
-            procurement and the rest &mdash; computed in your browser. Free. Nothing is
-            sent anywhere.
-          </p>
-          <ul class="creds">
-            <li class="cred-pill">PMP</li>
-            <li class="cred-pill">PRINCE2</li>
-            <li class="cred-pill">PMI-RMP</li>
-          </ul>
-
-          <!-- The way in. The calculators are on this page now, so the hero
-               states the scale and drops the reader straight into it. -->
-          <div class="hero-jump">
-            <div class="hero-figures">
-              <div>
-                <span class="hero-fig-num">14</span>
-                <span class="hero-fig-lab">Domains</span>
-              </div>
-              <div>
-                <span class="hero-fig-num">34</span>
-                <span class="hero-fig-lab">Calculators</span>
-              </div>
-              <div>
-                <span class="hero-fig-num">103</span>
-                <span class="hero-fig-lab">Metrics</span>
-              </div>
-            </div>
-            <a class="hero-cta" href="#calc-sections">
-              Open the desk
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M7 3v8M3 7l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <!-- The hero is the product in miniature: a real calculator, running. -->
-        <div class="hero-col-b">
-          <figure class="instrument" id="evm">
-            <figcaption class="instrument-head">
-              <strong>Earned value, live</strong>
-              <span class="label">Try it</span>
-            </figcaption>
-
-            <div class="strip">
-              <code>CPI = EV ÷ AC    CV = EV − AC</code>
-              <code>SPI = EV ÷ PV    SV = EV − PV</code>
-            </div>
-
-            <div class="instrument-fields">
-              <div class="ifield">
-                <label for="ev">EV earned</label>
-                <input id="ev" type="number" step="any" inputmode="decimal" value="108000" autocomplete="off">
-              </div>
-              <div class="ifield">
-                <label for="ac">AC spent</label>
-                <input id="ac" type="number" step="any" inputmode="decimal" value="96000" autocomplete="off">
-              </div>
-              <div class="ifield">
-                <label for="pv">PV planned</label>
-                <input id="pv" type="number" step="any" inputmode="decimal" value="120000" autocomplete="off">
-              </div>
-            </div>
-
-            <div class="instrument-out" aria-live="polite">
-              <div class="gauge" id="out-cpi">
-                <svg viewBox="-6 0 212 130" role="img" aria-label="Cost performance index, plotted against 1.00"></svg>
-                <span class="g-name">CPI · cost</span>
-                <span class="g-value">—</span>
-                <span class="g-verdict">Awaiting input</span>
-                <span class="g-note">Enter a value above.</span>
-              </div>
-              <div class="gauge" id="out-spi">
-                <svg viewBox="-6 0 212 130" role="img" aria-label="Schedule performance index, plotted against 1.00"></svg>
-                <span class="g-name">SPI · schedule</span>
-                <span class="g-value">—</span>
-                <span class="g-verdict">Awaiting input</span>
-                <span class="g-note">Enter a value above.</span>
-              </div>
-            </div>
-
-            <div class="variances">
-              <div class="variance">
-                <span class="v-name">CV · cost variance</span>
-                <span class="v-value" id="out-cv">—</span>
-              </div>
-              <div class="variance">
-                <span class="v-name">SV · schedule variance</span>
-                <span class="v-value" id="out-sv">—</span>
-              </div>
-            </div>
-
-            <div class="howto">
-              <p class="label">How to use it</p>
-              <ol class="howto-steps">
-                <li><span class="howto-text"><b>EV</b> — budgeted cost of the work actually finished: % complete × total budget.</span></li>
-                <li><span class="howto-text"><b>AC</b> — what that finished work really cost. <b>PV</b> — what you planned to have earned by today.</span></li>
-                <li><span class="howto-text">Read each needle against the <b>1.00</b> mark. Right of it is favourable, left of it is not.</span></li>
-              </ol>
-            </div>
-
-            <p class="instrument-foot">
-              Four of 103 metrics on the
-              <a href="#calc-sections">desk below</a>.
-            </p>
-          </figure>
-        </div>
-      </section>
-
-    <p id="desk-stats" role="status"></p>
-
-    <!-- The desk, twice. The block between these markers is a static text
-         mirror of every calculator, generated by tools/prerender.js and
-         committed, because a fetcher that does not run JavaScript would
-         otherwise see 428 words of hero copy and none of the 34 calculators.
-         A browser throws it away and builds the real instruments in its
-         place. tests/prerender.js fails the suite if it drifts from PM_DATA. -->
-    <div id="calc-sections">
-      <!-- prerender:start -->
-      <div class="prerender" id="prerender-desk">
-      <p class="prerender-lede">A text index of the 14 domains, 34 calculators and 103 metrics on this page. Every figure computes in your browser; open the page with JavaScript enabled for the working instruments.</p>
-      <ol class="prerender-toc">
-      <li><a href="#prerender-cat-evm">01 — Earned Value Management</a></li>
-      <li><a href="#prerender-cat-burn">02 — Budget &amp; Burn Rate</a></li>
-      <li><a href="#prerender-cat-estimation">03 — Estimation</a></li>
-      <li><a href="#prerender-cat-schedule">04 — Schedule &amp; Critical Path</a></li>
-      <li><a href="#prerender-cat-compression">05 — Schedule Compression</a></li>
-      <li><a href="#prerender-cat-resources">06 — Resources &amp; Team</a></li>
-      <li><a href="#prerender-cat-comms">07 — Communication</a></li>
-      <li><a href="#prerender-cat-risk">08 — Risk</a></li>
-      <li><a href="#prerender-cat-decision">09 — Decision Analysis</a></li>
-      <li><a href="#prerender-cat-quality">10 — Quality &amp; Six Sigma</a></li>
-      <li><a href="#prerender-cat-financial">11 — Project Selection &amp; Finance</a></li>
-      <li><a href="#prerender-cat-procurement">12 — Procurement &amp; Contracts</a></li>
-      <li><a href="#prerender-cat-agile">13 — Agile Forecasting</a></li>
-      <li><a href="#prerender-cat-flow">14 — Lean &amp; Flow</a></li>
-      </ol>
-      <section class="prerender-category" id="prerender-cat-evm">
-      <h2>01 — Earned Value Management</h2>
-      <p class="prerender-blurb">One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.</p>
-      <p class="prerender-citation">EVM — PMI Practice Standard; Lipke, “Schedule is Different.”</p>
-      <article class="prerender-card" id="prerender-calc-earned-value">
-      <h3>01.1 — Earned value core &amp; forecasting</h3>
-      <p class="prerender-tagline">CV · SV · CPI · SPI · EAC · ETC · VAC · TCPI</p>
-      <p class="prerender-about">Enter the four base measures below and every earned-value metric updates live. The performance metrics describe project health today; the forecasting metrics project that health forward to completion. All monetary figures share whatever currency you enter.</p>
-      <p class="prerender-page"><a href="earned-value-analysis.html">Full analysis</a></p>
-      <pre class="prerender-formula"><code>CV  = EV − AC        SV  = EV − PV
+      <section class="tool">
+        <h2>The calculator</h2>
+        <div id="calc-sections">
+          <!-- prerender:start -->
+          <article class="prerender-card" id="prerender-calc-earned-value">
+          <h3>1 — Earned value core &amp; forecasting</h3>
+          <p class="prerender-tagline">CV · SV · CPI · SPI · EAC · ETC · VAC · TCPI</p>
+          <p class="prerender-about">Enter the four base measures below and every earned-value metric updates live. The performance metrics describe project health today; the forecasting metrics project that health forward to completion. All monetary figures share whatever currency you enter.</p>
+          <p class="prerender-page"><a href="earned-value-analysis.html">Full analysis</a></p>
+          <pre class="prerender-formula"><code>CV  = EV − AC        SV  = EV − PV
 CPI = EV ÷ AC        SPI = EV ÷ PV
 EAC = BAC ÷ CPI      ETC = EAC − AC
 VAC = BAC − EAC
 TCPI = (BAC − EV) ÷ (BAC − AC)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>BAC — Budget at Completion</dt>
-      <dd>The total approved budget for all project work. The baseline everything else is measured against.</dd>
-      <dd class="prerender-eg">e.g. 100000</dd>
-      <dt>PV — Planned Value</dt>
-      <dd>The budgeted cost of the work that was scheduled to be done by now (also called BCWS).</dd>
-      <dd class="prerender-eg">e.g. 50000</dd>
-      <dt>EV — Earned Value</dt>
-      <dd>The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).</dd>
-      <dd class="prerender-eg">e.g. 45000</dd>
-      <dt>AC — Actual Cost</dt>
-      <dd>What the completed work really cost, regardless of what was budgeted (also called ACWP).</dd>
-      <dd class="prerender-eg">e.g. 60000</dd>
-      <dt>EAC — management forecast (optional)</dt>
-      <dd>A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.</dd>
-      <dd class="prerender-eg">e.g. 125000</dd>
-      </dl>
-      <h4>Results</h4>
-      <h5>Performance today</h5>
-      <dl class="prerender-results">
-      <dt>Cost Variance (CV)</dt>
-      <dd>Budget health in currency: value earned minus money spent.</dd>
-      <dt>Schedule Variance (SV)</dt>
-      <dd>Schedule health expressed in currency: work done minus work planned.</dd>
-      <dt>Cost Performance Index (CPI)</dt>
-      <dd>Cost efficiency: value earned per unit of money spent.</dd>
-      <dt>Schedule Performance Index (SPI)</dt>
-      <dd>Schedule efficiency: rate of progress versus the plan.</dd>
-      <dt>Cost–Schedule Index (CSI)</dt>
-      <dd>CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.</dd>
-      <dt>% Complete</dt>
-      <dd>Share of the total scope actually finished: EV ÷ BAC.</dd>
-      <dt>% Spent</dt>
-      <dd>Share of the total budget already consumed: AC ÷ BAC.</dd>
-      </dl>
-      <h5>Forecasting completion</h5>
-      <dl class="prerender-results">
-      <dt>EAC — typical variance</dt>
-      <dd>BAC ÷ CPI. Forecast final cost assuming today’s cost efficiency continues — the default assumption.</dd>
-      <dt>EAC — atypical variance</dt>
-      <dd>AC + (BAC − EV). Use when the variance was a one-off and the remaining work will go to plan.</dd>
-      <dt>EAC — cost &amp; schedule</dt>
-      <dd>AC + (BAC − EV) ÷ (CPI × SPI). Use when schedule pressure is also driving cost (e.g. a hard deadline).</dd>
-      <dt>ETC — Estimate to Complete</dt>
-      <dd>EAC − AC (using the typical-variance EAC). Money still needed to finish the remaining work.</dd>
-      <dt>VAC — Variance at Completion</dt>
-      <dd>BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.</dd>
-      <dt>TCPI — to hit BAC</dt>
-      <dd>(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.</dd>
-      <dt>TCPI — to hit EAC</dt>
-      <dd>(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Cost position</dt>
-      <dd>What was planned, what was earned, what it cost — against the budget line.</dd>
-      <dt>CPI–SPI quadrant</dt>
-      <dd>Cost efficiency against schedule efficiency, crossed at 1.00.</dd>
-      <dt>TCPI required efficiency</dt>
-      <dd>The cost performance the remaining work must sustain to still hit BAC.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-earned-schedule">
-      <h3>01.2 — Earned Schedule</h3>
-      <p class="prerender-tagline">ES · SV(t) · SPI(t) · IEAC(t)</p>
-      <p class="prerender-about">SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.</p>
-      <pre class="prerender-formula"><code>ES = PD × (EV ÷ BAC)
-SV(t) = ES − AT
-SPI(t) = ES ÷ AT
-IEAC(t) = PD ÷ SPI(t)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>BAC — Budget at Completion</dt>
-      <dd>Total approved budget for the complete scope. Currency; must be greater than 0.</dd>
-      <dd class="prerender-eg">e.g. 200000</dd>
-      <dt>PD — Planned duration</dt>
-      <dd>Baseline duration from start to planned finish. Periods; use a positive value.</dd>
-      <dd class="prerender-eg">e.g. 12</dd>
-      <dt>AT — Actual time</dt>
-      <dd>Time elapsed at the status date. Periods; must be greater than 0 for SPI(t).</dd>
-      <dd class="prerender-eg">e.g. 8</dd>
-      <dt>EV — Earned Value</dt>
-      <dd>Budgeted value of the work actually complete. Same currency as BAC; zero is valid.</dd>
-      <dd class="prerender-eg">e.g. 120000</dd>
-      </dl>
-      <h4>Results</h4>
-      <h5>Earned time</h5>
-      <dl class="prerender-results">
-      <dt>Earned Schedule (ES)</dt>
-      <dd>The baseline time equivalent of the EV entered.</dd>
-      <dt>Schedule Variance (SV(t))</dt>
-      <dd>The time difference at the status date. Negative means late.</dd>
-      <dt>Schedule Performance Index (SPI(t))</dt>
-      <dd>Time efficiency, with 1.00 as the plan line.</dd>
-      </dl>
-      <h5>Forecasting completion</h5>
-      <dl class="prerender-results">
-      <dt>Independent Estimate at Completion (IEAC(t))</dt>
-      <dd>A duration forecast under the same efficiency and linear-PV assumption; it is not a promise and it is not a calendar finish date.</dd>
-      </dl>
-      <h4>How to use it</h4>
-      <ol class="prerender-howto">
-      <li>Enter BAC and PD from the approved baseline, then enter EV and AT from the same status date.</li>
-      <li>Read SV(t) for the time gap and SPI(t) for the direction and efficiency of travel. Check that the linear-PV assumption is reasonable for this project.</li>
-      <li>Use IEAC(t) as a trend to test recovery options; reconcile it to the time-phased schedule before committing to a finish date.</li>
-      </ol>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Earned time position</dt>
-      <dd>The time the completed work earned against actual time and plan.</dd>
-      <dt>SPI(t) time efficiency</dt>
-      <dd>Earned schedule per period of actual time, crossed at 1.00.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-time-forecast">
-      <h3>01.3 — Time forecasting (SPI-based)</h3>
-      <p class="prerender-tagline">Planned duration ÷ SPI</p>
-      <p class="prerender-about">Cost gets EAC; schedule gets this. Dividing the planned duration by the schedule performance index projects when the project will actually finish if the current pace continues. It is an approximation — SPI drifts back toward 1.0 late in a project as planned value tops out, so trust it early and mid-project and re-check often.</p>
-      <pre class="prerender-formula"><code>Forecast duration = Planned duration ÷ SPI
-SPI = EV ÷ PV</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Planned duration</dt>
-      <dd>The baseline total duration, in any time unit — the forecast comes back in the same unit.</dd>
-      <dd class="prerender-eg">e.g. 12</dd>
-      <dt>EV — Earned Value</dt>
-      <dd>Budgeted cost of the work actually completed to date.</dd>
-      <dd class="prerender-eg">e.g. 45000</dd>
-      <dt>PV — Planned Value</dt>
-      <dd>Budgeted cost of the work scheduled to be done by now.</dd>
-      <dd class="prerender-eg">e.g. 50000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>SPI</dt>
-      <dd>Pace versus plan — the engine of the forecast.</dd>
-      <dt>Forecast duration</dt>
-      <dd>Expected total duration if the current pace holds.</dd>
-      <dt>Projected slip</dt>
-      <dd>Forecast minus plan — the schedule overrun taking shape.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Planned vs forecast duration</dt>
-      <dd>Where the project lands if today’s pace holds — not a certainty, a trend.</dd>
-      </dl>
-      </article>
+          <h4>Parameters</h4>
+          <dl class="prerender-params">
+          <dt>BAC — Budget at Completion</dt>
+          <dd>The total approved budget for all project work. The baseline everything else is measured against.</dd>
+          <dd class="prerender-eg">e.g. 100000</dd>
+          <dt>PV — Planned Value</dt>
+          <dd>The budgeted cost of the work that was scheduled to be done by now (also called BCWS).</dd>
+          <dd class="prerender-eg">e.g. 50000</dd>
+          <dt>EV — Earned Value</dt>
+          <dd>The budgeted cost of the work actually completed so far: % complete × BAC (also called BCWP).</dd>
+          <dd class="prerender-eg">e.g. 45000</dd>
+          <dt>AC — Actual Cost</dt>
+          <dd>What the completed work really cost, regardless of what was budgeted (also called ACWP).</dd>
+          <dd class="prerender-eg">e.g. 60000</dd>
+          <dt>EAC — management forecast (optional)</dt>
+          <dd>A forecast you have committed to, if it differs from BAC ÷ CPI. Only TCPI — to hit EAC uses it; leave blank to read that line against the calculated EAC.</dd>
+          <dd class="prerender-eg">e.g. 125000</dd>
+          </dl>
+          <h4>Results</h4>
+          <h5>Performance today</h5>
+          <dl class="prerender-results">
+          <dt>Cost Variance (CV)</dt>
+          <dd>Budget health in currency: value earned minus money spent.</dd>
+          <dt>Schedule Variance (SV)</dt>
+          <dd>Schedule health expressed in currency: work done minus work planned.</dd>
+          <dt>Cost Performance Index (CPI)</dt>
+          <dd>Cost efficiency: value earned per unit of money spent.</dd>
+          <dt>Schedule Performance Index (SPI)</dt>
+          <dd>Schedule efficiency: rate of progress versus the plan.</dd>
+          <dt>Cost–Schedule Index (CSI)</dt>
+          <dd>CPI × SPI — a single overall-health number; hard to recover once it drops far below 1.</dd>
+          <dt>% Complete</dt>
+          <dd>Share of the total scope actually finished: EV ÷ BAC.</dd>
+          <dt>% Spent</dt>
+          <dd>Share of the total budget already consumed: AC ÷ BAC.</dd>
+          </dl>
+          <h5>Forecasting completion</h5>
+          <dl class="prerender-results">
+          <dt>EAC — typical variance</dt>
+          <dd>BAC ÷ CPI. Forecast final cost assuming today’s cost efficiency continues — the default assumption.</dd>
+          <dt>EAC — atypical variance</dt>
+          <dd>AC + (BAC − EV). Use when the variance was a one-off and the remaining work will go to plan.</dd>
+          <dt>EAC — cost &amp; schedule</dt>
+          <dd>AC + (BAC − EV) ÷ (CPI × SPI). Use when schedule pressure is also driving cost (e.g. a hard deadline).</dd>
+          <dt>ETC — Estimate to Complete</dt>
+          <dd>EAC − AC (using the typical-variance EAC). Money still needed to finish the remaining work.</dd>
+          <dt>VAC — Variance at Completion</dt>
+          <dd>BAC − EAC (using the typical-variance EAC, BAC ÷ CPI). The over- or under-run expected on the day the project finishes.</dd>
+          <dt>TCPI — to hit BAC</dt>
+          <dd>(BAC − EV) ÷ (BAC − AC). The cost efficiency you must sustain on all remaining work to still land on the original budget.</dd>
+          <dt>TCPI — to hit EAC</dt>
+          <dd>(BAC − EV) ÷ (EAC − AC). The efficiency needed to hit a revised forecast instead of the original budget. Against the calculated EAC of BAC ÷ CPI this reduces to CPI itself, so it only becomes an independent test once you enter a management forecast above.</dd>
+          </dl>
+          <h4>Charts</h4>
+          <dl class="prerender-charts">
+          <dt>Cost position</dt>
+          <dd>What was planned, what was earned, what it cost — against the budget line.</dd>
+          <dt>CPI–SPI quadrant</dt>
+          <dd>Cost efficiency against schedule efficiency, crossed at 1.00.</dd>
+          <dt>TCPI required efficiency</dt>
+          <dd>The cost performance the remaining work must sustain to still hit BAC.</dd>
+          </dl>
+          </article>
+          <!-- prerender:end -->
+        </div>
       </section>
-      <section class="prerender-category" id="prerender-cat-burn">
-      <h2>02 — Budget &amp; Burn Rate</h2>
-      <p class="prerender-blurb">The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.</p>
-      <p class="prerender-citation">Budget &amp; burn — PMI PMBOK Guide, Cost Management.</p>
-      <article class="prerender-card" id="prerender-calc-burn-rate">
-      <h3>02.1 — Burn rate &amp; runway</h3>
-      <p class="prerender-tagline">Spend pace · runway · budget used</p>
-      <p class="prerender-about">Divide what you have spent by how long you have been spending it and you get the burn rate — the project’s cash velocity. Runway converts the remaining budget into time at that pace. Use any period unit (months, sprints); the runway comes back in the same unit.</p>
-      <pre class="prerender-formula"><code>Burn rate = Spent ÷ Periods elapsed
-Runway = (Budget − Spent) ÷ Burn rate</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Total budget</dt>
-      <dd>Approved funds for the whole project.</dd>
-      <dd class="prerender-eg">e.g. 120000</dd>
-      <dt>Spent to date</dt>
-      <dd>Actual cost so far — same as AC in earned value.</dd>
-      <dd class="prerender-eg">e.g. 45000</dd>
-      <dt>Periods elapsed</dt>
-      <dd>How many months / sprints of spending produced that cost.</dd>
-      <dd class="prerender-eg">e.g. 3</dd>
-      <dt>Planned periods remaining (optional)</dt>
-      <dd>How much longer the plan says the work will take — to test whether the money outlives the work.</dd>
-      <dd class="prerender-eg">e.g. 6</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Burn rate</dt>
-      <dd>Average spend per period — the pace at which the budget is being consumed.</dd>
-      <dt>Budget remaining</dt>
-      <dd>Funds left before the budget is exhausted.</dd>
-      <dt>Runway (periods)</dt>
-      <dd>How many more periods the remaining budget lasts at the current burn rate.</dd>
-      <dt>% of budget used</dt>
-      <dd>Share of total funds already consumed.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Runway vs plan</dt>
-      <dd>Whether the remaining money outlasts the remaining work.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-estimation">
-      <h2>03 — Estimation</h2>
-      <p class="prerender-blurb">Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.</p>
-      <p class="prerender-citation">Estimation — PMI Practice Standard for Project Estimating.</p>
-      <article class="prerender-card" id="prerender-calc-three-point">
-      <h3>03.1 — Three-point estimate (PERT)</h3>
-      <p class="prerender-tagline">Triangular · Beta · σ · confidence ranges</p>
-      <p class="prerender-about">Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.</p>
-      <pre class="prerender-formula"><code>Triangular = (O + M + P) ÷ 3
-PERT (beta) = (O + 4M + P) ÷ 6
-σ = (P − O) ÷ 6        Variance = σ²</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>O — Optimistic</dt>
-      <dd>Best-case estimate: everything goes right. Roughly the 1-in-100 lucky outcome.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      <dt>M — Most Likely</dt>
-      <dd>The realistic estimate you would give under normal conditions.</dd>
-      <dd class="prerender-eg">e.g. 6</dd>
-      <dt>P — Pessimistic</dt>
-      <dd>Worst-case estimate: known risks materialise. Roughly the 1-in-100 unlucky outcome.</dd>
-      <dd class="prerender-eg">e.g. 12</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Triangular average</dt>
-      <dd>Simple mean of the three points — use when you have no reason to trust M more.</dd>
-      <dt>PERT (beta) estimate</dt>
-      <dd>Weighted mean, 4× on Most Likely — the standard exam and planning answer.</dd>
-      <dt>Standard deviation (σ)</dt>
-      <dd>How spread out the outcome could be. A wide O–P gap means low confidence.</dd>
-      <dt>Variance (σ²)</dt>
-      <dd>σ squared. Variances (not σ) are what you add up along a path to get path-level uncertainty.</dd>
-      <dt>68% confidence (±1σ)</dt>
-      <dd>Roughly two times in three, the real result lands inside this range.</dd>
-      <dt>95% confidence (±2σ)</dt>
-      <dd>The range usually quoted when someone asks for a commitment.</dd>
-      <dt>99.7% confidence (±3σ)</dt>
-      <dd>Near-certainty bounds — use for hard external deadlines.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Three-point distribution</dt>
-      <dd>The shape of the estimate, the PERT expected value, and the 68% band around it.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-path-sigma">
-      <h3>03.2 — Path uncertainty roll-up</h3>
-      <p class="prerender-tagline">σ(path) = √(Σ σ²)</p>
-      <p class="prerender-about">Uncertainties don’t add — variances do. To get the uncertainty of a whole path (or project), square each activity’s σ, add them, and take the square root. The roll-up is always smaller than the simple sum of σ’s, which is why padding every task individually is wrong: the math already diversifies the risk. That diversification assumes the activities are <strong>INDEPENDENT</strong>. Correlated risks — one team, one supplier, one weather window — break the assumption, and the true path σ is then larger than this. It also covers a single path, not the merge bias where parallel paths converge.</p>
-      <pre class="prerender-formula"><code>σ(path) = √(σ₁² + σ₂² + … + σₙ²)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Activity σ values (comma-separated)</dt>
-      <dd>The standard deviation of each activity on the path, from the three-point calculator above.</dd>
-      <dd class="prerender-eg">e.g. 1.33, 0.5, 2</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Path σ</dt>
-      <dd>The combined uncertainty of the whole chain — use it for path-level confidence ranges.</dd>
-      <dt>Naive sum of σ’s</dt>
-      <dd>What you would get by simply adding the uncertainties — shown for contrast.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Roll-up vs naive sum</dt>
-      <dd>Why adding standard deviations overstates a path’s real uncertainty.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-learning-curve">
-      <h3>03.3 — Learning curve</h3>
-      <p class="prerender-tagline">T(n) = T₁ × n^(log rate ÷ log 2)</p>
-      <p class="prerender-about">Every doubling of repetitions cuts the per-unit time by a fixed percentage: on an 80% curve, unit 2 takes 80% of unit 1’s time, unit 4 takes 80% of unit 2’s, and so on. Use it to estimate repetitive work — floors of a building, server migrations, test cycles — instead of multiplying the first unit’s time by the count. This is the unit (Crawford) model.</p>
-      <pre class="prerender-formula"><code>Time for unit n = T₁ × n^(log(rate ÷ 100) ÷ log 2)
-rate is the learning rate as entered, in percent: 80 means 0.8</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>T₁ — first unit time (or cost)</dt>
-      <dd>How long the first repetition took — the anchor of the curve.</dd>
-      <dd class="prerender-eg">e.g. 100</dd>
-      <dt>Learning rate (%)</dt>
-      <dd>Per-doubling retention: 80 means each doubling takes 80% of the previous. Typical: 70–90%; 100 = no learning.</dd>
-      <dd class="prerender-eg">e.g. 80</dd>
-      <dt>Unit number (n)</dt>
-      <dd>Which repetition you want the estimate for.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Time for unit n</dt>
-      <dd>Predicted effort for that repetition.</dd>
-      <dt>Improvement vs unit 1</dt>
-      <dd>How much faster unit n is than the first attempt.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Learning curve</dt>
-      <dd>Per-unit time against a flat no-learning baseline, with the selected unit marked.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-schedule">
-      <h2>04 — Schedule &amp; Critical Path</h2>
-      <p class="prerender-blurb">The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.</p>
-      <p class="prerender-citation">Schedule — PMI Practice Standard for Scheduling.</p>
-      <article class="prerender-card" id="prerender-calc-float">
-      <h3>04.1 — Float (slack)</h3>
-      <p class="prerender-tagline">Total float · free float · critical path test</p>
-      <p class="prerender-about">Total float is how long an activity can slip without delaying the project finish. Free float is how long it can slip without delaying its immediate successor. Zero total float means the activity is on the critical path. Enter the dates from your forward/backward pass — either day numbers or durations, as long as they are consistent (this calculator uses the continuous convention where EF = ES + duration).</p>
-      <pre class="prerender-formula"><code>Total Float = LS − ES = LF − EF
-Free Float = ES(successor) − EF</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>ES — Early Start</dt>
-      <dd>The soonest the activity can start, from the forward pass.</dd>
-      <dd class="prerender-eg">e.g. 5</dd>
-      <dt>EF — Early Finish</dt>
-      <dd>The soonest it can finish: ES + duration.</dd>
-      <dd class="prerender-eg">e.g. 9</dd>
-      <dt>LS — Late Start</dt>
-      <dd>The latest it can start without delaying the project, from the backward pass.</dd>
-      <dd class="prerender-eg">e.g. 8</dd>
-      <dt>LF — Late Finish</dt>
-      <dd>The latest it can finish without delaying the project.</dd>
-      <dd class="prerender-eg">e.g. 12</dd>
-      <dt>Successor ES (optional)</dt>
-      <dd>Early start of the next activity — only needed for free float.</dd>
-      <dd class="prerender-eg">e.g. 11</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Total float</dt>
-      <dd>Slip allowance before the project end date moves: LS − ES.</dd>
-      <dt>Cross-check (LF − EF)</dt>
-      <dd>Should equal LS − ES; a mismatch means a pass was computed inconsistently.</dd>
-      <dt>Free float</dt>
-      <dd>Slip allowance before the next activity is disturbed: successor ES − EF.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Early vs late window</dt>
-      <dd>How much room the activity has before it becomes critical.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-compression">
-      <h2>05 — Schedule Compression</h2>
-      <p class="prerender-blurb">When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.</p>
-      <p class="prerender-citation">Compression — PMI PMBOK Guide, Schedule Compression.</p>
-      <article class="prerender-card" id="prerender-calc-crash">
-      <h3>05.1 — Crash cost slope</h3>
-      <p class="prerender-tagline">(Crash cost − Normal cost) ÷ time saved</p>
-      <p class="prerender-about">Most activities can be sped up — more people, overtime, premium suppliers — but only so far and at a price. The cost slope is the price of each time unit saved. To compress rationally: crash only critical-path activities, cheapest slope first, and stop when the slope costs more than the deadline is worth. Run this once per candidate activity and compare.</p>
-      <pre class="prerender-formula"><code>Cost slope = (Crash cost − Normal cost) ÷ (Normal duration − Crash duration)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Normal cost</dt>
-      <dd>Cost of the activity at its normal, efficient pace.</dd>
-      <dd class="prerender-eg">e.g. 10000</dd>
-      <dt>Crash cost</dt>
-      <dd>Cost at the fastest possible pace — overtime, extra staff, expediting fees included.</dd>
-      <dd class="prerender-eg">e.g. 16000</dd>
-      <dt>Normal duration</dt>
-      <dd>Duration at the normal pace (any time unit).</dd>
-      <dd class="prerender-eg">e.g. 10</dd>
-      <dt>Crash duration</dt>
-      <dd>The shortest duration physically achievable — beyond it, money buys nothing.</dd>
-      <dd class="prerender-eg">e.g. 8</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Cost slope</dt>
-      <dd>Extra cost per time unit saved on this activity.</dd>
-      <dt>Maximum time saved</dt>
-      <dd>The most this activity can be shortened: normal minus crash duration.</dd>
-      <dt>Full crash premium</dt>
-      <dd>Total extra cost of buying all the available time.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Normal vs crash</dt>
-      <dd>The cost slope drawn as a line — its gradient is the price of each time unit saved.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-resources">
-      <h2>06 — Resources &amp; Team</h2>
-      <p class="prerender-blurb">Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.</p>
-      <p class="prerender-citation">Resources — PMI PMBOK Guide, Resource Management.</p>
-      <article class="prerender-card" id="prerender-calc-fte">
-      <h3>06.1 — Full-time equivalents (FTE)</h3>
-      <p class="prerender-tagline">Effort ÷ capacity</p>
-      <p class="prerender-about">FTE converts a pile of estimated effort into how many full-time people the work actually needs within a given window. One FTE is one person fully allocated. Use productive hours per period, not contract hours — meetings, support and admin eat 15–30% before project work starts.</p>
-      <pre class="prerender-formula"><code>FTE = Effort hours ÷ (Productive hours per period × Periods)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Total effort (hours)</dt>
-      <dd>Estimated person-hours of work to deliver in the window.</dd>
-      <dd class="prerender-eg">e.g. 2080</dd>
-      <dt>Productive hours / person / period</dt>
-      <dd>Hours one person can really spend on this work each period — e.g. 130 of a 160-hour month after overhead.</dd>
-      <dd class="prerender-eg">e.g. 130</dd>
-      <dt>Periods in the window</dt>
-      <dd>How many periods (months, sprints) the work is spread across.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>FTE required</dt>
-      <dd>Full-time people the work demands over the window.</dd>
-      <dt>Headcount (rounded up)</dt>
-      <dd>Whole people to staff if nobody can split across projects cleanly.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-utilization">
-      <h3>06.2 — Utilization</h3>
-      <p class="prerender-tagline">Allocated ÷ available</p>
-      <p class="prerender-about">The share of a person’s available time already committed. Sustained utilization near 100% removes all slack: queues form, small surprises cascade, and cycle times explode (the queueing math behind this lives in Lean &amp; Flow). Plan people like you plan servers — with headroom.</p>
-      <pre class="prerender-formula"><code>Utilization % = Allocated hours ÷ Available hours × 100</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Allocated hours</dt>
-      <dd>Hours of committed work in the period across all assignments.</dd>
-      <dd class="prerender-eg">e.g. 150</dd>
-      <dt>Available hours</dt>
-      <dd>Hours the person actually has in the period.</dd>
-      <dd class="prerender-eg">e.g. 160</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Utilization</dt>
-      <dd>Commitment level for the period.</dd>
-      <dt>Uncommitted hours</dt>
-      <dd>Hours left for the work nobody predicted.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Commitment level</dt>
-      <dd>Where utilization sits against the point delays start to amplify.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-labor-cost">
-      <h3>06.3 — Loaded labor cost</h3>
-      <p class="prerender-tagline">Rate × (1 + overhead)</p>
-      <p class="prerender-about">A person’s cost to the project is never just their pay rate. The loaded (burdened) rate adds employer overhead — benefits, payroll taxes, equipment, facilities, licences — typically 25–50% on top. Budgets built on bare rates systematically understate cost and get discovered at the worst possible time.</p>
-      <pre class="prerender-formula"><code>Loaded cost = Hours × Rate × (1 + Overhead %)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Effort (hours)</dt>
-      <dd>Person-hours of work being costed.</dd>
-      <dd class="prerender-eg">e.g. 400</dd>
-      <dt>Base rate (per hour)</dt>
-      <dd>The bare pay or contract rate before burden.</dd>
-      <dd class="prerender-eg">e.g. 60</dd>
-      <dt>Overhead / burden (%)</dt>
-      <dd>Employer add-ons as a percentage of the base rate — ask finance; 25–50% is typical for employees.</dd>
-      <dd class="prerender-eg">e.g. 35</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Base cost</dt>
-      <dd>Hours × bare rate — the number that looks deceptively affordable.</dd>
-      <dt>Loaded cost</dt>
-      <dd>The true cost to the organisation, burden included.</dd>
-      <dt>Loaded hourly rate</dt>
-      <dd>The per-hour figure to use in every estimate.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-comms">
-      <h2>07 — Communication</h2>
-      <p class="prerender-blurb">Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.</p>
-      <p class="prerender-citation">Communication — PMI PMBOK Guide, Communications Management.</p>
-      <article class="prerender-card" id="prerender-calc-channels">
-      <h3>07.1 — Communication channels</h3>
-      <p class="prerender-tagline">n(n−1) ÷ 2</p>
-      <p class="prerender-about">Every pair of people on a project is a potential communication path that can carry — or garble — information. This count is used to justify communication plans, meeting structures and why large stakeholder groups need formal channels. Count everyone who communicates about the project, including yourself and the sponsor.</p>
-      <pre class="prerender-formula"><code>Channels = n × (n − 1) ÷ 2</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>n — People now</dt>
-      <dd>Current number of people communicating on the project (team + stakeholders + you).</dd>
-      <dd class="prerender-eg">e.g. 10</dd>
-      <dt>People after change (optional)</dt>
-      <dd>Headcount after adding or removing members — to see how many channels the change creates.</dd>
-      <dd class="prerender-eg">e.g. 15</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Channels now</dt>
-      <dd>One-to-one paths that currently exist.</dd>
-      <dt>Channels after change</dt>
-      <dd>Paths at the new headcount.</dd>
-      <dt>Channels added</dt>
-      <dd>New paths the headcount change creates — the hidden coordination cost.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Channel growth</dt>
-      <dd>Why one more person on a large team costs more coordination than on a small one.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-risk">
-      <h2>08 — Risk</h2>
-      <p class="prerender-blurb">Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.</p>
-      <p class="prerender-citation">Risk — PMI Risk Management in Portfolios, Programs, and Projects.</p>
-      <article class="prerender-card" id="prerender-calc-emv">
-      <h3>08.1 — Expected Monetary Value (EMV)</h3>
-      <p class="prerender-tagline">Probability × impact</p>
-      <p class="prerender-about">EMV is the probability-weighted value of an uncertain event — what the risk is “worth” on average if you could run the project many times. Enter threats with a negative impact and opportunities with a positive one. Summing the EMV of every identified risk gives the contingency reserve; EMV is also the math behind decision-tree analysis.</p>
-      <pre class="prerender-formula"><code>EMV = Probability × Impact</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Probability (%)</dt>
-      <dd>Likelihood the risk event actually occurs, from qualitative analysis or data. 0–100.</dd>
-      <dd class="prerender-eg">e.g. 30</dd>
-      <dt>Impact</dt>
-      <dd>Full monetary consequence if it occurs. Negative for threats (costs), positive for opportunities (gains).</dd>
-      <dd class="prerender-eg">e.g. -50000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Expected Monetary Value</dt>
-      <dd>The amount to carry in the contingency reserve for this single risk.</dd>
-      <dt>Impact if it happens</dt>
-      <dd>Reminder: EMV is an average — if the event fires you feel the full impact, not the EMV.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>EMV against full exposure</dt>
-      <dd>The average outcome versus what actually happens if the event fires.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-risk-score">
-      <h3>08.2 — Qualitative risk score</h3>
-      <p class="prerender-tagline">Probability × impact, on a 1–5 scale</p>
-      <p class="prerender-about">Before risks are worth quantifying in money, they are ranked qualitatively: rate probability and impact on an agreed 1–5 scale and multiply. The product places each risk in the probability–impact matrix and decides how much attention it gets. The scales are ordinal — a 4 is not “twice” a 2 — so use the score to rank, not to budget.</p>
-      <pre class="prerender-formula"><code>Risk score = Probability (1–5) × Impact (1–5)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Probability rating (1–5)</dt>
-      <dd>1 = rare, 3 = possible, 5 = almost certain — per your organisation’s definitions.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      <dt>Impact rating (1–5)</dt>
-      <dd>1 = negligible, 3 = moderate, 5 = severe effect on objectives.</dd>
-      <dd class="prerender-eg">e.g. 3</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Risk score</dt>
-      <dd>Position in the 25-cell probability–impact matrix.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Probability–impact matrix</dt>
-      <dd>Where this risk sits in the standard 5×5 grid.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-contingency">
-      <h3>08.3 — Contingency reserve roll-up</h3>
-      <p class="prerender-tagline">Σ EMV across the risk register</p>
-      <p class="prerender-about">Sum the expected monetary value of every identified risk and you get the contingency reserve — the funded buffer for known-unknowns, owned by the project manager. Enter matching lists: one probability and one impact per risk, threats negative, opportunities positive. (Unknown-unknowns are covered separately by management reserve, which sits outside the baseline.)</p>
-      <pre class="prerender-formula"><code>Contingency reserve = − Σ (Probabilityᵢ × Impactᵢ)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Probabilities % (comma-separated)</dt>
-      <dd>Likelihood of each risk, in register order — e.g. 30, 10, 50.</dd>
-      <dd class="prerender-eg">e.g. 30, 10, 50</dd>
-      <dt>Impacts (same order)</dt>
-      <dd>Monetary consequence of each risk: threats negative, opportunities positive.</dd>
-      <dd class="prerender-eg">e.g. -50000, -20000, 10000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Net EMV of the register</dt>
-      <dd>Probability-weighted sum of all risks — usually negative when threats dominate.</dd>
-      <dt>Suggested contingency reserve</dt>
-      <dd>The buffer to add to the cost baseline (zero if net EMV is positive).</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Register contribution</dt>
-      <dd>Which risks drive the reserve — each risk’s own EMV, side by side.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-decision">
-      <h2>09 — Decision Analysis</h2>
-      <p class="prerender-blurb">Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.</p>
-      <p class="prerender-citation">Decision — PMI PMBOK Guide, Decision Analysis.</p>
-      <article class="prerender-card" id="prerender-calc-decision-tree">
-      <h3>09.1 — Decision tree — compare two options</h3>
-      <p class="prerender-tagline">EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)</p>
-      <p class="prerender-about">Each option is a branch: pay its cost, then chance decides between a success payoff and a failure payoff. The branch with the higher expected monetary value wins — on average. Classic uses: build vs buy, prototype vs commit, upgrade vs replace. Remember EMV is a long-run average; for one-shot, bet-the-company decisions, weigh the worst case too.</p>
-      <pre class="prerender-formula"><code>EMV(option) = − Cost
-             + P(success) × Payoff(success)
-             + (1 − P) × Payoff(failure)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Option A — cost</dt>
-      <dd>Upfront cost of choosing branch A.</dd>
-      <dd class="prerender-eg">e.g. 40000</dd>
-      <dt>Option A — P(success) %</dt>
-      <dd>Probability branch A succeeds.</dd>
-      <dd class="prerender-eg">e.g. 60</dd>
-      <dt>Option A — payoff if success</dt>
-      <dd>Value delivered when A succeeds.</dd>
-      <dd class="prerender-eg">e.g. 100000</dd>
-      <dt>Option A — payoff if failure</dt>
-      <dd>Value (often 0, sometimes negative) when A fails.</dd>
-      <dd class="prerender-eg">e.g. 0</dd>
-      <dt>Option B — cost</dt>
-      <dd>Upfront cost of choosing branch B.</dd>
-      <dd class="prerender-eg">e.g. 10000</dd>
-      <dt>Option B — P(success) %</dt>
-      <dd>Probability branch B succeeds.</dd>
-      <dd class="prerender-eg">e.g. 30</dd>
-      <dt>Option B — payoff if success</dt>
-      <dd>Value delivered when B succeeds.</dd>
-      <dd class="prerender-eg">e.g. 60000</dd>
-      <dt>Option B — payoff if failure</dt>
-      <dd>Value when B fails.</dd>
-      <dd class="prerender-eg">e.g. 0</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>EMV — Option A</dt>
-      <dd>Expected value of branch A after its cost.</dd>
-      <dt>EMV — Option B</dt>
-      <dd>Expected value of branch B after its cost.</dd>
-      <dt>Better option</dt>
-      <dd>The branch with the higher expected value, and by how much.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Expected value comparison</dt>
-      <dd>Which branch wins on average, and how wide a bet each one is.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-quality">
-      <h2>10 — Quality &amp; Six Sigma</h2>
-      <p class="prerender-blurb">Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?</p>
-      <p class="prerender-citation">Quality — ASQ Quality Resources and Six Sigma guidance.</p>
-      <article class="prerender-card" id="prerender-calc-dpmo">
-      <h3>10.1 — DPMO &amp; sigma level</h3>
-      <p class="prerender-tagline">Defects per million opportunities</p>
-      <p class="prerender-about">DPMO normalizes defect counts by how many chances there were to fail, so processes of different complexity can be compared fairly. The sigma level restates DPMO on the Six Sigma scale (with the conventional 1.5σ shift): 3σ ≈ 66,800 defects per million, 4σ ≈ 6,210, 6σ ≈ 3.4.</p>
-      <pre class="prerender-formula"><code>DPMO = Defects × 1,000,000 ÷ (Units × Opportunities per unit)
-Sigma level ≈ 0.8406 + √(29.37 − 2.221 × ln DPMO)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Defects found</dt>
-      <dd>Total defects observed in the sample.</dd>
-      <dd class="prerender-eg">e.g. 25</dd>
-      <dt>Units inspected</dt>
-      <dd>How many items, transactions or deliverables were checked.</dd>
-      <dd class="prerender-eg">e.g. 1000</dd>
-      <dt>Opportunities per unit</dt>
-      <dd>Distinct ways each unit could be defective — fields on a form, joints on an assembly.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>DPMO</dt>
-      <dd>Defects expected per million opportunities at this rate.</dd>
-      <dt>Process yield</dt>
-      <dd>Share of opportunities that pass defect-free.</dd>
-      <dt>Sigma level</dt>
-      <dd>The process capability on the Six Sigma scale, 1.5σ shift included.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Sigma level</dt>
-      <dd>Process performance on the Six Sigma scale.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-control">
-      <h3>10.2 — Control limits (±3σ)</h3>
-      <p class="prerender-tagline">UCL · LCL · warning zone</p>
-      <p class="prerender-about">A control chart flags when a process leaves its normal noise band. The limits sit three standard deviations either side of the historical mean: a point outside them — or seven consecutive points on one side of the mean (the rule of seven) — signals the process is out of control and needs investigation, not tampering.</p>
-      <pre class="prerender-formula"><code>UCL = Mean + 3σ        LCL = Mean − 3σ</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Process mean</dt>
-      <dd>The long-run average of the measurement, from historical data.</dd>
-      <dd class="prerender-eg">e.g. 50</dd>
-      <dt>Process σ</dt>
-      <dd>Standard deviation of the measurement under normal conditions.</dd>
-      <dd class="prerender-eg">e.g. 2</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Upper control limit</dt>
-      <dd>Mean + 3σ — the ceiling of normal variation.</dd>
-      <dt>Lower control limit</dt>
-      <dd>Mean − 3σ — the floor of normal variation.</dd>
-      <dt>Warning zone (±2σ)</dt>
-      <dd>Inner band where points are legal but worth watching.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Control band</dt>
-      <dd>The mean, the ±2σ warning zone, and the ±3σ control limits on one axis.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-cpk">
-      <h3>10.3 — Process capability (Cp / Cpk)</h3>
-      <p class="prerender-tagline">Can the process meet the spec?</p>
-      <p class="prerender-about">Control limits describe what the process does; specification limits describe what the customer needs. Capability indices compare the two. Cp asks whether the spec window is wide enough for the process spread (ignoring centering); Cpk penalises a process that drifts off-centre. The common acceptance bar is Cpk ≥ 1.33.</p>
-      <pre class="prerender-formula"><code>Cp  = (USL − LSL) ÷ 6σ
-Cpk = min(USL − Mean, Mean − LSL) ÷ 3σ</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>USL — upper spec limit</dt>
-      <dd>The highest value the customer or requirement accepts.</dd>
-      <dd class="prerender-eg">e.g. 10</dd>
-      <dt>LSL — lower spec limit</dt>
-      <dd>The lowest acceptable value.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      <dt>Process mean</dt>
-      <dd>Where the process actually centres, from measurement data.</dd>
-      <dd class="prerender-eg">e.g. 6</dd>
-      <dt>Process σ</dt>
-      <dd>Standard deviation of the process output.</dd>
-      <dd class="prerender-eg">e.g. 0.5</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Cp — potential capability</dt>
-      <dd>Spec width versus process spread, assuming perfect centering.</dd>
-      <dt>Cpk — actual capability</dt>
-      <dd>Capability including how far off-centre the process runs.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Spec window vs process spread</dt>
-      <dd>Whether the ±3σ process spread fits inside the customer’s spec limits, and how centred it is.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-coq">
-      <h3>10.4 — Cost of Quality (CoQ)</h3>
-      <p class="prerender-tagline">Conformance vs failure spend</p>
-      <p class="prerender-about">Everything quality costs, split into money spent on purpose and money lost to failure. Conformance costs are investments: prevention (training, standards, design reviews) and appraisal (testing, inspections, audits). Non-conformance costs are the bill for defects: internal failures (rework, scrap) and external ones (warranty, support, reputation). Mature organisations deliberately shift spend from the failure side to the prevention side.</p>
-      <pre class="prerender-formula"><code>Conformance = Prevention + Appraisal
-Non-conformance = Internal failures + External failures
-CoQ = Conformance + Non-conformance</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Prevention costs</dt>
-      <dd>Spent stopping defects from happening: training, standards, quality planning.</dd>
-      <dd class="prerender-eg">e.g. 20000</dd>
-      <dt>Appraisal costs</dt>
-      <dd>Spent finding defects early: testing, inspection, audits.</dd>
-      <dd class="prerender-eg">e.g. 30000</dd>
-      <dt>Internal failure costs</dt>
-      <dd>Defects caught before the customer: rework, scrap, retesting.</dd>
-      <dd class="prerender-eg">e.g. 40000</dd>
-      <dt>External failure costs</dt>
-      <dd>Defects that reached the customer: warranty, incident response, lost business.</dd>
-      <dd class="prerender-eg">e.g. 25000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Cost of conformance</dt>
-      <dd>The deliberate investment in quality.</dd>
-      <dt>Cost of non-conformance</dt>
-      <dd>The price of failure, internal and external.</dd>
-      <dt>Total cost of quality</dt>
-      <dd>Everything quality costs, both sides combined.</dd>
-      <dt>Failure share of CoQ</dt>
-      <dd>What portion of quality spend is failure rather than investment.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Conformance vs failure spend</dt>
-      <dd>Where quality money goes — investment against the cost of failure.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-financial">
-      <h2>11 — Project Selection &amp; Finance</h2>
-      <p class="prerender-blurb">The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.</p>
-      <p class="prerender-citation">Finance — PMI PMBOK Guide, Project Finance and Benefits.</p>
-      <article class="prerender-card" id="prerender-calc-roi">
-      <h3>11.1 — Return on Investment (ROI)</h3>
-      <p class="prerender-tagline">(Benefit − Cost) ÷ Cost</p>
-      <p class="prerender-about">The simplest project-selection measure: how much you get back per unit invested, ignoring timing. Good for quick comparisons; misleading for long projects because it ignores when the money arrives — use NPV for that.</p>
-      <pre class="prerender-formula"><code>ROI % = (Benefit − Cost) ÷ Cost × 100</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Total cost</dt>
-      <dd>Everything invested in the project: build, licences, labour, run costs over the horizon you are measuring.</dd>
-      <dd class="prerender-eg">e.g. 200000</dd>
-      <dt>Total benefit</dt>
-      <dd>Total value returned over the same horizon: revenue, savings, avoided costs.</dd>
-      <dd class="prerender-eg">e.g. 260000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>ROI</dt>
-      <dd>Percentage return over the whole horizon (not per year).</dd>
-      <dt>Net benefit</dt>
-      <dd>Absolute value created: benefit minus cost.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-npv">
-      <h3>11.2 — NPV · IRR · Payback</h3>
-      <p class="prerender-tagline">Discounted cash-flow appraisal</p>
-      <p class="prerender-about">The rigorous way to value a project: every future cash flow is discounted back to today because money later is worth less than money now. NPV is the value created in today’s money; IRR is the discount rate at which the project merely breaks even; payback tells you how long capital is at risk. When choosing between projects, pick the higher NPV.</p>
-      <pre class="prerender-formula"><code>NPV = −Investment + Σ  CFₜ ÷ (1 + r)ᵗ
-IRR: the r where NPV = 0
-Payback: periods until cumulative cash flow ≥ 0</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Discount rate (%)</dt>
-      <dd>Cost of capital or required return per period — the hurdle the project must beat.</dd>
-      <dd class="prerender-eg">e.g. 10</dd>
-      <dt>Initial investment</dt>
-      <dd>Cash out at period 0, entered as a positive number.</dd>
-      <dd class="prerender-eg">e.g. 1000</dd>
-      <dt>Cash flows (comma-separated)</dt>
-      <dd>Net cash in (or out, negative) for each following period, in order: period 1, 2, 3…</dd>
-      <dd class="prerender-eg">e.g. 500, 500, 500</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Net Present Value</dt>
-      <dd>Value created in today’s money after paying back capital and the required return.</dd>
-      <dt>Internal Rate of Return</dt>
-      <dd>The project’s intrinsic return per period. Compare it to the discount rate. Reliable only for conventional flows — one outlay followed by inflows. If the signs change more than once, IRR can have several answers or none, and NPV is the measure to trust.</dd>
-      <dt>Benefit–Cost Ratio</dt>
-      <dd>Present value of the future net cash flows per unit invested — net, so a negative period nets off rather than counting as a benefit. Above 1 means benefits outweigh costs.</dd>
-      <dt>Payback period</dt>
-      <dd>Periods until the undiscounted cash recovers the investment — a measure of capital risk, not profitability.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Cumulative cash flow</dt>
-      <dd>Discounted against undiscounted — where the project actually breaks even.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-tvm">
-      <h3>11.3 — Present &amp; Future Value</h3>
-      <p class="prerender-tagline">FV = PV(1 + r)ⁿ</p>
-      <p class="prerender-about">The time-value-of-money primitive behind NPV. Future value answers “what will this be worth after n periods of compounding?”; present value answers the reverse: “what is a promised future amount worth today?”. Both outputs are computed from the single amount you enter.</p>
-      <pre class="prerender-formula"><code>FV = Amount × (1 + r)ⁿ
-PV = Amount ÷ (1 + r)ⁿ</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Amount</dt>
-      <dd>The sum of money to move through time.</dd>
-      <dd class="prerender-eg">e.g. 10000</dd>
-      <dt>Rate per period (%)</dt>
-      <dd>Interest or discount rate for each compounding period.</dd>
-      <dd class="prerender-eg">e.g. 8</dd>
-      <dt>Periods (n)</dt>
-      <dd>Number of compounding periods — years if the rate is annual.</dd>
-      <dd class="prerender-eg">e.g. 5</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Future value</dt>
-      <dd>What the amount grows to if invested today at the given rate.</dd>
-      <dt>Present value</dt>
-      <dd>What a payment of that amount, received n periods from now, is worth today.</dd>
-      <dt>Doubling time (Rule of 72)</dt>
-      <dd>72 ÷ rate: the mental-math shortcut for how many periods money takes to double.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-breakeven">
-      <h3>11.4 — Break-even point</h3>
-      <p class="prerender-tagline">Fixed costs ÷ contribution margin</p>
-      <p class="prerender-about">How many units (or billable hours, or subscriptions) you must sell before the venture stops losing money. The denominator — price minus variable cost — is the contribution margin: what each unit contributes toward covering fixed costs.</p>
-      <pre class="prerender-formula"><code>Break-even units = Fixed costs ÷ (Price − Variable cost per unit)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Fixed costs</dt>
-      <dd>Costs that exist regardless of volume: rent, salaries, licences, the project build itself.</dd>
-      <dd class="prerender-eg">e.g. 50000</dd>
-      <dt>Price per unit</dt>
-      <dd>Revenue received for each unit sold.</dd>
-      <dd class="prerender-eg">e.g. 25</dd>
-      <dt>Variable cost per unit</dt>
-      <dd>Cost incurred for each additional unit: materials, transaction fees, support.</dd>
-      <dd class="prerender-eg">e.g. 15</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Break-even units</dt>
-      <dd>Volume at which total revenue equals total cost.</dd>
-      <dt>Break-even revenue</dt>
-      <dd>The revenue level at that volume.</dd>
-      <dt>Contribution margin / unit</dt>
-      <dd>Price − variable cost: what each sale contributes to fixed costs.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Revenue vs cost</dt>
-      <dd>Where the revenue line crosses total cost.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-depreciation">
-      <h3>11.5 — Straight-line depreciation</h3>
-      <p class="prerender-tagline">(Cost − Salvage) ÷ Useful life</p>
-      <p class="prerender-about">Spreads an asset’s cost evenly across its useful life — the depreciation method assumed in PMP exam questions and the simplest for business cases that must account for capital assets.</p>
-      <pre class="prerender-formula"><code>Annual depreciation = (Cost − Salvage value) ÷ Useful life</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Purchase cost</dt>
-      <dd>What the asset costs to acquire and put into service.</dd>
-      <dd class="prerender-eg">e.g. 120000</dd>
-      <dt>Salvage value</dt>
-      <dd>Expected resale or scrap value at the end of its useful life.</dd>
-      <dd class="prerender-eg">e.g. 20000</dd>
-      <dt>Useful life (years)</dt>
-      <dd>How many years the asset will be productive.</dd>
-      <dd class="prerender-eg">e.g. 5</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Depreciation per year</dt>
-      <dd>The expense recognised each year of the asset’s life.</dd>
-      <dt>Depreciation rate</dt>
-      <dd>Share of the depreciable base expensed each year: 1 ÷ life.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-scoring">
-      <h3>11.6 — Weighted scoring model</h3>
-      <p class="prerender-tagline">Σ (weight × score)</p>
-      <p class="prerender-about">The standard way to compare options against several criteria at once: weight each criterion by importance, score the option against each, and sum weight × score. Run it once per option and compare the totals. Its real value is political — the weights force stakeholders to argue about priorities before the decision, not after it.</p>
-      <pre class="prerender-formula"><code>Weighted score = Σ (weightᵢ × scoreᵢ) ÷ Σ weightᵢ</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Criteria weights (comma-separated)</dt>
-      <dd>Importance of each criterion, any scale — e.g. strategic fit 5, cost 3, risk 2.</dd>
-      <dd class="prerender-eg">e.g. 5, 3, 2</dd>
-      <dt>Option scores (same order)</dt>
-      <dd>How this option rates on each criterion, on your scoring scale (say 1–10), in the same order as the weights.</dd>
-      <dd class="prerender-eg">e.g. 8, 6, 9</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Weighted score</dt>
-      <dd>The option’s weighted average on your scoring scale — directly comparable across options.</dd>
-      <dt>Raw weighted total</dt>
-      <dd>The unnormalized Σ weight × score, as many textbooks present it.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Weighted contribution</dt>
-      <dd>Each criterion’s share of the total score — the weights, made visible.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-procurement">
-      <h2>12 — Procurement &amp; Contracts</h2>
-      <p class="prerender-blurb">The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.</p>
-      <p class="prerender-citation">Procurement — PMI PMBOK Guide, Procurement Management.</p>
-      <article class="prerender-card" id="prerender-calc-pta">
-      <h3>12.1 — Point of Total Assumption (PTA)</h3>
-      <p class="prerender-tagline">Where the seller starts paying for overruns</p>
-      <p class="prerender-about">In a Fixed-Price-Incentive-Fee contract, cost overruns are shared according to the buyer/seller ratio only up to the ceiling price. The PTA is the actual-cost level at which the buyer’s share of the overrun has consumed the room up to the ceiling; beyond it, every additional dollar of cost comes out of the seller’s fee. Sellers manage hard to stay below it.</p>
-      <pre class="prerender-formula"><code>PTA = (Ceiling price − Target price) ÷ Buyer share + Target cost</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Ceiling price</dt>
-      <dd>The maximum the buyer will ever pay, regardless of cost.</dd>
-      <dd class="prerender-eg">e.g. 180000</dd>
-      <dt>Target price</dt>
-      <dd>Target cost + target fee: what both parties expect the buyer to pay.</dd>
-      <dd class="prerender-eg">e.g. 165000</dd>
-      <dt>Target cost</dt>
-      <dd>The cost both parties negotiated as the expected outcome.</dd>
-      <dd class="prerender-eg">e.g. 150000</dd>
-      <dt>Buyer share (%)</dt>
-      <dd>Buyer’s portion of the share ratio. An “80/20 split” means the buyer covers 80% of overruns — enter 80.</dd>
-      <dd class="prerender-eg">e.g. 80</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Point of Total Assumption</dt>
-      <dd>The actual cost at which the seller assumes all further overrun.</dd>
-      <dt>Overrun absorbed before PTA</dt>
-      <dd>How much the cost can overrun target before the PTA is reached.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Shared-risk band</dt>
-      <dd>Target cost, the point of total assumption, and the ceiling on one cost axis.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-fpif">
-      <h3>12.2 — FPIF final fee &amp; price</h3>
-      <p class="prerender-tagline">Settling an incentive contract</p>
-      <p class="prerender-about">When the work is done, the incentive formula converts the cost outcome into the seller’s final fee: the seller keeps its share of any saving and gives up its share of any overrun. If a ceiling price is set, the buyer never pays more than it.</p>
-      <pre class="prerender-formula"><code>Final fee = Target fee + (Target cost − Actual cost) × Seller share
-If the ceiling binds: Final fee = Ceiling price − Actual cost
-Final price = min(Actual cost + Final fee, Ceiling price)</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Target cost</dt>
-      <dd>Negotiated expected cost of the work.</dd>
-      <dd class="prerender-eg">e.g. 150000</dd>
-      <dt>Target fee</dt>
-      <dd>Profit the seller earns if actual cost exactly equals target cost.</dd>
-      <dd class="prerender-eg">e.g. 15000</dd>
-      <dt>Actual cost</dt>
-      <dd>What the work really cost the seller.</dd>
-      <dd class="prerender-eg">e.g. 140000</dd>
-      <dt>Seller share (%)</dt>
-      <dd>Seller’s portion of the ratio. In an 80/20 split, enter 20.</dd>
-      <dd class="prerender-eg">e.g. 20</dd>
-      <dt>Ceiling price (optional)</dt>
-      <dd>Contract maximum — caps what the buyer pays.</dd>
-      <dd class="prerender-eg">e.g. 180000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Final fee</dt>
-      <dd>Seller’s profit after applying the incentive share. Once the ceiling binds, the fee erodes dollar for dollar with the overrun and can go negative.</dd>
-      <dt>Final price (buyer pays)</dt>
-      <dd>Actual cost plus final fee, capped at the ceiling if one is set.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Final price vs actual cost</dt>
-      <dd>The slope changes at the PTA and flattens at the ceiling — that bend is where seller risk changes.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-cpif">
-      <h3>12.3 — CPIF final fee &amp; price</h3>
-      <p class="prerender-tagline">Cost-plus with a bounded incentive</p>
-      <p class="prerender-about">In a Cost-Plus-Incentive-Fee contract the buyer reimburses all allowable costs, but the seller’s fee moves with performance: it grows when the seller beats the target cost and shrinks on overruns, always clamped between a negotiated minimum and maximum fee. Unlike FPIF there is no ceiling price — cost risk stays mostly with the buyer, which is why CPIF suits work too uncertain to fix-price.</p>
-      <pre class="prerender-formula"><code>Fee = Target fee + (Target cost − Actual cost) × Seller share
-Final fee = clamp(Fee, Min fee, Max fee)
-Final price = Actual cost + Final fee</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Target cost</dt>
-      <dd>Negotiated expected cost of the work.</dd>
-      <dd class="prerender-eg">e.g. 100000</dd>
-      <dt>Target fee</dt>
-      <dd>Fee the seller earns if cost lands exactly on target.</dd>
-      <dd class="prerender-eg">e.g. 10000</dd>
-      <dt>Actual cost</dt>
-      <dd>What the work really cost — fully reimbursed by the buyer.</dd>
-      <dd class="prerender-eg">e.g. 90000</dd>
-      <dt>Seller share (%)</dt>
-      <dd>Seller’s portion of the share ratio. In an 80/20 split, enter 20.</dd>
-      <dd class="prerender-eg">e.g. 20</dd>
-      <dt>Minimum fee (optional)</dt>
-      <dd>Fee floor — the least the seller can earn however badly cost overruns.</dd>
-      <dd class="prerender-eg">e.g. 4000</dd>
-      <dt>Maximum fee (optional)</dt>
-      <dd>Fee ceiling — the most the seller can earn however well it performs.</dd>
-      <dd class="prerender-eg">e.g. 15000</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Final fee</dt>
-      <dd>Incentive-adjusted fee, clamped to the min/max band if provided.</dd>
-      <dt>Final price (buyer pays)</dt>
-      <dd>Reimbursed actual cost plus the final fee — no ceiling in CPIF.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Seller fee vs actual cost</dt>
-      <dd>The fee moves with performance, then clamps flat at the negotiated floor and ceiling.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-agile">
-      <h2>13 — Agile Forecasting</h2>
-      <p class="prerender-blurb">Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.</p>
-      <p class="prerender-citation">Agile — Scrum Guide (2020): scrumguides.org/scrum-guide.html</p>
-      <article class="prerender-card" id="prerender-calc-velocity">
-      <h3>13.1 — Velocity &amp; release forecast</h3>
-      <p class="prerender-tagline">Backlog ÷ velocity</p>
-      <p class="prerender-about">Velocity is the average number of story points a team completes per sprint, measured from finished sprints only (yesterday’s weather). Dividing the remaining backlog by velocity gives the most honest forecast available: how many sprints of work remain at the current, demonstrated pace.</p>
-      <pre class="prerender-formula"><code>Velocity = Points completed ÷ Sprints completed
-Sprints remaining = ⌈ Remaining backlog ÷ Velocity ⌉</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Points completed</dt>
-      <dd>Total story points fully done (meeting the Definition of Done) across the measured sprints.</dd>
-      <dd class="prerender-eg">e.g. 120</dd>
-      <dt>Sprints completed</dt>
-      <dd>Number of finished sprints those points came from — use at least 3 for a stable average.</dd>
-      <dd class="prerender-eg">e.g. 4</dd>
-      <dt>Remaining backlog (points)</dt>
-      <dd>Estimated points left in the release or project scope.</dd>
-      <dd class="prerender-eg">e.g. 200</dd>
-      <dt>Sprint length (weeks, optional)</dt>
-      <dd>Length of one sprint — converts the forecast into calendar time.</dd>
-      <dd class="prerender-eg">e.g. 2</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Velocity</dt>
-      <dd>Demonstrated delivery rate in points per sprint.</dd>
-      <dt>Sprints remaining</dt>
-      <dd>Whole sprints needed to clear the backlog at current velocity.</dd>
-      <dt>Calendar time remaining</dt>
-      <dd>Sprints remaining × sprint length.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Backlog burndown forecast</dt>
-      <dd>The remaining backlog burning down at the team’s demonstrated velocity.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-capacity">
-      <h3>13.2 — Sprint capacity</h3>
-      <p class="prerender-tagline">People × days × hours × focus</p>
-      <p class="prerender-about">Capacity planning in hours, for sprint-level task commitment. Start from raw availability, then apply a focus factor — the share of the day genuinely available for sprint work after ceremonies, support duty, e-mail and context switching. Teams that skip the focus factor systematically over-commit. Use capacity for task hours; use velocity (above) for story points — they answer different questions.</p>
-      <pre class="prerender-formula"><code>Capacity = Members × Days × Hours per day × Focus factor</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Team members</dt>
-      <dd>People doing sprint work — count partial allocations as fractions (0.5 for half-time).</dd>
-      <dd class="prerender-eg">e.g. 5</dd>
-      <dt>Working days in sprint</dt>
-      <dd>Sprint length minus holidays and planned leave.</dd>
-      <dd class="prerender-eg">e.g. 9</dd>
-      <dt>Hours per day</dt>
-      <dd>Nominal working hours per person per day.</dd>
-      <dd class="prerender-eg">e.g. 8</dd>
-      <dt>Focus factor (%)</dt>
-      <dd>Share of the day truly available for sprint work — 60–70% is realistic for most teams.</dd>
-      <dd class="prerender-eg">e.g. 65</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Raw hours</dt>
-      <dd>Theoretical availability before reality intervenes.</dd>
-      <dt>Plannable capacity (hours)</dt>
-      <dd>What the team can actually commit to after the focus factor.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Raw vs plannable capacity</dt>
-      <dd>The focus factor is the gap — committing to raw hours is how sprints fail.</dd>
-      </dl>
-      </article>
-      <article class="prerender-card" id="prerender-calc-say-do">
-      <h3>13.3 — Say/do ratio</h3>
-      <p class="prerender-tagline">Delivered ÷ committed</p>
-      <p class="prerender-about">The simplest measure of forecast reliability: of what the team committed to at sprint planning, how much was actually delivered? Track it over several sprints. A team that consistently delivers what it says — even if it says less — is worth more to planning than a fast team nobody can predict.</p>
-      <pre class="prerender-formula"><code>Say/do % = Points delivered ÷ Points committed × 100</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>Points committed</dt>
-      <dd>Story points the team signed up for at sprint planning.</dd>
-      <dd class="prerender-eg">e.g. 34</dd>
-      <dt>Points delivered</dt>
-      <dd>Points fully done (per the Definition of Done) by sprint end.</dd>
-      <dd class="prerender-eg">e.g. 29</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Say/do ratio</dt>
-      <dd>Forecast reliability for this sprint.</dd>
-      <dt>Commitment gap (points)</dt>
-      <dd>Delivered minus committed — negative means work rolled over.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>Forecast reliability</dt>
-      <dd>Where the say/do ratio sits against the reliable band.</dd>
-      </dl>
-      </article>
-      </section>
-      <section class="prerender-category" id="prerender-cat-flow">
-      <h2>14 — Lean &amp; Flow</h2>
-      <p class="prerender-blurb">Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.</p>
-      <p class="prerender-citation">Flow — Little (1961), “A Proof for L = λW”: doi.org/10.1287/opre.9.3.383</p>
-      <article class="prerender-card" id="prerender-calc-littles-law">
-      <h3>14.1 — Little’s Law &amp; flow efficiency</h3>
-      <p class="prerender-tagline">Cycle time = WIP ÷ throughput</p>
-      <p class="prerender-about">Given any two of work-in-progress, throughput and cycle time, Little’s Law fixes the third. It is the mathematical case for WIP limits: with throughput unchanged, every extra item you start adds directly to how long everything takes. Flow efficiency then reveals how much of that cycle time is actual work versus waiting in queues.</p>
-      <pre class="prerender-formula"><code>Cycle time = WIP ÷ Throughput
-Flow efficiency % = Active work time ÷ Cycle time × 100</code></pre>
-      <h4>Parameters</h4>
-      <dl class="prerender-params">
-      <dt>WIP — work in progress</dt>
-      <dd>Items currently started and unfinished on the board.</dd>
-      <dd class="prerender-eg">e.g. 12</dd>
-      <dt>Throughput (items / period)</dt>
-      <dd>Items finished per period — pick days or weeks and stay consistent.</dd>
-      <dd class="prerender-eg">e.g. 3</dd>
-      <dt>Active work per item (optional)</dt>
-      <dd>Hands-on time an item actually receives, in the same period units — for flow efficiency.</dd>
-      <dd class="prerender-eg">e.g. 0.5</dd>
-      </dl>
-      <h4>Results</h4>
-      <dl class="prerender-results">
-      <dt>Average cycle time</dt>
-      <dd>How long a newly started item takes to finish, in your chosen periods.</dd>
-      <dt>Flow efficiency</dt>
-      <dd>Share of the cycle time that is real work rather than waiting.</dd>
-      </dl>
-      <h4>Charts</h4>
-      <dl class="prerender-charts">
-      <dt>WIP vs cycle time</dt>
-      <dd>The linear relationship behind WIP limits — at fixed throughput, cycle time tracks WIP directly.</dd>
-      </dl>
-      </article>
-      </section>
+      <div class="prose">
+<!-- Long-form content for /earned-value-analysis.
+     Plain prose in plain HTML — edit this file directly; tools/calcpage.js
+     wraps it in the page furniture. Use h2 for sections, h3 beneath them.
+     Every number here is the same worked example the calculator opens with,
+     so a reader can follow along in the instrument above. -->
+
+<h2 id="what-it-answers">What earned value actually answers</h2>
+
+<p>Most progress reporting can be gamed by an optimist. "We're 60% done" is an
+opinion. "We've spent £96,000" is a fact about money, not about progress. Put
+them together and you still cannot say whether the project is in trouble,
+because neither number knows what the other one means.</p>
+
+<p>Earned value fixes this by insisting that progress is measured in the same
+unit as the budget. Three numbers, all in currency:</p>
+
+<ul>
+  <li><strong>Planned value (PV)</strong> — what the schedule said you should
+    have completed by today, priced at budget.</li>
+  <li><strong>Earned value (EV)</strong> — what you have <em>actually</em>
+    completed, priced at that same budget.</li>
+  <li><strong>Actual cost (AC)</strong> — what completing it really cost.</li>
+</ul>
+
+<p>The trick is that EV is priced at budget, not at what it cost. That single
+decision is what makes the comparison honest: EV against AC is a pure cost
+question, and EV against PV is a pure schedule question. Neither can hide
+inside the other.</p>
+
+<h2 id="worked-example">Every earned value formula, worked through end to end</h2>
+
+<p>Take a project with a <strong>budget at completion (BAC) of 200,000</strong>.
+By today the schedule expected 120,000 of work to be finished. In fact 108,000
+of budgeted work is finished, and it cost 96,000 to do.</p>
+
+<p>Those are the four numbers in the calculator above. Here is every metric
+they produce, and what each one is telling you.</p>
+
+<h3>Step 1 — the two variances</h3>
+
+<p>Variances are subtractions, and they answer in currency.</p>
+
+<pre><code>CV = EV − AC = 108,000 − 96,000 = +12,000
+SV = EV − PV = 108,000 − 120,000 = −12,000</code></pre>
+
+<p>Positive is good, negative is bad, in both cases. So this project is
+<strong>12,000 under budget and 12,000 behind schedule</strong>. Note that the
+schedule variance is expressed in money — earned value has no time axis, which
+is a real limitation we will come back to.</p>
+
+<h3>Step 2 — the two indices</h3>
+
+<p>Indices are divisions, and they answer in efficiency. They matter more than
+the variances because they scale: a variance of 12,000 means something
+different on a 200,000 project than on a 20,000,000 one.</p>
+
+<pre><code>CPI = EV ÷ AC = 108,000 ÷ 96,000 = 1.125
+SPI = EV ÷ PV = 108,000 ÷ 120,000 = 0.90</code></pre>
+
+<p>Read them as exchange rates. <strong>CPI 1.125</strong> means every 1.00
+spent has bought 1.125 of budgeted work — you are getting good value.
+<strong>SPI 0.90</strong> means you are completing work at 90% of the planned
+rate.</p>
+
+<h3>Step 3 — the forecast</h3>
+
+<p>Now the useful part. If today's efficiency continues, what will the whole
+project cost?</p>
+
+<pre><code>EAC = BAC ÷ CPI = 200,000 ÷ 1.125 = 177,778
+ETC = EAC − AC = 177,778 − 96,000 = 81,778
+VAC = BAC − EAC = 200,000 − 177,778 = +22,222</code></pre>
+
+<p>So: expect to finish around 177,778, needing roughly 81,778 more, and to
+come in about 22,222 under the approved budget. That is a forecast you can put
+in front of a sponsor, and it is derived rather than guessed.</p>
+
+<h2 id="reading-together">Cost performance index (CPI) and schedule performance index (SPI)</h2>
+
+<p>Neither index means much alone. Together they place the project in one of
+four positions, and each position calls for a different conversation.</p>
+
+<div class="table-wrap"><table>
+  <thead>
+    <tr><th>Position</th><th>What it usually means</th><th>What to do</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CPI ≥ 1, SPI ≥ 1</strong></td>
+      <td>Genuinely healthy — or the baseline was soft.</td>
+      <td>Check the baseline before celebrating.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI ≥ 1, SPI &lt; 1</strong></td>
+      <td>The example above. Often understaffed rather than efficient.</td>
+      <td>Ask whether cost looks good <em>because</em> work is not happening.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI &lt; 1, SPI ≥ 1</strong></td>
+      <td>Buying the schedule with overtime, premiums or extra people.</td>
+      <td>Decide deliberately whether the schedule is worth the money.</td>
+    </tr>
+    <tr>
+      <td><strong>CPI &lt; 1, SPI &lt; 1</strong></td>
+      <td>Over budget and late. Rarely recovers on its own.</td>
+      <td>Escalate now, not next month.</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>The second row is the one worth dwelling on, because it is the example above
+and it is the one most often misread. A project can look under budget purely
+because it has not yet spent money on work it has not yet done. Cost efficiency
+and slow progress frequently arrive together, and the CPI is not the good news
+it appears to be. If you take one habit from this page, take this one:
+<strong>never report CPI without SPI beside it</strong>.</p>
+
+<h2 id="which-eac">Estimate at completion (EAC): which formula to use</h2>
+
+<p>This is where most people go wrong, because there are four accepted formulas
+and they are not interchangeable. The formula encodes an assumption about the
+future, so choosing one is a forecasting judgement, not arithmetic.</p>
+
+<h3>1. Variances are typical — <code>EAC = BAC ÷ CPI</code></h3>
+<p>Assumes the rest of the project performs like the part you have done. The
+right default on a project running steadily with no known change. In the
+example: 177,778.</p>
+
+<h3>2. Variances are atypical — <code>EAC = AC + (BAC − EV)</code></h3>
+<p>Assumes the overrun so far was a one-off and everything remaining runs at
+plan. Use it when you can <em>name</em> the cause and show it is finished — a
+resolved supplier dispute, a rework cycle now closed. In the example: 188,000.
+Note it is the more pessimistic figure here, because it declines to assume
+today's favourable efficiency continues.</p>
+
+<h3>3. Cost and schedule both bite — <code>EAC = AC + (BAC − EV) ÷ (CPI × SPI)</code></h3>
+<p>Assumes remaining work is dragged by both indices. Appropriate when a hard
+end date means lateness will be bought back with money. In the example:
+186,864.</p>
+
+<h3>4. A fresh bottom-up estimate — <code>EAC = AC + new ETC</code></h3>
+<p>When the original baseline no longer describes the project, no index will
+rescue it. Re-estimate the remaining work and add it to what you have spent.
+This is the honest answer after a major scope change, and no calculator can
+produce it for you.</p>
+
+<p>The practical discipline: pick the formula <em>before</em> you look at which
+number you would prefer, and write down the assumption you are making. An EAC
+without its stated assumption is not a forecast, it is a preference.</p>
+
+<h2 id="tcpi">TCPI — the reality check</h2>
+
+<p>Every forecast above tells you where you are heading. TCPI answers a harder
+question: what efficiency would the remaining work have to sustain to still
+land on budget?</p>
+
+<pre><code>TCPI = (BAC − EV) ÷ (BAC − AC) = 92,000 ÷ 104,000 = 0.88</code></pre>
+
+<p>The rule of thumb is unforgiving and worth memorising:</p>
+
+<ul>
+  <li><strong>TCPI ≤ 1.00</strong> — achievable, no change in efficiency needed.</li>
+  <li><strong>TCPI up to about 1.10</strong> — a stretch; name the specific
+    actions that will deliver it.</li>
+  <li><strong>TCPI above 1.10</strong> — treat as unrealistic. Teams almost
+    never improve efficiency by more than 10% mid-flight without descoping.</li>
+</ul>
+
+<p>Here TCPI is 0.88, comfortably below 1.00 — this project could get
+<em>less</em> efficient and still land on budget. Compare that to the
+optimism you often hear on a project running at CPI 0.85 with a TCPI of 1.3,
+where the plan silently requires the team to become 50% more effective than
+they have managed all year.</p>
+
+<p>One trap: once <strong>AC reaches BAC</strong>, the denominator turns
+negative and TCPI stops meaning anything. A negative TCPI is not an easy
+target — it is an unreachable one. At that point the budget is spent with work
+outstanding, and the answer is to re-baseline and measure TCPI against an EAC
+instead.</p>
+
+<h2 id="spi-limits">Schedule performance index (SPI)</h2>
+
+<p>SPI has a structural flaw that every practitioner should know: <strong>it
+always returns to 1.00 at the end of a project</strong>, however late you
+finish. At completion EV equals BAC, and PV equals BAC too, because all the
+planned work has come due. SPI = BAC ÷ BAC = 1.00 — on a project delivered a
+year late.</p>
+
+<p>The distortion starts well before the end. In the last third of a project,
+PV is running out faster than EV, so SPI drifts upward regardless of real
+performance. Treat SPI as reliable in the early and middle phases, and stop
+trusting it as a schedule signal near the finish.</p>
+
+<p>The fix is <a href="/#calc-earned-schedule">earned schedule</a>, which puts
+EV back on the time axis and reports in periods rather than currency. SPI(t)
+does not collapse to 1.00, so it keeps working when SPI has stopped.</p>
+
+<h2 id="mistakes">Five mistakes that survive into real reporting</h2>
+
+<ol>
+  <li><strong>Using % spent as % complete.</strong> AC ÷ BAC is not progress —
+    it is consumption. In the example 48% of the budget is spent but 54% of the
+    work is done, and the gap is the entire point of the method.</li>
+  <li><strong>Mixing currencies and units.</strong> PV, EV, AC and BAC must all
+    be the same currency at the same baseline. A mixed-rate roll-up produces
+    indices that look precise and mean nothing.</li>
+  <li><strong>Reporting CPI alone.</strong> See the four-quadrant table above.
+    Cost efficiency without schedule context is the most common way a report
+    misleads honestly.</li>
+  <li><strong>Letting EV be an opinion.</strong> Earned value is only as sound
+    as the rule for claiming it. Fix the rule in advance — 0/100, 50/50, or
+    physical measurement — and never let it be a judgement made at
+    month end by the person being measured.</li>
+  <li><strong>Re-baselining to make the numbers look better.</strong> A
+    re-baseline resets the variances to zero. Sometimes that is right, because
+    the plan genuinely no longer describes the project. It is never right as a
+    reporting tactic, and reviewers can always see it in the history.</li>
+</ol>
+
+<h2 id="exam-vs-practice">On the exam and on a real project</h2>
+
+<p>If you are preparing for the <strong>PMP</strong>, expect to be given three
+of the four numbers and asked for a fourth, and expect at least one question
+that hinges on choosing the right EAC formula from its stated assumption. The
+arithmetic is easy; the assumption is what is being tested.</p>
+
+<p>In <strong>PRINCE2</strong> terms, earned value is a tolerance instrument.
+CV and SV tell you whether you are still inside the cost and time tolerances
+delegated to you, and the forecast tells you whether you are about to breach
+them — which is what turns a routine Highlight Report into an Exception
+Report. Used properly it is an early-warning system, not a scorecard.</p>
+
+<p>On a live project the numbers matter less than the cadence. Earned value
+calculated monthly on a twelve-month project gives you about three readings
+before it is too late to act. Calculated fortnightly, it gives you time.</p>
       </div>
-      <!-- prerender:end -->
-    </div>
-
-    <p class="no-results" id="no-results" hidden>
-      <strong>Nothing matches that.</strong>
-      Try a metric (CPI, EAC), a technique (PERT, float), or a domain (risk, quality).
-    </p>
-
-      <section class="bench" id="about" aria-labelledby="about-h">
-        <div class="section-head">
-          <div>
-            <h2 id="about-h">At the bench</h2>
-            <span class="section-sub">Who builds these.</span>
-          </div>
-          <span class="sheet-no">About</span>
-        </div>
-
-        <div class="bench-grid">
-          <div class="bio">
-            <p>
-              I'm <b>Yazeed Alotaibi</b> — a Project Engineer chasing AI applications in
-              project management, and never quite putting the instruments down.
-            </p>
-            <p>
-              The work has run from <b>mining</b> to <b>aviation</b> to <b>government</b>:
-              multibillion-riyal RFP packages and cost estimates at Ma'aden, a PMO
-              framework and stage-gate system built from nothing at Riyadh Airports,
-              portfolio governance and leadership reporting and EPM software control at
-              ELM, and portfolio project controls in addition to implementing AI
-              applications in an EPMO at ZATCA.
-            </p>
-            <p>
-              These tools exist because the arithmetic on this bench is the arithmetic I
-              actually use. A CPI of 0.87 is not a number to be reported — it is a
-              sentence about the project, and most software stops just before saying it.
-              Everything here says it.
-            </p>
-            <p class="bio-contact">
-              Based in Riyadh, Saudi Arabia. Reachable on
-              <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
-              or by <a href="mailto:yaz.otb.sa@gmail.com">email</a>.
-            </p>
-          </div>
-
-          <div class="plate">
-            <div class="plate-head">
-              <span class="label">Certifications</span>
-              <span class="sheet-no">7 held</span>
-            </div>
-            <ul class="cert-list">
-              <li class="cert-row">
-                <span class="cert-name">Project Management Professional · PMP</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">PRINCE2&reg; Practitioner</span>
-                <span class="cert-by">AXELOS</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Risk Management Professional · PMI-RMP</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified KPI Professional · C-KPI</span>
-                <span class="cert-by">KPI Institute</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified Associate in Project Management · CAPM</span>
-                <span class="cert-by">PMI</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">Certified Six Sigma Green Belt · CSSGB</span>
-              </li>
-              <li class="cert-row">
-                <span class="cert-name">OSHA 30 Hours · General Industry</span>
-                <span class="cert-by">IASP</span>
-              </li>
-            </ul>
-            <p class="plate-foot">
-              <b>BSc Mechanical Engineering</b>
-              Prince Sattam Bin Abdulaziz University, 2022
-            </p>
-          </div>
-        </div>
-      </section>
-
-    <footer class="page-foot">
-      Built as a study and working reference. Values compute locally in your
-      browser — nothing is sent anywhere. Interpretations are rules of thumb;
-      real decisions deserve context the formulas can't see.
-      <span class="credit">
-        Built by <a href="#about">Yazeed Alotaibi</a> &mdash; project controls,
-        PMO &amp; risk. PMP &middot; PRINCE2 &middot; PMI-RMP.
-        <a href="mailto:yaz.otb.sa@gmail.com">Email</a> &middot;
-        <a href="https://sa.linkedin.com/in/yazeed-alotaibi-rmp-prince2" target="_blank" rel="noopener">LinkedIn</a>
-      </span>
-    </footer>
+      <nav class="related">
+        <h2>Related calculators</h2>
+        <ul>
+          <li><a href="/#calc-earned-schedule"><b>Earned Schedule</b><span>ES · SV(t) · SPI(t) · IEAC(t)</span></a></li>
+          <li><a href="/#calc-time-forecast"><b>Time forecasting (SPI-based)</b><span>Planned duration ÷ SPI</span></a></li>
+          <li><a href="/#calc-burn-rate"><b>Burn rate &amp; runway</b><span>Spend pace · runway · budget used</span></a></li>
+        </ul>
+      </nav>
+    </article>
   </main>
-
+  <footer class="doc-foot">
+    <p>Every figure on this page is calculated in your browser. Nothing you
+    type is sent anywhere — there is no server to send it to, and no
+    analytics watching. <a href="/">Back to all 34 calculators</a>.</p>
+  </footer>
+  <!-- The rendering engine expects these; this page has no use for them,
+       so they exist off-screen rather than being coded around. Changing
+       the engine to make them optional would mean maintaining two. -->
+  <div class="engine-hooks" aria-hidden="true">
+    <input id="search" type="search" tabindex="-1" aria-hidden="true">
+    <div id="cat-nav"></div>
+    <p id="no-results" hidden></p>
+    <p id="desk-stats"></p>
+  </div>
   <script>
 /* PM Calculation Desk — calculator definitions.
    Each calculator carries its own teaching material: `about` (what it is and
@@ -5807,6 +4773,19 @@ var EXAMPLES = {
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
 
+  </script>
+  <script>
+/* One calculator, not thirty-four. The engine below renders whatever
+   PM_DATA holds, so narrowing it here is all it takes — no branch in the
+   renderer, and nothing on this page that the desk does not also run. */
+(function () {
+  'use strict';
+  var keep = 'earned-value';
+  PM_DATA.categories = PM_DATA.categories.filter(function (cat) {
+    cat.cards = cat.cards.filter(function (card) { return card.id === keep; });
+    return cat.cards.length > 0;
+  });
+})();
   </script>
   <script>
 /* ══ PM_XLSX ═══════════════════════════════════════════════════════════
@@ -8743,159 +7722,5 @@ var PM_CHART_MOUNT = (function () {
 })();
 
   </script>
-  <script>
-/* Hero instrument. The same indices the Calculation Desk opens with, wired
-   live so the homepage demonstrates the product rather than describing it.
-   Each index is drawn as a needle on a graduated arc, because that is what
-   reading a ratio against 1.00 actually is. */
-(function () {
-  'use strict';
-
-  var LO = 0.70, HI = 1.30, CX = 100, CY = 100, R = 74;
-
-  var fields = {
-    ev: document.getElementById('ev'),
-    ac: document.getElementById('ac'),
-    pv: document.getElementById('pv')
-  };
-  var figure = document.getElementById('evm');
-  if (!figure || !fields.ev) return;
-
-  function angleFor(v) {
-    var clamped = Math.min(HI, Math.max(LO, v));
-    return 180 - ((clamped - LO) / (HI - LO)) * 180;
-  }
-
-  function polar(deg, r) {
-    var rad = deg * Math.PI / 180;
-    return [CX + r * Math.cos(rad), CY - r * Math.sin(rad)];
-  }
-
-  function arcPath(from, to) {
-    var a = polar(angleFor(from), R), b = polar(angleFor(to), R);
-    return 'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2) +
-           'A' + R + ' ' + R + ' 0 0 1 ' + b[0].toFixed(2) + ' ' + b[1].toFixed(2);
-  }
-
-  /* The dial face is identical on both gauges, so it is drawn once per SVG
-     and never touched again — only the needle moves. */
-  function drawFace(svg) {
-    var s = '<path class="g-arc g-zone-bad" d="' + arcPath(LO, 0.95) + '"/>' +
-            '<path class="g-arc g-zone-warn" d="' + arcPath(0.95, 1.00) + '"/>' +
-            '<path class="g-arc g-zone-good" d="' + arcPath(1.00, HI) + '"/>';
-
-    var ticks = [0.70, 0.80, 0.90, 1.00, 1.10, 1.20, 1.30];
-    for (var i = 0; i < ticks.length; i++) {
-      var v = ticks[i], deg = angleFor(v), major = v === 1.00;
-      var outer = polar(deg, R + 5), inner = polar(deg, major ? R - 12 : R - 7);
-      s += '<line class="g-tick' + (major ? ' major' : '') +
-           '" x1="' + outer[0].toFixed(1) + '" y1="' + outer[1].toFixed(1) +
-           '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '"/>';
-
-      if (v === LO || v === 1.00 || v === HI) {
-        var lab = polar(deg, R + 15);
-        s += '<text class="g-tlabel" x="' + lab[0].toFixed(1) + '" y="' +
-             (lab[1] + 4).toFixed(1) + '">' + v.toFixed(2) + '</text>';
-      }
-    }
-
-    s += '<line class="g-needle" x1="' + CX + '" y1="' + CY +
-         '" x2="' + CX + '" y2="' + (CY - R + 14) + '"/>' +
-         '<circle class="g-hub" cx="' + CX + '" cy="' + CY + '" r="4.5"/>';
-
-    svg.innerHTML = s;
-  }
-
-  function pct(n) { return Math.round(Math.abs(n) * 100); }
-
-  /* Thousands separators without Intl — the page ships no locale assumptions. */
-  function money(n) {
-    var whole = Math.round(Math.abs(n)).toString();
-    var out = '';
-    var c = 0;
-    for (var i = whole.length - 1; i >= 0; i--) {
-      out = whole.charAt(i) + out;
-      c += 1;
-      if (c % 3 === 0 && i > 0) out = ',' + out;
-    }
-    return (n < 0 ? '−' : '+') + out;
-  }
-
-  function read(el) {
-    var n = parseFloat(el.value);
-    return isFinite(n) ? n : null;
-  }
-
-  function cpiVerdict(cpi) {
-    if (cpi <= 0) return { tone: 'bad', word: 'Over budget', text: 'No value earned against the money spent.' };
-    if (cpi >= 1.05) return { tone: 'good', word: 'Under budget', text: 'Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
-    if (cpi >= 1) return { tone: 'good', word: 'On budget', text: 'Spending is tracking the work delivered.' };
-    if (cpi >= 0.95) return { tone: 'warn', word: 'Watch', text: 'Slightly over budget. Watch the trend before it compounds.' };
-    return { tone: 'bad', word: 'Over budget', text: 'Over budget by ' + pct(1 / cpi - 1) + '%. Costs are outrunning the work delivered.' };
-  }
-
-  function spiVerdict(spi) {
-    if (spi <= 0) return { tone: 'bad', word: 'Behind', text: 'No scheduled work has been earned yet.' };
-    if (spi >= 1.05) return { tone: 'good', word: 'Ahead', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
-    if (spi >= 1) return { tone: 'good', word: 'On schedule', text: 'Work is landing when it was planned to.' };
-    if (spi >= 0.95) return { tone: 'warn', word: 'Slipping', text: pct(spi) + '% of the scheduled work is done.' };
-    return { tone: 'bad', word: 'Behind', text: 'Only ' + pct(spi) + '% of the scheduled work is done.' };
-  }
-
-  function paint(id, value, verdict) {
-    var el = document.getElementById(id);
-    var needle = el.querySelector('.g-needle');
-
-    if (value === null) {
-      el.className = 'gauge';
-      needle.setAttribute('transform', 'rotate(-90)');
-      el.querySelector('.g-value').textContent = '—';
-      el.querySelector('.g-verdict').textContent = 'Awaiting input';
-      el.querySelector('.g-note').textContent = 'Enter a value above.';
-      return;
-    }
-
-    el.className = 'gauge tone-' + verdict.tone;
-    needle.setAttribute('transform', 'rotate(' + (90 - angleFor(value)).toFixed(2) + ')');
-    el.querySelector('.g-value').textContent = value.toFixed(2);
-    el.querySelector('.g-verdict').textContent = verdict.word;
-    el.querySelector('.g-note').textContent = verdict.text;
-  }
-
-  function paintVariance(id, value) {
-    var el = document.getElementById(id);
-    if (value === null) { el.className = 'v-value'; el.textContent = '—'; return; }
-    el.className = 'v-value ' + (value < 0 ? 'v-bad' : 'v-good');
-    el.textContent = money(value);
-  }
-
-  function update() {
-    var ev = read(fields.ev), ac = read(fields.ac), pv = read(fields.pv);
-
-    var cpi = (ev !== null && ac !== null && ac > 0) ? ev / ac : null;
-    var spi = (ev !== null && pv !== null && pv > 0) ? ev / pv : null;
-
-    paint('out-cpi', cpi, cpi === null ? null : cpiVerdict(cpi));
-    paint('out-spi', spi, spi === null ? null : spiVerdict(spi));
-
-    paintVariance('out-cv', (ev !== null && ac !== null) ? ev - ac : null);
-    paintVariance('out-sv', (ev !== null && pv !== null) ? ev - pv : null);
-  }
-
-  drawFace(document.querySelector('#out-cpi svg'));
-  drawFace(document.querySelector('#out-spi svg'));
-
-  var keys = ['ev', 'ac', 'pv'];
-  for (var i = 0; i < keys.length; i++) {
-    fields[keys[i]].addEventListener('input', update);
-  }
-
-  /* Needles rest at zero, then sweep to the reading — an instrument coming up
-     to power. One frame of delay is what lets the CSS transition run. */
-  if (window.requestAnimationFrame) window.requestAnimationFrame(update);
-  else update();
-})();
-  </script>
-
 </body>
 </html>

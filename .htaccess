@@ -34,3 +34,14 @@
 # the way a bare RewriteRule can. It needs the same AllowOverride FileInfo the
 # rewrites already rely on, so if the rules above work, this works.
 ErrorDocument 404 /404.html
+
+# Response headers. Same guard model as the rewrites above: if mod_headers is
+# unavailable on the origin, this block does nothing rather than returning a
+# 500. A bare Header directive outside the guard would take the whole site
+# down on a host without the module.
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=300"
+  <FilesMatch "\.woff2$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
