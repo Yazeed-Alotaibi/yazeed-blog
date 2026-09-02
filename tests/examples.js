@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var H = require('../../tests/harness');
+var H = require('./harness');
 
 var page = H.loadPage('index.html');
 var data = page.sandbox.PM_DATA;

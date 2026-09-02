@@ -7,6 +7,10 @@
     "values": { "plannedDur": 12, "ev": 80000, "pv": 100000 },
     "note": "Progress is 80% of plan, pointing to a three-period slip."
   },
+  "earned-schedule": {
+    "values": { "bac": 200000, "pd": 12, "at": 8, "ev": 120000 },
+    "note": "Month eight: 60% of the budget earned, worth 7.2 months of plan — 0.8 behind."
+  },
   "burn-rate": {
     "values": { "budget": 120000, "spent": 45000, "elapsed": 3, "planLeft": 6 },
     "note": "The remaining budget buys five periods at the current burn."

@@ -40,10 +40,10 @@ file at 1200×630 — and re-render it whenever the figures on it (14 · 34 · 1
 stop being true. Nothing automates this; the PNG is committed.
 
 The source page loads its faces from `../fonts/` with the same `@font-face`
-declarations as `index.html`, so a render needs no fix-up first — but the other
-pages under `design/` still pull their webfonts from Google, because they are
-not deployed and nobody moved them. If you screenshot one of those, point it at
-`../fonts/` first or it will be set in whatever Google serves that day.
+declarations as `index.html`, so a render needs no fix-up first. The August
+design-canvas exploration beside it now sits in `design/archive/`; those pages
+still pull their webfonts from Google, so if you ever screenshot one, point it
+at `../../fonts/` first or it will be set in whatever Google serves that day.
 
 `tests/counts.js` is the tripwire for exactly that drift: it derives the three
 figures from `PM_DATA` and checks them against the hero copy, the `<title>`,
@@ -214,6 +214,10 @@ calculator formula: it copies `index.html`, flips one operator in three
 different formulas, and asserts the suite fails all three. A mutation it can't
 kill means the coverage regressed.
 
+`node tests/examples.js` is the other standalone check: it runs every card's
+worked example from `tests/examples.json` and reports any null, NaN or
+Infinity output. Like the mutation smoke it is run by hand, not by `run.js`.
+
 **They do not render anything.** The builders are pure functions returning spec
 objects, and that is where the coverage stops — nothing mounts a chart in a
 document. A chart can be broken by CSS or by layout measurement while every one
@@ -265,10 +269,10 @@ calculator, twenty-nine blank charts are the expected result, not a symptom.
 
 Vendored into the repository so both agents get the same guidance:
 
-- `.claude/skills/` — read by Claude Code
-- `.agents/skills/` — read by Codex
+- `.agents/skills/` — the one physical copy, read by Codex
+- `.claude/skills/` — symlinks into `.agents/skills/`, read by Claude Code
 
-Both contain `frontend-design` and `ui-ux-pro-max`, pinned in `skills-lock.json`.
+Both expose `frontend-design` and `ui-ux-pro-max`, pinned in `skills-lock.json`.
 Install more with `npx skills add <source>`, which writes to both paths and
 updates the lock file. Commit all three.
 
@@ -321,7 +325,10 @@ so it redeploys itself on a push to main. The deployed artifact is `index.html`,
 every committed root `*.html` page, `404.html`, `og.png`, `robots.txt`,
 `sitemap.xml`, `fonts/`, `.htaccess` and the two redirect stubs described
 below. `tests/`, `tools/`, `content/`, `docs/` and `design/` are repository
-furniture: Hostinger deploys them with everything else, but `.htaccess`
+furniture. Living reference material sits at the top of `docs/` (the SEO plan,
+the Earned Schedule spec, the citations); finished working notes and retired
+explorations live under `docs/archive/` and `design/archive/` and are kept for
+the record, not maintained. Hostinger deploys them with everything else, but `.htaccess`
 answers 404 for those paths, for `AGENTS.md`, `CLAUDE.md` and
 `skills-lock.json`, and for any dot-path other than `.well-known/`. There is deliberately no CI here: no workflow,
 no build, no `CNAME`.

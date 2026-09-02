@@ -47,7 +47,7 @@ function run(page, options) {
     return;
   }
 
-  var specPath = path.join(__dirname, '..', 'docs', 'content', 'earned-schedule-spec.md');
+  var specPath = path.join(__dirname, '..', 'docs', 'earned-schedule-spec.md');
   var markdown = fs.existsSync(specPath) ? fs.readFileSync(specPath, 'utf8') : '';
   var vectors = vectorBlock(markdown);
   var outputMap = {};
