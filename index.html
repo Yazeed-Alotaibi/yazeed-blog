@@ -611,6 +611,7 @@ main {
 
 .card-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
@@ -685,6 +686,362 @@ main {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-left: auto;
+}
+
+/* ------------------------------------------------------ project workspace */
+/* The project register sits on the same bench as the calculator index: a
+   compact ruled plate, not a second application shell. Project names use the
+   body face; codes, counts and actions use the calibrated mono face. */
+.project-bay {
+  padding: 0.95rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.project-bay .label { margin: 0 0 0.45rem; }
+
+.project-trigger {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  box-shadow: var(--lip);
+  background: var(--sheet-sunk);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-trigger:hover { border-color: var(--accent); }
+
+.project-trigger strong,
+.project-trigger span { display: block; }
+
+.project-trigger strong {
+  overflow: hidden;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-trigger span {
+  margin-top: 0.18rem;
+  font-family: var(--mono);
+  font-size: 0.61rem;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.project-bay-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.project-bay-actions .card-action {
+  width: 100%;
+  padding-inline: 0.4rem;
+}
+
+.project-bay-actions .sync-export { grid-column: 1 / -1; }
+
+.project-bay-status {
+  min-height: 1.4em;
+  margin: 0.45rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.61rem;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.bench-dialog {
+  width: min(44rem, calc(100vw - 2rem));
+  max-height: min(48rem, calc(100vh - 2rem));
+  padding: 0;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.bench-dialog::backdrop { background: rgba(0, 0, 0, 0.58); }
+
+.dialog-sheet { padding: clamp(1rem, 3vw, 1.6rem); }
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.dialog-head > div { flex: 1 1 auto; }
+
+.dialog-head .label { margin: 0 0 0.3rem; }
+
+.dialog-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.3rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dialog-lede {
+  margin: 0.75rem 0 1rem;
+  max-width: 62ch;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+}
+
+.dialog-close { flex: 0 0 auto; }
+
+.project-register-list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.project-register-list:empty::before {
+  content: "No projects yet. Name the first project below.";
+  display: block;
+  padding: 1rem;
+  border: 1px dashed var(--rule-2);
+  color: var(--ink-2);
+  font-size: 0.85rem;
+}
+
+.project-row {
+  display: grid;
+  grid-template-columns: 4.7rem minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  border-radius: 2px;
+  background: var(--sheet);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-row:hover { border-color: var(--rule-2); }
+
+.project-row[aria-current="true"] {
+  border-left-color: var(--accent);
+  background: var(--sheet-sunk);
+  box-shadow: var(--sunk);
+}
+
+.project-row-code,
+.project-row-meta {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+.project-row-name {
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-editor {
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.project-editor label,
+.import-source label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-editor input,
+.import-source input[type="file"],
+.import-source textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 0;
+  background: var(--sheet-sunk);
+  color: var(--ink);
+  font: inherit;
+}
+
+.project-editor input:focus,
+.import-source input[type="file"]:focus,
+.import-source textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.import-source textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.import-source-note + label { margin-top: 0.85rem; }
+
+.project-editor-actions,
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.project-error,
+.import-errors {
+  margin: 0.45rem 0 0;
+  color: var(--bad);
+  font-size: 0.78rem;
+}
+
+.project-error:empty,
+.import-errors:empty { display: none; }
+
+.import-source {
+  padding: 0.9rem;
+  border: 1px solid var(--rule);
+  background: var(--sheet-sunk);
+}
+
+.import-source-note {
+  margin: 0.55rem 0 0;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+}
+
+.import-preview { margin-top: 1.1rem; }
+
+.import-preview[hidden] { display: none; }
+
+.import-preview h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--display);
+  font-size: 1.25rem;
+  text-transform: uppercase;
+}
+
+.import-summary {
+  margin: 0 0 0.7rem;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+}
+
+.import-table-wrap {
+  max-height: 17rem;
+  overflow: auto;
+  border: 1px solid var(--rule);
+}
+
+.import-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+}
+
+.import-table th,
+.import-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.import-table th {
+  position: sticky;
+  top: 0;
+  background: var(--strip);
+  color: var(--strip-ink);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.import-table td:last-child { font-family: var(--mono); }
+
+.import-mode {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.85rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+}
+
+.import-mode legend {
+  padding: 0 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.import-mode label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.45rem;
+  color: var(--ink-2);
+  font-size: 0.8rem;
+}
+
+.import-mode input { margin-top: 0.22rem; }
+
+.import-mode strong {
+  display: block;
+  color: var(--ink);
+}
+
+.import-status {
+  min-height: 1.4em;
+  margin: 0.65rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-2);
+}
+
+@media (max-width: 560px) {
+  .bench-dialog {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    max-height: none;
+    margin: 0;
+    border-width: 0;
+  }
+
+  .dialog-sheet { min-height: 100%; }
+  .project-row { grid-template-columns: 4rem minmax(0, 1fr); }
+  .project-row-meta { grid-column: 2; margin-top: 0.15rem; }
 }
 
 .card-num {
@@ -1812,7 +2169,7 @@ h2 {
      the site, which is not the person holding the printout. The hero
      instrument goes with them: it is a demonstration, and the desk carries
      the same calculation in full. */
-  .sidebar, .skip, .hero, .bench, .no-results,
+  .sidebar, .skip, .hero, .bench, .no-results, .bench-dialog,
   .chart-data > summary, .search { display: none !important; }
 
   main { padding: 0; }
@@ -1972,6 +2329,22 @@ h2 {
       </div>
     </a>
 
+    <section class="project-bay" id="project-bay" aria-labelledby="project-bay-label">
+      <p class="label" id="project-bay-label">Project register</p>
+      <button class="project-trigger" id="project-register-open" type="button"
+              aria-haspopup="dialog" aria-controls="project-register-dialog">
+        <strong id="project-current-name">Unsaved desk</strong>
+        <span id="project-current-meta">Create or import a project</span>
+      </button>
+      <div class="project-bay-actions">
+        <button class="card-action" id="project-new-open" type="button">New project</button>
+        <button class="card-action" id="project-import-open" type="button"
+                aria-haspopup="dialog" aria-controls="project-import-dialog">Import data</button>
+        <button class="card-action sync-export" id="project-sync-export" type="button" disabled>Export sync file</button>
+      </div>
+      <p class="project-bay-status" id="project-bay-status" role="status" aria-live="polite"></p>
+    </section>
+
     <div class="sidebar-sticky">
       <div class="search">
         <label class="sr-only" for="search">Search calculators</label>
@@ -1990,6 +2363,88 @@ h2 {
       </p>
     </footer>
   </aside>
+
+  <dialog class="bench-dialog" id="project-register-dialog" aria-labelledby="project-register-title">
+    <div class="dialog-sheet">
+      <header class="dialog-head">
+        <div>
+          <p class="label">Project register</p>
+          <h2 id="project-register-title">Open a project</h2>
+        </div>
+        <button class="card-action dialog-close" id="project-register-close" type="button">Close</button>
+      </header>
+      <p class="dialog-lede">Each project keeps its own calculator readings. Switching projects saves the open readings before loading the next set.</p>
+      <ul class="project-register-list" id="project-register-list"></ul>
+      <form class="project-editor" id="project-editor" novalidate>
+        <label for="project-name">Project name</label>
+        <input id="project-name" name="project-name" type="text" maxlength="60"
+               autocomplete="off" aria-describedby="project-name-help project-name-error">
+        <p class="import-source-note" id="project-name-help">Use a name your team will recognise, up to 60 characters.</p>
+        <p class="project-error" id="project-name-error" role="alert"></p>
+        <div class="project-editor-actions">
+          <button class="card-action" id="project-create" type="submit">Create project</button>
+          <button class="card-action" id="project-rename" type="button" disabled>Rename current</button>
+          <button class="card-action" id="project-delete" type="button" disabled>Delete current</button>
+        </div>
+      </form>
+      <p class="import-status" id="project-register-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <dialog class="bench-dialog" id="project-import-dialog" aria-labelledby="project-import-title">
+    <div class="dialog-sheet">
+      <header class="dialog-head">
+        <div>
+          <p class="label">Import sequence · 01 / 03</p>
+          <h2 id="project-import-title">Select project data</h2>
+        </div>
+        <button class="card-action dialog-close" id="project-import-close" type="button">Close</button>
+      </header>
+      <p class="dialog-lede">Load a CSV reading sheet or a JSON sync file. Nothing changes until every row passes the check and you apply it.</p>
+      <div class="import-source">
+        <label for="project-import-file">CSV or JSON file</label>
+        <input id="project-import-file" type="file" accept=".csv,.json,text/csv,application/json"
+               aria-describedby="project-import-help project-import-errors">
+        <p class="import-source-note" id="project-import-help">CSV columns: <code>card_id,input_key,value</code>. Maximum 5,000 readings or 2 MB.</p>
+        <label for="project-import-paste">Or paste CSV / JSON</label>
+        <textarea id="project-import-paste" spellcheck="false" autocomplete="off"
+                  aria-describedby="project-import-help project-import-errors"
+                  placeholder="card_id,input_key,value&#10;earned-value,bac,100000"></textarea>
+        <div class="import-actions">
+          <button class="card-action" id="project-import-check" type="button">Check pasted data</button>
+          <button class="card-action" id="project-template-download" type="button">Download CSV template</button>
+        </div>
+        <p class="import-errors" id="project-import-errors" role="alert"></p>
+      </div>
+
+      <section class="import-preview" id="project-import-preview" aria-labelledby="project-import-preview-title" hidden>
+        <p class="label">Import sequence · 02 / 03</p>
+        <h3 id="project-import-preview-title" tabindex="-1">Check readings</h3>
+        <p class="import-summary" id="project-import-summary"></p>
+        <div class="import-table-wrap">
+          <table class="import-table">
+            <thead><tr><th scope="col">Calculator</th><th scope="col">Input</th><th scope="col">Reading</th></tr></thead>
+            <tbody id="project-import-rows"></tbody>
+          </table>
+        </div>
+        <fieldset class="import-mode">
+          <legend>Import sequence · 03 / 03 · Apply mode</legend>
+          <label>
+            <input type="radio" name="project-import-mode" value="merge" checked>
+            <span><strong>Merge readings</strong>Imported values replace matching inputs; all other project readings stay.</span>
+          </label>
+          <label>
+            <input type="radio" name="project-import-mode" value="replace">
+            <span><strong>Replace readings</strong>Clear the current project and use only the imported readings.</span>
+          </label>
+        </fieldset>
+        <div class="import-actions">
+          <button class="card-action" id="project-import-apply" type="button" disabled>Apply to project</button>
+        </div>
+      </section>
+      <p class="import-status" id="project-import-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
 
   <main id="content" tabindex="-1">
     <section class="hero" id="main-hero" aria-labelledby="hero-h">
@@ -8641,6 +9096,597 @@ var PM_CHART_MOUNT = (function () {
 })();
   </script>
   <script>
+/* PM Project Workspace — versioned project state and import interchange.
+   This block is deliberately DOM-free. The desk below supplies localStorage
+   today; a remote adapter can persist the same envelope later without moving
+   calculation or import rules out of the shipped page. */
+var PM_PROJECTS = (function () {
+  'use strict';
+
+  var STATE_SCHEMA = 'yazeed.projects';
+  var PROJECT_SCHEMA = 'yazeed.project';
+  var VERSION = 1;
+  var MAX_IMPORT_BYTES = 2 * 1024 * 1024;
+  var MAX_IMPORT_ROWS = 5000;
+
+  function owns(object, key) {
+    return Object.prototype.hasOwnProperty.call(object, key);
+  }
+
+  function iso(value) {
+    var date = value instanceof Date ? value : new Date(value || Date.now());
+    return isFinite(date.getTime()) ? date.toISOString() : new Date().toISOString();
+  }
+
+  function cleanName(value) {
+    return String(value === undefined || value === null ? '' : value)
+      .replace(/\s+/g, ' ').trim();
+  }
+
+  function emptyState() {
+    return {
+      schema: STATE_SCHEMA,
+      version: VERSION,
+      revision: 0,
+      nextProjectNumber: 1,
+      activeProjectId: null,
+      projects: []
+    };
+  }
+
+  function cloneReadings(source) {
+    var readings = {};
+    if (!source || typeof source !== 'object' || Array.isArray(source)) return readings;
+    Object.keys(source).forEach(function (cardId) {
+      var values = source[cardId];
+      var kept = {};
+      if (!values || typeof values !== 'object' || Array.isArray(values)) return;
+      Object.keys(values).forEach(function (inputKey) {
+        var value = values[inputKey];
+        if (typeof value === 'number' && isFinite(value)) kept[inputKey] = String(value);
+        else if (typeof value === 'string' && value.trim() && value.length <= 2000) kept[inputKey] = value;
+      });
+      if (Object.keys(kept).length) readings[cardId] = kept;
+    });
+    return readings;
+  }
+
+  function loadState(raw) {
+    var parsed = raw;
+    var state = emptyState();
+    var seen = {};
+    if (!raw) return state;
+    if (typeof raw === 'string') {
+      try { parsed = JSON.parse(raw); } catch (e) { return state; }
+    }
+    if (!parsed || parsed.schema !== STATE_SCHEMA || parsed.version !== VERSION ||
+        !Array.isArray(parsed.projects)) return state;
+
+    parsed.projects.forEach(function (source) {
+      var id, name, project;
+      if (!source || typeof source !== 'object') return;
+      id = String(source.id || '').trim();
+      name = cleanName(source.name);
+      if (!id || !name || name.length > 60 || seen[id]) return;
+      seen[id] = true;
+      project = {
+        id: id,
+        code: String(source.code || ('P-' + String(state.nextProjectNumber).padStart(3, '0'))),
+        name: name,
+        createdAt: iso(source.createdAt),
+        updatedAt: iso(source.updatedAt),
+        revision: typeof source.revision === 'number' && source.revision > 0 ? Math.floor(source.revision) : 1,
+        readings: cloneReadings(source.readings),
+        imports: Array.isArray(source.imports) ? source.imports.slice(0, 20) : []
+      };
+      state.projects.push(project);
+      state.nextProjectNumber += 1;
+    });
+
+    state.revision = typeof parsed.revision === 'number' && parsed.revision >= 0
+      ? Math.floor(parsed.revision) : 0;
+    if (typeof parsed.nextProjectNumber === 'number' && parsed.nextProjectNumber > state.nextProjectNumber) {
+      state.nextProjectNumber = Math.floor(parsed.nextProjectNumber);
+    }
+    state.activeProjectId = seen[parsed.activeProjectId]
+      ? parsed.activeProjectId : (state.projects.length ? state.projects[0].id : null);
+    return state;
+  }
+
+  function makeId(seed, randomValue) {
+    var time = typeof seed === 'number' ? seed : Date.now();
+    var random = typeof randomValue === 'number' ? randomValue : Math.random();
+    return 'project-' + Math.max(0, Math.floor(time)).toString(36) + '-' +
+      Math.max(0, Math.floor(random * 1679616)).toString(36).padStart(4, '0');
+  }
+
+  function projectById(state, id) {
+    for (var i = 0; i < state.projects.length; i++) {
+      if (state.projects[i].id === id) return state.projects[i];
+    }
+    return null;
+  }
+
+  function activeProject(state) {
+    return projectById(state, state.activeProjectId);
+  }
+
+  function assertName(state, name, exceptId) {
+    var cleaned = cleanName(name);
+    if (!cleaned) throw new Error('Enter a project name.');
+    if (cleaned.length > 60) throw new Error('Project names must be 60 characters or fewer.');
+    for (var i = 0; i < state.projects.length; i++) {
+      if (state.projects[i].id !== exceptId && state.projects[i].name.toLowerCase() === cleaned.toLowerCase()) {
+        throw new Error('A project with that name already exists.');
+      }
+    }
+    return cleaned;
+  }
+
+  function createProject(state, name, options) {
+    options = options || {};
+    var cleaned = assertName(state, name, null);
+    var id = String(options.id || makeId(options.seed, options.random));
+    var when = iso(options.now);
+    if (projectById(state, id)) throw new Error('That project identifier is already in use.');
+    var project = {
+      id: id,
+      code: 'P-' + String(state.nextProjectNumber).padStart(3, '0'),
+      name: cleaned,
+      createdAt: when,
+      updatedAt: when,
+      revision: 1,
+      readings: {},
+      imports: []
+    };
+    state.nextProjectNumber += 1;
+    state.projects.push(project);
+    state.activeProjectId = id;
+    state.revision += 1;
+    return project;
+  }
+
+  function renameProject(state, id, name, now) {
+    var project = projectById(state, id);
+    if (!project) throw new Error('Open a project before renaming it.');
+    project.name = assertName(state, name, id);
+    project.updatedAt = iso(now);
+    project.revision += 1;
+    state.revision += 1;
+    return project;
+  }
+
+  function activateProject(state, id) {
+    var project = projectById(state, id);
+    if (!project) throw new Error('That project is no longer available.');
+    state.activeProjectId = id;
+    state.revision += 1;
+    return project;
+  }
+
+  function deleteProject(state, id) {
+    var kept = [];
+    var removed = null;
+    state.projects.forEach(function (project) {
+      if (project.id === id) removed = project;
+      else kept.push(project);
+    });
+    if (!removed) throw new Error('That project is no longer available.');
+    state.projects = kept;
+    if (state.activeProjectId === id) {
+      state.activeProjectId = kept.length ? kept[0].id : null;
+    }
+    state.revision += 1;
+    return removed;
+  }
+
+  function mergeReadings(base, incoming) {
+    var merged = cloneReadings(base);
+    Object.keys(incoming).forEach(function (cardId) {
+      if (!merged[cardId]) merged[cardId] = {};
+      Object.keys(incoming[cardId]).forEach(function (inputKey) {
+        merged[cardId][inputKey] = incoming[cardId][inputKey];
+      });
+    });
+    return merged;
+  }
+
+  function setReadings(state, id, readings, mode, options) {
+    var project = projectById(state, id);
+    var clean = cloneReadings(readings);
+    options = options || {};
+    if (!project) throw new Error('Open a project before saving readings.');
+    project.readings = mode === 'merge' ? mergeReadings(project.readings, clean) : clean;
+    project.updatedAt = iso(options.now);
+    project.revision += 1;
+    if (options.importRecord) {
+      project.imports.unshift({
+        at: project.updatedAt,
+        format: String(options.importRecord.format || 'unknown'),
+        mode: mode === 'merge' ? 'merge' : 'replace',
+        count: readingsCount(clean),
+        source: String(options.importRecord.source || 'import')
+      });
+      project.imports = project.imports.slice(0, 20);
+    }
+    state.revision += 1;
+    return project;
+  }
+
+  function readingsCount(readings) {
+    var count = 0;
+    Object.keys(readings || {}).forEach(function (cardId) {
+      count += Object.keys(readings[cardId] || {}).length;
+    });
+    return count;
+  }
+
+  function readingAt(readings, cardId, inputKey) {
+    var card = readings && readings[cardId];
+    return {
+      present: !!card && owns(card, inputKey),
+      value: card && owns(card, inputKey) ? card[inputKey] : ''
+    };
+  }
+
+  function sameReading(left, right) {
+    return left.present === right.present && (!left.present || left.value === right.value);
+  }
+
+  /* Reconcile a tab's edited readings with the latest stored project. Changes
+     to different inputs combine; two tabs changing the same input is surfaced
+     as a conflict instead of silently choosing a winner. */
+  function reconcileReadings(base, local, latest) {
+    var keys = {};
+    var merged = cloneReadings(latest);
+    var conflicts = [];
+
+    [base, local, latest].forEach(function (source) {
+      Object.keys(source || {}).forEach(function (cardId) {
+        Object.keys(source[cardId] || {}).forEach(function (inputKey) {
+          keys[cardId + '\u0000' + inputKey] = { cardId: cardId, inputKey: inputKey };
+        });
+      });
+    });
+
+    Object.keys(keys).forEach(function (compound) {
+      var key = keys[compound];
+      var before = readingAt(base, key.cardId, key.inputKey);
+      var edited = readingAt(local, key.cardId, key.inputKey);
+      var stored = readingAt(latest, key.cardId, key.inputKey);
+      var localChanged = !sameReading(before, edited);
+      var storedChanged = !sameReading(before, stored);
+
+      if (localChanged && storedChanged && !sameReading(edited, stored)) {
+        conflicts.push(key.cardId + '.' + key.inputKey);
+        return;
+      }
+      if (!localChanged) return;
+      if (edited.present) {
+        if (!merged[key.cardId]) merged[key.cardId] = {};
+        merged[key.cardId][key.inputKey] = edited.value;
+      } else if (merged[key.cardId]) {
+        delete merged[key.cardId][key.inputKey];
+        if (!Object.keys(merged[key.cardId]).length) delete merged[key.cardId];
+      }
+    });
+
+    return { ok: conflicts.length === 0, readings: merged, conflicts: conflicts };
+  }
+
+  function importTarget(state) {
+    var project = activeProject(state);
+    return {
+      projectId: project ? project.id : null,
+      projectRevision: project ? project.revision : null
+    };
+  }
+
+  function sameImportTarget(state, target) {
+    var current = importTarget(state);
+    return !!target && current.projectId === target.projectId &&
+      current.projectRevision === target.projectRevision;
+  }
+
+  function storeState(storage, key, state) {
+    try {
+      storage.setItem(key, JSON.stringify(state));
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function parseCsv(text) {
+    var rows = [];
+    var errors = [];
+    var row = [];
+    var field = '';
+    var quoted = false;
+    var closedQuote = false;
+    var line = 1;
+    var rowLine = 1;
+
+    function finishRow() {
+      row.push(field);
+      if (row.some(function (value) { return String(value).trim() !== ''; })) {
+        rows.push({ line: rowLine, values: row });
+      }
+      row = [];
+      field = '';
+      closedQuote = false;
+      rowLine = line + 1;
+    }
+
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      if (quoted) {
+        if (ch === '"') {
+          if (text.charAt(i + 1) === '"') { field += '"'; i += 1; }
+          else { quoted = false; closedQuote = true; }
+        } else {
+          field += ch;
+          if (ch === '\n') line += 1;
+        }
+      } else if (ch === '"') {
+        if (field.length || closedQuote) errors.push('Line ' + line + ': quote must begin an empty field.');
+        else quoted = true;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+        closedQuote = false;
+      } else if (ch === '\r' || ch === '\n') {
+        if (ch === '\r' && text.charAt(i + 1) === '\n') i += 1;
+        finishRow();
+        line += 1;
+        rowLine = line;
+      } else if (closedQuote) {
+        if (!/\s/.test(ch)) errors.push('Line ' + line + ': unexpected text after a closing quote.');
+      } else {
+        field += ch;
+      }
+    }
+    if (quoted) errors.push('Line ' + line + ': quoted field is not closed.');
+    if (field.length || row.length) finishRow();
+    return { rows: rows, errors: errors };
+  }
+
+  function csvImportRows(text) {
+    var parsed = parseCsv(String(text || '').replace(/^\uFEFF/, ''));
+    var errors = parsed.errors.slice();
+    var warnings = [];
+    var rows = [];
+    if (!parsed.rows.length) return { rows: rows, errors: errors.concat(['The CSV file is empty.']), warnings: warnings };
+
+    var headers = parsed.rows[0].values.map(function (header) { return String(header).trim().toLowerCase(); });
+    var headerIndex = {};
+    headers.forEach(function (header, index) {
+      if (!header) return;
+      if (owns(headerIndex, header)) errors.push('Header "' + header + '" appears more than once.');
+      else headerIndex[header] = index;
+    });
+    ['card_id', 'input_key', 'value'].forEach(function (required) {
+      if (!owns(headerIndex, required)) errors.push('Missing required CSV column "' + required + '".');
+    });
+    headers.forEach(function (header) {
+      if (header && ['card_id', 'input_key', 'value', 'project_name', 'source'].indexOf(header) === -1) {
+        warnings.push('Column "' + header + '" was ignored.');
+      }
+    });
+    if (errors.length) return { rows: rows, errors: errors, warnings: warnings };
+
+    parsed.rows.slice(1).forEach(function (record) {
+      var rowObject = { line: record.line };
+      Object.keys(headerIndex).forEach(function (header) {
+        rowObject[header] = record.values[headerIndex[header]] === undefined
+          ? '' : record.values[headerIndex[header]];
+      });
+      rows.push(rowObject);
+    });
+    return { rows: rows, errors: errors, warnings: warnings };
+  }
+
+  function jsonImportRows(text) {
+    var parsed;
+    var rows = [];
+    var projectName = '';
+    try { parsed = JSON.parse(String(text || '').replace(/^\uFEFF/, '')); }
+    catch (e) { return { rows: rows, errors: ['The JSON file could not be parsed.'], warnings: [], projectName: '' }; }
+
+    if (Array.isArray(parsed)) {
+      rows = parsed;
+    } else if (parsed && typeof parsed === 'object') {
+      if (parsed.schema && (parsed.schema !== PROJECT_SCHEMA || parsed.version !== VERSION)) {
+        return { rows: rows, errors: ['This sync file uses an unsupported schema or version.'], warnings: [], projectName: '' };
+      }
+      projectName = cleanName(parsed.project && parsed.project.name);
+      if (Array.isArray(parsed.readings)) {
+        rows = parsed.readings;
+      } else if (parsed.readings && typeof parsed.readings === 'object') {
+        Object.keys(parsed.readings).forEach(function (cardId) {
+          var values = parsed.readings[cardId];
+          if (!values || typeof values !== 'object' || Array.isArray(values)) return;
+          Object.keys(values).forEach(function (inputKey) {
+            rows.push({ card_id: cardId, input_key: inputKey, value: values[inputKey] });
+          });
+        });
+      } else {
+        return { rows: rows, errors: ['The JSON file has no readings array or reading map.'], warnings: [], projectName: projectName };
+      }
+    } else {
+      return { rows: rows, errors: ['The JSON root must be an object or array.'], warnings: [], projectName: '' };
+    }
+    rows = rows.map(function (row, index) {
+      if (!row || typeof row !== 'object') return { line: index + 1 };
+      return {
+        line: index + 1,
+        card_id: row.card_id === undefined ? row.cardId : row.card_id,
+        input_key: row.input_key === undefined ? row.inputKey : row.input_key,
+        value: row.value,
+        project_name: row.project_name === undefined ? row.projectName : row.project_name,
+        source: row.source
+      };
+    });
+    return { rows: rows, errors: [], warnings: [], projectName: projectName };
+  }
+
+  function validateImportRows(source, catalog) {
+    var errors = source.errors.slice();
+    var warnings = source.warnings.slice();
+    var readings = {};
+    var preview = [];
+    var seen = {};
+    var projectName = source.projectName || '';
+
+    if (source.rows.length > MAX_IMPORT_ROWS) {
+      errors.push('The file contains more than ' + MAX_IMPORT_ROWS.toLocaleString('en-US') + ' readings.');
+      return { errors: errors, warnings: warnings, readings: readings, preview: preview, projectName: projectName };
+    }
+
+    source.rows.forEach(function (row, index) {
+      var line = row.line || index + 1;
+      var cardId = cleanName(row.card_id);
+      var inputKey = cleanName(row.input_key);
+      var value = row.value;
+      var card = catalog[cardId];
+      var input = card && card.inputs[inputKey];
+      var pair = cardId + '\u0000' + inputKey;
+      if (!cardId || !inputKey || value === undefined || value === null || String(value).trim() === '') {
+        errors.push('Row ' + line + ': card_id, input_key and value are required.');
+        return;
+      }
+      if (!card) { errors.push('Row ' + line + ': unknown calculator "' + cardId + '".'); return; }
+      if (!input) { errors.push('Row ' + line + ': "' + inputKey + '" is not an input for ' + card.name + '.'); return; }
+      if (seen[pair]) { errors.push('Row ' + line + ': duplicate reading for ' + cardId + ' / ' + inputKey + '.'); return; }
+      seen[pair] = true;
+      value = String(value).trim();
+      if (value.length > 2000) { errors.push('Row ' + line + ': the reading is too long.'); return; }
+      if (input.type !== 'text' && (!isFinite(Number(value)) || value === '')) {
+        errors.push('Row ' + line + ': ' + input.label + ' must be a finite number.');
+        return;
+      }
+      if (!readings[cardId]) readings[cardId] = {};
+      readings[cardId][inputKey] = value;
+      preview.push({
+        cardId: cardId,
+        cardName: card.name,
+        inputKey: inputKey,
+        inputLabel: input.label,
+        value: value
+      });
+      if (!projectName && row.project_name) projectName = cleanName(row.project_name);
+    });
+    if (!source.rows.length && !errors.length) errors.push('The file contains no readings.');
+    return { errors: errors, warnings: warnings, readings: readings, preview: preview, projectName: projectName };
+  }
+
+  function parseImport(text, format, catalog) {
+    var source;
+    var checked;
+    var raw = String(text || '');
+    var detected = format;
+    if (raw.length > MAX_IMPORT_BYTES) {
+      return { ok: false, format: format || 'unknown', errors: ['The file is larger than 2 MB.'], warnings: [], readings: {}, preview: [], projectName: '' };
+    }
+    if (!detected || detected === 'auto') {
+      detected = /^[\s\uFEFF]*[\[{]/.test(raw) ? 'json' : 'csv';
+    }
+    source = detected === 'json' ? jsonImportRows(raw) : csvImportRows(raw);
+    checked = validateImportRows(source, catalog || {});
+    return {
+      ok: checked.errors.length === 0,
+      format: detected,
+      errors: checked.errors,
+      warnings: checked.warnings,
+      readings: checked.readings,
+      preview: checked.preview,
+      projectName: checked.projectName
+    };
+  }
+
+  function orderedReadings(project, catalog) {
+    var rows = [];
+    Object.keys(project.readings || {}).sort().forEach(function (cardId) {
+      Object.keys(project.readings[cardId] || {}).sort().forEach(function (inputKey) {
+        var input = catalog && catalog[cardId] && catalog[cardId].inputs[inputKey];
+        rows.push({
+          card_id: cardId,
+          input_key: inputKey,
+          value: project.readings[cardId][inputKey],
+          value_type: input && input.type === 'text' ? 'text' : 'number'
+        });
+      });
+    });
+    return rows;
+  }
+
+  function exportProject(project, catalog, now) {
+    return JSON.stringify({
+      schema: PROJECT_SCHEMA,
+      version: VERSION,
+      exportedAt: iso(now),
+      project: {
+        id: project.id,
+        code: project.code,
+        name: project.name,
+        revision: project.revision,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt
+      },
+      readings: orderedReadings(project, catalog)
+    }, null, 2) + '\n';
+  }
+
+  function csvCell(value) {
+    var text = String(value === undefined || value === null ? '' : value);
+    return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+  }
+
+  function exportCsv(project, catalog) {
+    var lines = ['project_name,card_id,input_key,value'];
+    orderedReadings(project, catalog).forEach(function (row) {
+      lines.push([project.name, row.card_id, row.input_key, row.value].map(csvCell).join(','));
+    });
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  function csvTemplate() {
+    return [
+      'project_name,card_id,input_key,value',
+      'Example project,earned-value,bac,100000',
+      'Example project,earned-value,pv,50000',
+      'Example project,earned-value,ev,45000',
+      'Example project,earned-value,ac,60000'
+    ].join('\r\n') + '\r\n';
+  }
+
+  return {
+    STATE_SCHEMA: STATE_SCHEMA,
+    PROJECT_SCHEMA: PROJECT_SCHEMA,
+    VERSION: VERSION,
+    emptyState: emptyState,
+    loadState: loadState,
+    makeId: makeId,
+    createProject: createProject,
+    renameProject: renameProject,
+    activateProject: activateProject,
+    deleteProject: deleteProject,
+    projectById: projectById,
+    activeProject: activeProject,
+    setReadings: setReadings,
+    cloneReadings: cloneReadings,
+    readingsCount: readingsCount,
+    reconcileReadings: reconcileReadings,
+    importTarget: importTarget,
+    sameImportTarget: sameImportTarget,
+    storeState: storeState,
+    parseCsv: parseCsv,
+    parseImport: parseImport,
+    exportProject: exportProject,
+    exportCsv: exportCsv,
+    csvTemplate: csvTemplate
+  };
+})();
+  </script>
+  <script>
 /* PM Calculation Desk — rendering and live computation.
    Reads PM_DATA (data.js), builds the sidebar nav and one card per
    calculator, and recomputes a card's outputs on every keystroke. */
@@ -8653,6 +9699,18 @@ var PM_CHART_MOUNT = (function () {
   var navEl = document.getElementById('cat-nav');
   var searchEl = document.getElementById('search');
   var statsEl = document.getElementById('desk-stats');
+  var projectBayEl = document.getElementById('project-bay');
+  var projectEngine = window.PM_PROJECTS || null;
+  var projectState = null;
+  var projectCatalog = null;
+  var projectSaveSuspended = false;
+  var projectDirty = false;
+  var pendingImport = null;
+  var PROJECT_WRITER_LOCK = 'yazeed-project-workspace-v1';
+  var projectWriter = null;
+  var projectWriterClaiming = false;
+  var projectWriterRelease = null;
+  var projectWriterTimer = null;
 
   /* ------------------------------------------------------- formatting */
   function formatValue(val, format) {
@@ -8811,32 +9869,59 @@ var PM_CHART_MOUNT = (function () {
   }
 
   var STORAGE_KEY = 'desk.readings.v1';
+  var PROJECT_STORAGE_KEY = 'desk.projects.v1';
   var saveTimer = null;
 
-  function collectReadings() {
+  function collectReadings(projectKeys) {
     var saved = {};
     document.querySelectorAll('.calc-card').forEach(function (cardEl) {
       var values = {};
       cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
         if (node.value.trim()) values[node.dataset.key] = node.value;
       });
-      if (Object.keys(values).length) saved[cardEl.id] = values;
+      if (Object.keys(values).length) {
+        saved[projectKeys ? cardEl.id.replace(/^calc-/, '') : cardEl.id] = values;
+      }
     });
     return saved;
   }
 
   function saveReadings() {
-    var saved = collectReadings();
+    var usingProjects = projectEngine && projectBayEl && projectState;
+    var saved = collectReadings(usingProjects);
+    if (usingProjects) {
+      if (!saveProjectReadings(saved)) return false;
+      syncDisplayedReadings(currentProject() ? currentProject().readings : {});
+      projectDirty = false;
+      renderProjectWorkspace();
+      return true;
+    }
+
+    /* A generated calculator page sees one card, while the desk sees all of
+       them. Update only the visible cards so a satellite page cannot erase
+       readings that belong to the rest of the desk. */
     try {
-      if (Object.keys(saved).length) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      var existing = readSavedReadings() || {};
+      document.querySelectorAll('.calc-card').forEach(function (cardEl) {
+        if (saved[cardEl.id]) existing[cardEl.id] = saved[cardEl.id];
+        else delete existing[cardEl.id];
+      });
+      if (Object.keys(existing).length) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
       } else {
         localStorage.removeItem(STORAGE_KEY);
       }
     } catch (e) {}
+    return true;
   }
 
   function scheduleReadingsSave() {
+    if (projectSaveSuspended) return;
+    if (projectEngine && projectBayEl && projectState && projectWriter !== true) {
+      setProjectStatus('Another tab controls project saving. Changes here are temporary.');
+      return;
+    }
+    if (projectEngine && projectBayEl && projectState) projectDirty = true;
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       saveTimer = null;
@@ -8878,7 +9963,7 @@ var PM_CHART_MOUNT = (function () {
 
   function savedHasValues(saved) {
     return Object.keys(saved).some(function (cardId) {
-      var cardEl = document.getElementById(cardId);
+      var cardEl = document.getElementById(cardId) || document.getElementById('calc-' + cardId);
       var values = saved[cardId];
       if (!cardEl || !cardEl.classList.contains('calc-card') ||
           !values || typeof values !== 'object' || Array.isArray(values)) return false;
@@ -8893,7 +9978,7 @@ var PM_CHART_MOUNT = (function () {
   function applySavedReadings(saved) {
     var changed = [];
     Object.keys(saved).forEach(function (cardId) {
-      var cardEl = document.getElementById(cardId);
+      var cardEl = document.getElementById(cardId) || document.getElementById('calc-' + cardId);
       var values = saved[cardId];
       if (!cardEl || !cardEl.classList.contains('calc-card') ||
           !values || typeof values !== 'object' || Array.isArray(values)) return;
@@ -8940,6 +10025,762 @@ var PM_CHART_MOUNT = (function () {
       dismissRestore(strip);
       searchEl.focus();
     });
+  }
+
+  /* ------------------------------------------------ project workspace */
+  function clearProjectWriterTimer() {
+    if (!projectWriterTimer) return;
+    clearTimeout(projectWriterTimer);
+    projectWriterTimer = null;
+  }
+
+  function scheduleProjectWriterRetry() {
+    clearProjectWriterTimer();
+    projectWriterTimer = setTimeout(function () {
+      projectWriterTimer = null;
+      if (projectWriter !== true && document.visibilityState === 'visible') claimProjectWriter();
+      else if (projectWriter !== true) scheduleProjectWriterRetry();
+    }, 5000);
+  }
+
+  function finishProjectWriterClaim(allowed) {
+    var previous = projectWriter;
+    var migrated = false;
+    projectWriter = allowed;
+    projectWriterClaiming = false;
+    if (allowed) {
+      clearProjectWriterTimer();
+      if (previous !== true) {
+        projectState = readProjectState();
+        paintCurrentProject();
+      }
+      migrated = migrateLegacyReadings();
+      renderProjectWorkspace();
+      if (migrated) setProjectStatus('Previous readings moved into Recovered readings.');
+      else if (previous === false) setProjectStatus('Project saving is now available in this tab.');
+      return;
+    }
+    renderProjectWorkspace();
+    setProjectStatus('Another tab controls project saving. Calculations here are temporary.');
+    scheduleProjectWriterRetry();
+  }
+
+  function markProjectWriterUnsupported() {
+    clearProjectWriterTimer();
+    projectWriter = false;
+    projectWriterClaiming = false;
+    renderProjectWorkspace();
+    setProjectStatus('This browser cannot safely save projects because Web Locks are unavailable. Calculations remain available.');
+  }
+
+  function claimProjectWriter() {
+    var request;
+    if (projectWriter === true || projectWriterClaiming) return;
+    projectWriterClaiming = true;
+    if (!navigator.locks || typeof navigator.locks.request !== 'function') {
+      markProjectWriterUnsupported();
+      return;
+    }
+    try {
+      request = navigator.locks.request(PROJECT_WRITER_LOCK, { mode: 'exclusive', ifAvailable: true },
+        function (lock) {
+          if (!lock) {
+            finishProjectWriterClaim(false);
+            return;
+          }
+          finishProjectWriterClaim(true);
+          return new Promise(function (resolve) { projectWriterRelease = resolve; });
+        });
+      if (request && typeof request.catch === 'function') {
+        request.catch(function () {
+          projectWriterRelease = null;
+          markProjectWriterUnsupported();
+        });
+      }
+    } catch (e) { markProjectWriterUnsupported(); }
+  }
+
+  function releaseProjectWriter() {
+    clearProjectWriterTimer();
+    if (projectWriterRelease) {
+      projectWriterRelease();
+      projectWriterRelease = null;
+    }
+    projectWriter = false;
+  }
+
+  function projectStorageSnapshot() {
+    var raw = null;
+    if (!projectEngine) return { ok: false, exists: false, state: null };
+    try {
+      raw = localStorage.getItem(PROJECT_STORAGE_KEY);
+      return { ok: true, exists: raw !== null, state: projectEngine.loadState(raw) };
+    } catch (e) {
+      setProjectStatus('Project storage is unavailable in this browser. Your edits are not saved.');
+      return { ok: false, exists: false, state: null };
+    }
+  }
+
+  function readProjectState() {
+    var snapshot = projectStorageSnapshot();
+    return snapshot.ok ? snapshot.state : projectEngine.emptyState();
+  }
+
+  function cloneProjectState(state) {
+    return projectEngine.loadState(JSON.stringify(state || projectEngine.emptyState()));
+  }
+
+  function latestProjectState() {
+    var snapshot = projectStorageSnapshot();
+    if (!snapshot.ok) return null;
+    return snapshot.exists ? snapshot.state : cloneProjectState(projectState);
+  }
+
+  function persistProjectState(nextState) {
+    var state = nextState || projectState;
+    if (!projectEngine || !state) return false;
+    if (projectWriter !== true) {
+      setProjectStatus('Another tab controls project saving. Changes here are temporary.');
+      return false;
+    }
+    if (projectEngine.storeState(localStorage, PROJECT_STORAGE_KEY, state)) return true;
+    setProjectStatus('Project storage is unavailable in this browser. Your edits are not saved.');
+    return false;
+  }
+
+  function commitProjectState(nextState) {
+    if (!persistProjectState(nextState)) return false;
+    projectState = nextState;
+    return true;
+  }
+
+  function saveProjectReadings(saved) {
+    var baseProject = currentProject();
+    var candidate;
+    var storedProject;
+    var reconciled;
+    var project;
+
+    if (!baseProject && !Object.keys(saved).length) return true;
+    candidate = latestProjectState();
+    if (!candidate) return false;
+
+    if (!baseProject) {
+      try { project = projectEngine.createProject(candidate, 'Untitled project'); }
+      catch (e) { setProjectStatus(e.message); return false; }
+      projectEngine.setReadings(candidate, project.id, saved, 'replace');
+    } else {
+      storedProject = projectEngine.projectById(candidate, baseProject.id);
+      if (!storedProject) {
+        setProjectStatus('This project was removed in another tab. Your current edits were not saved.');
+        return false;
+      }
+      reconciled = projectEngine.reconcileReadings(
+        baseProject.readings, saved, storedProject.readings);
+      if (!reconciled.ok) {
+        setProjectStatus('A reading changed in another tab (' + reconciled.conflicts[0] +
+          '). Your current edits were not saved; reload before continuing.');
+        return false;
+      }
+      project = storedProject;
+      candidate.activeProjectId = project.id;
+      projectEngine.setReadings(candidate, project.id, reconciled.readings, 'replace');
+    }
+
+    return commitProjectState(candidate);
+  }
+
+  function makeProjectCatalog() {
+    var catalog = {};
+    DATA.categories.forEach(function (category) {
+      category.cards.forEach(function (card) {
+        var inputs = {};
+        card.inputs.forEach(function (input) {
+          inputs[input.key] = {
+            type: input.type || 'number',
+            label: input.label
+          };
+        });
+        catalog[card.id] = { name: card.name, inputs: inputs };
+      });
+    });
+    return catalog;
+  }
+
+  function currentProject() {
+    return projectEngine && projectState ? projectEngine.activeProject(projectState) : null;
+  }
+
+  function setProjectStatus(message) {
+    var status = document.getElementById('project-bay-status');
+    if (status) status.textContent = message || '';
+  }
+
+  function updatedLabel(value) {
+    var time = new Date(value).getTime();
+    var elapsed = Date.now() - time;
+    if (!isFinite(time) || elapsed < 0) return 'updated now';
+    if (elapsed < 60000) return 'updated now';
+    if (elapsed < 3600000) return 'updated ' + Math.floor(elapsed / 60000) + ' min ago';
+    if (elapsed < 86400000) return 'updated ' + Math.floor(elapsed / 3600000) + ' hr ago';
+    return 'updated ' + Math.floor(elapsed / 86400000) + ' d ago';
+  }
+
+  function renderProjectWorkspace() {
+    var project = currentProject();
+    var name = document.getElementById('project-current-name');
+    var meta = document.getElementById('project-current-meta');
+    var exportButton = document.getElementById('project-sync-export');
+    var newButton = document.getElementById('project-new-open');
+    var importButton = document.getElementById('project-import-open');
+    var writable = projectWriter === true;
+    if (!name || !meta) return;
+    if (!project) {
+      name.textContent = 'Unsaved desk';
+      meta.textContent = 'Create or import a project';
+    } else {
+      var count = projectEngine.readingsCount(project.readings);
+      name.textContent = project.name;
+      meta.textContent = project.code + ' · ' + count + ' reading' + (count === 1 ? '' : 's') + ' · ' + updatedLabel(project.updatedAt);
+    }
+    if (exportButton) exportButton.disabled = !project;
+    if (newButton) newButton.disabled = !writable;
+    if (importButton) importButton.disabled = !writable;
+    renderProjectRegister();
+  }
+
+  function clearDisplayedReadings() {
+    document.querySelectorAll('.calc-card').forEach(function (cardEl) {
+      var first = null;
+      cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
+        if (!first) first = node;
+        node.value = '';
+      });
+      if (first) first.dispatchEvent(inputEvent());
+    });
+  }
+
+  function syncDisplayedReadings(readings) {
+    var changedCards = {};
+    projectSaveSuspended = true;
+    document.querySelectorAll('.calc-card').forEach(function (cardEl) {
+      var cardId = cardEl.id.replace(/^calc-/, '');
+      var values = readings[cardId] || {};
+      cardEl.querySelectorAll('.inputs input[data-key]').forEach(function (node) {
+        var value = Object.prototype.hasOwnProperty.call(values, node.dataset.key)
+          ? String(values[node.dataset.key]) : '';
+        if (node.value === value) return;
+        node.value = value;
+        if (!changedCards[cardId]) changedCards[cardId] = node;
+      });
+    });
+    Object.keys(changedCards).forEach(function (cardId) {
+      changedCards[cardId].dispatchEvent(inputEvent());
+    });
+    projectSaveSuspended = false;
+  }
+
+  function paintCurrentProject() {
+    var project = currentProject();
+    projectSaveSuspended = true;
+    clearDisplayedReadings();
+    if (project) applySavedReadings(project.readings);
+    projectSaveSuspended = false;
+    projectDirty = false;
+  }
+
+  function flushProjectSave() {
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    if (projectDirty) return saveReadings();
+    return true;
+  }
+
+  function openBenchDialog(dialog, focusTarget) {
+    if (!dialog) return;
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+    setTimeout(function () {
+      var target = focusTarget || dialog.querySelector('button, input, select');
+      if (target) target.focus();
+    }, 0);
+  }
+
+  function closeBenchDialog(dialog) {
+    if (!dialog) return;
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
+  }
+
+  function renderProjectRegister() {
+    var list = document.getElementById('project-register-list');
+    var create = document.getElementById('project-create');
+    var rename = document.getElementById('project-rename');
+    var remove = document.getElementById('project-delete');
+    var project = currentProject();
+    var writable = projectWriter === true;
+    if (!list || !projectState) return;
+    list.innerHTML = '';
+    projectState.projects.forEach(function (item) {
+      var li = document.createElement('li');
+      var button = document.createElement('button');
+      var code = document.createElement('span');
+      var name = document.createElement('span');
+      var meta = document.createElement('span');
+      button.type = 'button';
+      button.className = 'project-row';
+      button.dataset.projectId = item.id;
+      button.disabled = !writable;
+      button.setAttribute('aria-current', item.id === projectState.activeProjectId ? 'true' : 'false');
+      button.setAttribute('aria-label', 'Open ' + item.name + ', ' + item.code);
+      code.className = 'project-row-code';
+      code.textContent = item.code;
+      name.className = 'project-row-name';
+      name.textContent = item.name;
+      meta.className = 'project-row-meta';
+      meta.textContent = projectEngine.readingsCount(item.readings) + ' readings';
+      button.appendChild(code);
+      button.appendChild(name);
+      button.appendChild(meta);
+      button.addEventListener('click', function () { switchProject(item.id); });
+      li.appendChild(button);
+      list.appendChild(li);
+    });
+    if (create) create.disabled = !writable;
+    if (rename) rename.disabled = !project || !writable;
+    if (remove) {
+      remove.disabled = !project || !writable;
+      remove.dataset.armed = 'false';
+      remove.textContent = 'Delete current';
+    }
+  }
+
+  function switchProject(id) {
+    var candidate;
+    var next;
+    var dialog = document.getElementById('project-register-dialog');
+    if (!flushProjectSave()) return;
+    candidate = latestProjectState();
+    if (!candidate) return;
+    next = projectEngine.projectById(candidate, id);
+    if (!next) {
+      setProjectStatus('That project is no longer available.');
+      renderProjectWorkspace();
+      return;
+    }
+    projectEngine.activateProject(candidate, id);
+    if (!commitProjectState(candidate)) return;
+    paintCurrentProject();
+    renderProjectWorkspace();
+    closeBenchDialog(dialog);
+    setProjectStatus(next.name + ' opened.');
+    document.getElementById('project-register-open').focus();
+  }
+
+  function createProjectFromEditor(event) {
+    var input = document.getElementById('project-name');
+    var error = document.getElementById('project-name-error');
+    var candidate;
+    var project;
+    event.preventDefault();
+    error.textContent = '';
+    input.removeAttribute('aria-invalid');
+    try {
+      if (!flushProjectSave()) throw new Error('Save the current readings before creating another project.');
+      candidate = latestProjectState();
+      if (!candidate) throw new Error('Project storage is unavailable. The project was not created.');
+      project = projectEngine.createProject(candidate, input.value);
+      if (!commitProjectState(candidate)) throw new Error('Project storage is unavailable. The project was not created.');
+      paintCurrentProject();
+      renderProjectWorkspace();
+      input.value = '';
+      closeBenchDialog(document.getElementById('project-register-dialog'));
+      setProjectStatus(project.name + ' created and opened.');
+      document.getElementById('project-register-open').focus();
+    } catch (e) {
+      error.textContent = e.message;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+    }
+  }
+
+  function renameCurrentProject() {
+    var input = document.getElementById('project-name');
+    var error = document.getElementById('project-name-error');
+    var project = currentProject();
+    var candidate;
+    error.textContent = '';
+    input.removeAttribute('aria-invalid');
+    try {
+      if (!flushProjectSave()) throw new Error('Save the current readings before renaming this project.');
+      candidate = latestProjectState();
+      if (!candidate) throw new Error('Project storage is unavailable. The name was not changed.');
+      project = projectEngine.renameProject(candidate, project && project.id, input.value);
+      if (!commitProjectState(candidate)) throw new Error('Project storage is unavailable. The name was not changed.');
+      renderProjectWorkspace();
+      setProjectStatus(project.name + ' renamed.');
+      document.getElementById('project-register-status').textContent = 'Project name saved.';
+    } catch (e) {
+      error.textContent = e.message;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+    }
+  }
+
+  function deleteCurrentProject(button) {
+    var project = currentProject();
+    var candidate;
+    var removedName;
+    if (!project) return;
+    if (button.dataset.armed !== 'true') {
+      button.dataset.armed = 'true';
+      button.textContent = 'Confirm delete';
+      document.getElementById('project-register-status').textContent =
+        'Press Confirm delete again to remove ' + project.name + '.';
+      return;
+    }
+    if (!flushProjectSave()) {
+      document.getElementById('project-register-status').textContent =
+        'The current readings could not be saved, so the project was not deleted.';
+      return;
+    }
+    candidate = latestProjectState();
+    if (!candidate) return;
+    project = projectEngine.projectById(candidate, project.id);
+    if (!project) {
+      document.getElementById('project-register-status').textContent =
+        'That project is no longer available.';
+      return;
+    }
+    removedName = project.name;
+    projectEngine.deleteProject(candidate, project.id);
+    if (!commitProjectState(candidate)) {
+      document.getElementById('project-register-status').textContent =
+        'Project storage is unavailable. The project was not deleted.';
+      return;
+    }
+    paintCurrentProject();
+    renderProjectWorkspace();
+    document.getElementById('project-name').value = '';
+    setProjectStatus(removedName + ' deleted.');
+    document.getElementById('project-register-status').textContent = removedName + ' was deleted.';
+  }
+
+  function openProjectRegister(newProject) {
+    var input = document.getElementById('project-name');
+    var project = currentProject();
+    if (!flushProjectSave()) return;
+    renderProjectRegister();
+    document.getElementById('project-name-error').textContent = '';
+    document.getElementById('project-register-status').textContent = '';
+    input.removeAttribute('aria-invalid');
+    input.value = newProject || !project ? '' : project.name;
+    openBenchDialog(document.getElementById('project-register-dialog'), newProject ? input : null);
+  }
+
+  function safeFilename(value) {
+    var name = String(value || 'project').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return name || 'project';
+  }
+
+  function downloadText(text, filename, type) {
+    var blob = new Blob([text], { type: type + ';charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.position = 'fixed';
+    link.style.left = '-9999px';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  function exportCurrentProject() {
+    var project;
+    if (!flushProjectSave()) return;
+    project = currentProject();
+    if (!project) { setProjectStatus('Create or import a project before exporting.'); return; }
+    downloadText(projectEngine.exportProject(project, projectCatalog),
+      safeFilename(project.name) + '-project.json', 'application/json');
+    setProjectStatus(project.name + ' sync file downloaded.');
+  }
+
+  function importError(message, sourceControl) {
+    var errors = document.getElementById('project-import-errors');
+    var file = document.getElementById('project-import-file');
+    var pasted = document.getElementById('project-import-paste');
+    errors.textContent = message || '';
+    file.removeAttribute('aria-invalid');
+    pasted.removeAttribute('aria-invalid');
+    if (message && sourceControl === 'paste') pasted.setAttribute('aria-invalid', 'true');
+    else if (message && sourceControl === 'file') file.setAttribute('aria-invalid', 'true');
+  }
+
+  function clearImportPreview() {
+    pendingImport = null;
+    document.getElementById('project-import-preview').hidden = true;
+    document.getElementById('project-import-rows').innerHTML = '';
+    document.getElementById('project-import-summary').textContent = '';
+    document.getElementById('project-import-apply').disabled = true;
+  }
+
+  function renderImportPreview(result, fileName) {
+    var preview = document.getElementById('project-import-preview');
+    var summary = document.getElementById('project-import-summary');
+    var body = document.getElementById('project-import-rows');
+    var target = currentProject();
+    var shown = Math.min(result.preview.length, 50);
+    body.innerHTML = '';
+    for (var i = 0; i < shown; i++) {
+      var reading = result.preview[i];
+      var row = document.createElement('tr');
+      var calculator = document.createElement('td');
+      var input = document.createElement('td');
+      var value = document.createElement('td');
+      calculator.textContent = reading.cardName;
+      input.textContent = reading.inputLabel;
+      value.textContent = reading.value;
+      row.appendChild(calculator);
+      row.appendChild(input);
+      row.appendChild(value);
+      body.appendChild(row);
+    }
+    summary.textContent = result.preview.length + ' reading' +
+      (result.preview.length === 1 ? '' : 's') + ' ready for ' +
+      (target ? target.name : (result.projectName || 'a new project')) + '.' +
+      (result.preview.length > shown ? ' First ' + shown + ' shown.' : '') +
+      (result.warnings.length ? ' ' + result.warnings.join(' ') : '');
+    preview.hidden = false;
+    pendingImport = {
+      result: result,
+      fileName: fileName,
+      target: projectEngine.importTarget(projectState)
+    };
+    document.getElementById('project-import-apply').disabled = false;
+    document.getElementById('project-import-preview-title').focus();
+  }
+
+  function checkImportText(text, format, sourceName, sourceControl) {
+    var status = document.getElementById('project-import-status');
+    var result;
+    clearImportPreview();
+    importError('');
+    status.textContent = '';
+    if (!String(text || '').trim()) {
+      importError('Choose a file or paste CSV / JSON data first.', sourceControl);
+      return;
+    }
+    result = projectEngine.parseImport(String(text), format || 'auto', projectCatalog);
+    if (!result.ok) {
+      importError(result.errors.slice(0, 8).join(' ') +
+        (result.errors.length > 8 ? ' ' + (result.errors.length - 8) + ' more errors were found.' : ''),
+        sourceControl);
+      return;
+    }
+    renderImportPreview(result, sourceName || 'pasted data');
+  }
+
+  function checkImportFile(file) {
+    var reader;
+    var status = document.getElementById('project-import-status');
+    clearImportPreview();
+    importError('');
+    status.textContent = '';
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      importError('The file is larger than 2 MB. Choose a smaller CSV or JSON file.', 'file');
+      return;
+    }
+    status.textContent = 'Checking ' + file.name + '…';
+    reader = new FileReader();
+    reader.onload = function () {
+      var format = /\.json$/i.test(file.name) ? 'json' : (/\.csv$/i.test(file.name) ? 'csv' : 'auto');
+      checkImportText(String(reader.result || ''), format, file.name, 'file');
+    };
+    reader.onerror = function () {
+      status.textContent = '';
+      importError('The browser could not read this file. Choose it again or export a new copy.', 'file');
+    };
+    reader.readAsText(file);
+  }
+
+  function applyPendingImport() {
+    var modeNode = document.querySelector('input[name="project-import-mode"]:checked');
+    var mode = modeNode ? modeNode.value : 'merge';
+    var candidate;
+    var project;
+    var imported;
+    var status = document.getElementById('project-import-status');
+    if (!pendingImport || !pendingImport.result.ok) return;
+    if (!flushProjectSave()) {
+      importError('The current readings could not be saved, so the import was not applied.');
+      return;
+    }
+    if (!projectEngine.sameImportTarget(projectState, pendingImport.target)) {
+      clearImportPreview();
+      importError('The target project changed after this preview. Check the pasted data or file again.');
+      return;
+    }
+    candidate = latestProjectState();
+    if (!candidate) {
+      importError('Project storage is unavailable. The import was not applied.');
+      return;
+    }
+    if (!projectEngine.sameImportTarget(candidate, pendingImport.target)) {
+      clearImportPreview();
+      importError('The target project changed in another tab. Check the pasted data or file again.');
+      return;
+    }
+    project = projectEngine.activeProject(candidate);
+    if (!project) {
+      try {
+        project = projectEngine.createProject(candidate,
+          pendingImport.result.projectName || pendingImport.fileName.replace(/\.[^.]+$/, '') || 'Imported project');
+      } catch (e) {
+        importError(e.message);
+        return;
+      }
+    }
+    imported = projectEngine.readingsCount(pendingImport.result.readings);
+    projectEngine.setReadings(candidate, project.id, pendingImport.result.readings, mode, {
+      importRecord: {
+        format: pendingImport.result.format,
+        source: pendingImport.fileName
+      }
+    });
+    if (!commitProjectState(candidate)) {
+      importError('Project storage is unavailable. The import was not applied.');
+      return;
+    }
+    paintCurrentProject();
+    renderProjectWorkspace();
+    status.textContent = imported + ' reading' + (imported === 1 ? '' : 's') +
+      ' imported into ' + project.name + '.';
+    setProjectStatus(project.name + ' updated from ' + pendingImport.fileName + '.');
+    document.getElementById('project-import-apply').disabled = true;
+    pendingImport = null;
+  }
+
+  function openImportDialog() {
+    var project = currentProject();
+    var summary = document.getElementById('project-import-summary');
+    if (!flushProjectSave()) return;
+    project = currentProject();
+    if (pendingImport && !projectEngine.sameImportTarget(projectState, pendingImport.target)) {
+      clearImportPreview();
+      importError('The target project changed after this preview. Check the data again.');
+    }
+    if (summary && pendingImport) {
+      summary.textContent = pendingImport.result.preview.length + ' readings ready for ' +
+        (project ? project.name : (pendingImport.result.projectName || 'a new project')) + '.';
+    }
+    openBenchDialog(document.getElementById('project-import-dialog'),
+      document.getElementById('project-import-file'));
+  }
+
+  function wireProjectWorkspace() {
+    var register = document.getElementById('project-register-dialog');
+    var importDialog = document.getElementById('project-import-dialog');
+    var nameInput = document.getElementById('project-name');
+    document.getElementById('project-register-open').addEventListener('click', function () {
+      openProjectRegister(false);
+    });
+    document.getElementById('project-new-open').addEventListener('click', function () {
+      openProjectRegister(true);
+    });
+    document.getElementById('project-register-close').addEventListener('click', function () {
+      closeBenchDialog(register);
+    });
+    document.getElementById('project-editor').addEventListener('submit', createProjectFromEditor);
+    document.getElementById('project-rename').addEventListener('click', renameCurrentProject);
+    document.getElementById('project-delete').addEventListener('click', function (event) {
+      deleteCurrentProject(event.currentTarget);
+    });
+    nameInput.addEventListener('input', function () {
+      nameInput.removeAttribute('aria-invalid');
+      document.getElementById('project-name-error').textContent = '';
+    });
+
+    document.getElementById('project-import-open').addEventListener('click', openImportDialog);
+    document.getElementById('project-import-close').addEventListener('click', function () {
+      closeBenchDialog(importDialog);
+    });
+    document.getElementById('project-import-file').addEventListener('change', function (event) {
+      checkImportFile(event.target.files && event.target.files[0]);
+    });
+    document.getElementById('project-import-check').addEventListener('click', function () {
+      checkImportText(document.getElementById('project-import-paste').value, 'auto', 'pasted data', 'paste');
+    });
+    document.getElementById('project-template-download').addEventListener('click', function () {
+      downloadText(projectEngine.csvTemplate(), 'yazeed-project-import-template.csv', 'text/csv');
+      document.getElementById('project-import-status').textContent = 'CSV template downloaded.';
+    });
+    document.getElementById('project-import-apply').addEventListener('click', applyPendingImport);
+    document.getElementById('project-sync-export').addEventListener('click', exportCurrentProject);
+
+    window.addEventListener('beforeunload', function (event) {
+      if (!flushProjectSave() && projectDirty) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    });
+    window.addEventListener('storage', function (event) {
+      if (event.key !== PROJECT_STORAGE_KEY) return;
+      if (projectDirty) {
+        setProjectStatus('This workspace changed in another tab. Your edits will be reconciled before saving.');
+        return;
+      }
+      projectState = projectEngine.loadState(event.newValue);
+      paintCurrentProject();
+      renderProjectWorkspace();
+      if (pendingImport && !projectEngine.sameImportTarget(projectState, pendingImport.target)) {
+        document.getElementById('project-import-apply').disabled = true;
+        document.getElementById('project-import-status').textContent =
+          'The target project changed in another tab. Check the data again before applying it.';
+      }
+      setProjectStatus('Workspace updated from another tab.');
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && projectWriter !== true) claimProjectWriter();
+    });
+    window.addEventListener('pagehide', releaseProjectWriter);
+  }
+
+  function migrateLegacyReadings() {
+    var legacy;
+    var candidate;
+    var migratedReadings;
+    var project;
+    if (projectWriter !== true || !projectState || projectState.projects.length) return false;
+    legacy = readSavedReadings();
+    if (!legacy || !savedHasValues(legacy)) return false;
+    candidate = cloneProjectState(projectState);
+    project = projectEngine.createProject(candidate, 'Recovered readings');
+    migratedReadings = {};
+    Object.keys(legacy).forEach(function (cardId) {
+      migratedReadings[cardId.replace(/^calc-/, '')] = legacy[cardId];
+    });
+    projectEngine.setReadings(candidate, project.id, migratedReadings, 'replace');
+    if (!commitProjectState(candidate)) return false;
+    clearSavedReadings();
+    paintCurrentProject();
+    return true;
+  }
+
+  function initProjectWorkspace() {
+    if (!projectEngine || !projectBayEl) return false;
+    projectCatalog = makeProjectCatalog();
+    projectState = readProjectState();
+    wireProjectWorkspace();
+    if (currentProject()) paintCurrentProject();
+    renderProjectWorkspace();
+    claimProjectWriter();
+    return true;
   }
 
   function decoded(value) {
@@ -9272,8 +11113,9 @@ var PM_CHART_MOUNT = (function () {
   });
 
   sectionsEl.addEventListener('input', scheduleReadingsSave);
+  var projectWorkspaceActive = initProjectWorkspace();
   var stateHashPresent = restoreStateHash();
-  offerSavedReadings(stateHashPresent);
+  if (!projectWorkspaceActive) offerSavedReadings(stateHashPresent);
 
   if (statsEl) {
     statsEl.textContent = DATA.categories.length + ' domains · ' +

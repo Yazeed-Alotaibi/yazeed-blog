@@ -8,6 +8,13 @@ value, risk, estimation, schedule and quality — each with its formula, a live
 chart, and a one-click export to a real Excel workbook with a native editable
 chart in it. Everything computes in the visitor's browser.
 
+The browser-local Project Register keeps named projects and their readings
+separate. CSV or JSON data can be checked in a preview before an explicit merge
+or replacement, and each project can move between browsers as a JSON sync file.
+On browsers with the Web Locks API, one open tab owns project saving at a time;
+other tabs remain usable for temporary calculations until that writer closes.
+Project saving is disabled when that safety primitive is unavailable.
+
 ## The unusual thing about this repository
 
 **There is no build step.** The HTML files at the root are not compiled from
@@ -34,8 +41,8 @@ node tools/check.js
 ```
 
 Run that after any change. It regenerates the pages, rewrites the static
-mirror, and runs all 2,326 tests, in that order because each step reads the one
-before it. One command instead of three in a particular sequence.
+mirror, and runs the full test suite, in that order because each step reads the
+one before it. One command instead of three in a particular sequence.
 
 ```bash
 node tools/check.js --verify    # change nothing; fail if committed output is stale

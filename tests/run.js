@@ -10,6 +10,8 @@ var suites = [
   require('./redirects'),
   require('./counts'),
   require('./earned-schedule'),
+  require('./calcpage-crlf'),
+  require('./projects'),
   require('./prerender'),
   require('./pages'),
   require('./export')

@@ -59,6 +59,10 @@ function wordCount(text) {
   return text.split(/\s+/).filter(Boolean).length;
 }
 
+function sameText(a, b) {
+  return String(a).replace(/\r\n/g, '\n') === String(b).replace(/\r\n/g, '\n');
+}
+
 /* The same phrase test tests/counts.js uses, so the footer on a subpage
    agrees with the desk's count down to the same regex. */
 function hasCount(text, count, noun) {
@@ -146,7 +150,7 @@ function run(page) {
     }
 
     /* The one that catches real drift: index.html changed, the page did not. */
-    H.check(file + ': is current with index.html', onDisk === rebuilt,
+    H.check(file + ': is current with index.html', sameText(onDisk, rebuilt),
       'stale by ' + Math.abs(onDisk.length - rebuilt.length) +
       ' bytes — run node tools/calcpage.js --all');
 

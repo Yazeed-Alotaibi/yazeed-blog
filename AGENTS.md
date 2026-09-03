@@ -259,6 +259,34 @@ graduated scales, tabular figures.
 Copy the custom properties and font stack from `index.html` when adding a page —
 consistency across the bench is the point.
 
+## Project workspace and imports
+
+The homepage Project Register is browser-local. Its versioned envelope lives at
+`desk.projects.v1`; raw calculator input strings are the source of truth and all
+results remain derived. The DOM-free `PM_PROJECTS` module owns project state,
+CSV/JSON parsing, validation, reconciliation and sync-file serialization. The
+desk runtime owns `localStorage`, dialogs and painting values back through the
+normal input events.
+
+Imports are atomic. CSV uses one reading per row with
+`card_id,input_key,value` (an optional `project_name` column is accepted); JSON
+sync files use the `yazeed.project` version 1 schema. Unknown calculators or
+inputs, duplicate rows, invalid numbers, malformed quoting, more than 5,000
+rows or more than 2 MB disable Apply. A reader must preview the validated rows
+and explicitly choose Merge or Replace before anything is committed.
+
+Only one same-origin tab may write project state at a time, enforced by the Web
+Locks API. Other tabs continue to calculate but label those edits temporary and
+disable project-changing controls until the writer is released. Browsers
+without Web Locks do not save projects; do not substitute a `localStorage`
+lease, because its read/write sequence is not atomic. The storage event keeps
+secondary tabs' displayed project current. Do not remove that serialization
+while the workspace is stored as one envelope.
+
+Standalone calculator pages do not mount the Project Register. Their legacy
+`desk.readings.v1` save path merges only the visible card so opening a satellite
+page cannot erase readings for the rest of the desk.
+
 ## Exporting to Excel
 
 Every card carries an **Excel** button beside *Copy link*. It writes a real

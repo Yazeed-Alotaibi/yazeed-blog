@@ -155,7 +155,7 @@ function countCalculators(html) {
    the block stays formatted the way it is now — so `checkNarrowed` below
    proves each cut rather than trusting it. */
 function narrowData(data, keep) {
-  var lines = data.split('\n');
+  var lines = data.split(/\r?\n/);
   function find(pred, from) {
     for (var i = from || 0; i < lines.length; i++) if (pred(lines[i])) return i;
     return -1;
@@ -410,6 +410,7 @@ function pageCss() {
 /* ── the page ───────────────────────────────────────────────────── */
 
 function build(spec, html, manifestPath) {
+  html = html.replace(/\r\n/g, '\n');
   var found = cardFrom(html, spec.card);
   if (!found) throw new Error('no card with id "' + spec.card + '" in PM_DATA');
 
@@ -636,11 +637,11 @@ function main(argv) {
     var next = build(spec, html);
     var prev = fs.existsSync(path.join(ROOT, out)) ? read(out) : null;
     if (check) {
-      if (prev !== next) stale.push(out);
+      if (!sameText(prev, next)) stale.push(out);
       return;
     }
     fs.writeFileSync(path.join(ROOT, out), next);
-    console.log((prev === next ? 'unchanged  ' : 'wrote      ') + out +
+    console.log((sameText(prev, next) ? 'unchanged  ' : 'wrote      ') + out +
       '  (' + next.length + ' bytes)');
   });
 
@@ -651,6 +652,10 @@ function main(argv) {
     }
     console.log('calcpage: every generated page is current');
   }
+}
+
+function sameText(a, b) {
+  return String(a).replace(/\r\n/g, '\n') === String(b).replace(/\r\n/g, '\n');
 }
 
 if (require.main === module) main(process.argv.slice(2));
