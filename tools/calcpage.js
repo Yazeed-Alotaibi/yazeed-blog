@@ -500,4 +500,14 @@ function main(argv) {
 }
 
 if (require.main === module) main(process.argv.slice(2));
-module.exports = { build: build, manifest: manifest, scriptBlocks: scriptBlocks };
+module.exports = {
+  build: build,
+  manifest: manifest,
+  scriptBlocks: scriptBlocks,
+  /* Exported for tools/newpage.js, which has to answer two questions before
+     it scaffolds anything: does this card id exist, and what is it called?
+     Both are already solved here, and a second copy of the sandbox in
+     another file is exactly the drift this repository keeps designing out. */
+  loadData: loadData,
+  cardFrom: cardFrom
+};
