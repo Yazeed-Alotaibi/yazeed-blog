@@ -31,6 +31,146 @@
         "time-forecast",
         "burn-rate"
       ]
+    },
+    {
+      "card": "earned-schedule",
+      "slug": "earned-schedule",
+      "title": "Earned Schedule (ES) Calculator — SPI(t) & IEAC(t)",
+      "description": "Calculate earned schedule, time variance, SPI(t) and IEAC(t) from BAC, planned duration, actual time and EV, with clear limits on the forecast.",
+      "h1": "Earned Schedule: put progress back on the time axis",
+      "lede": "Enter BAC, planned duration, actual time and earned value to estimate earned schedule and completion trend. The guide explains the linear-PV assumption, late-project SPI limits and how to turn the reading into an action.",
+      "updated": "2026-09-04",
+      "related": [
+        "earned-value",
+        "time-forecast",
+        "float"
+      ]
+    },
+    {
+      "card": "three-point",
+      "slug": "pert-estimate",
+      "title": "Three-Point Estimate (PERT) Calculator — Ranges",
+      "description": "Compare triangular and PERT estimates, calculate standard deviation and variance, and build 68%, 95% and 99.7% confidence ranges.",
+      "h1": "Three-point estimates that show the uncertainty",
+      "lede": "Enter optimistic, most-likely and pessimistic values to compare a simple triangular average with weighted PERT, then read the standard deviation and confidence ranges. The guide shows how to roll uncertainty up a path without adding standard deviations blindly.",
+      "updated": "2026-09-04",
+      "related": [
+        "path-sigma",
+        "learning-curve",
+        "time-forecast"
+      ]
+    },
+    {
+      "card": "emv",
+      "slug": "expected-monetary-value",
+      "title": "Expected Monetary Value (EMV) Calculator — Risk",
+      "description": "Calculate probability-weighted risk value for threats and opportunities, separate EMV from full impact, and use the result to size a reserve.",
+      "h1": "Expected Monetary Value: price uncertainty without hiding it",
+      "lede": "Enter a probability and the full financial impact of a risk to calculate its expected monetary value. The guide explains negative threats, positive opportunities, contingency reserves, and why EMV is an average rather than a cap on loss.",
+      "updated": "2026-09-04",
+      "related": [
+        "risk-score",
+        "contingency",
+        "decision-tree"
+      ]
+    },
+    {
+      "card": "risk-score",
+      "slug": "qualitative-risk-score",
+      "title": "Qualitative Risk Score Calculator — 5×5 Matrix",
+      "description": "Multiply 1–5 probability and impact ratings to place a risk on a 5×5 matrix, then set practical response thresholds without treating scores as money.",
+      "h1": "Qualitative risk scoring that leads to a response",
+      "lede": "Rate probability and impact on your agreed 1–5 scales to place a risk in the calculator’s 25-cell matrix. The guide shows how to define anchors, interpret low, moderate and high bands, and avoid false precision when the scale is ordinal.",
+      "updated": "2026-09-04",
+      "related": [
+        "emv",
+        "contingency",
+        "decision-tree"
+      ]
+    },
+    {
+      "card": "roi",
+      "slug": "roi-calculator",
+      "title": "Return on Investment (ROI) Calculator — Projects",
+      "description": "Calculate project ROI and net benefit from total cost and benefit, align both figures to one time horizon, and see when NPV is the better measure.",
+      "h1": "Return on Investment: the quick project value test",
+      "lede": "Enter the total cost and total benefit for the same project horizon to calculate ROI and net benefit. The guide explains what the percentage does and does not say, how to compare scale, and why timing can make NPV a better decision measure.",
+      "updated": "2026-09-04",
+      "related": [
+        "npv",
+        "breakeven",
+        "emv"
+      ]
+    },
+    {
+      "card": "npv",
+      "slug": "npv-irr-payback",
+      "title": "NPV, IRR & Payback Calculator — Cash Flow",
+      "description": "Evaluate an investment with NPV, IRR, benefit–cost ratio and payback from a discount rate, initial outlay and period-by-period cash flows.",
+      "h1": "NPV, IRR and payback: three views of one investment",
+      "lede": "Enter the hurdle rate, initial investment and ordered cash flows to discount the project and read NPV, IRR, benefit–cost ratio and payback together. The guide covers timing, sign changes, reinvestment assumptions and the limits of a simple payback period.",
+      "updated": "2026-09-04",
+      "related": [
+        "roi",
+        "tvm",
+        "breakeven"
+      ]
+    },
+    {
+      "card": "velocity",
+      "slug": "velocity-forecast",
+      "title": "Velocity Forecast Calculator — Sprints to Release",
+      "description": "Estimate velocity, sprints remaining and calendar time from completed points, finished sprints, backlog and optional sprint length.",
+      "h1": "Velocity forecasting from the team’s actual delivery",
+      "lede": "Enter completed story points, the number of finished sprints and the remaining backlog to calculate demonstrated velocity and whole sprints left. Add sprint length for a calendar estimate, then use the guide to forecast honestly without turning velocity into a team ranking.",
+      "updated": "2026-09-04",
+      "related": [
+        "capacity",
+        "three-point",
+        "learning-curve"
+      ]
+    },
+    {
+      "card": "float",
+      "slug": "float-calculator",
+      "title": "Float Calculator — Total & Free Slack",
+      "description": "Calculate total float, free float and the critical-path test from early and late dates, with a cross-check for inconsistent schedule passes.",
+      "h1": "Float and slack: find the schedule’s real room",
+      "lede": "Enter early and late start and finish dates to calculate total float, cross-check the backward pass, and optionally measure free float before the successor moves. The guide explains zero and negative float, date conventions and how to protect the critical path.",
+      "updated": "2026-09-04",
+      "related": [
+        "earned-schedule",
+        "crash",
+        "velocity"
+      ]
+    },
+    {
+      "card": "decision-tree",
+      "slug": "decision-tree",
+      "title": "Decision Tree Calculator — Compare Two Options",
+      "description": "Compare two uncertain options by expected monetary value, including upfront cost, success probability, success payoff and failure payoff.",
+      "h1": "Decision trees: compare uncertain choices explicitly",
+      "lede": "Describe two options with their cost, probability of success and payoffs in each outcome to calculate both expected monetary values and the margin between them. The guide shows how to test the branches, expose assumptions and combine EMV with risk appetite.",
+      "updated": "2026-09-04",
+      "related": [
+        "emv",
+        "roi",
+        "npv"
+      ]
+    },
+    {
+      "card": "cpk",
+      "slug": "cpk-calculator",
+      "title": "Cp & Cpk Calculator — Process Capability",
+      "description": "Calculate Cp and Cpk from specification limits, process mean and standard deviation to see whether spread and centering can meet customer limits.",
+      "h1": "Cp and Cpk: separate process spread from centering",
+      "lede": "Enter the upper and lower specification limits, process mean and standard deviation to calculate potential capability Cp and actual capability Cpk. The guide explains the common 1.33 bar, stability prerequisites and what to improve when Cp and Cpk disagree.",
+      "updated": "2026-09-04",
+      "related": [
+        "dpmo",
+        "control",
+        "coq"
+      ]
     }
   ]
 }

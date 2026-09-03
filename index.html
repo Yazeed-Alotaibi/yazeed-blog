@@ -2854,6 +2854,7 @@ TCPI = (BAC − EV) ÷ (BAC − AC)</code></pre>
       <h3>01.2 — Earned Schedule</h3>
       <p class="prerender-tagline">ES · SV(t) · SPI(t) · IEAC(t)</p>
       <p class="prerender-about">SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.</p>
+      <p class="prerender-page"><a href="earned-schedule.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>ES = PD × (EV ÷ BAC)
 SV(t) = ES − AT
 SPI(t) = ES ÷ AT
@@ -2987,6 +2988,7 @@ Runway = (Budget − Spent) ÷ Burn rate</code></pre>
       <h3>03.1 — Three-point estimate (PERT)</h3>
       <p class="prerender-tagline">Triangular · Beta · σ · confidence ranges</p>
       <p class="prerender-about">Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.</p>
+      <p class="prerender-page"><a href="pert-estimate.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>Triangular = (O + M + P) ÷ 3
 PERT (beta) = (O + 4M + P) ÷ 6
 σ = (P − O) ÷ 6        Variance = σ²</code></pre>
@@ -3089,6 +3091,7 @@ rate is the learning rate as entered, in percent: 80 means 0.8</code></pre>
       <h3>04.1 — Float (slack)</h3>
       <p class="prerender-tagline">Total float · free float · critical path test</p>
       <p class="prerender-about">Total float is how long an activity can slip without delaying the project finish. Free float is how long it can slip without delaying its immediate successor. Zero total float means the activity is on the critical path. Enter the dates from your forward/backward pass — either day numbers or durations, as long as they are consistent (this calculator uses the continuous convention where EF = ES + duration).</p>
+      <p class="prerender-page"><a href="float-calculator.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>Total Float = LS − ES = LF − EF
 Free Float = ES(successor) − EF</code></pre>
       <h4>Parameters</h4>
@@ -3291,6 +3294,7 @@ Free Float = ES(successor) − EF</code></pre>
       <h3>08.1 — Expected Monetary Value (EMV)</h3>
       <p class="prerender-tagline">Probability × impact</p>
       <p class="prerender-about">EMV is the probability-weighted value of an uncertain event — what the risk is “worth” on average if you could run the project many times. Enter threats with a negative impact and opportunities with a positive one. Summing the EMV of every identified risk gives the contingency reserve; EMV is also the math behind decision-tree analysis.</p>
+      <p class="prerender-page"><a href="expected-monetary-value.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>EMV = Probability × Impact</code></pre>
       <h4>Parameters</h4>
       <dl class="prerender-params">
@@ -3318,6 +3322,7 @@ Free Float = ES(successor) − EF</code></pre>
       <h3>08.2 — Qualitative risk score</h3>
       <p class="prerender-tagline">Probability × impact, on a 1–5 scale</p>
       <p class="prerender-about">Before risks are worth quantifying in money, they are ranked qualitatively: rate probability and impact on an agreed 1–5 scale and multiply. The product places each risk in the probability–impact matrix and decides how much attention it gets. The scales are ordinal — a 4 is not “twice” a 2 — so use the score to rank, not to budget.</p>
+      <p class="prerender-page"><a href="qualitative-risk-score.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>Risk score = Probability (1–5) × Impact (1–5)</code></pre>
       <h4>Parameters</h4>
       <dl class="prerender-params">
@@ -3375,6 +3380,7 @@ Free Float = ES(successor) − EF</code></pre>
       <h3>09.1 — Decision tree — compare two options</h3>
       <p class="prerender-tagline">EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)</p>
       <p class="prerender-about">Each option is a branch: pay its cost, then chance decides between a success payoff and a failure payoff. The branch with the higher expected monetary value wins — on average. Classic uses: build vs buy, prototype vs commit, upgrade vs replace. Remember EMV is a long-run average; for one-shot, bet-the-company decisions, weigh the worst case too.</p>
+      <p class="prerender-page"><a href="decision-tree.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>EMV(option) = − Cost
              + P(success) × Payoff(success)
              + (1 − P) × Payoff(failure)</code></pre>
@@ -3491,6 +3497,7 @@ Sigma level ≈ 0.8406 + √(29.37 − 2.221 × ln DPMO)</code></pre>
       <h3>10.3 — Process capability (Cp / Cpk)</h3>
       <p class="prerender-tagline">Can the process meet the spec?</p>
       <p class="prerender-about">Control limits describe what the process does; specification limits describe what the customer needs. Capability indices compare the two. Cp asks whether the spec window is wide enough for the process spread (ignoring centering); Cpk penalises a process that drifts off-centre. The common acceptance bar is Cpk ≥ 1.33.</p>
+      <p class="prerender-page"><a href="cpk-calculator.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>Cp  = (USL − LSL) ÷ 6σ
 Cpk = min(USL − Mean, Mean − LSL) ÷ 3σ</code></pre>
       <h4>Parameters</h4>
@@ -3569,6 +3576,7 @@ CoQ = Conformance + Non-conformance</code></pre>
       <h3>11.1 — Return on Investment (ROI)</h3>
       <p class="prerender-tagline">(Benefit − Cost) ÷ Cost</p>
       <p class="prerender-about">The simplest project-selection measure: how much you get back per unit invested, ignoring timing. Good for quick comparisons; misleading for long projects because it ignores when the money arrives — use NPV for that.</p>
+      <p class="prerender-page"><a href="roi-calculator.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>ROI % = (Benefit − Cost) ÷ Cost × 100</code></pre>
       <h4>Parameters</h4>
       <dl class="prerender-params">
@@ -3591,6 +3599,7 @@ CoQ = Conformance + Non-conformance</code></pre>
       <h3>11.2 — NPV · IRR · Payback</h3>
       <p class="prerender-tagline">Discounted cash-flow appraisal</p>
       <p class="prerender-about">The rigorous way to value a project: every future cash flow is discounted back to today because money later is worth less than money now. NPV is the value created in today’s money; IRR is the discount rate at which the project merely breaks even; payback tells you how long capital is at risk. When choosing between projects, pick the higher NPV.</p>
+      <p class="prerender-page"><a href="npv-irr-payback.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>NPV = −Investment + Σ  CFₜ ÷ (1 + r)ᵗ
 IRR: the r where NPV = 0
 Payback: periods until cumulative cash flow ≥ 0</code></pre>
@@ -3861,6 +3870,7 @@ Final price = Actual cost + Final fee</code></pre>
       <h3>13.1 — Velocity &amp; release forecast</h3>
       <p class="prerender-tagline">Backlog ÷ velocity</p>
       <p class="prerender-about">Velocity is the average number of story points a team completes per sprint, measured from finished sprints only (yesterday’s weather). Dividing the remaining backlog by velocity gives the most honest forecast available: how many sprints of work remain at the current, demonstrated pace.</p>
+      <p class="prerender-page"><a href="velocity-forecast.html">Full analysis</a></p>
       <pre class="prerender-formula"><code>Velocity = Points completed ÷ Sprints completed
 Sprints remaining = ⌈ Remaining backlog ÷ Velocity ⌉</code></pre>
       <h4>Parameters</h4>
@@ -4383,6 +4393,7 @@ var PM_DATA = (function () {
         },
         {
           id: 'earned-schedule',
+          page: 'earned-schedule.html',
           name: 'Earned Schedule',
           tagline: 'ES · SV(t) · SPI(t) · IEAC(t)',
           about: 'SPI can look healthy late in a project because PV is running out. Earned Schedule puts EV back on the time axis. This card assumes <strong>LINEAR PV</strong> — the useful, explicit approximation for a four-input reading. Treat IEAC(t) as a trend, not a committed finish date.',
@@ -4634,6 +4645,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'three-point',
+          page: 'pert-estimate.html',
           name: 'Three-point estimate (PERT)',
           tagline: 'Triangular · Beta · σ · confidence ranges',
           about: 'Instead of a single guess, you estimate three scenarios and blend them. The PERT (beta) formula weights the most-likely case 4× because real outcomes cluster around it; the standard deviation then converts your optimism–pessimism spread into confidence ranges you can commit to. Works for durations and for costs alike. The 68 / 95 / 99.7% figures below are properties of the normal curve, while a single activity follows a skewed beta — read them as a good working approximation for one activity, and as genuinely accurate for the sum of several, which is where the roll-up below sends them.',
@@ -4848,6 +4860,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'float',
+          page: 'float-calculator.html',
           name: 'Float (slack)',
           tagline: 'Total float · free float · critical path test',
           about: 'Total float is how long an activity can slip without delaying the project finish. Free float is how long it can slip without delaying its immediate successor. Zero total float means the activity is on the critical path. Enter the dates from your forward/backward pass — either day numbers or durations, as long as they are consistent (this calculator uses the continuous convention where EF = ES + duration).',
@@ -5162,6 +5175,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'emv',
+          page: 'expected-monetary-value.html',
           name: 'Expected Monetary Value (EMV)',
           tagline: 'Probability × impact',
           about: 'EMV is the probability-weighted value of an uncertain event — what the risk is “worth” on average if you could run the project many times. Enter threats with a negative impact and opportunities with a positive one. Summing the EMV of every identified risk gives the contingency reserve; EMV is also the math behind decision-tree analysis.',
@@ -5208,6 +5222,7 @@ var PM_DATA = (function () {
         },
         {
           id: 'risk-score',
+          page: 'qualitative-risk-score.html',
           name: 'Qualitative risk score',
           tagline: 'Probability × impact, on a 1–5 scale',
           about: 'Before risks are worth quantifying in money, they are ranked qualitatively: rate probability and impact on an agreed 1–5 scale and multiply. The product places each risk in the probability–impact matrix and decides how much attention it gets. The scales are ordinal — a 4 is not “twice” a 2 — so use the score to rank, not to budget.',
@@ -5310,6 +5325,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'decision-tree',
+          page: 'decision-tree.html',
           name: 'Decision tree — compare two options',
           tagline: 'EMV = −cost + p·payoff(success) + (1−p)·payoff(failure)',
           about: 'Each option is a branch: pay its cost, then chance decides between a success payoff and a failure payoff. The branch with the higher expected monetary value wins — on average. Classic uses: build vs buy, prototype vs commit, upgrade vs replace. Remember EMV is a long-run average; for one-shot, bet-the-company decisions, weigh the worst case too.',
@@ -5503,6 +5519,7 @@ var PM_DATA = (function () {
         },
         {
           id: 'cpk',
+          page: 'cpk-calculator.html',
           name: 'Process capability (Cp / Cpk)',
           tagline: 'Can the process meet the spec?',
           about: 'Control limits describe what the process does; specification limits describe what the customer needs. Capability indices compare the two. Cp asks whether the spec window is wide enough for the process spread (ignoring centering); Cpk penalises a process that drifts off-centre. The common acceptance bar is Cpk ≥ 1.33.',
@@ -5641,6 +5658,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'roi',
+          page: 'roi-calculator.html',
           name: 'Return on Investment (ROI)',
           tagline: '(Benefit − Cost) ÷ Cost',
           about: 'The simplest project-selection measure: how much you get back per unit invested, ignoring timing. Good for quick comparisons; misleading for long projects because it ignores when the money arrives — use NPV for that.',
@@ -5666,6 +5684,7 @@ var PM_DATA = (function () {
         },
         {
           id: 'npv',
+          page: 'npv-irr-payback.html',
           name: 'NPV · IRR · Payback',
           tagline: 'Discounted cash-flow appraisal',
           about: 'The rigorous way to value a project: every future cash flow is discounted back to today because money later is worth less than money now. NPV is the value created in today’s money; IRR is the discount rate at which the project merely breaks even; payback tells you how long capital is at risk. When choosing between projects, pick the higher NPV.',
@@ -6168,6 +6187,7 @@ var PM_DATA = (function () {
       cards: [
         {
           id: 'velocity',
+          page: 'velocity-forecast.html',
           name: 'Velocity & release forecast',
           tagline: 'Backlog ÷ velocity',
           about: 'Velocity is the average number of story points a team completes per sprint, measured from finished sprints only (yesterday’s weather). Dividing the remaining backlog by velocity gives the most honest forecast available: how many sprints of work remain at the current, demonstrated pace.',

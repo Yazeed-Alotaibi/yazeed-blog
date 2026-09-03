@@ -1,0 +1,64 @@
+<h2 id="what-it-answers">What Earned Schedule actually answers</h2>
+
+<p>Earned Schedule (ES) is a time-based interpretation of earned value. Traditional schedule performance index, SPI, compares earned value with planned value in currency. That is useful early in a project, but it becomes misleading as the planned-value curve approaches the budget at completion. Earned Schedule asks a more direct question: how many periods of planned work has the completed work earned, and how does that compare with the time that has actually passed?</p>
+
+<p>This calculator uses four inputs: BAC, planned duration (PD), actual time (AT), and earned value (EV). BAC is the approved budget for the whole scope. PD is the baseline duration in a consistent unit such as weeks or months. AT is the elapsed time at the status date, and EV is the budgeted value of work that is genuinely complete. Currency belongs in BAC and EV; periods belong in PD and AT. Do not mix a twelve-month baseline with an actual time entered in weeks.</p>
+
+<p>The instrument makes one important assumption visible: planned value is linear across the duration. Under that approximation, the share of the budget earned can be translated into an equivalent share of planned time. This is not a replacement for the time-phased schedule on a complex project with a strongly curved spending profile. It is a compact trend reading that is easy to calculate consistently and explain in a review.</p>
+
+<h2 id="formula">The four readings and what they mean</h2>
+
+<p>The calculator first converts EV into earned schedule:</p>
+
+<pre><code>ES = PD × (EV ÷ BAC)</code></pre>
+
+<p>It then compares that earned time with actual time and turns the comparison into two performance measures:</p>
+
+<pre><code>SV(t) = ES − AT
+SPI(t) = ES ÷ AT
+IEAC(t) = PD ÷ SPI(t)</code></pre>
+
+<p>Schedule variance in time, SV(t), is the gap between the time equivalent of completed work and the elapsed time. A negative value means the project has consumed more time than its completed work represents. SPI(t) is a ratio with 1.00 as the plan line. An IEAC(t) of ten periods means that, if the observed time efficiency continues and the linear-PV assumption remains reasonable, the project trend points to ten periods rather than the original PD.</p>
+
+<h2 id="worked-example">A worked reading from four inputs</h2>
+
+<p>Suppose BAC is 200,000, planned duration is 12 months, actual time is 8 months, and EV is 120,000. The completed work is 60% of the approved budget. With a linear baseline, that completed share represents 7.2 months of planned work:</p>
+
+<pre><code>ES = 12 × (120,000 ÷ 200,000) = 7.2 months
+SV(t) = 7.2 − 8 = −0.8 months
+SPI(t) = 7.2 ÷ 8 = 0.90
+IEAC(t) = 12 ÷ 0.90 = 13.33 months</code></pre>
+
+<p>The useful conclusion is not that the project is exactly 0.8 months late or that the finish date is guaranteed to be 13.33 months after start. The conclusion is that the work completed by month eight represents only 7.2 months of planned progress. The team is travelling at 90% of the time baseline, and the simple trend adds roughly 1.33 months to the original duration. That is enough evidence to investigate dependencies, throughput and remaining work.</p>
+
+<p>Try changing EV while leaving the other inputs fixed. If EV rises to 140,000, ES becomes 8.4 months, SV(t) becomes +0.4 months, SPI(t) becomes 1.05 and IEAC(t) falls to about 11.43 months. The result moves because the definition of progress moved. That is why the quality of EV measurement matters more than the number of decimal places displayed.</p>
+
+<h2 id="reading">How to read ES, SV(t), SPI(t) and IEAC(t) together</h2>
+
+<p>Use ES as the translation into the baseline’s time language. Use SV(t) to describe the gap in periods, especially when a sponsor wants to understand the size of the delay. Use SPI(t) to compare projects or reporting periods with different scales. Use IEAC(t) to test whether recovery options are plausible. None of the four readings tells you the cause. A low reading can come from an unavailable dependency, late approval, underestimated complexity, changed scope, or an overly optimistic baseline.</p>
+
+<p>A value of SPI(t) above 1.00 means the earned time exceeds elapsed time under this model. It does not prove the team should add scope, nor does it prove that quality is acceptable. A value of exactly 1.00 means the earned-time equivalent matches elapsed time. A value below 1.00 is a prompt to investigate. Agree thresholds with the project’s tolerances rather than copying a universal red line into every context.</p>
+
+<p>IEAC(t) is especially easy to misuse. It is a forecast based on the same efficiency continuing. It is not a calendar finish date, because the calculator does not know the status date, holidays, working calendars, remaining dependencies, or future scope decisions. Convert it into a calendar date only after reconciling the trend with the integrated schedule and with the team’s remaining work.</p>
+
+<h2 id="limits">Why earned schedule helps when SPI stops helping</h2>
+
+<p>At project completion, both EV and PV equal BAC. Traditional SPI therefore returns to 1.00 even when delivery was late. Near the end, PV is running out, so SPI can drift toward the plan line without the project recovering its actual time position. Earned Schedule keeps the comparison on a time axis and therefore preserves the meaning of being ahead or behind the planned duration.</p>
+
+<p>The linear assumption has its own boundary. If the baseline expects a large design effort early, a procurement peak in the middle, and testing at the end, the percentage of EV is not a perfect proxy for elapsed planned time. For a first-pass reading, state the assumption. For governance or a formal forecast, compare the result with the schedule’s time-phased earned schedule, milestone dates and remaining critical-path work.</p>
+
+<h2 id="mistakes">Mistakes that make the reading unreliable</h2>
+
+<ul>
+  <li><strong>Entering percent complete as EV.</strong> EV must be budgeted value, not a bare percentage. Convert the percentage using BAC, and make sure the progress rule is defined.</li>
+  <li><strong>Mixing status dates.</strong> BAC and PD come from the approved baseline, while EV and AT must describe the same reporting date.</li>
+  <li><strong>Calling IEAC(t) a commitment.</strong> It is an independent trend. A committed finish needs schedule logic, resource decisions and owner acceptance.</li>
+  <li><strong>Ignoring scope and quality.</strong> Fast apparent progress created by accepting incomplete or defective work is not earned progress.</li>
+  <li><strong>Comparing unlike periods.</strong> Use weeks with weeks or months with months, and document whether the periods are calendar or working periods.</li>
+</ul>
+
+<h2 id="practice">From a number to a project action</h2>
+
+<p>Record the four inputs, the status date, the baseline version and the resulting readings. Then add one sentence explaining the likely driver and one action with an owner. For the worked example, that might be: “SPI(t) is 0.90; confirm whether the 0.8-month gap is caused by the approval dependency, and return with a recovery option at the next weekly review.” Recalculate every reporting period and compare the direction, not just the latest point.</p>
+
+<p>For an exam or a quick planning exercise, apply the stated formulas carefully and keep the units consistent. For a live project, treat the calculator as a calibrated indicator on the desk: useful because it makes a hidden time relationship visible, but only trustworthy when its baseline and progress evidence are understood. The strongest decision combines ES with milestone health, critical-path float, cost performance, risk exposure and the team’s explanation of what will happen next.</p>
