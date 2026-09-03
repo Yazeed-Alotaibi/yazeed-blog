@@ -6,6 +6,11 @@ Thumbs.db
 !.env.example
 node_modules/
 
+# Claude Code's per-machine permission overrides. The shared allowlist lives in
+# .claude/settings.json and is committed; this one is personal to a checkout
+# and committing it would push one person's approvals onto everyone else.
+.claude/settings.local.json
+
 # Python bytecode, generated when a vendored skill script runs
 __pycache__/
 *.py[cod]
