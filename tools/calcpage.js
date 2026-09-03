@@ -95,14 +95,19 @@ function scriptBlocks(html) {
   return found;
 }
 
-function loadData(html) {
-  /* The definitions evaluate cleanly on their own; nothing in that block
-     touches a document. */
-  var blocks = scriptBlocks(html);
+/* The definitions evaluate cleanly on their own; nothing in that block
+   touches a document. Returns the whole sandbox because the block defines
+   two things — PM_DATA and the EXAMPLES pack beside it — and narrowing has
+   to check both. */
+function evaluate(source) {
   var sandbox = { module: { exports: {} }, console: console, Math: Math, Date: Date };
   sandbox.window = sandbox;
-  require('vm').runInNewContext(blocks.data, sandbox);
-  return sandbox.PM_DATA;
+  require('vm').runInNewContext(source, sandbox);
+  return sandbox;
+}
+
+function loadData(html) {
+  return evaluate(scriptBlocks(html).data).PM_DATA;
 }
 
 function cardFrom(html, id) {
@@ -127,6 +132,160 @@ function countCalculators(html) {
   });
   return n;
 }
+
+/* ── narrowing the definitions to one card ──────────────────────── */
+
+/* A page that shows one calculator has no use for the other thirty-three,
+   but it used to ship all of them: the whole definitions block went into
+   the page and a script immediately below it filtered the rest away at
+   run time. Correct, and about 134 kB of prose, formulas and interpret
+   functions that every visitor downloaded and parsed so the page could
+   throw them away before drawing anything. The cost was per page, so it
+   grew with the manifest rather than staying put.
+
+   This does the same filtering here, on the source text, so the bytes
+   never leave. Slicing text rather than re-serialising the parsed object
+   is deliberate: the compute and interpret functions close over the
+   helpers at the top of the block (`ok`, `f2`, `npvOf` and the rest), and
+   a function put back through `toString()` would lose that closure and
+   fail at the first call. Keeping the prelude and cutting whole card
+   literals out of the array between preserves every reference exactly.
+
+   The cut is anchored on indentation, which is safe only for as long as
+   the block stays formatted the way it is now — so `checkNarrowed` below
+   proves each cut rather than trusting it. */
+function narrowData(data, keep) {
+  var lines = data.split('\n');
+  function find(pred, from) {
+    for (var i = from || 0; i < lines.length; i++) if (pred(lines[i])) return i;
+    return -1;
+  }
+
+  var catsStart = find(function (l) { return l === '  var categories = ['; });
+  var catsEnd = find(function (l) { return l === '  ];'; }, catsStart);
+  if (catsStart === -1 || catsEnd === -1) {
+    throw new Error('PM_DATA: no `var categories = [ ... ];` array to narrow');
+  }
+
+  var target = null;
+  var i = catsStart + 1;
+  while (i < catsEnd) {
+    if (lines[i] !== '    {') { i++; continue; }
+    var catStart = i;
+    var catEnd = -1, j;
+    for (j = catStart + 1; j < catsEnd; j++) {
+      if (/^    \},?$/.test(lines[j])) { catEnd = j; break; }
+    }
+    if (catEnd === -1) throw new Error('PM_DATA: unclosed category at line ' + catStart);
+
+    var open = -1;
+    for (j = catStart + 1; j < catEnd; j++) if (lines[j] === '      cards: [') { open = j; break; }
+    if (open === -1) throw new Error('PM_DATA: category at line ' + catStart + ' has no cards array');
+    var close = -1;
+    for (j = open + 1; j < catEnd; j++) if (/^      \],?$/.test(lines[j])) { close = j; break; }
+    if (close === -1) throw new Error('PM_DATA: unclosed cards array at line ' + open);
+
+    var k = open + 1;
+    while (k < close) {
+      if (lines[k] !== '        {') { k++; continue; }
+      var cardStart = k, cardEnd = -1;
+      for (j = cardStart + 1; j < close; j++) {
+        if (/^        \},?$/.test(lines[j])) { cardEnd = j; break; }
+      }
+      if (cardEnd === -1) throw new Error('PM_DATA: unclosed card at line ' + cardStart);
+      var m = /^          id: '([^']+)',$/.exec(lines[cardStart + 1] || '');
+      if (!m) {
+        throw new Error('PM_DATA: the card at line ' + cardStart + ' does not open with ' +
+          'an `id:` field — narrowing reads the id from that line');
+      }
+      if (m[1] === keep) {
+        if (target) throw new Error('PM_DATA: two cards share the id "' + keep + '"');
+        target = { catStart: catStart, open: open, start: cardStart, end: cardEnd };
+      }
+      k = cardEnd + 1;
+    }
+    i = catEnd + 1;
+  }
+  if (!target) throw new Error('no card with id "' + keep + '" in PM_DATA');
+
+  /* One category holding one card, so both closers lose their comma. */
+  var out = lines.slice(0, catsStart + 1)
+    .concat(lines.slice(target.catStart, target.open + 1))
+    .concat(lines.slice(target.start, target.end))
+    .concat(['        }', '      ]', '    }'])
+    .concat(lines.slice(catsEnd));
+
+  return narrowExamples(out, keep).join('\n');
+}
+
+/* The worked readings ride along in the same block, keyed by DOM id. The
+   desk looks up `EXAMPLES['calc-' + card.id]` for the card it is rendering
+   and nothing else, so every other entry is dead weight on this page too. */
+function narrowExamples(lines, keep) {
+  var start = -1, i;
+  for (i = 0; i < lines.length; i++) if (lines[i] === 'var EXAMPLES = {') { start = i; break; }
+  if (start === -1) return lines;
+  var end = -1;
+  for (i = start + 1; i < lines.length; i++) if (lines[i] === '};') { end = i; break; }
+  if (end === -1) throw new Error('EXAMPLES: unclosed object literal');
+
+  var want = "  'calc-" + keep + "': {";
+  var kept = [];
+  var k = start + 1;
+  while (k < end) {
+    if (!/^  '[^']+': \{$/.test(lines[k])) { k++; continue; }
+    var entryEnd = -1, j;
+    for (j = k + 1; j < end; j++) if (/^  \},?$/.test(lines[j])) { entryEnd = j; break; }
+    if (entryEnd === -1) throw new Error('EXAMPLES: unclosed entry at line ' + k);
+    if (lines[k] === want) kept = lines.slice(k, entryEnd).concat(['  }']);
+    k = entryEnd + 1;
+  }
+  return lines.slice(0, start + 1).concat(kept).concat(lines.slice(end));
+}
+
+/* Proof, not assumption. The narrowed block has to evaluate, hold exactly
+   the one card, and hold it unchanged — functions compared by source, so a
+   cut that clipped an `interpret` mid-body is caught here rather than by a
+   reader whose verdict line has gone blank. */
+function checkNarrowed(narrowed, full, keep) {
+  var sandbox = evaluate(narrowed);
+  var cats = sandbox.PM_DATA && sandbox.PM_DATA.categories;
+  if (!cats || cats.length !== 1 || cats[0].cards.length !== 1) {
+    throw new Error('narrowing "' + keep + '": expected one category holding one card, got ' +
+      (cats ? cats.length + ' holding ' + cats.map(function (c) { return c.cards.length; }).join('/') : 'nothing'));
+  }
+
+  var want = null;
+  full.PM_DATA.categories.forEach(function (cat) {
+    cat.cards.forEach(function (card) { if (card.id === keep) want = card; });
+  });
+  if (shape(cats[0].cards[0]) !== shape(want)) {
+    throw new Error('narrowing "' + keep + '": the card changed on the way through');
+  }
+
+  var keys = Object.keys(sandbox.EXAMPLES || {});
+  var expected = full.EXAMPLES && full.EXAMPLES['calc-' + keep] ? ['calc-' + keep] : [];
+  if (keys.join(',') !== expected.join(',')) {
+    throw new Error('narrowing "' + keep + '": EXAMPLES should hold ' +
+      (expected.length ? expected[0] : 'nothing') + ', holds ' + (keys.join(',') || 'nothing'));
+  }
+  return narrowed;
+}
+
+/* A stable string for a value, functions included — `JSON.stringify` drops
+   them, and a compute function is most of what a card is. */
+function shape(v) {
+  return JSON.stringify(v, function (k, val) {
+    if (typeof val === 'function') return 'fn:' + val.toString();
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      var sorted = {};
+      Object.keys(val).sort().forEach(function (key) { sorted[key] = val[key]; });
+      return sorted;
+    }
+    return val;
+  });
+}
+
 
 /* ── the page's own styling ─────────────────────────────────────── */
 
@@ -255,6 +414,9 @@ function build(spec, html, manifestPath) {
   if (!found) throw new Error('no card with id "' + spec.card + '" in PM_DATA');
 
   var blocks = scriptBlocks(html);
+  /* The definitions as the desk holds them, kept so the narrowed copy below
+     can be checked against the original card rather than merely parsed. */
+  var defs = evaluate(blocks.data);
   /* The full desk's calculator count, before the page narrows PM_DATA to a
      single card. Interpolated into the footer so the number can never drift
      from the desk the reader came from. */
@@ -430,20 +592,12 @@ function build(spec, html, manifestPath) {
     '    <p id="desk-stats"></p>',
     '  </div>',
     '',
-    '  <script>' + blocks.data + '</script>',
-    '  <script>',
-    '/* One calculator, not thirty-four. The engine below renders whatever',
-    '   PM_DATA holds, so narrowing it here is all it takes — no branch in the',
-    '   renderer, and nothing on this page that the desk does not also run. */',
-    '(function () {',
-    "  'use strict';",
-    "  var keep = '" + spec.card + "';",
-    '  PM_DATA.categories = PM_DATA.categories.filter(function (cat) {',
-    '    cat.cards = cat.cards.filter(function (card) { return card.id === keep; });',
-    '    return cat.cards.length > 0;',
-    '  });',
-    '})();',
-    '  </script>',
+    /* One calculator, not thirty-four. The engine renders whatever PM_DATA
+       holds, so narrowing the definitions is all it takes — no branch in the
+       renderer, and nothing on this page that the desk does not also run.
+       The cut happens here rather than in a script on the page so the other
+       thirty-three are never sent, and is proved before it is written. */
+    '  <script>' + checkNarrowed(narrowData(blocks.data, spec.card), defs, spec.card) + '</script>',
     '  <script>' + blocks.xlsx + '</script>',
     '  <script>' + blocks.charts + '</script>',
     '  <script>' + blocks.export + '</script>',

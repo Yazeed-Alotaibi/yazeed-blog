@@ -4,16 +4,19 @@
    one of them. Miss any and the suite fails — correctly, but after the fact:
 
      1. content/<slug>.html      the long-form prose, 1000 words minimum
-     2. content/pages.json       the manifest entry the generator reads
-     3. sitemap.xml              or a crawler has no list to find it in
-     4. index.html               a `page:` field on the card, so the desk
+     2. content/pages.json       the manifest entry the generator reads, and
+                                 the homepage's own `updated` date, since a
+                                 new page changes the desk that links to it
+     3. index.html               a `page:` field on the card, so the desk
                                  links to it in both the runtime template
                                  and the prerendered static mirror
-     5. <slug>.html              the generated page itself
+     4. <slug>.html              the generated page itself
+     5. sitemap.xml              or a crawler has no list to find it in
 
-   This tool does 1 through 4 and leaves 5 to `tools/calcpage.js`, which is
-   the thing that actually knows how to build a page. What you are left with
-   is the only part that needed a person: writing the prose.
+   This tool does 1 through 3 and leaves the two generated files to
+   `tools/calcpage.js` and `tools/sitemap.js`, which are the things that
+   actually know how to build them — `node tools/check.js` runs both. What
+   you are left with is the only part that needed a person: the prose.
 
      node tools/newpage.js <slug> --card <card-id>
      node tools/newpage.js <slug> --card <card-id> --dry-run
@@ -156,25 +159,19 @@ function addToManifest(slug, card, opts) {
   return { path: path.join('content', 'pages.json'), body: JSON.stringify(data, null, 2) + '\n' };
 }
 
-function addToSitemap(slug) {
-  var raw = read('sitemap.xml');
-  var loc = SITE + '/' + slug + '.html';
-  if (raw.indexOf('<loc>' + loc + '</loc>') !== -1) return null;
+/* sitemap.xml is generated from content/pages.json by tools/sitemap.js, so
+   there is no entry to splice in here — writing the manifest entry above is
+   what puts the page in the sitemap. All this does is bump the homepage's
+   own date, because a new page changes the desk that links to it.
 
-  var entry = [
-    '  <url>',
-    '    <loc>' + loc + '</loc>',
-    '    <lastmod>' + today() + '</lastmod>',
-    '  </url>',
-    ''
-  ].join('\n');
-
-  var close = raw.lastIndexOf('</urlset>');
-  if (close === -1) throw new Error('sitemap.xml has no </urlset> to insert before');
-  return {
-    path: 'sitemap.xml',
-    body: raw.slice(0, close) + entry + raw.slice(close)
-  };
+   Call it after the manifest write has been staged: it reads the manifest
+   body being written, not the one still on disk. */
+function bumpHomeUpdated(pagesWrite) {
+  var data = JSON.parse(pagesWrite.body);
+  if (!data.home) data.home = {};
+  if (data.home.updated === today()) return pagesWrite;
+  data.home.updated = today();
+  return { path: pagesWrite.path, body: JSON.stringify(data, null, 2) + '\n' };
 }
 
 /* Insert `page: '<slug>.html',` into the card's object literal, immediately
@@ -335,9 +332,7 @@ function main(argv) {
     path: path.join('content', opts.slug + '.html'),
     body: proseStub(opts.slug, card, opts)
   });
-  writes.push(addToManifest(opts.slug, card, opts));
-  var sitemapWrite = addToSitemap(opts.slug);
-  if (sitemapWrite) writes.push(sitemapWrite);
+  writes.push(bumpHomeUpdated(addToManifest(opts.slug, card, opts)));
 
   if (opts.link) {
     var linked;

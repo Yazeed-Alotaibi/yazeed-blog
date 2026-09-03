@@ -42,6 +42,13 @@ var STEPS = [
     fix: 'node tools/calcpage.js --all'
   },
   {
+    label: 'sitemap',
+    script: path.join('tools', 'sitemap.js'),
+    write: [],
+    verify: ['--check'],
+    fix: 'node tools/sitemap.js'
+  },
+  {
     label: 'prerendered desk mirror',
     script: path.join('tools', 'prerender.js'),
     write: [],
@@ -82,7 +89,7 @@ function main(argv) {
     } else if (argv[i] === '--help' || argv[i] === '-h') {
       console.log('usage: node tools/check.js [--verify]');
       console.log('');
-      console.log('  (no flag)  regenerate the pages and the prerender, then test');
+      console.log('  (no flag)  regenerate the pages, the sitemap and the prerender, then test');
       console.log('  --verify   change nothing; fail if any committed output is stale');
       return 0;
     } else {

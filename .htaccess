@@ -51,8 +51,45 @@ ErrorDocument 404 /404.html
 # 500. A bare Header directive outside the guard would take the whole site
 # down on a host without the module.
 <IfModule mod_headers.c>
-  Header always set Strict-Transport-Security "max-age=300"
+  # HSTS, second rung. The ramp started at max-age=300 so a certificate
+  # mistake would expire in five minutes rather than in a browser's memory
+  # for a year. It has served production traffic without one since, so this
+  # steps up to a day — long enough to be worth having, short enough that a
+  # rollback is a rollback rather than a wait. Advance to 31536000 once a day
+  # has passed cleanly; only then consider includeSubDomains, and preload
+  # last of all, since preload is effectively irreversible.
+  Header always set Strict-Transport-Security "max-age=86400"
+
+  # Do not let a browser second-guess a Content-Type. Every response here is
+  # a file this repository committed, so a sniffed type can only ever be a
+  # wrong one.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Send the full URL to this origin, only the origin to anyone else. The
+  # calculators keep their figures in the hash, so a referrer carrying the
+  # whole URL off-site would carry a reader's numbers with it — the same
+  # thing the Google tag already strips from page_location.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Font filenames are immutable: a new cut of a face arrives under a new
+  # name, so nothing at these paths ever changes.
   <FilesMatch "\.woff2$">
     Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # The pages are the deploy. They must not be served stale after a push, so
+  # they are cacheable but always revalidated — a conditional request against
+  # the ETag the origin already sends, which answers 304 and costs nothing
+  # when nothing changed.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  # The share card changes only when the figures on it do, and it is fetched
+  # by crawlers unfurling a link rather than by the page itself. A day is
+  # long enough to save the repeat fetches and short enough that a re-render
+  # is visible the same day.
+  <FilesMatch "\.(?:png|xml|txt)$">
+    Header set Cache-Control "public, max-age=86400"
   </FilesMatch>
 </IfModule>

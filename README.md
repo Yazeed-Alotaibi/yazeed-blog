@@ -72,10 +72,10 @@ alarm has been raised here once already.
 node tools/newpage.js <slug> --card <calculator-id>
 ```
 
-That handles the four mechanical edits — prose stub, manifest entry, sitemap
-entry, and the link from the desk. You then write the prose (1,000 words
-minimum, enforced) and replace the placeholder title and description, then run
-`node tools/check.js`.
+That handles the mechanical edits — prose stub, manifest entry, and the link
+from the desk. You then write the prose (1,000 words minimum, enforced) and
+replace the placeholder title and description, then run `node tools/check.js`,
+which generates the page itself and the sitemap row that goes with it.
 
 ## What lives where
 

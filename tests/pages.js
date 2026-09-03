@@ -30,6 +30,20 @@ var ROOT = path.join(__dirname, '..');
    does not pass. */
 var MIN_WORDS = 1000;
 
+/* The card ids a generated page's definitions actually contain. Read from
+   the shipped text rather than by evaluating it: a page that went back to
+   embedding the whole desk and filtering at run time would evaluate to one
+   card and still have sent all thirty-four. */
+function shippedCardIds(html) {
+  var re = /<script>([\s\S]*?)<\/script>/g, m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[1].indexOf('var PM_DATA = (function') === -1) continue;
+    var ids = m[1].match(/^          id: '([^']+)',$/gm) || [];
+    return ids.map(function (line) { return /'([^']+)'/.exec(line)[1]; });
+  }
+  return [];
+}
+
 function stripMarkup(html) {
   return String(html)
     .replace(/<!--[\s\S]*?-->/g, ' ')
@@ -199,6 +213,20 @@ function run(page) {
       hasCount(onDisk, totalCards, 'calculators'),
       'expected ' + totalCards + ' calculators in the footer');
 
+    /* A page about one calculator should carry one calculator. It used to
+       carry all thirty-four and filter the rest away in the browser, which
+       cost every visitor about 134 kB of definitions the page then discarded
+       — invisible on screen, so nothing but a check like this would notice
+       it coming back. Counted from the definitions the page actually ships,
+       not from the rendered DOM, because the point is the bytes. */
+    H.suite('ships one calculator, not the whole desk');
+    var shipped = shippedCardIds(onDisk);
+    H.deep(file + ': the definitions hold only its own card',
+      shipped, [spec.card]);
+    H.check(file + ': no other calculator\'s prose rides along',
+      shipped.length === 1,
+      'found ' + shipped.length + ' cards: ' + shipped.slice(0, 5).join(', '));
+
     H.suite('discoverability');
     var sitemap = fs.existsSync(path.join(ROOT, 'sitemap.xml'))
       ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
@@ -220,6 +248,23 @@ function run(page) {
     H.check('index.html links to ' + file,
       indexOnDisk.indexOf('href="' + file + '"') !== -1,
       'no static href="' + file + '" in index.html — run node tools/prerender.js');
+  });
+
+  /* The sitemap is generated from the same `updated` field the byline and
+     the JSON-LD dates come from, so a page cannot tell a reader one date and
+     a crawler another. Regenerate and compare, exactly as the pages above
+     are compared — a hand-edit here is the drift this replaced. */
+  H.suite('sitemap is generated, not typed');
+  var sitemapTool = require('../tools/sitemap.js');
+  var sitemapPath = path.join(ROOT, sitemapTool.FILE);
+  H.eq(sitemapTool.FILE + ': matches the manifest',
+    fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, 'utf8') : '',
+    sitemapTool.build(),
+    'stale — run `node tools/sitemap.js`');
+  specs.forEach(function (spec) {
+    H.check(sitemapTool.FILE + ': ' + spec.slug + ' carries its own `updated`',
+      sitemapTool.build().indexOf('<lastmod>' + spec.updated + '</lastmod>') !== -1,
+      'expected lastmod ' + spec.updated);
   });
 
   H.suite('Google tag on every shipped page');

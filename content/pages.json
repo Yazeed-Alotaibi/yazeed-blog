@@ -13,6 +13,10 @@
     "",
     "URLs end in .html because that is how Apache serves the file. Extensionless URLs (/earned-value-analysis) would need one RewriteRule, guarded inside <IfModule mod_rewrite.c> like every other directive in .htaccess. Worth doing before there are many pages and links to them, not after."
   ],
+  "home": {
+    "_comment": "The homepage row of sitemap.xml. Bump when index.html changes in a way a reader would notice; tools/newpage.js bumps it when a page ships, since a new page changes the desk.",
+    "updated": "2026-09-03"
+  },
   "pages": [
     {
       "card": "earned-value",
