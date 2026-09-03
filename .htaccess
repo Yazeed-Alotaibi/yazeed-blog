@@ -36,7 +36,7 @@
   # is confirmed to exist and the branded not-found page is what a visitor sees.
   # .well-known stays reachable for anything a verifier may need to place there.
   RewriteRule ^(?:docs|design|tests|tools|content)(?:/|$) - [R=404,L]
-  RewriteRule ^(?:AGENTS\.md|CLAUDE\.md|skills-lock\.json)$ - [R=404,L]
+  RewriteRule ^(?:AGENTS\.md|CLAUDE\.md|README\.md|skills-lock\.json)$ - [R=404,L]
   RewriteRule ^\.(?!well-known(?:/|$)) - [R=404,L]
 </IfModule>
 

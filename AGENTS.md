@@ -3,7 +3,48 @@
 Project management tools and resources by Yazeed Alotaibi (PMI-RMP · PRINCE2),
 published at yazeed.blog. This file is the source of truth for both Claude Code
 and Codex. `CLAUDE.md` imports it, so edit this file — never duplicate rules
-into a second one.
+into a second one. `README.md` is the human-facing front door and deliberately
+says less; when a rule changes it changes here, and the README is updated only
+if it contradicts.
+
+## The daily loop
+
+The rest of this file is reference — read the section you need. This is the
+loop itself, and it is short on purpose.
+
+```bash
+node tools/check.js          # regenerate the committed output, then test
+node tools/check.js --verify # change nothing; fail if that output is stale
+```
+
+1. **Edit** what you were assigned, and nothing else.
+2. **Regenerate and test** with `node tools/check.js`. It runs
+   `tools/calcpage.js --all`, then `tools/prerender.js`, then `tests/run.js`,
+   in that order because each reads the one before it. Never run them out of
+   order by hand; that is what this script is for.
+3. **Look at the page** in a real browser, in a **foreground tab**
+   (`python -m http.server 4173`). The suite never draws a chart, so a green
+   run is not evidence that one does. See **Tests** for why this cannot be
+   automated here, and for the false alarm it has already caused.
+4. **Stage by name.** Never `git add -A` — the other agent may have a file
+   half-written. Commit the regenerated output *with* the change that caused
+   it; a commit that edits a calculator but not its rebuilt page is broken
+   even though the suite passed on your tree.
+5. **Publish only when verified.** `main` is the live site; merging is
+   deploying. See **Publishing a finished unit**.
+
+Adding a calculator page has its own scaffolder, because it is five edits
+across four files and every one of them is gated by a test:
+
+```bash
+node tools/newpage.js <slug> --card <card-id>
+```
+
+It writes the prose stub, the manifest entry, the sitemap entry and the desk
+link, then re-parses `index.html` to confirm its own edit was sound and
+restores the original bytes if it was not. What it leaves you is the part that
+needed a person: 1000 words of prose and a real title and description. See
+**Per-calculator pages**.
 
 ## What this project is
 
@@ -76,9 +117,28 @@ After editing calculator data in `index.html` **or** any file under `content/`,
 run both generators and commit their output:
 
 ```bash
+node tools/check.js
+```
+
+That is `tools/calcpage.js --all` then `tools/prerender.js` then the suite, in
+the order they depend on each other. Run them individually only when debugging
+one of them:
+
+```bash
 node tools/calcpage.js --all
 node tools/prerender.js
 ```
+
+To start a new page, scaffold it rather than making the five edits by hand:
+
+```bash
+node tools/newpage.js <slug> --card <card-id>
+```
+
+Note that adding a `page:` field ripples further than it looks. Every generated
+page embeds the whole of `PM_DATA`, so a new page changes the related-links
+inside pages that already shipped — which is why the first step regenerates
+*all* pages, not only the new one.
 
 Commit the regenerated root `*.html` files and the prerender block in
 `index.html`. Skipping either step leaves the desk and its satellite pages out
@@ -276,6 +336,28 @@ Both expose `frontend-design` and `ui-ux-pro-max`, pinned in `skills-lock.json`.
 Install more with `npx skills add <source>`, which writes to both paths and
 updates the lock file. Commit all three.
 
+`site-workflow` is this project's own skill rather than a vendored one, so it
+is **not** in `skills-lock.json` and `npx skills` does not manage it. It
+carries the loop at the top of this file in the form an agent reads when it
+picks up a task, and it lives at `.agents/skills/site-workflow/` with the same
+symlink into `.claude/skills/`. Edit it when the loop changes.
+
+Claude Code has three further affordances that Codex does not read, so nothing
+here may depend on them:
+
+- `.claude/commands/` — `/check`, `/new-page` and `/publish`. Thin prompts that
+  call the scripts; the detail stays in the skill and in this file.
+- `.claude/settings.json` — pre-approves the project's own scripts and
+  read-only git so routine work stops prompting. Its `deny` list encodes the
+  two rules that are expensive rather than merely annoying to break:
+  `git add -A` and its variants, and pushing to `main`. Publishing is a human
+  action here because its one real pre-flight, looking at a chart, cannot be
+  automated.
+
+There is deliberately no hook. A `PostToolUse` hook cannot add a reminder to a
+turn without blocking it, and a reminder that interrupts every edit of
+`index.html` would cost more than the mistake it prevents.
+
 ## Working concurrently
 
 Claude Code and Codex both work this repository at the same time. Isolation is
@@ -329,9 +411,11 @@ furniture. Living reference material sits at the top of `docs/` (the SEO plan,
 the Earned Schedule spec, the citations); finished working notes and retired
 explorations live under `docs/archive/` and `design/archive/` and are kept for
 the record, not maintained. Hostinger deploys them with everything else, but `.htaccess`
-answers 404 for those paths, for `AGENTS.md`, `CLAUDE.md` and
-`skills-lock.json`, and for any dot-path other than `.well-known/`. There is deliberately no CI here: no workflow,
-no build, no `CNAME`.
+answers 404 for those paths, for `AGENTS.md`, `CLAUDE.md`, `README.md` and
+`skills-lock.json`, and for any dot-path other than `.well-known/` — which is
+what keeps `.claude/` and `.agents/` off the live site. `tests/redirects.js`
+holds that list, so a new furniture file at the root needs an entry in both.
+There is deliberately no CI here: no workflow, no build, no `CNAME`.
 
 `.htaccess` is the one piece of host config in the repository. Apache reads it
 on the origin, and it answers 301 for the three addresses that are not the
