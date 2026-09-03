@@ -745,6 +745,21 @@ main {
   color: var(--ink-3);
 }
 
+/* "Unsaved desk" on its own explains nothing to a first visit; the plate
+   points at the capability that says what a project is for. */
+.project-bay-help {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+.project-bay-help:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .bench-dialog {
   width: min(44rem, calc(100vw - 2rem));
   max-height: min(48rem, calc(100vh - 2rem));
@@ -1762,6 +1777,7 @@ main {
   font-weight: 600; font-size: .95rem; color: var(--accent); text-decoration: none;
 }
 .hero-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hero-cta + .hero-cta { margin-left: 1.5rem; }
 /* Engraved label plate — small mono caps sitting in a milled recess. */
 .label {
   display: inline-block;
@@ -2130,6 +2146,80 @@ h2 {
   font-size: .84rem; color: var(--ink-2);
 }
 .plate-foot b { display: block; color: var(--ink); font-weight: 600; margin-bottom: .1rem; }
+
+/* ---- Capabilities --------------------------------------------------------
+   What the desk does besides read a number. Its features shipped one at a
+   time — Excel export, deep links, the analysis pages, chart inspection, the
+   project register, checked imports — and each surfaced only as a small mono
+   button on a card far down the page, or as a sidebar plate reading "Unsaved
+   desk". A visitor who never scrolled that far never learned they existed.
+   This section names them once, above the desk, in the bench's own idiom: an
+   index plate per capability, stamped with the date it shipped. The stamp does
+   what a "new" badge would, and unlike a badge it never goes stale — it just
+   reads as older. Add a plate when a feature ships; do not remove old ones. */
+.capabilities { border-bottom: 1px solid var(--rule-2); }
+.cap-grid {
+  display: grid;
+  gap: .9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 46em) { .cap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 62em) { .cap-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cap {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1rem 1.05rem 1.05rem;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--lift), var(--lip);
+}
+.cap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .6rem;
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.cap h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.cap p { margin: 0; flex: 1 1 auto; font-size: .92rem; color: var(--ink-2); }
+.cap-foot { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-top: .3rem; }
+/* Where a capability lives on every card there is nothing to open, so the
+   foot says where to look and jumps there. */
+.cap-where {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: .66rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+.cap-where:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* A control the writer lock has taken away must look taken away. Until now a
+   disabled action kept its enabled face, so a second tab saw buttons that did
+   nothing when pressed. Opacity and the cursor together, never colour alone. */
+.card-action:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.card-action:disabled:hover { border-color: var(--rule-2); background: var(--sheet); color: var(--ink-2); }
 
 /* ── print ────────────────────────────────────────────────────────────────
    A filled calculator should leave the bench as a worksheet: the reading,
@@ -6373,6 +6463,11 @@ var PM_CHART_MOUNT = (function () {
     var exportButton = document.getElementById('project-sync-export');
     var newButton = document.getElementById('project-new-open');
     var importButton = document.getElementById('project-import-open');
+    /* The capability plates above the desk repeat the two project controls,
+       so they obey the same writer lock — a second tab must not be shown an
+       enabled button it cannot use. */
+    var capNew = document.getElementById('cap-project-new');
+    var capImport = document.getElementById('cap-import-open');
     var writable = projectWriter === true;
     if (!name || !meta) return;
     if (!project) {
@@ -6386,6 +6481,8 @@ var PM_CHART_MOUNT = (function () {
     if (exportButton) exportButton.disabled = !project;
     if (newButton) newButton.disabled = !writable;
     if (importButton) importButton.disabled = !writable;
+    if (capNew) capNew.disabled = !writable;
+    if (capImport) capImport.disabled = !writable;
     renderProjectRegister();
   }
 
@@ -6827,6 +6924,8 @@ var PM_CHART_MOUNT = (function () {
     var register = document.getElementById('project-register-dialog');
     var importDialog = document.getElementById('project-import-dialog');
     var nameInput = document.getElementById('project-name');
+    var capNew = document.getElementById('cap-project-new');
+    var capImport = document.getElementById('cap-import-open');
     document.getElementById('project-register-open').addEventListener('click', function () {
       openProjectRegister(false);
     });
@@ -6847,6 +6946,10 @@ var PM_CHART_MOUNT = (function () {
     });
 
     document.getElementById('project-import-open').addEventListener('click', openImportDialog);
+    /* The capability plates carry the same two controls. Guarded, because a
+       satellite page lifts this script and has no plates. */
+    if (capNew) capNew.addEventListener('click', function () { openProjectRegister(true); });
+    if (capImport) capImport.addEventListener('click', openImportDialog);
     document.getElementById('project-import-close').addEventListener('click', function () {
       closeBenchDialog(importDialog);
     });
