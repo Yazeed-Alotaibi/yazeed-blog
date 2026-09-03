@@ -1141,7 +1141,82 @@ main {
   box-shadow: var(--sunk);
 }
 
+.chart-plot { position: relative; }
 .chart-plot svg { display: block; width: 100%; height: auto; }
+
+.chart-plot.is-inspectable {
+  cursor: crosshair;
+  touch-action: pan-y pinch-zoom;
+}
+.chart-plot.is-inspectable:focus,
+.chart-plot.is-inspectable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ch-inspect-guide,
+.ch-inspect-dot,
+.ch-inspect-box,
+.ch-inspect-readout {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.ch-inspect-guide { background: var(--ink-3); opacity: 0.58; }
+.ch-inspect-guide-x { width: 1px; }
+.ch-inspect-guide-y { height: 1px; }
+.ch-inspect-dot {
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 2px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--ink);
+}
+.ch-inspect-box {
+  box-sizing: border-box;
+  border: 2px solid var(--ink);
+  background: transparent;
+}
+.ch-inspect-readout {
+  box-sizing: border-box;
+  top: 8px;
+  max-width: calc(100% - 16px);
+  padding: 0.42rem 0.55rem 0.45rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  background: var(--sheet);
+  box-shadow: var(--lip);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.ch-inspect-readout.is-left { left: 8px; }
+.ch-inspect-readout.is-right { right: 8px; }
+.ch-inspect-label,
+.ch-inspect-value,
+.ch-inspect-detail { display: block; }
+.ch-inspect-label {
+  margin-bottom: 0.12rem;
+  font-size: 0.57rem;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.ch-inspect-value {
+  font-size: 0.72rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ch-inspect-detail {
+  margin-top: 0.1rem;
+  font-size: 0.61rem;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+.ch-inspect-detail[hidden] { display: none; }
 
 .chart-empty,
 .chart-summary {
@@ -6643,6 +6718,46 @@ var PM_CHARTS = (function () {
       '" width="' + r1(w) + '" height="' + r1(h) + '"/>';
   }
 
+  /* A comparison bar has a square zero-end and a 4px rounded data-end. The
+     shared rect() primitive stays square because interval bands, matrix cells
+     and calibrated meter zones encode exact boundaries. */
+  function barPath(x, y, w, h, cls, growsUp) {
+    if (!(w > 0)) w = 0;
+    if (!(h > 0)) h = 0;
+    var r = Math.min(4, w / 2, h / 2);
+    var x2 = x + w, y2 = y + h;
+    var d;
+    if (growsUp) {
+      d = 'M' + r1(x) + ' ' + r1(y2) +
+        'L' + r1(x) + ' ' + r1(y + r) +
+        'Q' + r1(x) + ' ' + r1(y) + ' ' + r1(x + r) + ' ' + r1(y) +
+        'L' + r1(x2 - r) + ' ' + r1(y) +
+        'Q' + r1(x2) + ' ' + r1(y) + ' ' + r1(x2) + ' ' + r1(y + r) +
+        'L' + r1(x2) + ' ' + r1(y2) + 'Z';
+    } else {
+      d = 'M' + r1(x) + ' ' + r1(y) +
+        'L' + r1(x2) + ' ' + r1(y) +
+        'L' + r1(x2) + ' ' + r1(y2 - r) +
+        'Q' + r1(x2) + ' ' + r1(y2) + ' ' + r1(x2 - r) + ' ' + r1(y2) +
+        'L' + r1(x + r) + ' ' + r1(y2) +
+        'Q' + r1(x) + ' ' + r1(y2) + ' ' + r1(x) + ' ' + r1(y2 - r) + 'Z';
+    }
+    return '<path class="' + cls + '" d="' + d + '"/>';
+  }
+
+  function inspection(w, h, pad, items, columns) {
+    return {
+      width: w,
+      height: h,
+      x1: pad.l,
+      y1: pad.t,
+      x2: w - pad.r,
+      y2: h - pad.b,
+      columns: columns || 0,
+      items: items
+    };
+  }
+
   /* Half-pixel offsets keep hairlines from smearing across two device rows. */
   function r1(n) { return Math.round(n * 10) / 10; }
   function crisp(n) { return Math.round(n) + 0.5; }
@@ -6693,9 +6808,10 @@ var PM_CHARTS = (function () {
     out += yAxis(w, h, pad, sy, ticks(lo, hi, 4), spec.tickFmt);
     out += plotFrame(w, h, pad);
 
+    var inspectItems = [];
     var n = series.length;
     var slot = pw / n;
-    var bw = Math.min(slot * 0.56, 54);
+    var bw = Math.min(slot * 0.56, 24);
     var zeroY = sy(0);
 
     for (var i = 0; i < n; i++) {
@@ -6703,14 +6819,27 @@ var PM_CHARTS = (function () {
       var cx = pad.l + slot * (i + 0.5);
       var y = sy(s.value);
       var top = Math.min(y, zeroY), hgt = Math.abs(y - zeroY);
+      var barH = Math.max(hgt, 1);
+      var barX = cx - bw / 2;
       /* A hairline at least 1px tall so a zero-value bar still reads as a
          measured zero rather than a missing entry. */
-      out += rect(cx - bw / 2, top, bw, Math.max(hgt, 1), 'ch-bar ch-t-' + (s.tone || 'neutral'));
+      out += barPath(barX, top, bw, barH, 'ch-bar ch-t-' + (s.tone || 'neutral'), s.value >= 0);
       /* Pattern overlay, so a bar's role survives greyscale. */
-      if (s.hatch) out += rect(cx - bw / 2, top, bw, Math.max(hgt, 1), 'ch-hatch');
+      if (s.hatch) out += barPath(barX, top, bw, barH, 'ch-hatch', s.value >= 0);
       out += text(cx, h - pad.b + 14, s.label, 'ch-cat');
       if (s.sub) out += text(cx, h - pad.b + 26, s.sub, 'ch-cat ch-cat-sub');
       out += text(cx, top - 5, (spec.valueFmt || short)(s.value), 'ch-val');
+      inspectItems.push({
+        key: 'bar-' + i,
+        label: s.label,
+        value: full(s.value),
+        detail: (s.sub ? s.sub + ' · ' : '') + (spec.valHead || 'Value'),
+        x: cx,
+        y: s.value >= 0 ? top : top + barH,
+        guide: 'none',
+        box: { x: barX, y: top, w: bw, h: barH },
+        hit: { x: pad.l + slot * i, y: pad.t, w: slot, h: ph }
+      });
     }
 
     out += line(pad.l, crisp(zeroY), w - pad.r, crisp(zeroY), 'ch-zero');
@@ -6724,6 +6853,7 @@ var PM_CHARTS = (function () {
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, inspectItems),
       summary: spec.summary || series.map(function (s) {
         return s.label + ' ' + full(s.value);
       }).join('; ') + '.',
@@ -6806,6 +6936,15 @@ var PM_CHARTS = (function () {
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, [{
+        key: 'quadrant-reading',
+        label: 'Current reading',
+        value: (spec.xLabel || 'x') + ' ' + full(spec.x),
+        detail: (spec.yLabel || 'y') + ' ' + full(spec.y),
+        x: px,
+        y: py,
+        guide: 'xy'
+      }]),
       summary: spec.summary || ((spec.xLabel || 'x') + ' ' + trim(spec.x) + ', ' +
         (spec.yLabel || 'y') + ' ' + trim(spec.y) + '.'),
       table: {
@@ -6831,6 +6970,7 @@ var PM_CHARTS = (function () {
     var gw = cell * size;
     var h = pad.t + gw + pad.b;
 
+    var inspectItems = [];
     var out = svgOpen(w, h);
     var x0 = pad.l, y0 = pad.t;
 
@@ -6840,9 +6980,23 @@ var PM_CHARTS = (function () {
         var imp = c + 1;
         var score = prob * imp;
         var band = score >= 15 ? 'bad' : score >= 8 ? 'warn' : 'good';
+        var bandName = score >= 15 ? 'High' : score >= 8 ? 'Moderate' : 'Low';
         var cx = x0 + c * cell, cy = y0 + r * cell;
         out += rect(cx, cy, cell, cell, 'ch-cell ch-band-' + band);
         out += text(cx + cell / 2, cy + cell / 2 + 3.5, String(score), 'ch-cellnum');
+        inspectItems.push({
+          key: 'cell-' + prob + '-' + imp,
+          label: (prob === p && imp === im ? 'Selected · ' : '') +
+            'Probability ' + prob + ' × impact ' + imp,
+          value: 'Score ' + score,
+          detail: bandName + ' band',
+          x: cx + cell / 2,
+          y: cy + cell / 2,
+          guide: 'none',
+          selected: prob === p && imp === im,
+          box: { x: cx, y: cy, w: cell, h: cell },
+          hit: { x: cx, y: cy, w: cell, h: cell }
+        });
       }
     }
 
@@ -6863,6 +7017,7 @@ var PM_CHARTS = (function () {
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, inspectItems, size),
       summary: 'Probability ' + p + ' × impact ' + im + ' places this risk at score ' +
         (p * im) + ' of ' + (size * size) + '.',
       table: {
@@ -6905,6 +7060,8 @@ var PM_CHARTS = (function () {
     var sx = function (v) { return pad.l + ((v - xlo) / (xhi - xlo)) * pw; };
     var sy = function (v) { return pad.t + ph - ((v - ylo) / (yhi - ylo)) * ph; };
 
+    var inspectItems = [];
+    var inspectSeq = 0;
     var out = svgOpen(w, h);
     out += yAxis(w, h, pad, sy, ticks(ylo, yhi, 4), spec.tickFmt);
 
@@ -6935,9 +7092,40 @@ var PM_CHARTS = (function () {
        stays a baseline in greyscale and for a dichromatic reader. */
     series.forEach(function (s, si) {
       var d = '';
+      var seriesLabel = s.label || ('Series ' + (si + 1));
       s.points.forEach(function (pt, k) {
         if (!isFinite(pt[0]) || !isFinite(pt[1])) return;
-        d += (k === 0 || !d ? 'M' : 'L') + r1(sx(pt[0])) + ' ' + r1(sy(pt[1]));
+        var px = sx(pt[0]), py = sy(pt[1]);
+        d += (k === 0 || !d ? 'M' : 'L') + r1(px) + ' ' + r1(py);
+        var merged = null;
+        for (var ii = 0; ii < inspectItems.length; ii++) {
+          if (inspectItems[ii].priority === 1 &&
+              Math.abs(inspectItems[ii].x - px) < 0.05 &&
+              Math.abs(inspectItems[ii].y - py) < 0.05) {
+            merged = inspectItems[ii];
+            break;
+          }
+        }
+        if (merged) {
+          if (merged.label.indexOf(seriesLabel) === -1) {
+            merged.label += ' / ' + seriesLabel;
+            merged.seriesValues += ' · ' + seriesLabel + ' ' + full(pt[1]);
+            merged.value = (spec.yLabel || 'Value') + ': ' + merged.seriesValues;
+          }
+        } else {
+          inspectItems.push({
+            key: 'series-' + si + '-' + k,
+            label: seriesLabel,
+            value: (spec.yLabel || 'Value') + ' ' + full(pt[1]),
+            seriesValues: seriesLabel + ' ' + full(pt[1]),
+            detail: (spec.xLabel || 'x') + ' ' + full(pt[0]),
+            x: px,
+            y: py,
+            guide: 'xy',
+            priority: 1,
+            order: inspectSeq++
+          });
+        }
       });
       if (s.fill) {
         var base = sy(Math.max(ylo, Math.min(yhi, 0)));
@@ -6949,7 +7137,7 @@ var PM_CHARTS = (function () {
         ' ch-t-' + (s.tone || 'accent') + '" d="' + d + '"/>';
     });
 
-    (spec.markers || []).forEach(function (m) {
+    (spec.markers || []).forEach(function (m, mi) {
       if (!isFinite(m.x) || !isFinite(m.y)) return;
       var mx = sx(m.x), my = sy(m.y);
       out += line(mx, pad.t, mx, h - pad.b, 'ch-marker-rule');
@@ -6959,6 +7147,17 @@ var PM_CHARTS = (function () {
         out += text(mx, my - 10, m.label, 'ch-val',
           mx > w - pad.r - 50 ? 'end' : mx < pad.l + 50 ? 'start' : 'middle');
       }
+      inspectItems.push({
+        key: 'marker-' + mi,
+        label: m.label || 'Marker',
+        value: (spec.yLabel || 'Value') + ' ' + full(m.y),
+        detail: (spec.xLabel || 'x') + ' ' + full(m.x),
+        x: mx,
+        y: my,
+        guide: 'xy',
+        priority: 2,
+        order: inspectSeq++
+      });
     });
 
     out += text(pad.l + pw / 2, h - 5, spec.xLabel || '', 'ch-axis');
@@ -6972,8 +7171,13 @@ var PM_CHARTS = (function () {
       return { label: s.label, style: s.style || 'solid', tone: s.tone || 'accent' };
     }) : null;
 
+    inspectItems.sort(function (a, b) {
+      return a.x - b.x || a.y - b.y || a.order - b.order;
+    });
+
     return {
       svg: out,
+      inspect: inspection(w, h, pad, inspectItems),
       summary: spec.summary || '',
       legend: legend,
       table: spec.table || {
@@ -7036,6 +7240,31 @@ var PM_CHARTS = (function () {
       pts.push([sx(o + (i / N) * span), baseY - (dens[i] / maxD) * (ph - 8)]);
     }
 
+    var inspectItems = [];
+    function inspectStem(key, label, value, y) {
+      for (var j = 0; j < inspectItems.length; j++) {
+        if (inspectItems[j].raw === value) {
+          inspectItems[j].label += ' / ' + label;
+          inspectItems[j].y = Math.min(inspectItems[j].y, y);
+          return;
+        }
+      }
+      inspectItems.push({
+        key: key,
+        label: label,
+        value: full(value),
+        detail: 'Three-point estimate',
+        raw: value,
+        x: sx(value),
+        y: y,
+        guide: 'x'
+      });
+    }
+    inspectStem('optimistic', 'Optimistic (O)', o, baseY - 8);
+    inspectStem('most-likely', 'Most likely (M)', m, baseY - 8);
+    inspectStem('pessimistic', 'Pessimistic (P)', p, baseY - 8);
+    inspectStem('estimate', 'PERT estimate (E)', e, pad.t + 2);
+
     var out = svgOpen(w, h);
     var d0 = '';
     for (i = 0; i < pts.length; i++) d0 += (i ? 'L' : 'M') + r1(pts[i][0]) + ' ' + r1(pts[i][1]);
@@ -7072,6 +7301,7 @@ var PM_CHARTS = (function () {
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, inspectItems),
       summary: 'Optimistic ' + full(o) + ', most likely ' + full(m) + ', pessimistic ' + full(p) +
         '. PERT estimate ' + full(e) +
         (isFinite(sd) && sd > 0 ? ', with the shaded band covering ' + full(e - sd) + ' to ' + full(e + sd) +
@@ -7107,6 +7337,7 @@ var PM_CHARTS = (function () {
     var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
     var axisY = h - pad.b;
 
+    var markItems = [], bandItems = [];
     var out = svgOpen(w, h);
     var xt = ticks(lo, hi, Math.max(2, Math.min(5, Math.floor(w / 84))));
     for (var i = 0; i < xt.length; i++) {
@@ -7125,21 +7356,44 @@ var PM_CHARTS = (function () {
       if (b.label) {
         out += text(x1 + 5, y + bandH / 2 + 3.5, b.label, 'ch-bandlabel', 'start');
       }
+      bandItems.push({
+        key: 'band-' + k,
+        label: b.label || 'Range',
+        value: full(b.from) + ' – ' + full(b.to),
+        detail: 'Range band',
+        x: (x1 + x2) / 2,
+        y: y + bandH / 2,
+        guide: 'none',
+        box: { x: x1, y: y, w: Math.max(x2 - x1, 1), h: bandH },
+        hit: { x: x1, y: y, w: Math.max(x2 - x1, 1), h: bandH }
+      });
     });
 
     out += line(pad.l, crisp(axisY), w - pad.r, crisp(axisY), 'ch-zero');
 
-    marks.forEach(function (m) {
+    marks.forEach(function (m, mi) {
       var x = sx(m.at);
       out += line(crisp(x), pad.t, crisp(x), axisY + 4, 'ch-stem' + (m.strong ? '-e' : ''));
       var anchor = x > w - pad.r - 44 ? 'end' : x < pad.l + 44 ? 'start' : 'middle';
       out += text(x, axisY + 26, m.label, 'ch-cat', anchor);
       out += text(x, axisY + 37, (spec.valueFmt || short)(m.at), 'ch-val', anchor);
+      markItems.push({
+        key: 'mark-' + mi,
+        label: m.label || 'Marked point',
+        value: full(m.at),
+        detail: 'Marked point',
+        x: x,
+        y: pad.t + (axisY - pad.t) / 2,
+        guide: 'x',
+        priority: 2,
+        hit: { x: x - 22, y: pad.t, w: 44, h: axisY - pad.t }
+      });
     });
     out += '</svg>';
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, markItems.concat(bandItems)),
       summary: spec.summary || marks.map(function (m) {
         return m.label + ' at ' + full(m.at);
       }).join('; ') + '.',
@@ -7168,6 +7422,10 @@ var PM_CHARTS = (function () {
        so the reader can see how far past the last threshold it sits. */
     lo = Math.min(lo, spec.value);
     hi = Math.max(hi, spec.value);
+    if (isFinite(spec.target)) {
+      lo = Math.min(lo, spec.target);
+      hi = Math.max(hi, spec.target);
+    }
     if (lo === hi) { lo -= 1; hi += 1; }
 
     var h = spec.height || 108;
@@ -7175,6 +7433,7 @@ var PM_CHARTS = (function () {
     var pw = w - pad.l - pad.r;
     var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
     var barY = pad.t, barH = 20;
+    var valueFmt = spec.valueFmt || trim;
 
     var out = svgOpen(w, h);
     zones.forEach(function (z) {
@@ -7200,7 +7459,7 @@ var PM_CHARTS = (function () {
     out += '<path class="ch-needle ch-t-' + (spec.tone || 'neutral') + '" d="M' + r1(vx) + ' ' +
       r1(barY - 1) + 'l-6 -9 h12 Z"/>';
     var anchor = vx > w - pad.r - 40 ? 'end' : vx < pad.l + 40 ? 'start' : 'middle';
-    out += text(vx, barY - 14, (spec.valueFmt || trim)(spec.value), 'ch-val ch-val-strong', anchor);
+    out += text(vx, barY - 14, valueFmt(spec.value), 'ch-val ch-val-strong', anchor);
     out += text(pad.l, h - 6, (spec.tickFmt || short)(lo), 'ch-tick', 'start');
     out += text(w - pad.r, h - 6, (spec.tickFmt || short)(hi), 'ch-tick', 'end');
     if (spec.scaleLabel) out += text(pad.l + pw / 2, h - 6, spec.scaleLabel, 'ch-axis');
@@ -7211,8 +7470,48 @@ var PM_CHARTS = (function () {
       if (spec.value >= zones[i].from && spec.value <= zones[i].to) { inZone = zones[i]; break; }
     }
 
+    var inspectItems = [{
+      key: 'meter-reading',
+      label: spec.label || 'Reading',
+      value: valueFmt(spec.value),
+      detail: inZone && inZone.label ? inZone.label + ' band' : 'Outside labelled bands',
+      x: vx,
+      y: barY - 5,
+      guide: 'x',
+      priority: 2,
+      hit: { x: vx - 22, y: barY - 12, w: 44, h: barH + 24 }
+    }];
+    if (isFinite(spec.target)) {
+      inspectItems.push({
+        key: 'meter-target',
+        label: spec.targetLabel || 'Target',
+        value: valueFmt(spec.target),
+        detail: 'Reference target',
+        x: sx(spec.target),
+        y: barY + barH / 2,
+        guide: 'x',
+        priority: 1,
+        hit: { x: sx(spec.target) - 22, y: barY - 12, w: 44, h: barH + 24 }
+      });
+    }
+    zones.forEach(function (z, zi) {
+      var x1 = sx(Math.min(z.from, z.to)), x2 = sx(Math.max(z.from, z.to));
+      inspectItems.push({
+        key: 'meter-zone-' + zi,
+        label: z.label || 'Threshold band',
+        value: valueFmt(z.from) + ' – ' + valueFmt(z.to),
+        detail: 'Threshold band',
+        x: (x1 + x2) / 2,
+        y: barY + barH / 2,
+        guide: 'none',
+        box: { x: x1, y: barY, w: Math.max(x2 - x1, 1), h: barH },
+        hit: { x: x1, y: barY, w: Math.max(x2 - x1, 1), h: barH }
+      });
+    });
+
     return {
       svg: out,
+      inspect: inspection(w, h, pad, inspectItems),
       summary: spec.summary || ((spec.label || 'Reading') + ' ' + full(spec.value) +
         (inZone && inZone.label ? ', in the ' + inZone.label + ' band.' : '.')),
       table: {
@@ -7256,6 +7555,7 @@ var PM_CHARTS = (function () {
     var sx = function (v) { return pad.l + ((v - lo) / (hi - lo)) * pw; };
     var axisY = h - pad.b;
 
+    var markItems = [], rowItems = [];
     var out = svgOpen(w, h);
     var xt = ticks(lo, hi, Math.max(2, Math.min(6, Math.floor(w / 70))));
     for (var i = 0; i < xt.length; i++) {
@@ -7275,14 +7575,36 @@ var PM_CHARTS = (function () {
          a bar that reaches the frame edge would otherwise push its own
          note off the drawing. */
       if (r.note) out += text(w - 4, y + bh / 2 + 3.5, r.note, 'ch-val', 'end');
+      rowItems.push({
+        key: 'window-' + k,
+        label: r.label || 'Activity window',
+        value: full(r.from) + ' – ' + full(r.to),
+        detail: r.note || ('Span ' + full(Math.abs(r.to - r.from))),
+        x: (x1 + x2) / 2,
+        y: y + bh / 2,
+        guide: 'none',
+        box: { x: x1, y: y, w: Math.max(x2 - x1, 2), h: bh },
+        hit: { x: x1, y: y, w: Math.max(x2 - x1, 2), h: bh }
+      });
     });
 
-    (spec.marks || []).forEach(function (m) {
+    (spec.marks || []).forEach(function (m, mi) {
       if (!isFinite(m.at)) return;
       var x = crisp(sx(m.at));
       out += line(x, pad.t - 2, x, axisY, 'ch-stem-e');
       out += text(sx(m.at), axisY + 26, m.label, 'ch-cat',
         sx(m.at) > w - pad.r - 40 ? 'end' : 'middle');
+      markItems.push({
+        key: 'window-mark-' + mi,
+        label: m.label || 'Schedule marker',
+        value: full(m.at),
+        detail: 'Schedule marker',
+        x: sx(m.at),
+        y: pad.t + (axisY - pad.t) / 2,
+        guide: 'x',
+        priority: 2,
+        hit: { x: sx(m.at) - 22, y: pad.t, w: 44, h: axisY - pad.t }
+      });
     });
 
     out += line(pad.l, crisp(axisY), w - pad.r, crisp(axisY), 'ch-zero');
@@ -7290,6 +7612,7 @@ var PM_CHARTS = (function () {
 
     return {
       svg: out,
+      inspect: inspection(w, h, pad, markItems.concat(rowItems)),
       summary: spec.summary || rows.map(function (r) {
         return r.label + ' from ' + full(r.from) + ' to ' + full(r.to);
       }).join('; ') + '.',
@@ -7853,6 +8176,9 @@ var PM_CHART_MOUNT = (function () {
       '</figcaption>' +
       '<div class="chart-legend" hidden></div>' +
       '<div class="chart-plot"></div>' +
+      '<p class="sr-only" id="' + id + '-help">Interactive chart. Use the arrow keys to inspect values, ' +
+        'Home and End to jump, and Escape to clear the reading. Touch the plot to pin a reading.</p>' +
+      '<p class="sr-only" id="' + id + '-status" role="status" aria-live="polite" aria-atomic="true"></p>' +
       '<p class="chart-empty">Enter the parameters to plot this.</p>' +
       '<p class="chart-summary"></p>' +
       '<details class="chart-data" hidden>' +
@@ -7861,6 +8187,7 @@ var PM_CHART_MOUNT = (function () {
       '</details>';
 
     var plot = fig.querySelector('.chart-plot');
+    var statusEl = fig.querySelector('#' + id + '-status');
     var legendEl = fig.querySelector('.chart-legend');
     var emptyEl = fig.querySelector('.chart-empty');
     var sumEl = fig.querySelector('.chart-summary');
@@ -7873,6 +8200,189 @@ var PM_CHART_MOUNT = (function () {
       visible: false,
       lastW: 0,
       drawnSpec: null,
+      inspect: null,
+      inspectIndex: -1,
+      inspectKey: '',
+      inspectMode: '',
+      inspectEls: null,
+      touchStart: null,
+
+      disableInspection: function () {
+        plot.classList.remove('is-inspectable');
+        plot.removeAttribute('tabindex');
+        plot.removeAttribute('role');
+        plot.removeAttribute('aria-labelledby');
+        plot.removeAttribute('aria-describedby');
+        inst.inspect = null;
+        inst.inspectIndex = -1;
+        inst.inspectKey = '';
+        inst.inspectMode = '';
+        inst.inspectEls = null;
+        inst.touchStart = null;
+        statusEl.textContent = '';
+      },
+
+      prepareInspection: function (data, restoreKey, restoreMode) {
+        inst.disableInspection();
+        if (!data || !data.items || !data.items.length) return;
+
+        inst.inspect = data;
+        plot.classList.add('is-inspectable');
+        plot.setAttribute('tabindex', '0');
+        plot.setAttribute('role', 'group');
+        plot.setAttribute('aria-labelledby', id + '-t');
+        plot.setAttribute('aria-describedby', id + '-help');
+
+        function make(cls) {
+          var el = document.createElement('span');
+          el.className = cls;
+          el.hidden = true;
+          el.setAttribute('aria-hidden', 'true');
+          plot.appendChild(el);
+          return el;
+        }
+
+        var guideX = make('ch-inspect-guide ch-inspect-guide-x');
+        var guideY = make('ch-inspect-guide ch-inspect-guide-y');
+        var dot = make('ch-inspect-dot');
+        var box = make('ch-inspect-box');
+        var readout = document.createElement('span');
+        var label = document.createElement('span');
+        var value = document.createElement('span');
+        var detail = document.createElement('span');
+        readout.className = 'ch-inspect-readout';
+        readout.hidden = true;
+        readout.setAttribute('aria-hidden', 'true');
+        label.className = 'ch-inspect-label';
+        value.className = 'ch-inspect-value';
+        detail.className = 'ch-inspect-detail';
+        readout.appendChild(label);
+        readout.appendChild(value);
+        readout.appendChild(detail);
+        plot.appendChild(readout);
+
+        inst.inspectEls = {
+          guideX: guideX,
+          guideY: guideY,
+          dot: dot,
+          box: box,
+          readout: readout,
+          label: label,
+          value: value,
+          detail: detail
+        };
+
+        if (restoreKey && restoreMode && restoreMode !== 'hover') {
+          for (var i = 0; i < data.items.length; i++) {
+            if (data.items[i].key === restoreKey) {
+              inst.showInspection(i, restoreMode, false);
+              break;
+            }
+          }
+        }
+      },
+
+      showInspection: function (index, mode, announce) {
+        if (!inst.inspect || !inst.inspectEls || !inst.inspect.items[index]) return;
+        var data = inst.inspect;
+        var item = data.items[index];
+        var els = inst.inspectEls;
+        var xp = item.x / data.width * 100;
+        var yp = item.y / data.height * 100;
+
+        els.guideX.style.left = xp + '%';
+        els.guideX.style.top = (data.y1 / data.height * 100) + '%';
+        els.guideX.style.height = ((data.y2 - data.y1) / data.height * 100) + '%';
+        els.guideX.hidden = item.guide === 'none';
+
+        els.guideY.style.left = (data.x1 / data.width * 100) + '%';
+        els.guideY.style.top = yp + '%';
+        els.guideY.style.width = ((data.x2 - data.x1) / data.width * 100) + '%';
+        els.guideY.hidden = item.guide !== 'xy';
+
+        if (item.box) {
+          els.box.style.left = (item.box.x / data.width * 100) + '%';
+          els.box.style.top = (item.box.y / data.height * 100) + '%';
+          els.box.style.width = (item.box.w / data.width * 100) + '%';
+          els.box.style.height = (item.box.h / data.height * 100) + '%';
+          els.box.hidden = false;
+          els.dot.hidden = true;
+        } else {
+          els.box.hidden = true;
+          els.dot.style.left = xp + '%';
+          els.dot.style.top = yp + '%';
+          els.dot.hidden = item.guide === 'x';
+        }
+
+        els.readout.className = 'ch-inspect-readout ' +
+          (item.x > data.width * 0.56 ? 'is-left' : 'is-right');
+        els.label.textContent = item.label;
+        els.value.textContent = item.value;
+        els.detail.textContent = item.detail || '';
+        els.detail.hidden = !item.detail;
+        els.readout.hidden = false;
+
+        inst.inspectIndex = index;
+        inst.inspectKey = item.key || String(index);
+        inst.inspectMode = mode || '';
+        if (announce) {
+          statusEl.textContent = item.label + '. ' + item.value +
+            (item.detail ? '. ' + item.detail : '') + '. ' +
+            (index + 1) + ' of ' + data.items.length + '.';
+        }
+      },
+
+      clearInspection: function (announce) {
+        var els = inst.inspectEls;
+        if (els) {
+          els.guideX.hidden = true;
+          els.guideY.hidden = true;
+          els.dot.hidden = true;
+          els.box.hidden = true;
+          els.readout.hidden = true;
+        }
+        inst.inspectIndex = -1;
+        inst.inspectKey = '';
+        inst.inspectMode = '';
+        inst.touchStart = null;
+        statusEl.textContent = announce ? 'Chart inspection cleared.' : '';
+      },
+
+      nearestInspection: function (clientX, clientY) {
+        if (!inst.inspect || !inst.inspect.items.length) return -1;
+        var bounds = plot.getBoundingClientRect();
+        if (!(bounds.width > 0) || !(bounds.height > 0)) return -1;
+        var data = inst.inspect;
+        var x = (clientX - bounds.left) * data.width / bounds.width;
+        var y = (clientY - bounds.top) * data.height / bounds.height;
+        var best = -1, bestScore = Infinity, bestPriority = -Infinity;
+
+        function edgeDistance(value, start, length) {
+          if (value < start) return start - value;
+          if (value > start + length) return value - start - length;
+          return 0;
+        }
+
+        for (var i = 0; i < data.items.length; i++) {
+          var item = data.items[i];
+          var dx, dy;
+          if (item.hit) {
+            dx = edgeDistance(x, item.hit.x, item.hit.w);
+            dy = edgeDistance(y, item.hit.y, item.hit.h);
+          } else {
+            dx = x - item.x;
+            dy = y - item.y;
+          }
+          var score = dx * dx + dy * dy;
+          var priority = item.priority || 0;
+          if (score < bestScore || (score === bestScore && priority > bestPriority)) {
+            best = i;
+            bestScore = score;
+            bestPriority = priority;
+          }
+        }
+        return best;
+      },
 
       /* Whether the reader has actually typed anything into this card. It
          separates "nothing entered yet" from "entered, but this combination
@@ -7913,10 +8423,13 @@ var PM_CHART_MOUNT = (function () {
         /* Sub-threshold width jitter is ignored so a redraw can never change
            the width that triggered it. */
         if (inst.drawnSpec === inst.spec && Math.abs(w - inst.lastW) < 8) return;
+        var restoreKey = inst.inspectKey;
+        var restoreMode = inst.inspectMode;
         inst.lastW = w;
         inst.drawnSpec = inst.spec;
 
         if (!inst.spec) {
+          inst.disableInspection();
           plot.innerHTML = '';
           legendEl.hidden = true;
           emptyEl.textContent = inst.hasValues()
@@ -7941,6 +8454,7 @@ var PM_CHART_MOUNT = (function () {
         }
 
         if (!out) {
+          inst.disableInspection();
           plot.innerHTML = '';
           legendEl.hidden = true;
           /* There is a spec here, so the values exist — the plot itself is
@@ -7956,6 +8470,7 @@ var PM_CHART_MOUNT = (function () {
         fig.classList.remove('is-empty');
         emptyEl.hidden = true;
         plot.innerHTML = out.svg;
+        inst.prepareInspection(out.inspect, restoreKey, restoreMode);
         details.hidden = false;
 
         if (out.legend && out.legend.length) {
@@ -7992,6 +8507,89 @@ var PM_CHART_MOUNT = (function () {
       }
     };
 
+    plot.addEventListener('pointermove', function (e) {
+      if (!inst.inspect || e.pointerType === 'touch' || inst.inspectMode === 'touch') return;
+      var next = inst.nearestInspection(e.clientX, e.clientY);
+      if (next >= 0 && (inst.inspectMode !== 'hover' || inst.inspectIndex !== next)) {
+        inst.showInspection(next, 'hover', false);
+      }
+    });
+
+    plot.addEventListener('pointerleave', function () {
+      if (inst.inspectMode === 'hover') inst.clearInspection(false);
+    });
+
+    plot.addEventListener('pointerdown', function (e) {
+      if (!inst.inspect || e.pointerType !== 'touch') return;
+      inst.touchStart = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+
+    plot.addEventListener('pointercancel', function () {
+      inst.touchStart = null;
+    });
+
+    plot.addEventListener('pointerup', function (e) {
+      var start = inst.touchStart;
+      inst.touchStart = null;
+      if (!inst.inspect || e.pointerType !== 'touch' || !start || start.id !== e.pointerId) return;
+      var dx = e.clientX - start.x, dy = e.clientY - start.y;
+      if (dx * dx + dy * dy > 144) return;
+      var next = inst.nearestInspection(e.clientX, e.clientY);
+      if (next < 0) return;
+      var same = inst.inspectMode === 'touch' && inst.inspectIndex === next;
+      inst.inspectMode = 'touch';
+      plot.focus();
+      if (same) inst.clearInspection(true);
+      else inst.showInspection(next, 'touch', true);
+    });
+
+    plot.addEventListener('focus', function () {
+      if (!inst.inspect || inst.inspectMode === 'touch') return;
+      var next = inst.inspectIndex;
+      if (next < 0) {
+        next = 0;
+        for (var i = 0; i < inst.inspect.items.length; i++) {
+          if (inst.inspect.items[i].selected) { next = i; break; }
+        }
+      }
+      inst.showInspection(next, 'keyboard', true);
+    });
+
+    plot.addEventListener('blur', function () {
+      if (inst.inspectMode === 'keyboard') inst.clearInspection(false);
+    });
+
+    plot.addEventListener('keydown', function (e) {
+      if (!inst.inspect || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var key = e.key;
+      if (key === 'Escape') {
+        inst.clearInspection(true);
+        e.preventDefault();
+        return;
+      }
+
+      var count = inst.inspect.items.length;
+      var current = inst.inspectIndex >= 0 ? inst.inspectIndex : 0;
+      var next = current;
+      var columns = inst.inspect.columns || 0;
+      if (key === 'Home') next = 0;
+      else if (key === 'End') next = count - 1;
+      else if (key === 'ArrowLeft') {
+        next = columns && current % columns === 0 ? current : current - 1;
+      } else if (key === 'ArrowRight') {
+        next = columns && current % columns === columns - 1 ? current : current + 1;
+      } else if (key === 'ArrowUp') {
+        next = current - (columns || 1);
+      } else if (key === 'ArrowDown') {
+        next = current + (columns || 1);
+      } else {
+        return;
+      }
+      next = Math.max(0, Math.min(count - 1, next));
+      inst.showInspection(next, 'keyboard', true);
+      e.preventDefault();
+    });
+
     details.addEventListener('toggle', function () {
       if (details.open) inst.fillTable(inst.pendingTable);
     });
@@ -8016,6 +8614,15 @@ var PM_CHART_MOUNT = (function () {
   }
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', onResize);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].inspectMode === 'hover') {
+          all[i].clearInspection(true);
+          e.preventDefault();
+        }
+      }
+    });
     if (window.matchMedia) {
       var mq = window.matchMedia('(prefers-color-scheme: dark)');
       /* Colours come from CSS custom properties, so a scheme flip needs no

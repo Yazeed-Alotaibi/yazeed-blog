@@ -50,9 +50,64 @@ function pointBoundaries(spec) {
   return boundaries.length ? boundaries : null;
 }
 
-function renderAt(id, renderer, spec, width) {
+function finiteNumber(value) {
+  return typeof value === 'number' && isFinite(value);
+}
+
+function validGeometry(geometry) {
+  if (!geometry || typeof geometry !== 'object' || Array.isArray(geometry)) return false;
+  return finiteNumber(geometry.x) && finiteNumber(geometry.y) &&
+    finiteNumber(geometry.w) && finiteNumber(geometry.h) &&
+    geometry.w >= 0 && geometry.h >= 0;
+}
+
+function inspectProblem(inspect) {
+  var fields = ['width', 'height', 'x1', 'y1', 'x2', 'y2'];
+  var problem = '';
+
+  if (!inspect || typeof inspect !== 'object' || Array.isArray(inspect)) {
+    return 'renderer omitted its inspection geometry';
+  }
+  fields.forEach(function (field) {
+    if (!problem && !finiteNumber(inspect[field])) {
+      problem = 'inspection ' + field + ' is not finite';
+    }
+  });
+  if (problem) return problem;
+  if (!(inspect.width > 0) || !(inspect.height > 0) ||
+      !(inspect.x2 >= inspect.x1) || !(inspect.y2 >= inspect.y1)) {
+    return 'inspection bounds are malformed';
+  }
+  if (!Array.isArray(inspect.items) || !inspect.items.length) {
+    return 'inspection items are missing';
+  }
+
+  inspect.items.forEach(function (item, index) {
+    if (problem) return;
+    if (!item || typeof item !== 'object') {
+      problem = 'inspection item ' + index + ' is malformed';
+    } else if (!finiteNumber(item.x) || !finiteNumber(item.y)) {
+      problem = 'inspection item ' + index + ' has a non-finite position';
+    } else if (typeof item.label !== 'string' || !item.label.trim() ||
+        typeof item.value !== 'string' || !item.value.trim()) {
+      problem = 'inspection item ' + index + ' has an empty label or value';
+    } else if (['none', 'x', 'xy'].indexOf(item.guide) === -1) {
+      problem = 'inspection item ' + index + ' has an unknown guide';
+    } else if (item.box !== undefined && !validGeometry(item.box)) {
+      problem = 'inspection item ' + index + ' has malformed box geometry';
+    } else if (item.hit !== undefined && !validGeometry(item.hit)) {
+      problem = 'inspection item ' + index + ' has malformed hit geometry';
+    }
+  });
+
+  return problem;
+}
+
+function renderAt(id, kind, renderer, spec, width) {
   var out;
   var problem = '';
+  var boxes;
+  var barPaths;
   try {
     out = renderer(spec, width);
   } catch (e) {
@@ -68,7 +123,87 @@ function renderAt(id, renderer, spec, width) {
   if (!problem && (out.svg.indexOf('NaN') !== -1 || out.svg.indexOf('Infinity') !== -1)) {
     problem = 'renderer emitted a non-finite SVG coordinate';
   }
+  if (!problem) problem = inspectProblem(out.inspect);
+  if (!problem && kind === 'bars') {
+    boxes = out.inspect.items.filter(function (item) { return item.box; });
+    barPaths = out.svg.match(/<path class="ch-bar\b[^>]*>/g) || [];
+    if (!boxes.length || boxes.some(function (item) {
+      return item.box.w > 24;
+    })) {
+      problem = 'bar inspection geometry exceeds the 24px thickness cap';
+    } else if (!barPaths.length || barPaths.some(function (path) {
+      return !/[Qq]/.test(path);
+    })) {
+      problem = 'bars are not drawn as rounded quadratic paths';
+    } else if (/<rect class="ch-bar\b/.test(out.svg)) {
+      problem = 'bars still use square-cornered rect elements';
+    }
+  }
   H.check(id + ' renders at ' + width + 'px', !problem, problem);
+}
+
+function inspectionRegressions(charts) {
+  var meter = charts.renderers.meter({
+    value: 12.5,
+    target: 50,
+    targetLabel: 'Stretch target',
+    valueFmt: function (value) { return 'fmt(' + value.toFixed(1) + ')'; },
+    zones: [
+      { from: 0, to: 5, label: 'Low' },
+      { from: 5, to: 10, label: 'High' }
+    ]
+  }, 360);
+  var meterValues = meter.inspect.items.map(function (item) { return item.value; });
+  var meterTarget = meter.inspect.items.filter(function (item) {
+    return item.key === 'meter-target';
+  })[0];
+
+  H.deep('meter inspection formats its reading, target, and zones with valueFmt',
+    plain(meterValues),
+    ['fmt(12.5)', 'fmt(50.0)', 'fmt(0.0) – fmt(5.0)', 'fmt(5.0) – fmt(10.0)']);
+  H.check('meter inspection includes an out-of-band target inside its plot bounds',
+    !!meterTarget && meterTarget.x >= meter.inspect.x1 && meterTarget.x <= meter.inspect.x2,
+    'target x=' + (meterTarget && meterTarget.x) +
+      ', bounds=' + meter.inspect.x1 + '–' + meter.inspect.x2);
+
+  var curveSpec = {
+    xLabel: 'X',
+    yLabel: 'Y',
+    series: [
+      { label: 'Alpha', points: [[2, 20], [1, 10], [3, 30]] },
+      { label: 'Beta', points: [[1, 10], [2, 5], [3, 25]] }
+    ]
+  };
+  var curve = charts.renderers.curve(curveSpec, 360);
+  var curveAgain = charts.renderers.curve(curveSpec, 360);
+  var coincident = curve.inspect.items.filter(function (item) {
+    return item.label.indexOf('Alpha') !== -1 && item.label.indexOf('Beta') !== -1;
+  })[0];
+  var ordered = true;
+  var i;
+
+  for (i = 1; i < curve.inspect.items.length; i++) {
+    if (curve.inspect.items[i - 1].x > curve.inspect.items[i].x ||
+        (curve.inspect.items[i - 1].x === curve.inspect.items[i].x &&
+         curve.inspect.items[i - 1].y > curve.inspect.items[i].y)) {
+      ordered = false;
+      break;
+    }
+  }
+
+  H.check('curve inspection preserves both series at a coincident point',
+    curve.inspect.items.length === 5 && !!coincident &&
+      coincident.value.indexOf('Alpha 10') !== -1 &&
+      coincident.value.indexOf('Beta 10') !== -1 &&
+      coincident.value.indexOf('Alpha 10') < coincident.value.indexOf('Beta 10'),
+    coincident ? coincident.label + ': ' + coincident.value : 'coincident point missing');
+  H.check('curve inspection orders points by rendered x then y', ordered,
+    JSON.stringify(curve.inspect.items.map(function (item) {
+      return [item.key, item.x, item.y];
+    })));
+  H.deep('curve inspection order is deterministic across renders',
+    curve.inspect.items.map(function (item) { return item.key; }),
+    curveAgain.inspect.items.map(function (item) { return item.key; }));
 }
 
 function edgeValues(card, numberValue, textValue) {
@@ -100,6 +235,7 @@ function verifyEdge(id, def, renderer, v, label, card) {
          /NaN|Infinity/.test(out.summary))) {
       problem = 'renderer emitted a malformed summary';
     }
+    if (!problem && out) problem = inspectProblem(out.inspect);
   }
 
   H.check(id + ' handles ' + label, !problem,
@@ -148,8 +284,8 @@ function run(page) {
       }
 
       if (!problem && spec !== null && spec !== undefined && typeof renderer === 'function') {
-        renderAt(id, renderer, spec, 360);
-        renderAt(id, renderer, spec, 900);
+        renderAt(id, def.kind, renderer, spec, 360);
+        renderAt(id, def.kind, renderer, spec, 900);
       }
     });
   });
@@ -157,6 +293,9 @@ function run(page) {
   Object.keys(BASELINE).forEach(function (id) {
     H.check(id + ' still exists', !!seen[id], 'chart disappeared from PM_DATA');
   });
+
+  H.suite('inspection regressions');
+  inspectionRegressions(charts);
 
   H.suite('edge-class specs');
   H.eachCard(data, function (card, cat) {
