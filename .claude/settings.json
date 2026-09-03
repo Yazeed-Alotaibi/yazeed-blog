@@ -34,7 +34,7 @@
       "Bash(git commit -a:*)",
       "Bash(git commit --all:*)",
       "Bash(git push --force:*)",
-      "Bash(git push -f:*)",
+      "Bash(git push -f:*)"
     ]
   }
 }
