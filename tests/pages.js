@@ -261,9 +261,9 @@ function run(page) {
   H.suite('sitemap is generated, not typed');
   var sitemapTool = require('../tools/sitemap.js');
   var sitemapPath = path.join(ROOT, sitemapTool.FILE);
-  H.eq(sitemapTool.FILE + ': matches the manifest',
-    fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, 'utf8') : '',
-    sitemapTool.build(),
+  H.check(sitemapTool.FILE + ': matches the manifest',
+    sameText(fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, 'utf8') : '',
+      sitemapTool.build()),
     'stale — run `node tools/sitemap.js`');
   specs.forEach(function (spec) {
     H.check(sitemapTool.FILE + ': ' + spec.slug + ' carries its own `updated`',
