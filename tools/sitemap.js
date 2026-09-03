@@ -9,7 +9,9 @@
    it already had.
 
    So it is generated from the same field, and `tests/pages.js` regenerates
-   and compares byte for byte, the way it does for the pages themselves.
+   and compares, the way it does for the pages themselves. Line endings are
+   left out of that comparison: under autocrlf a Windows checkout holds this
+   file as CRLF while `build()` writes LF, and that is not staleness.
 
      node tools/sitemap.js            # write sitemap.xml
      node tools/sitemap.js --check    # change nothing; fail if it is stale
@@ -70,13 +72,20 @@ function build() {
   return lines.join('\n');
 }
 
+/* Line endings are not content. A Windows checkout under autocrlf holds the
+   file as CRLF while build() emits LF; the same normalisation
+   tools/calcpage.js applies to its pages keeps that from reading as stale. */
+function sameText(a, b) {
+  return String(a).replace(/\r\n/g, '\n') === String(b).replace(/\r\n/g, '\n');
+}
+
 function main(argv) {
   var check = argv.indexOf('--check') !== -1;
   var want = build();
   var file = path.join(ROOT, FILE);
   var have = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
 
-  if (have === want) {
+  if (sameText(have, want)) {
     console.log('sitemap: ' + FILE + ' is up to date');
     return;
   }
