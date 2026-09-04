@@ -6,7 +6,7 @@ var H = require('./harness');
 
 var TITLE = 'Redirect integrity';
 var STUBS = ['pm-calculation-desk.html', 'wbs-estimation-toolkit.html'];
-var FURNITURE = ['docs', 'design', 'tests', 'tools', 'content', 'AGENTS', 'README', '^\\.'];
+var FURNITURE = ['docs', 'design', 'tests', 'tools', 'content', 'AGENTS', 'DESIGN', 'README', '^\\.'];
 
 function refreshTarget(html) {
   var tags = html.match(/<meta\b[^>]*>/gi) || [];
