@@ -68,6 +68,7 @@ function styleBlock(html) {
    position means inserting a new module cannot silently reorder these. */
 var WANTED = [
   ['data', /calculator definitions/],
+  ['registry', /PM_REGISTRY/],
   ['xlsx', /PM_XLSX/],
   ['charts', /instrument plotting/],
   ['export', /PM_EXPORT/],
@@ -656,6 +657,7 @@ function build(spec, html, manifestPath) {
        The cut happens here rather than in a script on the page so the other
        thirty-three are never sent, and is proved before it is written. */
     '  <script>' + checkNarrowed(narrowData(blocks.data, spec.card), defs, spec.card) + '</script>',
+    '  <script>' + blocks.registry + '</script>',
     '  <script>' + blocks.xlsx + '</script>',
     '  <script>' + blocks.charts + '</script>',
     '  <script>' + blocks.export + '</script>',

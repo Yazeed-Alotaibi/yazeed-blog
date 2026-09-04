@@ -1,10 +1,9 @@
 /* The one command to run before every commit.
 
-   Three things have to happen in order, and the order matters. The per-page
-   generator reads calculator definitions out of `index.html`, so it runs
-   first. The prerender then rewrites the static mirror inside `index.html`
-   — including the link to each generated page — so it runs second. The test
-   suite reads both results, so it runs last.
+   The modular authoring sources assemble the self-contained homepage first.
+   The manifest then validates every registered feature against that artifact.
+   Calculator pages, sitemap and prerender follow in dependency order, and the
+   tests read the final committed output last.
 
    Run them in the wrong order and the suite fails on work you have already
    done; skip one and the suite fails on work you have not. Neither is
@@ -34,6 +33,27 @@ var ROOT = path.join(__dirname, '..');
    whose `verify` is null has no read-only form and simply runs as-is —
    the test suite neither writes nor needs a flag to avoid writing. */
 var STEPS = [
+  {
+    label: 'self-contained site assembly',
+    script: path.join('tools', 'assemble.js'),
+    write: [],
+    verify: ['--check'],
+    fix: 'node tools/assemble.js'
+  },
+  {
+    label: 'feature manifest',
+    script: path.join('tools', 'feature-manifest.js'),
+    write: [],
+    verify: [],
+    fix: 'node tools/feature-manifest.js'
+  },
+  {
+    label: 'feature scaffolding contract',
+    script: path.join('tests', 'newfeature.js'),
+    write: [],
+    verify: [],
+    fix: 'node tests/newfeature.js'
+  },
   {
     label: 'per-calculator pages',
     script: path.join('tools', 'calcpage.js'),
@@ -89,7 +109,7 @@ function main(argv) {
     } else if (argv[i] === '--help' || argv[i] === '-h') {
       console.log('usage: node tools/check.js [--verify]');
       console.log('');
-      console.log('  (no flag)  regenerate the pages, the sitemap and the prerender, then test');
+      console.log('  (no flag)  assemble, regenerate pages/sitemap/prerender, then test');
       console.log('  --verify   change nothing; fail if any committed output is stale');
       return 0;
     } else {

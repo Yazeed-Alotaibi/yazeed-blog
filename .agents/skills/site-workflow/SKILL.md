@@ -1,6 +1,6 @@
 ---
 name: site-workflow
-description: The commit workflow for yazeed.blog — regenerating the committed output, adding a per-calculator page, and publishing to the live site. Use when editing calculator data in index.html, adding or editing anything under content/, adding a new calculator page, running the tests, or merging to main.
+description: The commit workflow for yazeed.blog — assembling modular source, regenerating committed output, adding a feature or calculator page, and publishing. Use when editing src/, content/, generated pages, tests, or deployment configuration.
 ---
 
 # yazeed.blog — the working loop
@@ -21,16 +21,19 @@ it before changing how anything works. This file is only the loop.
 node tools/check.js
 ```
 
-It runs three things in the order they depend on each other:
+It runs the release pipeline in dependency order:
 
-1. `tools/calcpage.js --all` — regenerates every per-calculator page, because
-   those pages embed the calculator definitions lifted out of `index.html`.
-2. `tools/prerender.js` — rewrites the static mirror inside `index.html`,
+1. `tools/assemble.js` — inlines modular authoring source into committed `index.html`.
+2. `tools/feature-manifest.js` and `tests/newfeature.js` — validate the feature
+   registry and its atomic scaffolding contract.
+3. `tools/calcpage.js --all` — regenerates every per-calculator page from the
+   assembled homepage.
+4. `tools/sitemap.js` — regenerates the URL inventory from the page manifest.
+5. `tools/prerender.js` — rewrites the static mirror inside `index.html`,
    including the desk's link to each generated page.
-3. `tests/run.js` — the full suite, which reads both results.
+6. `tests/run.js` — runs the complete dependency-free suite.
 
-Run it after **any** change to calculator data in `index.html` or to anything
-under `content/`. Running the steps out of order fails the suite on work you
+Run it after **any** change under `src/` or `content/`. Running the steps out of order fails the suite on work you
 have already done; skipping one fails it on work you have not.
 
 ```bash
@@ -92,8 +95,8 @@ node tools/newpage.js <slug> --card <card-id>
 
 That writes the prose stub in `content/`, the manifest entry in
 `content/pages.json`, the `sitemap.xml` entry, and the `page:` field on the
-calculator in `index.html` that makes the desk link to it. It refuses to
-overwrite anything that already exists, and it re-parses `index.html` after
+calculator in `src/site/scripts/data.js` that makes the desk link to it. It refuses to
+overwrite anything that already exists, and it re-parses that source after
 editing to confirm the edit was sound, restoring the original bytes if not.
 
 Then do the part that needed a person:
@@ -162,11 +165,12 @@ These are constraints, not preferences. Breaking one breaks the site's
 premise. `AGENTS.md` carries the full list; these are the ones this loop
 touches most:
 
-- No build step at serve time, no bundler, no framework.
+- No build step at serve time, no bundler, no framework. The dependency-free
+  commit-time assembler is part of the repository workflow.
 - No npm dependencies. These tools run on a bare `node`.
 - No third-party request other than the named Google Analytics tag. No CDN,
   no hosted font, no embed.
-- Every page self-contained: its CSS in a `<style>` block and its JavaScript
-  in a `<script>` block, inline, in the page that uses them.
-- Plain ES5-compatible JavaScript — `var`, IIFEs, `'use strict'`. Match the
-  code around you.
+- Every published page is self-contained: modular authoring sources are inlined
+  into CSS `<style>` and JavaScript `<script>` blocks before commit.
+- Shipped code follows the browser baseline in `AGENTS.md`. Preserve an existing
+  module's style unless intentionally modernising that whole module.

@@ -2671,7 +2671,196 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
 
   a { color: #000; text-decoration: none; }
 }
+.category {
+  --family-ink: var(--accent);
+  --family-wash: var(--accent-soft);
+  --family-rule: var(--rule-2);
+  --family-pattern: repeating-linear-gradient(90deg, transparent 0 31px, var(--family-rule) 31px 32px);
+}
 
+.category[data-family="control-room"] {
+  --family-ink: oklch(0.52 0.17 257);
+  --family-wash: oklch(0.95 0.02 257);
+  --family-rule: oklch(0.78 0.07 257);
+}
+
+.category[data-family="field-notebook"] {
+  --family-ink: oklch(0.48 0.09 75);
+  --family-wash: oklch(0.96 0.025 83);
+  --family-rule: oklch(0.78 0.055 75);
+  --family-pattern: repeating-linear-gradient(0deg, transparent 0 23px, var(--family-rule) 23px 24px);
+}
+
+.category[data-family="survey-map"] {
+  --family-ink: oklch(0.47 0.11 174);
+  --family-wash: oklch(0.95 0.025 174);
+  --family-rule: oklch(0.76 0.065 174);
+  --family-pattern: radial-gradient(circle at 30% 45%, transparent 0 17px, var(--family-rule) 18px 19px, transparent 20px 31px, var(--family-rule) 32px 33px, transparent 34px);
+}
+
+.category[data-family="planning-wall"] {
+  --family-ink: oklch(0.51 0.13 317);
+  --family-wash: oklch(0.96 0.025 317);
+  --family-rule: oklch(0.79 0.06 317);
+  --family-pattern: linear-gradient(90deg, var(--family-rule) 1px, transparent 1px), linear-gradient(0deg, var(--family-rule) 1px, transparent 1px);
+}
+
+.category[data-family="drafting-table"] {
+  --family-ink: oklch(0.48 0.12 225);
+  --family-wash: oklch(0.95 0.025 225);
+  --family-rule: oklch(0.76 0.06 225);
+  --family-pattern: repeating-linear-gradient(135deg, transparent 0 15px, var(--family-rule) 15px 16px);
+}
+
+.category[data-family="signal-station"] {
+  --family-ink: oklch(0.52 0.14 42);
+  --family-wash: oklch(0.96 0.028 63);
+  --family-rule: oklch(0.78 0.075 52);
+  --family-pattern: repeating-linear-gradient(90deg, transparent 0 11px, var(--family-rule) 11px 13px, transparent 13px 31px);
+}
+
+.category[data-family="laboratory"] {
+  --family-ink: oklch(0.46 0.12 285);
+  --family-wash: oklch(0.95 0.025 285);
+  --family-rule: oklch(0.77 0.065 285);
+  --family-pattern: radial-gradient(circle, var(--family-rule) 1px, transparent 1.5px);
+}
+
+.category .cat-head {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-inline-start: 4px solid var(--family-ink);
+  background: linear-gradient(90deg, var(--family-wash), var(--sheet) 68%);
+}
+
+.category .cat-head::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 68%;
+  content: "";
+  background-image: var(--family-pattern);
+  background-size: 32px 32px;
+  opacity: .42;
+  mask-image: linear-gradient(90deg, transparent, var(--ink));
+}
+
+.category .cat-num,
+.category .cat-head h2 { color: var(--family-ink); }
+
+.category .calc-card {
+  border-top: 2px solid var(--family-rule);
+  box-shadow: inset 4px 0 0 var(--family-wash), var(--lip);
+}
+
+.category .chart {
+  border-top-color: var(--family-rule);
+}
+
+.category .chart-head {
+  border-bottom: 1px solid var(--family-rule);
+  background: linear-gradient(90deg, var(--family-wash), var(--sheet));
+}
+
+.review-lens {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin: var(--space-5) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--sheet);
+  box-shadow: var(--lip);
+}
+
+.review-lens-label span {
+  display: block;
+  color: var(--accent);
+  font: 600 .64rem/1.2 var(--mono);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.review-lens-label strong { font-size: .82rem; }
+
+.review-lens-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.review-lens-controls button {
+  min-height: 44px;
+  border: 1px solid var(--rule-2);
+  border-radius: 4px;
+  background: var(--sheet-sunk);
+  color: var(--ink-2);
+  font: 600 .72rem/1 var(--mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.review-lens-controls button:hover { border-color: var(--accent); }
+.review-lens-controls button:active { transform: translateY(1px); }
+.review-lens-controls button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.review-trace {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.review-trace i {
+  display: block;
+  width: 33.333%;
+  height: 100%;
+  background: var(--accent);
+  transform: translateX(var(--lens-step, 0));
+  transition: transform var(--dur) var(--ease);
+}
+
+#main-hero[data-lens="schedule"] { --lens-step: 100%; }
+#main-hero[data-lens="forecast"] { --lens-step: 200%; }
+
+.review-lens-copy {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: .78rem;
+}
+
+.is-lens-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .category[data-family] {
+    --family-wash: oklch(0.24 0.025 260);
+    --family-rule: oklch(0.42 0.045 260);
+  }
+}
+
+@media (max-width: 38rem) {
+  .review-lens { grid-template-columns: minmax(0, 1fr); }
+  .category .cat-head::after { inset-inline-start: 52%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-lens-controls button,
+  .review-trace i { transition: none; }
+}
   </style>
 
   <!-- Structured data: what this page is and who keeps it, stated once in the
@@ -2915,6 +3104,17 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
         <p class="overview-date"><span>Reporting snapshot</span><strong>Live browser reading</strong></p>
       </div>
 
+      <div class="review-lens" aria-labelledby="review-lens-title">
+        <div class="review-lens-label"><span>Review lens</span><strong id="review-lens-title">Trace the decision</strong></div>
+        <div class="review-lens-controls" role="group" aria-label="Choose a performance review lens">
+          <button type="button" data-review-lens="cost" aria-pressed="true">Cost</button>
+          <button type="button" data-review-lens="schedule" aria-pressed="false">Schedule</button>
+          <button type="button" data-review-lens="forecast" aria-pressed="false">Forecast</button>
+        </div>
+        <div class="review-trace" aria-hidden="true"><i></i></div>
+        <p class="review-lens-copy" id="review-lens-status" aria-live="polite">Cost lens selected: efficiency, value comparison, and cost signal are connected.</p>
+      </div>
+
       <div class="command-kpis" aria-label="Live performance indicators">
         <article class="command-kpi" id="out-cpi">
           <div class="kpi-label"><span>CPI</span><svg class="kpi-link" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M7 4h5v5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -2944,7 +3144,7 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
       <p class="sr-only" id="deck-live" aria-live="polite" aria-atomic="true"></p>
 
       <div class="analysis-grid">
-        <article class="command-panel comparison-panel" aria-labelledby="value-comparison-h">
+        <article class="command-panel comparison-panel" id="comparison-panel" aria-labelledby="value-comparison-h">
           <header class="panel-heading"><div><h2 id="value-comparison-h">Value comparison</h2><p>Planned, earned, and actual value at this reporting point.</p></div><span class="panel-unit">USD</span></header>
           <figure class="deck-bars">
             <div class="deck-bar-row"><span>PV</span><div class="deck-bar-track"><i id="bar-pv"></i></div><strong id="bar-pv-value">—</strong></div>
@@ -2954,7 +3154,7 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
           </figure>
         </article>
 
-        <article class="command-panel efficiency-panel" aria-labelledby="efficiency-h">
+        <article class="command-panel efficiency-panel" id="efficiency-panel" aria-labelledby="efficiency-h">
           <header class="panel-heading"><div><h2 id="efficiency-h">Efficiency thresholds</h2><p>Performance indices against the healthy 1.00 baseline.</p></div><span class="panel-unit">Index</span></header>
           <figure class="efficiency-figure">
             <div class="eff-row"><div><span>CPI</span><span class="eff-reading"><strong id="eff-cpi-value">—</strong><em id="eff-cpi-delta">Waiting</em></span></div><div class="eff-track"><span class="eff-target" aria-hidden="true"></span><i id="eff-cpi-fill"></i></div></div>
@@ -3006,7 +3206,7 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
       <div class="section-head">
         <div>
           <h2 id="cap-h">What the desk does</h2>
-          <span class="section-sub">Six things you can do here besides read a number.</span>
+          <span class="section-sub">Seven things you can do here besides read a number.</span>
         </div>
         <span class="sheet-no">Capabilities</span>
       </div>
@@ -3079,6 +3279,17 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
             <a class="cap-where" href="#calc-sections">Copy link on every card</a>
           </div>
         </li>
+        <li class="cap">
+          <div class="cap-head">
+            <span class="cap-num">07</span>
+            <time class="cap-since" datetime="2026-09-04">Added 2026-09-04</time>
+          </div>
+          <h3>Review lens</h3>
+          <p>Switch between cost, schedule, and forecast to trace the readings that belong in the same management conversation. The highlighted path stays connected while the live inputs change.</p>
+          <div class="cap-foot">
+            <a class="cap-where" href="#main-hero">Cost · schedule · forecast</a>
+          </div>
+        </li>
       </ul>
     </section>
 
@@ -3110,7 +3321,7 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
       <li><a href="#prerender-cat-agile">13 — Agile Forecasting</a></li>
       <li><a href="#prerender-cat-flow">14 — Lean &amp; Flow</a></li>
       </ol>
-      <section class="prerender-category" id="prerender-cat-evm">
+      <section class="prerender-category" data-family="control-room" id="prerender-cat-evm">
       <h2>01 — Earned Value Management</h2>
       <p class="prerender-blurb">One integrated system that answers three questions at once: are we on budget, are we on schedule, and where will we land at completion? It works by comparing what you planned to spend, what you actually spent, and the value of the work actually finished.</p>
       <p class="prerender-citation">EVM — PMI Practice Standard; Lipke, “Schedule is Different.”</p>
@@ -3274,7 +3485,7 @@ SPI = EV ÷ PV</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-burn">
+      <section class="prerender-category" data-family="control-room" id="prerender-cat-burn">
       <h2>02 — Budget &amp; Burn Rate</h2>
       <p class="prerender-blurb">The cash view of project health: how fast money is leaving, and how long the remaining budget lasts at that pace. Simpler than earned value — but it says nothing about what was delivered for the money, so read it next to % complete, never instead of it.</p>
       <p class="prerender-citation">Budget &amp; burn — PMI PMBOK Guide, Cost Management.</p>
@@ -3317,7 +3528,7 @@ Runway = (Budget − Spent) ÷ Burn rate</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-estimation">
+      <section class="prerender-category" data-family="laboratory" id="prerender-cat-estimation">
       <h2>03 — Estimation</h2>
       <p class="prerender-blurb">Turning uncertainty into a defensible number. For reference, typical estimate accuracy ranges: Rough Order of Magnitude −25% / +75%, Budget estimate −10% / +25%, Definitive estimate −5% / +10%.</p>
       <p class="prerender-citation">Estimation — PMI Practice Standard for Project Estimating.</p>
@@ -3420,7 +3631,7 @@ rate is the learning rate as entered, in percent: 80 means 0.8</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-schedule">
+      <section class="prerender-category" data-family="drafting-table" id="prerender-cat-schedule">
       <h2>04 — Schedule &amp; Critical Path</h2>
       <p class="prerender-blurb">The critical path method finds which activities control the finish date. Early dates come from the forward pass, late dates from the backward pass; float is the gap between them.</p>
       <p class="prerender-citation">Schedule — PMI Practice Standard for Scheduling.</p>
@@ -3465,7 +3676,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-compression">
+      <section class="prerender-category" data-family="drafting-table" id="prerender-cat-compression">
       <h2>05 — Schedule Compression</h2>
       <p class="prerender-blurb">When the schedule must shrink there are only two levers: crashing buys time with money, fast-tracking buys it with risk. The cost slope tells you which activity sells the cheapest week.</p>
       <p class="prerender-citation">Compression — PMI PMBOK Guide, Schedule Compression.</p>
@@ -3505,7 +3716,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-resources">
+      <section class="prerender-category" data-family="planning-wall" id="prerender-cat-resources">
       <h2>06 — Resources &amp; Team</h2>
       <p class="prerender-blurb">Turning effort estimates into headcount, and checking whether the people you have are quietly over-committed.</p>
       <p class="prerender-citation">Resources — PMI PMBOK Guide, Resource Management.</p>
@@ -3589,7 +3800,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-comms">
+      <section class="prerender-category" data-family="planning-wall" id="prerender-cat-comms">
       <h2>07 — Communication</h2>
       <p class="prerender-blurb">Why adding “just one more person” is never cheap: the number of one-to-one communication paths grows with the square of team size.</p>
       <p class="prerender-citation">Communication — PMI PMBOK Guide, Communications Management.</p>
@@ -3623,7 +3834,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-risk">
+      <section class="prerender-category" data-family="survey-map" id="prerender-cat-risk">
       <h2>08 — Risk</h2>
       <p class="prerender-blurb">Quantitative risk analysis puts money on uncertainty so risks can be compared, prioritised and reserved for.</p>
       <p class="prerender-citation">Risk — PMI Risk Management in Portfolios, Programs, and Projects.</p>
@@ -3709,7 +3920,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-decision">
+      <section class="prerender-category" data-family="planning-wall" id="prerender-cat-decision">
       <h2>09 — Decision Analysis</h2>
       <p class="prerender-blurb">Choosing under uncertainty: a decision tree multiplies what each choice costs by what it might return, so competing options can be compared on expected value instead of gut feel.</p>
       <p class="prerender-citation">Decision — PMI PMBOK Guide, Decision Analysis.</p>
@@ -3764,7 +3975,7 @@ Free Float = ES(successor) − EF</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-quality">
+      <section class="prerender-category" data-family="laboratory" id="prerender-cat-quality">
       <h2>10 — Quality &amp; Six Sigma</h2>
       <p class="prerender-blurb">Quality math answers two questions: how often does the process fail (DPMO, sigma level) and is it drifting out of control (control limits)?</p>
       <p class="prerender-citation">Quality — ASQ Quality Resources and Six Sigma guidance.</p>
@@ -3905,7 +4116,7 @@ CoQ = Conformance + Non-conformance</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-financial">
+      <section class="prerender-category" data-family="field-notebook" id="prerender-cat-financial">
       <h2>11 — Project Selection &amp; Finance</h2>
       <p class="prerender-blurb">The business-case math used to choose between projects and to prove a project was worth doing. Rule of thumb across all of these: money later is worth less than money now.</p>
       <p class="prerender-citation">Finance — PMI PMBOK Guide, Project Finance and Benefits.</p>
@@ -4082,7 +4293,7 @@ PV = Amount ÷ (1 + r)ⁿ</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-procurement">
+      <section class="prerender-category" data-family="field-notebook" id="prerender-cat-procurement">
       <h2>12 — Procurement &amp; Contracts</h2>
       <p class="prerender-blurb">The math of incentive contracts (FPIF): buyer and seller share cost savings and overruns by an agreed ratio — until the point of total assumption, where the seller carries every extra dollar alone.</p>
       <p class="prerender-citation">Procurement — PMI PMBOK Guide, Procurement Management.</p>
@@ -4199,7 +4410,7 @@ Final price = Actual cost + Final fee</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-agile">
+      <section class="prerender-category" data-family="signal-station" id="prerender-cat-agile">
       <h2>13 — Agile Forecasting</h2>
       <p class="prerender-blurb">Empirical forecasting: measure what the team actually delivered, then project it forward. Velocity is a planning tool for the team — never a performance comparison between teams.</p>
       <p class="prerender-citation">Agile — Scrum Guide (2020): scrumguides.org/scrum-guide.html</p>
@@ -4301,7 +4512,7 @@ Sprints remaining = ⌈ Remaining backlog ÷ Velocity ⌉</code></pre>
       </dl>
       </article>
       </section>
-      <section class="prerender-category" id="prerender-cat-flow">
+      <section class="prerender-category" data-family="signal-station" id="prerender-cat-flow">
       <h2>14 — Lean &amp; Flow</h2>
       <p class="prerender-blurb">Little’s Law is the physics of work in progress: the more you start, the slower everything finishes. It holds for any stable system — a kanban board, a help desk, a factory line.</p>
       <p class="prerender-citation">Flow — Little (1961), “A Proof for L = λW”: doi.org/10.1287/opre.9.3.383</p>
@@ -6745,6 +6956,11 @@ var PM_DATA = (function () {
   return { categories: categories };
 })();
 
+var PM_CATEGORY_FAMILIES = {"evm":"control-room","burn":"control-room","estimation":"laboratory","schedule":"drafting-table","compression":"drafting-table","resources":"planning-wall","comms":"planning-wall","risk":"survey-map","decision":"planning-wall","quality":"laboratory","financial":"field-notebook","procurement":"field-notebook","agile":"signal-station","flow":"signal-station"};
+PM_DATA.categories.forEach(function (category) {
+  category.instrumentFamily = PM_CATEGORY_FAMILIES[category.id] || 'control-room';
+});
+
 /* Lane D supplies the complete pack. Keeping the data outside PM_DATA lets a
    worked reading demonstrate a card without changing its formulas or guards. */
 var EXAMPLES = {
@@ -6889,8 +7105,61 @@ var EXAMPLES = {
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
+</script>
+  <script>/* PM_REGISTRY — feature discovery over PM_DATA. */
+var PM_REGISTRY = (function (data, manifest) {
+  'use strict';
+  var definitions = {};
+  var active = [];
 
-  </script>
+  data.categories.forEach(function (category) {
+    category.cards.forEach(function (card) {
+      definitions[card.id] = card;
+    });
+  });
+
+  manifest.forEach(function (feature) {
+    if (definitions[feature.id]) {
+      active.push({
+        id: feature.id,
+        category: feature.category,
+        kind: feature.kind,
+        instrumentFamily: feature.instrumentFamily,
+        definition: definitions[feature.id]
+      });
+    }
+  });
+
+  function get(id) {
+    var hit = null;
+    active.some(function (feature) {
+      if (feature.id !== id) return false;
+      hit = feature;
+      return true;
+    });
+    return hit;
+  }
+
+  function familyForCategory(id) {
+    var family = 'control-room';
+    active.some(function (feature) {
+      if (feature.category !== id) return false;
+      family = feature.instrumentFamily;
+      return true;
+    });
+    return family;
+  }
+
+  return {
+    data: function () { return data; },
+    get: get,
+    list: function () { return active.slice(); },
+    familyForCategory: familyForCategory
+  };
+}(PM_DATA, [{"id":"earned-value","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"earned-schedule","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"time-forecast","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"burn-rate","category":"burn","kind":"calculator","instrumentFamily":"control-room"},{"id":"three-point","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"path-sigma","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"learning-curve","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"float","category":"schedule","kind":"calculator","instrumentFamily":"drafting-table"},{"id":"crash","category":"compression","kind":"calculator","instrumentFamily":"drafting-table"},{"id":"fte","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"utilization","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"labor-cost","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"channels","category":"comms","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"emv","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"risk-score","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"contingency","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"decision-tree","category":"decision","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"dpmo","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"control","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"cpk","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"coq","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"roi","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"npv","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"tvm","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"breakeven","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"depreciation","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"scoring","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"pta","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"fpif","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"cpif","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"velocity","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"capacity","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"say-do","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"littles-law","category":"flow","kind":"calculator","instrumentFamily":"signal-station"}]));
+if (typeof window !== 'undefined') window.PM_REGISTRY = PM_REGISTRY;
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_REGISTRY;
+</script>
   <script>
 /* ══ PM_XLSX ═══════════════════════════════════════════════════════════
    Writes a real .xlsx in the browser, with no library.
@@ -7619,7 +7888,7 @@ var PM_XLSX = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_XLSX;
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — instrument plotting.
 
@@ -8869,7 +9138,7 @@ var PM_CHARTS = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_CHARTS;
-  </script>
+</script>
   <script>
 /* ══ PM_EXPORT ═════════════════════════════════════════════════════════
    Lays a calculator out as a spreadsheet: what was entered, what came out,
@@ -9126,7 +9395,7 @@ var PM_EXPORT = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_EXPORT;
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — chart mounting and lifecycle.
 
@@ -9635,7 +9904,7 @@ var PM_CHART_MOUNT = (function () {
     }
   };
 })();
-  </script>
+</script>
   <script>
 /* PM Project Workspace — versioned project state and import interchange.
    This block is deliberately DOM-free. The desk below supplies localStorage
@@ -10226,7 +10495,7 @@ var PM_PROJECTS = (function () {
     csvTemplate: csvTemplate
   };
 })();
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — rendering and live computation.
    Reads PM_DATA (data.js), builds the sidebar nav and one card per
@@ -10235,7 +10504,8 @@ var PM_PROJECTS = (function () {
 (function () {
   'use strict';
 
-  var DATA = window.PM_DATA;
+  var REGISTRY = window.PM_REGISTRY;
+  var DATA = REGISTRY ? REGISTRY.data() : window.PM_DATA;
   var sectionsEl = document.getElementById('calc-sections');
   var navEl = document.getElementById('cat-nav');
   var searchEl = document.getElementById('search');
@@ -11640,6 +11910,8 @@ var PM_PROJECTS = (function () {
     var section = document.createElement('section');
     section.className = 'category';
     section.id = 'cat-' + cat.id;
+    section.setAttribute('data-family', cat.instrumentFamily || (REGISTRY ?
+      REGISTRY.familyForCategory(cat.id) : 'control-room'));
     section.setAttribute('aria-labelledby', 'cat-h-' + cat.id);
     section.innerHTML =
       '<header class="cat-head">' +
@@ -11756,8 +12028,7 @@ var PM_PROJECTS = (function () {
   window.addEventListener('resize', syncNavEdges);
   syncNavEdges();
 })();
-
-  </script>
+</script>
   <script>
 /* Hero instrument. The same indices the Calculation Desk opens with, wired
    live so the homepage demonstrates the product rather than describing it.
@@ -11765,8 +12036,6 @@ var PM_PROJECTS = (function () {
    reading a ratio against 1.00 actually is. */
 (function () {
   'use strict';
-
-  var LO = 0.70, HI = 1.30, CX = 100, CY = 100, R = 74;
 
   var fields = {
     bac: document.getElementById('bac'),
@@ -11837,7 +12106,9 @@ var PM_PROJECTS = (function () {
     var node = document.getElementById(id);
     var text = value === null ? '—' : format === 'ratio' ? value.toFixed(2) : deckNumber(value);
     var previous = node.querySelector('.g-value').textContent;
+    var selected = node.classList.contains('is-lens-selected');
     node.className = 'command-kpi' + (tone === 'current' ? '' : ' tone-' + tone);
+    if (selected) node.classList.add('is-lens-selected');
     node.querySelector('.g-value').textContent = text;
     node.querySelector('.g-verdict').className = 'g-verdict status-badge' + (tone === 'current' ? '' : ' tone-' + tone);
     node.querySelector('.g-verdict').textContent = value === null ? 'Awaiting input' : deckWord(tone);
@@ -11860,7 +12131,9 @@ var PM_PROJECTS = (function () {
 
   function deckPaintSignal(id, tone, value, detail) {
     var node = document.getElementById(id);
+    var selected = node.classList.contains('is-lens-selected');
     node.className = 'signal' + (tone === 'current' ? '' : ' tone-' + tone);
+    if (selected) node.classList.add('is-lens-selected');
     node.querySelector('.signal-mark').textContent = tone === 'good' ? '✓' : tone === 'current' ? '·' : '!';
     node.querySelector('p').textContent = detail;
     node.querySelector('b').textContent = value;
@@ -11927,6 +12200,42 @@ var PM_PROJECTS = (function () {
   }
   deckUpdate(false);
 
+  var lensTargets = {
+    cost: ['out-cpi', 'comparison-panel', 'signal-cost'],
+    schedule: ['out-spi', 'efficiency-panel', 'signal-schedule'],
+    forecast: ['out-eac', 'out-vac', 'evm', 'signal-forecast']
+  };
+  var lensCopy = {
+    cost: 'Cost lens selected: efficiency, value comparison, and cost signal are connected.',
+    schedule: 'Schedule lens selected: delivery efficiency and the recovery signal are connected.',
+    forecast: 'Forecast lens selected: completion estimate, variance, and headroom are connected.'
+  };
+  var lensButtons = document.querySelectorAll('[data-review-lens]');
+
+  function selectLens(name, announce) {
+    var current = document.querySelectorAll('.is-lens-selected');
+    var i;
+    document.getElementById('main-hero').setAttribute('data-lens', name);
+    for (i = 0; i < current.length; i++) current[i].classList.remove('is-lens-selected');
+    for (i = 0; i < lensButtons.length; i++) {
+      lensButtons[i].setAttribute('aria-pressed',
+        lensButtons[i].getAttribute('data-review-lens') === name ? 'true' : 'false');
+    }
+    lensTargets[name].forEach(function (id) {
+      var target = document.getElementById(id);
+      if (target) target.classList.add('is-lens-selected');
+    });
+    document.getElementById('review-lens-status').textContent = lensCopy[name];
+    if (announce) document.getElementById('deck-live').textContent = lensCopy[name];
+  }
+
+  for (var lensIndex = 0; lensIndex < lensButtons.length; lensIndex++) {
+    lensButtons[lensIndex].addEventListener('click', function () {
+      selectLens(this.getAttribute('data-review-lens'), true);
+    });
+  }
+  selectLens('cost', false);
+
   /* The mobile rail is a modal drawer: Escape and the scrim close it, Tab is
      contained within it, and focus returns to the control that opened it. */
   var rail = document.getElementById('command-rail');
@@ -11979,143 +12288,8 @@ var PM_PROJECTS = (function () {
   });
   window.addEventListener('resize', function () { if (window.innerWidth > 920 && document.body.classList.contains('rail-open')) closeRail(false); });
 
-  return;
-
-  function angleFor(v) {
-    var clamped = Math.min(HI, Math.max(LO, v));
-    return 180 - ((clamped - LO) / (HI - LO)) * 180;
-  }
-
-  function polar(deg, r) {
-    var rad = deg * Math.PI / 180;
-    return [CX + r * Math.cos(rad), CY - r * Math.sin(rad)];
-  }
-
-  function arcPath(from, to) {
-    var a = polar(angleFor(from), R), b = polar(angleFor(to), R);
-    return 'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2) +
-           'A' + R + ' ' + R + ' 0 0 1 ' + b[0].toFixed(2) + ' ' + b[1].toFixed(2);
-  }
-
-  /* The dial face is identical on both gauges, so it is drawn once per SVG
-     and never touched again — only the needle moves. */
-  function drawFace(svg) {
-    var s = '<path class="g-arc g-zone-bad" d="' + arcPath(LO, 0.95) + '"/>' +
-            '<path class="g-arc g-zone-warn" d="' + arcPath(0.95, 1.00) + '"/>' +
-            '<path class="g-arc g-zone-good" d="' + arcPath(1.00, HI) + '"/>';
-
-    var ticks = [0.70, 0.80, 0.90, 1.00, 1.10, 1.20, 1.30];
-    for (var i = 0; i < ticks.length; i++) {
-      var v = ticks[i], deg = angleFor(v), major = v === 1.00;
-      var outer = polar(deg, R + 5), inner = polar(deg, major ? R - 12 : R - 7);
-      s += '<line class="g-tick' + (major ? ' major' : '') +
-           '" x1="' + outer[0].toFixed(1) + '" y1="' + outer[1].toFixed(1) +
-           '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '"/>';
-
-      if (v === LO || v === 1.00 || v === HI) {
-        var lab = polar(deg, R + 15);
-        s += '<text class="g-tlabel" x="' + lab[0].toFixed(1) + '" y="' +
-             (lab[1] + 4).toFixed(1) + '">' + v.toFixed(2) + '</text>';
-      }
-    }
-
-    s += '<line class="g-needle" x1="' + CX + '" y1="' + CY +
-         '" x2="' + CX + '" y2="' + (CY - R + 14) + '"/>' +
-         '<circle class="g-hub" cx="' + CX + '" cy="' + CY + '" r="4.5"/>';
-
-    svg.innerHTML = s;
-  }
-
-  function pct(n) { return Math.round(Math.abs(n) * 100); }
-
-  /* Thousands separators without Intl — the page ships no locale assumptions. */
-  function money(n) {
-    var whole = Math.round(Math.abs(n)).toString();
-    var out = '';
-    var c = 0;
-    for (var i = whole.length - 1; i >= 0; i--) {
-      out = whole.charAt(i) + out;
-      c += 1;
-      if (c % 3 === 0 && i > 0) out = ',' + out;
-    }
-    return (n < 0 ? '−' : '+') + out;
-  }
-
-  function read(el) {
-    var n = parseFloat(el.value);
-    return isFinite(n) ? n : null;
-  }
-
-  function cpiVerdict(cpi) {
-    if (cpi <= 0) return { tone: 'bad', word: 'Over budget', text: 'No value earned against the money spent.' };
-    if (cpi >= 1.05) return { tone: 'good', word: 'Under budget', text: 'Each unit spent is buying ' + cpi.toFixed(2) + ' of planned work.' };
-    if (cpi >= 1) return { tone: 'good', word: 'On budget', text: 'Spending is tracking the work delivered.' };
-    if (cpi >= 0.95) return { tone: 'warn', word: 'Watch', text: 'Slightly over budget. Watch the trend before it compounds.' };
-    return { tone: 'bad', word: 'Over budget', text: 'Over budget by ' + pct(1 / cpi - 1) + '%. Costs are outrunning the work delivered.' };
-  }
-
-  function spiVerdict(spi) {
-    if (spi <= 0) return { tone: 'bad', word: 'Behind', text: 'No scheduled work has been earned yet.' };
-    if (spi >= 1.05) return { tone: 'good', word: 'Ahead', text: 'Ahead of plan by ' + pct(spi - 1) + '% of scheduled work.' };
-    if (spi >= 1) return { tone: 'good', word: 'On schedule', text: 'Work is landing when it was planned to.' };
-    if (spi >= 0.95) return { tone: 'warn', word: 'Slipping', text: pct(spi) + '% of the scheduled work is done.' };
-    return { tone: 'bad', word: 'Behind', text: 'Only ' + pct(spi) + '% of the scheduled work is done.' };
-  }
-
-  function paint(id, value, verdict) {
-    var el = document.getElementById(id);
-    var needle = el.querySelector('.g-needle');
-
-    if (value === null) {
-      el.className = 'gauge';
-      needle.setAttribute('transform', 'rotate(-90)');
-      el.querySelector('.g-value').textContent = '—';
-      el.querySelector('.g-verdict').textContent = 'Awaiting input';
-      el.querySelector('.g-note').textContent = 'Enter a value above.';
-      return;
-    }
-
-    el.className = 'gauge tone-' + verdict.tone;
-    needle.setAttribute('transform', 'rotate(' + (90 - angleFor(value)).toFixed(2) + ')');
-    el.querySelector('.g-value').textContent = value.toFixed(2);
-    el.querySelector('.g-verdict').textContent = verdict.word;
-    el.querySelector('.g-note').textContent = verdict.text;
-  }
-
-  function paintVariance(id, value) {
-    var el = document.getElementById(id);
-    if (value === null) { el.className = 'v-value'; el.textContent = '—'; return; }
-    el.className = 'v-value ' + (value < 0 ? 'v-bad' : 'v-good');
-    el.textContent = money(value);
-  }
-
-  function update() {
-    var ev = read(fields.ev), ac = read(fields.ac), pv = read(fields.pv);
-
-    var cpi = (ev !== null && ac !== null && ac > 0) ? ev / ac : null;
-    var spi = (ev !== null && pv !== null && pv > 0) ? ev / pv : null;
-
-    paint('out-cpi', cpi, cpi === null ? null : cpiVerdict(cpi));
-    paint('out-spi', spi, spi === null ? null : spiVerdict(spi));
-
-    paintVariance('out-cv', (ev !== null && ac !== null) ? ev - ac : null);
-    paintVariance('out-sv', (ev !== null && pv !== null) ? ev - pv : null);
-  }
-
-  drawFace(document.querySelector('#out-cpi svg'));
-  drawFace(document.querySelector('#out-spi svg'));
-
-  var keys = ['ev', 'ac', 'pv'];
-  for (var i = 0; i < keys.length; i++) {
-    fields[keys[i]].addEventListener('input', update);
-  }
-
-  /* Needles rest at zero, then sweep to the reading — an instrument coming up
-     to power. One frame of delay is what lets the CSS transition run. */
-  if (window.requestAnimationFrame) window.requestAnimationFrame(update);
-  else update();
 })();
-  </script>
+</script>
 
 </body>
 </html>

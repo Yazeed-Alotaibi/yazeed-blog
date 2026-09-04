@@ -7,7 +7,7 @@
      2. content/pages.json       the manifest entry the generator reads, and
                                  the homepage's own `updated` date, since a
                                  new page changes the desk that links to it
-     3. index.html               a `page:` field on the card, so the desk
+     3. src/site/scripts/data.js a `page:` field on the card, so the desk
                                  links to it in both the runtime template
                                  and the prerendered static mirror
      4. <slug>.html              the generated page itself
@@ -27,7 +27,7 @@
    to between 110 and 175, so a default that merely parsed would fail the
    suite later and teach you nothing. Edit them before you run the tests.
 
-   On the index.html edit
+   On the modular data-source edit
    ──────────────────────
    Step 4 writes into the 400KB file the whole site is built from, which is
    the one edit here worth being nervous about. So it is not a blind splice:
@@ -40,6 +40,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var vm = require('vm');
 
 var calcpage = require('./calcpage.js');
 
@@ -179,16 +180,17 @@ function bumpHomeUpdated(pagesWrite) {
    literal carries no meaning, and anchoring to `id:` is the one line every
    card is guaranteed to have exactly once. */
 function linkFromDesk(slug, cardId) {
-  var raw = read('index.html');
+  var sourcePath = path.join('src', 'site', 'scripts', 'data.js');
+  var raw = read(sourcePath);
   var re = new RegExp('^([ \\t]*)id: \'' + cardId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\',[ \\t]*$', 'm');
   var hits = raw.match(new RegExp(re.source, 'gm')) || [];
 
   if (hits.length === 0) {
-    throw new Error('could not find the line `id: \'' + cardId + '\',` in index.html');
+    throw new Error('could not find the line `id: \'' + cardId + '\',` in ' + sourcePath);
   }
   if (hits.length > 1) {
     throw new Error('the line `id: \'' + cardId + '\',` appears ' + hits.length +
-      ' times in index.html — refusing to guess which card is the calculator');
+      ' times in ' + sourcePath + ' — refusing to guess which card is the calculator');
   }
 
   var m = re.exec(raw);
@@ -198,18 +200,26 @@ function linkFromDesk(slug, cardId) {
     '\n' + indent + 'page: \'' + slug + '.html\',' +
     raw.slice(insertAt);
 
-  return { path: 'index.html', body: body };
+  return { path: sourcePath, body: body };
 }
 
 /* The safety net for the edit above: parse the result and insist the card
    now carries the value we meant to give it. A splice that produced invalid
    JavaScript throws here, before anything reaches the working tree. */
-function verifyLink(html, cardId, slug) {
-  var hit = calcpage.cardFrom(html, cardId);
-  if (!hit) throw new Error('after the edit, no card with id "' + cardId + '" parses out of index.html');
-  if (hit.card.page !== slug + '.html') {
+function verifyLink(source, cardId, slug) {
+  var sandbox = { module: { exports: {} }, console: console, Math: Math, Date: Date };
+  sandbox.window = sandbox;
+  vm.runInNewContext(source.replace('__CATEGORY_FAMILIES__', '{}'), sandbox);
+  var found = null;
+  sandbox.PM_DATA.categories.forEach(function (category) {
+    category.cards.forEach(function (card) {
+      if (card.id === cardId) found = card;
+    });
+  });
+  if (!found) throw new Error('after the edit, no card with id "' + cardId + '" parses out of the data source');
+  if (found.page !== slug + '.html') {
     throw new Error('after the edit, card "' + cardId + '" has page=' +
-      JSON.stringify(hit.card.page) + ', expected ' + JSON.stringify(slug + '.html'));
+      JSON.stringify(found.page) + ', expected ' + JSON.stringify(slug + '.html'));
   }
 }
 
@@ -224,7 +234,7 @@ function usage() {
   console.log('  --h1 <text>        the on-page heading');
   console.log('  --lede <text>      the sentence under the heading');
   console.log('  --related a,b,c    card ids to link at the foot of the page');
-  console.log('  --no-link          do not touch index.html; print the line to add instead');
+  console.log('  --no-link          do not touch the data source; print the line to add instead');
   console.log('  --dry-run          report what would change and write nothing');
 }
 
@@ -340,7 +350,7 @@ function main(argv) {
       linked = linkFromDesk(opts.slug, opts.card);
       verifyLink(linked.body, opts.card, opts.slug);
     } catch (e) {
-      console.error('newpage: could not add the desk link to index.html — ' + e.message);
+      console.error('newpage: could not add the desk link to the modular data source — ' + e.message);
       console.error('         Nothing has been written. Re-run with --no-link to do');
       console.error('         the other three edits and add the field by hand.');
       return 1;
@@ -371,7 +381,7 @@ function main(argv) {
   console.log('     The title must fit 62 characters and the description 110 to 175,');
   console.log('     and the suite checks both.');
   if (!opts.link) {
-    console.log('  3. Add this line to the "' + opts.card + '" card in index.html, so the');
+    console.log('  3. Add this line to the "' + opts.card + '" card in src/site/scripts/data.js, so the');
     console.log('     desk links to the page in both the template and the static mirror:');
     console.log('');
     console.log('         page: \'' + opts.slug + '.html\',');

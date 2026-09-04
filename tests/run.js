@@ -3,6 +3,9 @@
 var H = require('./harness');
 
 var suites = [
+  require('./assemble'),
+  require('./feature-manifest'),
+  require('./instrument-families'),
   require('./baseline'),
   require('./edge-cases'),
   require('./charts'),

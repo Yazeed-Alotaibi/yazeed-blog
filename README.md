@@ -17,18 +17,18 @@ Project saving is disabled when that safety primitive is unavailable.
 
 ## The unusual thing about this repository
 
-**There is no build step.** The HTML files at the root are not compiled from
-anything — they are the exact bytes a visitor receives. No bundler, no
-framework, no npm packages, no CDN. You can open `index.html` from your
-filesystem and the whole site works.
+**There is no deployment-time build step.** The committed HTML files at the
+root are the exact bytes a visitor receives. A dependency-free commit-time
+assembler inlines modular source from `src/`; there is still no backend,
+framework, npm package, or CDN.
 
 That is a deliberate constraint, and it is the reason the repository looks the
 way it does. Read `AGENTS.md` before changing how anything works.
 
-There *are* two generators, but they run **before you commit**, not when a
-visitor loads a page. They copy calculator definitions out of `index.html` into
-the standalone pages and into a static text mirror for search engines. Their
-output is committed. Keeping that output in step with its source is the single
+There are commit-time generators, but nothing builds when a visitor loads a
+page. They assemble `index.html`, copy calculator definitions into standalone
+pages, and produce a static text mirror for search engines. Their output is
+committed. Keeping that output in step with its source is the single
 thing this project's tooling exists to enforce.
 
 ## The loop
@@ -84,11 +84,16 @@ from the desk. You then write the prose (1,000 words minimum, enforced) and
 replace the placeholder title and description, then run `node tools/check.js`,
 which generates the page itself and the sitemap row that goes with it.
 
+To start a new feature type, including a guide, checklist, or matrix, use
+`node tools/newfeature.js`; it creates a scoped feature directory and draft
+registry entry without changing shipped output.
+
 ## What lives where
 
 | Path | What it is |
 |---|---|
-| `index.html` | The whole site: the desk, every calculator, and the Excel writer |
+| `index.html` | Generated, committed artifact: the desk, calculators, and Excel writer |
+| `src/` | Canonical modular authoring source and feature registry |
 | `*.html` (root) | Generated standalone calculator pages, committed and served as-is |
 | `404.html`, `og.png`, `robots.txt`, `sitemap.xml`, `fonts/`, `.htaccess` | The rest of the deployed surface |
 | `content/` | Long-form prose and the page manifest |

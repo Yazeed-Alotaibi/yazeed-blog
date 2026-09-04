@@ -288,7 +288,8 @@ function generateLines(data) {
 
   data.categories.forEach(function (cat, i) {
     var where = 'category ' + cat.id;
-    out.push('<section class="prerender-category" id="prerender-cat-' + attr(cat.id) + '">');
+    out.push('<section class="prerender-category" data-family="' +
+      attr(cat.instrumentFamily || 'control-room') + '" id="prerender-cat-' + attr(cat.id) + '">');
     out.push('<h2>' + pad2(i + 1) + ' — ' + html(cat.name, where + '.name') + '</h2>');
     out.push('<p class="prerender-blurb">' + html(cat.blurb, where + '.blurb') + '</p>');
     out.push('<p class="prerender-citation">' + html(cat.citation, where + '.citation') + '</p>');

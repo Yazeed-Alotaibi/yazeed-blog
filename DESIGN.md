@@ -2,7 +2,7 @@
 
 ## 1. Atmosphere & Identity
 
-The site is a calm project-controls command deck: precise enough for a risk or controls lead, but readable at a glance during a meeting. Its signature is the contrast between a dark navy navigation rail and a daylight operational canvas, joined by a thin blue reporting line that makes the page feel like one coordinated instrument. The approved Command Deck prototype at `design/workbench-concepts/references/03-command-deck.png` is the reference-fidelity contract; the live implementation adapts it to the repository's self-contained HTML/CSS/ES5 architecture and bundled fonts.
+The site is a calm project-controls command deck: precise enough for a risk or controls lead, but readable at a glance during a meeting. Its signature is the contrast between a dark navy navigation rail and a daylight operational canvas, joined by the interactive blue Review Lens trace. `design/deck-system-showcase.html` and the live homepage are the maintained reference surfaces; the implementation adapts them to modular authoring source and self-contained static output with bundled fonts.
 
 ## 2. Color
 
@@ -31,6 +31,8 @@ The site is a calm project-controls command deck: precise enough for a risk or c
 | Rail divider | `--strip-grid` | `oklch(0.37 0.05 260 / 0.55)` | `oklch(0.37 0.05 260 / 0.55)` | Sidebar separators |
 
 The indigo accent is a brand and interaction color only. It never communicates a verdict. Every good, watch, and action state includes written status and a positional or symbolic cue, so meaning never depends on color alone. No color literal is used in a CSS rule outside custom-property declarations.
+
+Category art direction uses four semantic family tokens: `--family-ink`, `--family-wash`, `--family-rule`, and `--family-pattern`. The seven permitted families are control room, field notebook, survey map, planning wall, drafting table, signal station, and laboratory. They decorate context only and never replace status colors.
 
 ## 3. Typography
 
@@ -102,6 +104,19 @@ All spacing intent derives from a 4px base.
 - **Accessibility**: 44px minimum targets and explicit labels for icon-only controls.
 - **Layout**: sticky header with wrapping action cluster.
 
+### Review lens
+
+- **Structure**: Cost, Schedule, and Forecast buttons over one moving reporting trace and a written selection sentence.
+- **States**: exactly one `aria-pressed="true"`; connected KPI, analysis panel, workspace, and signal receive the same visible focus treatment.
+- **Accessibility**: the sentence names the selected lens; the trace is decorative; reduced motion changes selection instantly.
+- **Purpose**: connects related readings across the overview instead of presenting the dashboard as unrelated cards.
+
+### Instrument family
+
+- **Scope**: category header, edge rule, chart ornament, and quiet background material.
+- **Source**: `src/features/manifest.json` assigns the family; runtime and prerender read the same assembled category value.
+- **Protected semantics**: family colors never imply Good, Watch, or Action.
+
 ### KPI reading
 
 - **Structure**: metric label, linked-reading marker, tabular value, status badge, plain-language description.
@@ -151,7 +166,7 @@ All spacing intent derives from a 4px base.
 |---|---|---|---|
 | Micro | `120ms` | `ease-out` | Press and focus feedback |
 | Standard | `180ms` | `cubic-bezier(0.2, 0.7, 0.3, 1)` | Drawer and panel state |
-| Instrument | `700ms` | `cubic-bezier(0.2, 0.7, 0.3, 1)` | Existing gauge needle |
+| Instrument trace | `180ms` | `cubic-bezier(0.2, 0.7, 0.3, 1)` | Review Lens selection |
 
 Motion explains state change only. Hover and active feedback applies solely to interactive elements. `prefers-reduced-motion: reduce` disables non-essential transitions and smooth scrolling.
 
@@ -176,3 +191,12 @@ Strategy: mixed tonal shift plus tokenized instrument depth. White panels sit on
 | Item | Location | Why accepted | Owner / Exit |
 |---|---|---|---|
 | None | — | No new design or accessibility debt is accepted for this replacement. | — |
+
+## 9. Source and Output Contract
+
+- `src/site/index.template.html` owns homepage structure.
+- `src/site/styles/` owns the shared token, component, Command Deck, and instrument-family layers.
+- `src/site/scripts/` owns ordered browser modules.
+- `src/features/manifest.json` owns feature kind and instrument-family assignments.
+- `tools/assemble.js` inlines those sources into committed `index.html` before every other generator runs.
+- Root HTML remains self-contained and deployable without Node.js, a backend, or runtime asset imports.

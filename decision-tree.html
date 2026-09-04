@@ -2656,7 +2656,196 @@ main { width: 100%; max-width: none; padding: 0 0 var(--space-16); min-width: 0;
 
   a { color: #000; text-decoration: none; }
 }
+.category {
+  --family-ink: var(--accent);
+  --family-wash: var(--accent-soft);
+  --family-rule: var(--rule-2);
+  --family-pattern: repeating-linear-gradient(90deg, transparent 0 31px, var(--family-rule) 31px 32px);
+}
 
+.category[data-family="control-room"] {
+  --family-ink: oklch(0.52 0.17 257);
+  --family-wash: oklch(0.95 0.02 257);
+  --family-rule: oklch(0.78 0.07 257);
+}
+
+.category[data-family="field-notebook"] {
+  --family-ink: oklch(0.48 0.09 75);
+  --family-wash: oklch(0.96 0.025 83);
+  --family-rule: oklch(0.78 0.055 75);
+  --family-pattern: repeating-linear-gradient(0deg, transparent 0 23px, var(--family-rule) 23px 24px);
+}
+
+.category[data-family="survey-map"] {
+  --family-ink: oklch(0.47 0.11 174);
+  --family-wash: oklch(0.95 0.025 174);
+  --family-rule: oklch(0.76 0.065 174);
+  --family-pattern: radial-gradient(circle at 30% 45%, transparent 0 17px, var(--family-rule) 18px 19px, transparent 20px 31px, var(--family-rule) 32px 33px, transparent 34px);
+}
+
+.category[data-family="planning-wall"] {
+  --family-ink: oklch(0.51 0.13 317);
+  --family-wash: oklch(0.96 0.025 317);
+  --family-rule: oklch(0.79 0.06 317);
+  --family-pattern: linear-gradient(90deg, var(--family-rule) 1px, transparent 1px), linear-gradient(0deg, var(--family-rule) 1px, transparent 1px);
+}
+
+.category[data-family="drafting-table"] {
+  --family-ink: oklch(0.48 0.12 225);
+  --family-wash: oklch(0.95 0.025 225);
+  --family-rule: oklch(0.76 0.06 225);
+  --family-pattern: repeating-linear-gradient(135deg, transparent 0 15px, var(--family-rule) 15px 16px);
+}
+
+.category[data-family="signal-station"] {
+  --family-ink: oklch(0.52 0.14 42);
+  --family-wash: oklch(0.96 0.028 63);
+  --family-rule: oklch(0.78 0.075 52);
+  --family-pattern: repeating-linear-gradient(90deg, transparent 0 11px, var(--family-rule) 11px 13px, transparent 13px 31px);
+}
+
+.category[data-family="laboratory"] {
+  --family-ink: oklch(0.46 0.12 285);
+  --family-wash: oklch(0.95 0.025 285);
+  --family-rule: oklch(0.77 0.065 285);
+  --family-pattern: radial-gradient(circle, var(--family-rule) 1px, transparent 1.5px);
+}
+
+.category .cat-head {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-inline-start: 4px solid var(--family-ink);
+  background: linear-gradient(90deg, var(--family-wash), var(--sheet) 68%);
+}
+
+.category .cat-head::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 68%;
+  content: "";
+  background-image: var(--family-pattern);
+  background-size: 32px 32px;
+  opacity: .42;
+  mask-image: linear-gradient(90deg, transparent, var(--ink));
+}
+
+.category .cat-num,
+.category .cat-head h2 { color: var(--family-ink); }
+
+.category .calc-card {
+  border-top: 2px solid var(--family-rule);
+  box-shadow: inset 4px 0 0 var(--family-wash), var(--lip);
+}
+
+.category .chart {
+  border-top-color: var(--family-rule);
+}
+
+.category .chart-head {
+  border-bottom: 1px solid var(--family-rule);
+  background: linear-gradient(90deg, var(--family-wash), var(--sheet));
+}
+
+.review-lens {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin: var(--space-5) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--sheet);
+  box-shadow: var(--lip);
+}
+
+.review-lens-label span {
+  display: block;
+  color: var(--accent);
+  font: 600 .64rem/1.2 var(--mono);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.review-lens-label strong { font-size: .82rem; }
+
+.review-lens-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.review-lens-controls button {
+  min-height: 44px;
+  border: 1px solid var(--rule-2);
+  border-radius: 4px;
+  background: var(--sheet-sunk);
+  color: var(--ink-2);
+  font: 600 .72rem/1 var(--mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.review-lens-controls button:hover { border-color: var(--accent); }
+.review-lens-controls button:active { transform: translateY(1px); }
+.review-lens-controls button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.review-trace {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.review-trace i {
+  display: block;
+  width: 33.333%;
+  height: 100%;
+  background: var(--accent);
+  transform: translateX(var(--lens-step, 0));
+  transition: transform var(--dur) var(--ease);
+}
+
+#main-hero[data-lens="schedule"] { --lens-step: 100%; }
+#main-hero[data-lens="forecast"] { --lens-step: 200%; }
+
+.review-lens-copy {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: .78rem;
+}
+
+.is-lens-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .category[data-family] {
+    --family-wash: oklch(0.24 0.025 260);
+    --family-rule: oklch(0.42 0.045 260);
+  }
+}
+
+@media (max-width: 38rem) {
+  .review-lens { grid-template-columns: minmax(0, 1fr); }
+  .category .cat-head::after { inset-inline-start: 52%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-lens-controls button,
+  .review-trace i { transition: none; }
+}
   </style>
   <style>
 /* ── one-calculator page: command-deck satellite ─────────────── */
@@ -3193,6 +3382,11 @@ var PM_DATA = (function () {
   return { categories: categories };
 })();
 
+var PM_CATEGORY_FAMILIES = {"evm":"control-room","burn":"control-room","estimation":"laboratory","schedule":"drafting-table","compression":"drafting-table","resources":"planning-wall","comms":"planning-wall","risk":"survey-map","decision":"planning-wall","quality":"laboratory","financial":"field-notebook","procurement":"field-notebook","agile":"signal-station","flow":"signal-station"};
+PM_DATA.categories.forEach(function (category) {
+  category.instrumentFamily = PM_CATEGORY_FAMILIES[category.id] || 'control-room';
+});
+
 /* Lane D supplies the complete pack. Keeping the data outside PM_DATA lets a
    worked reading demonstrate a card without changing its formulas or guards. */
 var EXAMPLES = {
@@ -3206,8 +3400,61 @@ var EXAMPLES = {
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_DATA;
+</script>
+  <script>/* PM_REGISTRY — feature discovery over PM_DATA. */
+var PM_REGISTRY = (function (data, manifest) {
+  'use strict';
+  var definitions = {};
+  var active = [];
 
-  </script>
+  data.categories.forEach(function (category) {
+    category.cards.forEach(function (card) {
+      definitions[card.id] = card;
+    });
+  });
+
+  manifest.forEach(function (feature) {
+    if (definitions[feature.id]) {
+      active.push({
+        id: feature.id,
+        category: feature.category,
+        kind: feature.kind,
+        instrumentFamily: feature.instrumentFamily,
+        definition: definitions[feature.id]
+      });
+    }
+  });
+
+  function get(id) {
+    var hit = null;
+    active.some(function (feature) {
+      if (feature.id !== id) return false;
+      hit = feature;
+      return true;
+    });
+    return hit;
+  }
+
+  function familyForCategory(id) {
+    var family = 'control-room';
+    active.some(function (feature) {
+      if (feature.category !== id) return false;
+      family = feature.instrumentFamily;
+      return true;
+    });
+    return family;
+  }
+
+  return {
+    data: function () { return data; },
+    get: get,
+    list: function () { return active.slice(); },
+    familyForCategory: familyForCategory
+  };
+}(PM_DATA, [{"id":"earned-value","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"earned-schedule","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"time-forecast","category":"evm","kind":"calculator","instrumentFamily":"control-room"},{"id":"burn-rate","category":"burn","kind":"calculator","instrumentFamily":"control-room"},{"id":"three-point","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"path-sigma","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"learning-curve","category":"estimation","kind":"calculator","instrumentFamily":"laboratory"},{"id":"float","category":"schedule","kind":"calculator","instrumentFamily":"drafting-table"},{"id":"crash","category":"compression","kind":"calculator","instrumentFamily":"drafting-table"},{"id":"fte","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"utilization","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"labor-cost","category":"resources","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"channels","category":"comms","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"emv","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"risk-score","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"contingency","category":"risk","kind":"calculator","instrumentFamily":"survey-map"},{"id":"decision-tree","category":"decision","kind":"calculator","instrumentFamily":"planning-wall"},{"id":"dpmo","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"control","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"cpk","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"coq","category":"quality","kind":"calculator","instrumentFamily":"laboratory"},{"id":"roi","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"npv","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"tvm","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"breakeven","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"depreciation","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"scoring","category":"financial","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"pta","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"fpif","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"cpif","category":"procurement","kind":"calculator","instrumentFamily":"field-notebook"},{"id":"velocity","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"capacity","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"say-do","category":"agile","kind":"calculator","instrumentFamily":"signal-station"},{"id":"littles-law","category":"flow","kind":"calculator","instrumentFamily":"signal-station"}]));
+if (typeof window !== 'undefined') window.PM_REGISTRY = PM_REGISTRY;
+if (typeof module !== 'undefined' && module.exports) module.exports = PM_REGISTRY;
+</script>
   <script>
 /* ══ PM_XLSX ═══════════════════════════════════════════════════════════
    Writes a real .xlsx in the browser, with no library.
@@ -3936,7 +4183,7 @@ var PM_XLSX = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_XLSX;
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — instrument plotting.
 
@@ -5186,7 +5433,7 @@ var PM_CHARTS = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_CHARTS;
-  </script>
+</script>
   <script>
 /* ══ PM_EXPORT ═════════════════════════════════════════════════════════
    Lays a calculator out as a spreadsheet: what was entered, what came out,
@@ -5443,7 +5690,7 @@ var PM_EXPORT = (function () {
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = PM_EXPORT;
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — chart mounting and lifecycle.
 
@@ -5952,7 +6199,7 @@ var PM_CHART_MOUNT = (function () {
     }
   };
 })();
-  </script>
+</script>
   <script>
 /* PM Calculation Desk — rendering and live computation.
    Reads PM_DATA (data.js), builds the sidebar nav and one card per
@@ -5961,7 +6208,8 @@ var PM_CHART_MOUNT = (function () {
 (function () {
   'use strict';
 
-  var DATA = window.PM_DATA;
+  var REGISTRY = window.PM_REGISTRY;
+  var DATA = REGISTRY ? REGISTRY.data() : window.PM_DATA;
   var sectionsEl = document.getElementById('calc-sections');
   var navEl = document.getElementById('cat-nav');
   var searchEl = document.getElementById('search');
@@ -7366,6 +7614,8 @@ var PM_CHART_MOUNT = (function () {
     var section = document.createElement('section');
     section.className = 'category';
     section.id = 'cat-' + cat.id;
+    section.setAttribute('data-family', cat.instrumentFamily || (REGISTRY ?
+      REGISTRY.familyForCategory(cat.id) : 'control-room'));
     section.setAttribute('aria-labelledby', 'cat-h-' + cat.id);
     section.innerHTML =
       '<header class="cat-head">' +
@@ -7482,7 +7732,6 @@ var PM_CHART_MOUNT = (function () {
   window.addEventListener('resize', syncNavEdges);
   syncNavEdges();
 })();
-
-  </script>
+</script>
 </body>
 </html>
