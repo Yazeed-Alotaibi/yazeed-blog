@@ -19,3 +19,9 @@ __pycache__/
 # .dc.html sources beside it. Regenerate it with the design skill's
 # seed-canvas.mjs rather than tracking the build output.
 design/archive/calculation-desk.html
+
+# Agent scratch. .omo/ holds per-run evidence dumps and .superdesign/ holds a
+# design tool's working notes; both are regenerated per session and belong to
+# one checkout rather than the repository.
+.omo/
+.superdesign/

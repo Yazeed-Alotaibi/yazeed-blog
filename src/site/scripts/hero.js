@@ -234,7 +234,8 @@
   railClose.addEventListener('click', function () { closeRail(true); });
   scrim.addEventListener('click', function () { closeRail(true); });
   rail.addEventListener('click', function (event) {
-    if (window.innerWidth <= 920 && event.target.closest && event.target.closest('#cat-nav a')) closeRail(false);
+    if (window.innerWidth <= 920 && event.target.closest &&
+      event.target.closest('#cat-nav a, #search-results a')) closeRail(false);
   });
   document.addEventListener('keydown', function (event) {
     if (!document.body.classList.contains('rail-open')) return;
