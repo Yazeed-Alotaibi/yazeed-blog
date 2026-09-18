@@ -1455,9 +1455,77 @@
     var emptyEl = document.getElementById('no-results');
     var baseStats = statsEl ? statsEl.textContent : '';
 
+    /* The matches, named under the input. Filtering the deck is correct but
+       silent: the first card sits below the fold and the deck runs past
+       38,000px, so from the sidebar a query looks like it did nothing. The
+       list says what matched and Enter goes there. Calculator pages mount
+       this engine against a stub #search with no list beside it, so every
+       branch below is guarded and simply does nothing there. */
+    var resultsEl = document.getElementById('search-results');
+    var RESULT_LIMIT = 8;
+    var matches = [];
+    var activeIndex = -1;
+
+    /* The markup stays until the next query replaces it. Emptying it here
+       would detach the very link whose click is still bubbling — and the rail
+       closes itself off that click. */
+    function closeResults() {
+      if (!resultsEl) return;
+      resultsEl.hidden = true;
+      activeIndex = -1;
+      searchEl.setAttribute('aria-expanded', 'false');
+      searchEl.removeAttribute('aria-activedescendant');
+    }
+
+    function renderResults(q) {
+      if (!resultsEl) return;
+      activeIndex = -1;
+      searchEl.removeAttribute('aria-activedescendant');
+      if (!q || !matches.length) { closeResults(); return; }
+      var shown = matches.slice(0, RESULT_LIMIT);
+      resultsEl.innerHTML = shown.map(function (m, i) {
+        return '<li role="option" id="search-result-' + i + '" aria-selected="false">' +
+          '<a href="#calc-' + m.id + '" tabindex="-1">' +
+            '<span class="sr-name">' + m.name + '</span>' +
+            '<span class="sr-cat">' + m.category + '</span>' +
+          '</a></li>';
+      }).join('') + (matches.length > shown.length
+        /* A listbox takes options and nothing else, so the overflow line
+           announces itself as decoration rather than a match. */
+        ? '<li class="sr-more" role="presentation">' + (matches.length - shown.length) + ' more on the deck below</li>'
+        : '');
+      resultsEl.hidden = false;
+      searchEl.setAttribute('aria-expanded', 'true');
+      /* The first match is highlighted on sight, so what Enter will open is
+         shown rather than described. */
+      setActive(0);
+    }
+
+    /* One highlight, carried in aria-activedescendant so the option is
+       announced while focus stays in the field, and in a class so it is
+       visible. Wraps at both ends. */
+    function setActive(next) {
+      if (!resultsEl || resultsEl.hidden) return;
+      var options = resultsEl.querySelectorAll('[role="option"]');
+      if (!options.length) return;
+      if (next < 0) next = options.length - 1;
+      if (next >= options.length) next = 0;
+      activeIndex = next;
+      for (var i = 0; i < options.length; i += 1) {
+        var on = i === activeIndex;
+        options[i].setAttribute('aria-selected', on ? 'true' : 'false');
+        options[i].classList.toggle('is-active', on);
+        if (on) {
+          searchEl.setAttribute('aria-activedescendant', options[i].id);
+          options[i].scrollIntoView({ block: 'nearest' });
+        }
+      }
+    }
+
     searchEl.addEventListener('input', function () {
       var q = searchEl.value.trim().toLowerCase();
       var matched = 0;
+      matches = [];
 
       DATA.categories.forEach(function (cat) {
         var section = document.getElementById('cat-' + cat.id);
@@ -1466,7 +1534,10 @@
           var el = document.getElementById('calc-' + card.id);
           var show = !q || el.dataset.search.indexOf(q) !== -1;
           el.hidden = !show;
-          if (show) visible += 1;
+          if (show) {
+            visible += 1;
+            if (q) matches.push({ id: card.id, name: card.name, category: cat.name });
+          }
         });
         section.hidden = visible === 0;
         matched += visible;
@@ -1482,7 +1553,53 @@
           ? matched + (matched === 1 ? ' calculator matches “' : ' calculators match “') + searchEl.value.trim() + '”'
           : baseStats;
       }
+
+      renderResults(q);
     });
+
+    /* Arrow keys walk the list, Enter opens the highlighted match — or the
+       first one, so a query never needs a second keystroke to pay off. The
+       option is a real link: clicking it is the one path, and the drawer and
+       the landing focus both hang off that click. */
+    searchEl.addEventListener('keydown', function (e) {
+      if (!resultsEl || resultsEl.hidden) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); return; }
+      if (e.key !== 'Enter') return;
+      var links = resultsEl.querySelectorAll('[role="option"] a');
+      var target = links[activeIndex < 0 ? 0 : activeIndex];
+      if (!target) return;
+      e.preventDefault();
+      target.click();
+    });
+
+    if (resultsEl) {
+      resultsEl.addEventListener('click', function (e) {
+        var link = e.target.closest ? e.target.closest('a[href^="#calc-"]') : null;
+        if (!link) return;
+        var card = document.getElementById(link.getAttribute('href').slice(1));
+        closeResults();
+        /* The href does the travelling. Landing with the cursor in the first
+           parameter means the reading can be typed straight away — but not on
+           a phone, where it would only throw the keyboard over the card the
+           reader just asked to see. */
+        if (!card || window.innerWidth <= 920) return;
+        var field = card.querySelector('input');
+        /* preventScroll: the href has already placed the card clear of the
+           command bar, and focus would drag it back under. */
+        if (field) window.setTimeout(function () { field.focus({ preventScroll: true }); }, 0);
+      });
+
+      /* Leaving the field puts the list away, unless the pointer is on its
+         way into it — that click has not landed yet. */
+      searchEl.addEventListener('blur', function () {
+        window.setTimeout(function () {
+          if (resultsEl.contains(document.activeElement)) return;
+          if (resultsEl.matches(':hover')) return;
+          closeResults();
+        }, 150);
+      });
+    }
 
     /* "/" jumps to search from anywhere; Escape clears and returns the page. */
     document.addEventListener('keydown', function (e) {

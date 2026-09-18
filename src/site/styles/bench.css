@@ -299,6 +299,65 @@ body {
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
+/* The match list sits in flow rather than floating over the nav: the sidebar
+   is a sticky column on the desk and a scrolling drawer on a phone, and an
+   overlay gets clipped by one or the other. It only exists while a query
+   does, so the nav moving down is the affordance, not a cost. */
+.search-results {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  max-height: 17rem;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  box-shadow: var(--sunk);
+}
+
+.search-results[hidden] { display: none; }
+
+.search-results a {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  color: var(--ink);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+
+.search-results li + li a { border-top: 1px solid var(--rule); }
+
+.search-results a:hover,
+.search-results .is-active a {
+  background: var(--sheet-sunk);
+  border-left-color: var(--accent);
+}
+
+.search-results .sr-name {
+  display: block;
+  font-size: 0.84rem;
+  line-height: 1.25;
+}
+
+.search-results .sr-cat {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.search-results .sr-more {
+  padding: 0.4rem 0.6rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
 .search-hint {
   display: block;
   margin-top: 0.4rem;
@@ -538,6 +597,9 @@ main {
   border: 1px solid var(--rule);
   padding: clamp(1.15rem, 2.5vw, 1.85rem);
   margin-bottom: 1.25rem;
+  /* A #calc-… link — from the match list, or one a colleague was sent —
+     lands the card below the 64px command bar instead of under it. */
+  scroll-margin-top: 5rem;
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 

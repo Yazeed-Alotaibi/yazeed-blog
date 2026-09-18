@@ -161,7 +161,12 @@
     <div class="sidebar-sticky">
       <div class="search">
         <label class="sr-only" for="search">Search calculators</label>
-        <input id="search" type="search" placeholder="Search… CPI, float, NPV" autocomplete="off">
+        <input id="search" type="search" placeholder="Search… CPI, float, NPV" autocomplete="off"
+          role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="search-results">
+        <!-- Filtering alone is invisible from here: the cards it hides start
+             a screen below the fold and run for tens of thousands of pixels.
+             The matches are named where the typing happens, and Enter goes. -->
+        <ul class="search-results" id="search-results" role="listbox" aria-label="Matching calculators" hidden></ul>
         <span class="search-hint">Press <kbd>/</kbd> to search</span>
       </div>
 
